@@ -1,0 +1,112 @@
+namespace MagnumOpus.Networking.Cryptography
+{
+    public static unsafe class RivestCipher5
+    {
+        public const uint RC5_PW32 = 0xB7E15163;
+        public const uint RC5_QW32 = 0x61C88647;
+
+        private const int RC5_32 = 32;
+        private const int RC5_12 = 12;
+        private const int RC5_SUB = RC5_12 * 2 + 2;
+        private const int RC5_16 = 16;
+        private const int RC5_KEY = RC5_16 / 4;
+
+        private static readonly uint[] mKey = new uint[RC5_KEY];
+        private static readonly uint[] mSub = new uint[RC5_SUB];
+
+        static RivestCipher5()
+        {
+            var aSeed = new byte[RC5_16] { 0x3C, 0xDC, 0xFE, 0xE8, 0xC4, 0x54, 0xD6, 0x7E, 0x16, 0xA6, 0xF8, 0x1A, 0xE8, 0xD0, 0x38, 0xBE };
+            fixed (byte* seed = aSeed)
+            {
+                for (int z = 0; z < RC5_KEY; ++z)
+                    mKey[z] = ((uint*)seed)[z];
+            }
+
+            mSub[0] = RC5_PW32;
+            int i, j;
+            for (i = 1; i < RC5_SUB; ++i)
+                mSub[i] = mSub[i - 1] - RC5_QW32;
+
+            uint x, y;
+            i = j = 0;
+            x = y = 0;
+            for (int k = 0, count = 3 * Math.Max(RC5_KEY, RC5_SUB); k < count; ++k)
+            {
+                mSub[i] = RotL(mSub[i] + x + y, 3);
+                x = mSub[i];
+                i = (i + 1) % RC5_SUB;
+                mKey[j] = RotL(mKey[j] + x + y, x + y);
+                y = mKey[j];
+                j = (j + 1) % RC5_KEY;
+            }
+        }
+
+        /// <summary>
+        /// Encrypts data with the RC5 algorithm.
+        /// </summary>
+        public static void Encrypt(ref byte[] aBuf, int aLength)
+        {
+            if (aLength % 8 != 0)
+                throw new ArgumentException("Length of the buffer must be a multiple of 64 bits.", nameof(aLength));
+
+            fixed (byte* buf = aBuf)
+            {
+                uint* data = (uint*)buf;
+                for (int k = 0, len = aLength / 8; k < len; ++k)
+                {
+                    uint lv = data[2 * k] + mSub[0];
+                    uint rv = data[2 * k + 1] + mSub[1];
+                    for (int i = 1; i <= RC5_12; ++i)
+                    {
+                        lv = RotL(lv ^ rv, rv) + mSub[2 * i];
+                        rv = RotL(rv ^ lv, lv) + mSub[2 * i + 1];
+                    }
+
+                    data[2 * k] = lv;
+                    data[2 * k + 1] = rv;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Decrypts data with the RC5 algorithm.
+        /// </summary>
+        public static void Decrypt(byte* buf, int aLength)
+        {
+            if (aLength % 8 != 0)
+                throw new ArgumentException("Length of the buffer must be a multiple of 64 bits.", nameof(aLength));
+
+            uint* data = (uint*)buf;
+            for (int k = 0, len = aLength / 8; k < len; ++k)
+            {
+                uint lv = data[2 * k];
+                uint rv = data[2 * k + 1];
+                for (int i = RC5_12; i >= 1; --i)
+                {
+                    rv = RotR(rv - mSub[2 * i + 1], lv) ^ lv;
+                    lv = RotR(lv - mSub[2 * i], rv) ^ rv;
+                }
+
+                data[2 * k] = lv - mSub[0];
+                data[2 * k + 1] = rv - mSub[1];
+            }
+        }
+
+        private static uint RotL(uint aValue, uint aCount)
+        {
+            int leftShift = (int)(aCount % 32);
+            int rightShift = 32 - leftShift;
+
+            return aValue << leftShift | aValue >> rightShift;
+        }
+
+        private static uint RotR(uint aValue, uint aCount)
+        {
+            int rightShift = (int)(aCount % 32);
+            int leftShift = 32 - rightShift;
+
+            return aValue >> rightShift | aValue << leftShift;
+        }
+    }
+}
