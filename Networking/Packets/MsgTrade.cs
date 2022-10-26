@@ -24,9 +24,9 @@ namespace MagnumOpus.Networking.Packets
             return packet;
         }
 
-        public static unsafe implicit operator byte[](MsgTrade msg)
+        public static unsafe implicit operator Memory<byte>(MsgTrade msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgTrade)];
             fixed (byte* p = buffer)
                 *(MsgTrade*)p = *&msg;
             return buffer;

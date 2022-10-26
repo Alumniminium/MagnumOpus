@@ -45,12 +45,12 @@ namespace MagnumOpus.Networking.Cryptography
         /// <summary>
         /// Encrypts data with the RC5 algorithm.
         /// </summary>
-        public static void Encrypt(ref byte[] aBuf, int aLength)
+        public static void Encrypt(ref Memory<byte> aBuf, int aLength)
         {
             if (aLength % 8 != 0)
                 throw new ArgumentException("Length of the buffer must be a multiple of 64 bits.", nameof(aLength));
 
-            fixed (byte* buf = aBuf)
+            fixed (byte* buf = aBuf.Span)
             {
                 uint* data = (uint*)buf;
                 for (int k = 0, len = aLength / 8; k < len; ++k)

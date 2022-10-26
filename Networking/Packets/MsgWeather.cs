@@ -14,7 +14,7 @@ namespace MagnumOpus.Networking.Packets
         public int Direction;
         public int Color;
 
-        public static unsafe byte[] Create(WeatherType weather, int intensity, int direction, int color)
+        public static unsafe Memory<byte> Create(WeatherType weather, int intensity, int direction, int color)
         {
             var packet = new MsgWeather
             {
@@ -28,9 +28,9 @@ namespace MagnumOpus.Networking.Packets
             return packet;
         }
 
-        public static unsafe implicit operator byte[](MsgWeather msg)
+        public static unsafe implicit operator Memory<byte>(MsgWeather msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgWeather)];
             fixed (byte* p = buffer)
                 *(MsgWeather*)p = *&msg;
             return buffer;

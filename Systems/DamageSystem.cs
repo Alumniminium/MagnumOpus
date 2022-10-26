@@ -19,7 +19,7 @@ namespace MagnumOpus.Simulation.Systems
             {
                 var rewardableDamage = Math.Min(dmg.Damage, hlt.Health);
                 hlt.Health -= (ushort)Math.Clamp(hlt.Health, 0, dmg.Damage);
-                hlt.ChangedTick = Game.CurrentTick;
+                hlt.ChangedTick = PixelWorld.Tick;
 
                 if (attacker.Has<LevelComponent>())
                 {

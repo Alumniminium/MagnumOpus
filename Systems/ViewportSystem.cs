@@ -4,28 +4,25 @@ using MagnumOpus.Simulation.Components;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class ViewportSystem : PixelSystem<BodyComponent, ViewportComponent>
+    public sealed class ViewportSystem : PixelSystem<PositionComponent, ViewportComponent>
     {
         public ViewportSystem() : base("Viewport System", threads: 1) { }
-        protected override bool MatchesFilter(in PixelEntity ntt)
-        {
-            return ntt.Type != EntityType.Item && ntt.Type != EntityType.Npc && base.MatchesFilter(in ntt);
-        }
+        protected override bool MatchesFilter(in PixelEntity ntt) => ntt.Type != EntityType.Item && ntt.Type != EntityType.Npc && base.MatchesFilter(in ntt);
 
-        public override void Update(in PixelEntity ntt, ref BodyComponent phy, ref ViewportComponent vwp)
+        public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref ViewportComponent vwp)
         {
-            if (phy.LastLocation == phy.Location && ntt.Type != EntityType.Player)
+            if (pos.ChangedTick != PixelWorld.Tick)
                 return;
 
-            vwp.Viewport.X = phy.Location.X - vwp.Viewport.Width / 2;
-            vwp.Viewport.Y = phy.Location.Y - vwp.Viewport.Height / 2;
+            vwp.Viewport.X = pos.Position.X - vwp.Viewport.Width / 2;
+            vwp.Viewport.Y = pos.Position.Y - vwp.Viewport.Height / 2;
 
             vwp.EntitiesVisibleLast.Clear();
 
             vwp.EntitiesVisibleLast.AddRange(vwp.EntitiesVisible);
             vwp.EntitiesVisible.Clear();
 
-            Game.Grids[(int)phy.Location.Z].GetVisibleEntities(ref vwp);
+            Game.Grids[(int)pos.Position.Z].GetVisibleEntities(ref vwp);
 
             if (ntt.Type != EntityType.Player)
                 return;

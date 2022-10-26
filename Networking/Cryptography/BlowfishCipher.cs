@@ -195,8 +195,8 @@ namespace MagnumOpus.Networking.Cryptography
         };
 
         // Local fields and properties
-        public byte[] DecryptionIV { get; private set; }
-        public byte[] EncryptionIV { get; private set; }
+        public Memory<byte> DecryptionIV { get; private set; }
+        public Memory<byte> EncryptionIV { get; private set; }
         public uint[]? P { get; private set; }
         public uint[]? S { get; private set; }
         public int DecryptCount, EncryptCount;
@@ -231,15 +231,21 @@ namespace MagnumOpus.Networking.Cryptography
         /// <param name="copy">The cipher to copy keys from</param>
         public BlowfishCipher(BlowfishCipher copy)
         {
-            DecryptionIV = (byte[])copy.DecryptionIV.Clone();
-            EncryptionIV = (byte[])copy.EncryptionIV.Clone();
+            DecryptionIV = new byte[BlockSize];
+            EncryptionIV = new byte[BlockSize];
+
+            copy.DecryptionIV.CopyTo(DecryptionIV);
+            copy.EncryptionIV.CopyTo(EncryptionIV);
             DecryptCount = copy.DecryptCount;
             EncryptCount = copy.EncryptCount;
 
             if(copy.S != null && copy.P != null)
             {
-                S = (uint[])copy.S.Clone();
-                P = (uint[])copy.P.Clone();
+                S = new uint[copy.S.Length];
+                P = new uint[copy.P.Length];
+
+                copy.S.CopyTo(S,0);
+                copy.P.CopyTo(P,0);
             }
         }
 
@@ -287,10 +293,10 @@ namespace MagnumOpus.Networking.Cryptography
         /// <summary>Sets the IVs of the cipher.</summary>
         /// <param name="decryptionIV">Decryption IV from client key exchange</param>
         /// <param name="encryptionIV">Encryption IV from client key exchange</param>
-        public void SetIVs(byte[] decryptionIV, byte[] encryptionIV)
+        public void SetIVs(in Memory<byte> decryptionIV, Memory<byte> encryptionIV)
         {
-            Array.Copy(decryptionIV, 0, DecryptionIV, 0, BlockSize);
-            Array.Copy(encryptionIV, 0, EncryptionIV, 0, BlockSize);
+            decryptionIV.CopyTo(DecryptionIV);
+            encryptionIV.CopyTo(EncryptionIV);
             DecryptCount = 0;
             EncryptCount = 0;
         }
@@ -301,7 +307,7 @@ namespace MagnumOpus.Networking.Cryptography
         /// </summary>
         /// <param name="src">Source span that requires decrypting</param>
         /// <param name="dst">Destination span to contain the decrypted result</param>
-        public void Decrypt(Span<byte> src, Span<byte> dst)
+        public void Decrypt(Span<byte> src)
         {
             uint[] block = new uint[2];
             for (int i = 0; i < src.Length; i++)
@@ -315,9 +321,9 @@ namespace MagnumOpus.Networking.Cryptography
                     N12(DecryptionIV, 4, block[1]);
                 }
 
-                byte tmp = DecryptionIV[DecryptCount];
-                DecryptionIV[DecryptCount] = src[i];
-                dst[i] = (byte)(src[i] ^ tmp);
+                byte tmp = DecryptionIV.Span[DecryptCount];
+                DecryptionIV.Span[DecryptCount] = src[i];
+                src[i] = (byte)(src[i] ^ tmp);
                 DecryptCount = (DecryptCount + 1) & (BlockSize - 1);
             }
         }
@@ -328,7 +334,7 @@ namespace MagnumOpus.Networking.Cryptography
         /// </summary>
         /// <param name="src">Source span that requires encrypting</param>
         /// <param name="dst">Destination span to contain the encrypted result</param>
-        public void Encrypt(Span<byte> src, Span<byte> dst)
+        public void Encrypt(Span<byte> src)
         {
             uint[] block = new uint[2];
             for (int i = 0; i < src.Length; i++)
@@ -342,8 +348,8 @@ namespace MagnumOpus.Networking.Cryptography
                     N12(EncryptionIV, 4, block[1]);
                 }
 
-                dst[i] = (byte)(src[i] ^ EncryptionIV[EncryptCount]);
-                EncryptionIV[EncryptCount] = dst[i];
+                src[i] = (byte)(src[i] ^ EncryptionIV.Span[EncryptCount]);
+                EncryptionIV.Span[EncryptCount] = src[i];
                 EncryptCount = (EncryptCount + 1) & (BlockSize - 1);
             }
         }
@@ -371,12 +377,12 @@ namespace MagnumOpus.Networking.Cryptography
         /// <param name="iv">IV depending on the direction of the cipher</param>
         /// <param name="x">Index used to read from the IV buffer</param>
         /// <returns>An unsigned integer representing a side of the block.</returns>
-        private static uint N21(byte[] iv, int x)
+        private static uint N21(in Memory<byte> iv, int x)
         {
-            uint l = (uint)(iv[x] << 24);
-            l |= (uint)(iv[x + 1] << 16);
-            l |= (uint)(iv[x + 2] << 8);
-            l |= iv[x + 3];
+            uint l = (uint)(iv.Span[x] << 24);
+            l |= (uint)(iv.Span[x + 1] << 16);
+            l |= (uint)(iv.Span[x + 2] << 8);
+            l |= iv.Span[x + 3];
             return l;
         }
 
@@ -386,12 +392,12 @@ namespace MagnumOpus.Networking.Cryptography
         /// <param name="iv">IV depending on the direction of the cipher</param>
         /// <param name="x">Index used to write to the IV buffer</param>
         /// <param name="v">Value from the block operation results.</param>
-        private static void N12(byte[] iv, int x, uint v)
+        private static void N12(in Memory<byte> iv, int x, uint v)
         {
-            iv[x] = (byte)((v >> 24) & 0xFF);
-            iv[x + 1] = (byte)((v >> 16) & 0xFF);
-            iv[x + 2] = (byte)((v >> 8) & 0xFF);
-            iv[x + 3] = (byte)((v) & 0xFF);
+            iv.Span[x] = (byte)((v >> 24) & 0xFF);
+            iv.Span[x + 1] = (byte)((v >> 16) & 0xFF);
+            iv.Span[x + 2] = (byte)((v >> 8) & 0xFF);
+            iv.Span[x + 3] = (byte)((v) & 0xFF);
         }
 
         /// <summary>

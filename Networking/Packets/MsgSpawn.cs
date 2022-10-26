@@ -7,7 +7,7 @@ using MagnumOpus.Simulation.Components;
 
 namespace MagnumOpus.Networking.Packets
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 1/*, Size = 101*/)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public unsafe struct MsgSpawn
     {
         public ushort Size;
@@ -41,39 +41,42 @@ namespace MagnumOpus.Networking.Packets
         public byte NameLen;
         public fixed byte Name[16];
 
-        public static Memory<byte> Create(PixelEntity ntt)
+        public static Memory<byte> Create(in PixelEntity ntt)
         {
             return ntt.Type switch
             {
-                EntityType.Player => (Memory<byte>)CreatePlayer(ntt),
-                EntityType.Monster => (Memory<byte>)CreateMonster(ntt),
+                EntityType.Player => CreatePlayer(ntt),
+                EntityType.Monster => CreateMonster(ntt),
                 _ => default,
             };
         }
 
-        public static byte[] CreatePlayer(PixelEntity ntt)
+        public static Memory<byte> CreatePlayer(in PixelEntity ntt)
         {
-            ref readonly var phy = ref ntt.Get<BodyComponent>();
+            ref readonly var bdy = ref ntt.Get<BodyComponent>();
             ref readonly var ntc = ref ntt.Get<NameTagComponent>();
             ref readonly var lvl = ref ntt.Get<LevelComponent>();
             ref readonly var gld = ref ntt.Get<GuildComponent>();
             ref readonly var hlt = ref ntt.Get<HealthComponent>();
             ref readonly var eqc = ref ntt.Get<EquipmentComponent>();
+            ref readonly var pos = ref ntt.Get<PositionComponent>();
+            ref readonly var rbn = ref ntt.Get<RebornComponent>();
+            ref readonly var eff = ref ntt.Get<StatusEffectComponent>();
 
             if (ntt.Has<DeathTagComponent>())
             {
-                if (phy.Look % 10000 == 2001 || phy.Look % 10000 == 2002)
-                    AddTransform(phy.Look,99);
+                if (bdy.Look % 10000 == 2001 || bdy.Look % 10000 == 2002)
+                    AddTransform(bdy.Look,99);
                 else
-                    AddTransform(phy.Look, 98);
+                    AddTransform(bdy.Look, 98);
             }
 
             var packet = stackalloc MsgSpawn[1];
             packet->Size = (ushort)sizeof(MsgSpawn);
             packet->Id = 1014;
             packet->UniqueId = ntt.Id;
-            packet->Look = phy.Look;
-            packet->StatusEffects = phy.StatusEffects;
+            packet->Look = bdy.Look;
+            packet->StatusEffects = eff.Effects;
             packet->GuildRank = gld.Rank;
             packet->Head = eqc.Head;
             packet->Armor = eqc.Armor;
@@ -81,12 +84,12 @@ namespace MagnumOpus.Networking.Packets
             packet->OffHand = eqc.OffHand;
             packet->CurrentHp = hlt.Health;
             packet->Level = lvl.Level;
-            packet->X = (ushort)phy.Location.X;
-            packet->Y = (ushort)phy.Location.Y;
-            packet->Hair = phy.Hair;
-            packet->Direction = phy.Direction;
-            packet->Emote = phy.Emote;
-            packet->Reborn = phy.Reborn;
+            packet->X = (ushort)pos.Position.X;
+            packet->Y = (ushort)pos.Position.Y;
+            packet->Hair = bdy.Hair;
+            packet->Direction = bdy.Direction;
+            packet->Emote = bdy.Emote;
+            packet->Reborn = rbn.Count;
             packet->GuildId = (ushort)gld.GuildId;
             packet->StringCount = 1;
 
@@ -94,61 +97,53 @@ namespace MagnumOpus.Networking.Packets
             for (byte i = 0; i < ntc.Name.Length; i++)
                 packet->Name[i] = (byte)ntc.Name[i];
 
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgSpawn));
+            var buffer = new byte[sizeof(MsgSpawn)];
             fixed (byte* p = buffer)
                 *(MsgSpawn*)p = *packet;
             return buffer;
         }
 
-        public static byte[] CreateMonster(PixelEntity ntt)
+        public static Memory<byte> CreateMonster(in PixelEntity ntt)
         {
-            ref readonly var phy = ref ntt.Get<BodyComponent>();
+            ref readonly var bdy = ref ntt.Get<BodyComponent>();
             ref readonly var ntc = ref ntt.Get<NameTagComponent>();
             ref readonly var lvl = ref ntt.Get<LevelComponent>();
             ref readonly var gld = ref ntt.Get<GuildComponent>();
             ref readonly var hlt = ref ntt.Get<HealthComponent>();
+            ref readonly var pos = ref ntt.Get<PositionComponent>();
+            ref readonly var eff = ref ntt.Get<StatusEffectComponent>();
 
             var packet = stackalloc MsgSpawn[1];
             packet->Size = (ushort)sizeof(MsgSpawn);
             packet->Id = 1014;
             packet->UniqueId = ntt.Id;
-            packet->Look = phy.Look;
-            packet->StatusEffects = phy.StatusEffects;
+            packet->Look = bdy.Look;
+            packet->StatusEffects = eff.Effects;
             packet->CurrentHp = hlt.Health;
             packet->Level = lvl.Level;
-            packet->Direction = phy.Direction;
+            packet->Direction = bdy.Direction;
             packet->Emote = Emote.Stand;
             packet->StringCount = 1;
             packet->NameLen = (byte)ntc.Name.Trim().Length;
-            packet->X = (ushort)phy.Location.X;
-            packet->Y = (ushort)phy.Location.Y;
+            packet->X = (ushort)pos.Position.X;
+            packet->Y = (ushort)pos.Position.Y;
             for (byte i = 0; i < ntc.Name.Trim().Length; i++)
                 packet->Name[i] = (byte)ntc.Name.Trim()[i];
 
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgSpawn));
+            var buffer = new byte[sizeof(MsgSpawn)];
             fixed (byte* p = buffer)
                 *(MsgSpawn*)p = *packet;
             return buffer;
         }
-        public static uint AddTransform(uint look, long transformId)
-        {
-            return (uint)(transformId * 10000000L + look % 10000000L);
-        }
+        
+        public static uint AddTransform(uint look, long transformId) => (uint)(transformId * 10000000L + look % 10000000L);
+        public static uint DelTransform(uint look) => look % 10000000;
 
-        public static uint DelTransform(uint look)
+        public static implicit operator Memory<byte>(MsgSpawn msg)
         {
-            return look % 10000000;
-        }
-
-        public static implicit operator byte[](MsgSpawn msg)
-        {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgSpawn));
+            var buffer = new byte[sizeof(MsgSpawn)];
             fixed (byte* p = buffer)
                 *(MsgSpawn*)p = *&msg;
-
-                var tqServerBytes = Encoding.ASCII.GetBytes("TQServer");
-            Array.Copy(tqServerBytes, 0, buffer, buffer.Length-tqServerBytes.Length, tqServerBytes.Length);
-            
             return buffer;
         }
     }

@@ -12,12 +12,10 @@ namespace MagnumOpus.Simulation.Components
         public RespawnTagComponent(int entityId, uint expPenalty, int respawnTimeDelaySeconds)
         {
             EntityId = entityId;
-            RespawnTimeTick = Game.CurrentTick + Game.TargetTps * respawnTimeDelaySeconds;
+            RespawnTimeTick = PixelWorld.Tick + PixelWorld.TargetTps * respawnTimeDelaySeconds;
             ExpPenalty = expPenalty;
         }
-        public override int GetHashCode()
-        {
-            return EntityId;
-        }
+        
+        public override int GetHashCode() => EntityId;
     }
 }

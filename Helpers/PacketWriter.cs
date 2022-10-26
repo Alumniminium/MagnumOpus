@@ -46,7 +46,7 @@ namespace MagnumOpus.Helpers
         /// of the stream. Flushes all writes to the stream before returning an array. 
         /// </summary>
         /// <returns>Returns the byte array representation of the memory stream.</returns>
-        public byte[] ToArray()
+        public Memory<byte> ToArray()
         {
             BaseStream.Flush();
             var position = BaseStream.Position;

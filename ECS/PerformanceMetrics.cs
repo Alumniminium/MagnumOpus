@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace MagnumOpus.ECS
@@ -87,14 +86,14 @@ namespace MagnumOpus.ECS
             sb.AppendLine($"{"Name",-30}{"Avg",-10}{"Min",-10}{"Max",-10}{"Total",-10}{"Entities",-10}");
             foreach (var (name, samples) in SystemTimesLastPeriod)
             {
-                if (name == nameof(Game))
+                if (name == nameof(PixelWorld))
                 {
                     total = samples.Average;
                     continue;
                 }
                 sb.AppendLine($"{name,-30}{$"{samples.Average:#0.00}",-10}{$"{samples.Min:#0.00}",-10}{$"{samples.Max:#0.00}",-10}{$"{samples.Total:#0.00}",-10}{$"{Systems[name]?._entities.Count}",-10}");
             }
-            sb.AppendLine($"Average Total Tick Time: {total:#0.00}/{1000f / Game.TargetTps:#0.00}ms ({100 * total / (1000f / Game.TargetTps):#0.00}% of budget)");
+            sb.AppendLine($"Average Total Tick Time: {total:#0.00}/{1000f / PixelWorld.TargetTps:#0.00}ms ({100 * total / (1000f / PixelWorld.TargetTps):#0.00}% of budget)");
 
             sb.Append("GC: ");
             for (var i = 0; i < GC.MaxGeneration; i++)

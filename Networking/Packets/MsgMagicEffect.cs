@@ -1,7 +1,5 @@
 using System.Buffers;
 using System.Runtime.InteropServices;
-using MagnumOpus.ECS;
-using MagnumOpus.Simulation.Components;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -17,9 +15,9 @@ namespace MagnumOpus.Networking.Packets
         public int TargetCount;
         public fixed int Targets[180];
 
-        // public static IEnumerable<byte[]> Create(PixelEntity attacker, IEnumerable<(PixelEntity, int)> targetEnumerable)
+        // public static IEnumerable<byte[]> Create(in PixelEntity attacker, IEnumerable<(in PixelEntity, int)> targetEnumerable)
         // {
-        //     ref readonly var phy = ref attacker.Get<PhysicsComponent>();
+        //     ref readonly var bdy = ref attacker.Get<PhysicsComponent>();
             
         //     const int maxTargets = 60;
         //     var targets = targetEnumerable.ToDictionary(pair => pair.Item1, pair => pair.Item2);
@@ -34,7 +32,7 @@ namespace MagnumOpus.Networking.Packets
         //             packet->Size = (ushort)(28 + 12 * Math.Min(Math.Min(targets.Count - i * maxTargets, maxTargets), targets.Count));
         //             packet->Id = 1105;
         //             packet->UniqId = attacker.Id;
-        //             packet->Param = (int)phy.Direction;
+        //             packet->Param = (int)bdy.Direction;
         //             packet->Type = attacker.CurrentSkill.Id;
         //             packet->Level = attacker.CurrentSkill.Level;
         //             packet->TargetCount = Math.Min(Math.Min(targets.Count - i * maxTargets, maxTargets), targets.Count);
@@ -47,7 +45,7 @@ namespace MagnumOpus.Networking.Packets
         //             packet->Targets[offset++] = 0;
         //         }
 
-        //         var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+        //         var buffer = new byte[sizeof(MsgUpdate));
         //         fixed (byte* p = buffer)
         //             *(MsgMagicEffect*)p = *packet;
         //         packets[i] = buffer;
@@ -55,15 +53,15 @@ namespace MagnumOpus.Networking.Packets
         //     return packets;
         // }
 
-        // public static byte[] Create(PixelEntity attacker, PixelEntity target, int damage)
+        // public static Memory<byte> Create(in PixelEntity attacker, PixelEntity target, int damage)
         // {
-        //     ref readonly var phy = ref attacker.Get<PhysicsComponent>();
+        //     ref readonly var bdy = ref attacker.Get<PhysicsComponent>();
         //     var packet = stackalloc MsgMagicEffect[1];
         //     {
         //         packet->Size = 40;
         //         packet->Id = 1105;
         //         packet->UniqId = attacker.Id;
-        //         packet->Param = (int)phy.Direction;
+        //         packet->Param = (int)bdy.Direction;
         //         packet->Type = attacker.CurrentSkill.Id;
         //         packet->Level = attacker.CurrentSkill.Level;
         //         packet->TargetCount = 1;
@@ -74,16 +72,16 @@ namespace MagnumOpus.Networking.Packets
 
 
 
-        //     var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+        //     var buffer = new byte[sizeof(MsgUpdate));
         //     fixed (byte* p = buffer)
         //         *(MsgMagicEffect*)p = *packet;
 
         //     return buffer;
         // }
 
-        public static implicit operator byte[](MsgMagicEffect msg)
+        public static implicit operator Memory<byte>(MsgMagicEffect msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgMagicEffect)];
             fixed (byte* p = buffer)
                 *(MsgMagicEffect*)p = *&msg;
             return buffer;

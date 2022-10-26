@@ -1,6 +1,5 @@
 using System.Buffers;
 using System.Runtime.InteropServices;
-using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 
 namespace MagnumOpus.Networking.Packets
@@ -27,7 +26,7 @@ namespace MagnumOpus.Networking.Packets
         public readonly byte Enchant;
         public readonly int Restrain;
 
-        // public MsgItemInformation(PixelEntity item, MsgItemPosition position = MsgItemPosition.Inventory) : this()
+        // public MsgItemInformation(in PixelEntity item, MsgItemPosition position = MsgItemPosition.Inventory) : this()
         // {
         //     Size = (ushort)sizeof(MsgItemInformation);
         //     Id = 1008;
@@ -48,7 +47,7 @@ namespace MagnumOpus.Networking.Packets
         //     Restrain = item.CustomTextId;
         // }
 
-        // public MsgItemInformation(PixelEntity owner, PixelEntity item, MsgItemPosition position, MsgItemInfoAction action = MsgItemInfoAction.OtherPlayerEquipement) : this()
+        // public MsgItemInformation(in PixelEntity owner, PixelEntity item, MsgItemPosition position, MsgItemInfoAction action = MsgItemInfoAction.OtherPlayerEquipement) : this()
         // {
         //     Size = (ushort)sizeof(MsgItemInformation);
         //     Id = 1008;
@@ -68,7 +67,7 @@ namespace MagnumOpus.Networking.Packets
         //     Enchant = item.Enchant;
         //     Restrain = item.CustomTextId;
         // }
-        // public MsgItemInformation(PixelEntity item, MsgItemInfoAction action = MsgItemInfoAction.AddItem, MsgItemPosition position = MsgItemPosition.Inventory) : this()
+        // public MsgItemInformation(in PixelEntity item, MsgItemInfoAction action = MsgItemInfoAction.AddItem, MsgItemPosition position = MsgItemPosition.Inventory) : this()
         // {
         //     Size = (ushort)sizeof(MsgItemInformation);
         //     Id = 1008;
@@ -89,9 +88,9 @@ namespace MagnumOpus.Networking.Packets
         //     Restrain = item.CustomTextId;
         // }
 
-        public static implicit operator byte[](MsgItemInformation msg)
+        public static implicit operator Memory<byte>(MsgItemInformation msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgItemInformation)];
             fixed (byte* p = buffer)
                 *(MsgItemInformation*)p = *&msg;
             return buffer;

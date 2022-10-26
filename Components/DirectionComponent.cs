@@ -4,26 +4,18 @@ using MagnumOpus.Enums;
 namespace MagnumOpus.Simulation.Components
 {
     [Component]
-    public struct BodyComponent
+    public struct DirectionComponent
     {
         public readonly int EntityId;
         public uint ChangedTick;
-        
-        internal ushort Hair;
-        public uint Look;
         public Direction Direction;
-        internal Emote Emote;
 
-        public BodyComponent(int entityId, Direction direction = Direction.South, uint look = 1003)
+        public DirectionComponent(int entityId, Direction direction = Direction.South)
         {
             EntityId = entityId;
             Direction = direction;
             ChangedTick = PixelWorld.Tick;
-            Look = look;
-            Hair = 0;
-            Emote = Emote.Stand;
         }
-
 
         public override int GetHashCode() => EntityId;
     }

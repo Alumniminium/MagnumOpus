@@ -12,7 +12,7 @@ namespace MagnumOpus.Networking.Packets
         public byte Count;
         public fixed byte Params[255];
 
-        public static byte[] Create(int data, string param, byte action)
+        public static Memory<byte> Create(int data, string param, byte action)
         {
             var Out = new byte[13 + param.Length];
             fixed (byte* p = Out)
@@ -29,7 +29,7 @@ namespace MagnumOpus.Networking.Packets
             return Out;
         }
 
-        public static byte[] Create(int data, string[] Params, MsgNameType action)
+        public static Memory<byte> Create(int data, string[] Params, MsgNameType action)
         {
             var strLength = 0;
             for (var i = 0; i < Params.Length; i++)
@@ -58,9 +58,9 @@ namespace MagnumOpus.Networking.Packets
             return Out;
         }
 
-        public static implicit operator byte[](MsgName msg)
+        public static implicit operator Memory<byte>(MsgName msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgName)];
             fixed (byte* p = buffer)
                 *(MsgName*)p = *&msg;
             return buffer;

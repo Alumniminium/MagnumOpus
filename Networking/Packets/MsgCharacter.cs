@@ -55,9 +55,9 @@ namespace MagnumOpus.Networking.Packets
         [FieldOffset(68)]
         public fixed byte Name[32];
 
-        public static Memory<byte> Create(PixelEntity entity)
+        public static Memory<byte> Create(in PixelEntity entity)
         {
-            ref var phy = ref entity.Get<BodyComponent>();
+            ref var bdy = ref entity.Get<BodyComponent>();
             ref var lvl = ref entity.Get<LevelComponent>();
             ref var pkp = ref entity.Get<PkPointComponent>();
             ref var hlt = ref entity.Get<HealthComponent>();
@@ -67,6 +67,7 @@ namespace MagnumOpus.Networking.Packets
             ref var mar = ref entity.Get<MarriageComponent>();
             ref var inv = ref entity.Get<InventoryComponent>();
             ref var atr = ref entity.Get<AttributeComponent>();
+            ref var rbn = ref entity.Get<RebornComponent>();
 
             ref readonly var partner = ref PixelWorld.GetEntity(mar.SpouseId);
             ref var sNtc = ref partner.Get<NameTagComponent>();
@@ -80,12 +81,12 @@ namespace MagnumOpus.Networking.Packets
                 ntc.Name = "None";
             }
 
-            if(phy.Look == 0)
-                phy.Look = 1003;
-            if(phy.Emote == 0)
-                phy.Emote = Enums.Emote.Stand;
+            if(bdy.Look == 0)
+                bdy.Look = 1003;
+            if(bdy.Emote == 0)
+                bdy.Emote = Enums.Emote.Stand;
 
-            phy.Hair = 302;
+            bdy.Hair = 302;
             
             if(atr.Statpoints == 0)
             {
@@ -119,8 +120,8 @@ namespace MagnumOpus.Networking.Packets
                 Size = (ushort)(sizeof(MsgCharacter) - 30 + ntc.Name.Length + sNtc.Name.Length),
                 Id = 1006,
                 EntityId = entity.Id,
-                Look = phy.Look,
-                Hair = phy.Hair,
+                Look = bdy.Look,
+                Hair = bdy.Hair,
                 Money = inv.Money,
                 CPs = inv.CPs,
                 Experience = lvl.Experience,
@@ -134,7 +135,7 @@ namespace MagnumOpus.Networking.Packets
                 PkPoints = pkp.Points,
                 Level = lvl.Level,
                 Class = (byte)pro.Class,
-                Reborn = phy.Reborn,
+                Reborn = rbn.Count,
                 ShowName = true,
                 StringCount = 2,
             };
@@ -151,12 +152,9 @@ namespace MagnumOpus.Networking.Packets
 
         public static implicit operator Memory<byte>(MsgCharacter packet)
         { 
-            var buffer = new byte[packet.Size + 8];
+            var buffer = new byte[packet.Size];
             fixed (byte* p = buffer)
                 *(MsgCharacter*)p = packet;
-            
-            var tqServerBytes = Encoding.ASCII.GetBytes("TQServer");
-            Array.Copy(tqServerBytes, 0, buffer, buffer.Length-tqServerBytes.Length, tqServerBytes.Length);
             
             return buffer;
         }

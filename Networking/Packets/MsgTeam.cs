@@ -13,7 +13,7 @@ namespace MagnumOpus.Networking.Packets
         public MsgTeamAction Mode;
         public int TargetUniqueId;
 
-        public static byte[] Create(PixelEntity human, MsgTeamAction action)
+        public static Memory<byte> Create(in PixelEntity human, MsgTeamAction action)
         {
             var msg = new MsgTeam
             {
@@ -25,34 +25,34 @@ namespace MagnumOpus.Networking.Packets
             return msg;
         }
 
-        public static byte[] CreateTeam(PixelEntity human)
+        public static Memory<byte> CreateTeam(in PixelEntity human)
         {
             return Create(human, MsgTeamAction.Create);
         }
 
-        public static byte[] DisbandTeam(PixelEntity human)
+        public static Memory<byte> DisbandTeam(in PixelEntity human)
         {
             return Create(human, MsgTeamAction.Dismiss);
         }
 
-        public static byte[] Kick(PixelEntity human)
+        public static Memory<byte> Kick(in PixelEntity human)
         {
             return Create(human, MsgTeamAction.Kick);
         }
 
-        public static byte[] Invite(PixelEntity human)
+        public static Memory<byte> Invite(in PixelEntity human)
         {
             return Create(human, MsgTeamAction.Invite);
         }
 
-        public static byte[] Leave(PixelEntity human)
+        public static Memory<byte> Leave(in PixelEntity human)
         {
             return Create(human, MsgTeamAction.LeaveTeam);
         }
 
-        public static unsafe implicit operator byte[](MsgTeam msg)
+        public static unsafe implicit operator Memory<byte>(MsgTeam msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgTeam)];
             fixed (byte* p = buffer)
                 *(MsgTeam*)p = *&msg;
             return buffer;

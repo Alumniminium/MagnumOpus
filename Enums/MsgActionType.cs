@@ -72,6 +72,7 @@ namespace MagnumOpus.Enums
         QueryEnemy = 123,
         OpenDialog = 126,
         GuardJump = 130,
+        Jump = 133,
         /// <summary>
         /// [134] 
         /// Data1 = EntityId,
@@ -84,7 +85,6 @@ namespace MagnumOpus.Enums
         /// Data1 = EntityId
         /// </summary>
         RemoveEntity = 135,
-        Jump = 137,
         TeleportReply = 138,
         DeathConfirmation = 145,
         /// <summary>

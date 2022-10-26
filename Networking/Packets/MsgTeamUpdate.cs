@@ -20,14 +20,14 @@ namespace MagnumOpus.Networking.Packets
         public ushort MaxHp;
         public ushort CurHp;
 
-        public static MsgTeamUpdate JoinLeave(PixelEntity owner, MsgTeamMemberAction addMember)
+        public static MsgTeamUpdate JoinLeave(in PixelEntity owner, MsgTeamMemberAction addMember)
         {
             ref readonly var ntc = ref owner.Get<NameTagComponent>();
-            ref readonly var phy = ref owner.Get<BodyComponent>();
+            ref readonly var bdy = ref owner.Get<BodyComponent>();
             ref readonly var hlt = ref owner.Get<HealthComponent>();
             ref readonly var trs = ref owner.Get<TransformationComponent>();
 
-            var look = trs.EntityId == owner.Id ? trs.Look : phy.Look;
+            var look = trs.EntityId == owner.Id ? trs.Look : bdy.Look;
 
             var packet = new MsgTeamUpdate
             {
@@ -47,9 +47,9 @@ namespace MagnumOpus.Networking.Packets
             return packet;
         }
 
-        public static implicit operator byte[](MsgTeamUpdate msg)
+        public static implicit operator Memory<byte>(MsgTeamUpdate msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgTeamUpdate)];
             fixed (byte* p = buffer)
                 *(MsgTeamUpdate*)p = *&msg;
             return buffer;

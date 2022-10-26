@@ -7,6 +7,8 @@ namespace MagnumOpus.Simulation.Components
     public struct ViewportComponent
     {
         public readonly int EntityId;
+        public uint ChangedTick;
+
         public readonly List<PixelEntity> EntitiesVisible;
         public readonly List<PixelEntity> EntitiesVisibleLast;
         public RectangleF Viewport;
@@ -17,10 +19,9 @@ namespace MagnumOpus.Simulation.Components
             Viewport = new RectangleF(0, 0, viewDistance, viewDistance);
             EntitiesVisible = new();
             EntitiesVisibleLast = new();
+            ChangedTick = PixelWorld.Tick;
         }
-        public override int GetHashCode()
-        {
-            return EntityId;
-        }
+
+        public override int GetHashCode() => EntityId;
     }
 }

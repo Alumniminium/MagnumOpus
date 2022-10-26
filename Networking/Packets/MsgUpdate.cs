@@ -14,15 +14,15 @@ namespace MagnumOpus.Networking.Packets
         public MsgUpdateType Type;
         public long Value;
 
-        public static implicit operator byte[](MsgUpdate msg)
+        public static implicit operator Memory<byte>(MsgUpdate msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgUpdate)];
             fixed (byte* p = buffer)
                 *(MsgUpdate*)p = *&msg;
             return buffer;
         }
 
-        public static byte[] Create(int entityId, long value, MsgUpdateType type)
+        public static Memory<byte> Create(int entityId, long value, MsgUpdateType type)
         {
             var packet = stackalloc MsgUpdate[1];
             packet->Size = (ushort)sizeof(MsgUpdate);
@@ -31,7 +31,7 @@ namespace MagnumOpus.Networking.Packets
             packet->Amount = 1;
             packet->Value = value;
             packet->Type = type;
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgUpdate)];
             fixed (byte* p = buffer)
                 *(MsgUpdate*)p = *packet;
             return buffer;

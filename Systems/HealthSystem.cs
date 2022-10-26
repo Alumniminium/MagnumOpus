@@ -21,7 +21,7 @@ namespace MagnumOpus.Simulation.Systems
                 hlt.Health = hlt.MaxHealth;
 
             if (lastHealth != hlt.Health)
-                hlt.ChangedTick = Game.CurrentTick;
+                hlt.ChangedTick = PixelWorld.Tick;
         }
     }
 }

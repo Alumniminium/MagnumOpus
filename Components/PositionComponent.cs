@@ -17,7 +17,7 @@ namespace MagnumOpus.Simulation.Components
             EntityId = nttId;
             Position = position;
             LastPosition = position;
-            ChangedTick = Game.CurrentTick;
+            ChangedTick = PixelWorld.Tick;
         }
 
         public override int GetHashCode() => EntityId;

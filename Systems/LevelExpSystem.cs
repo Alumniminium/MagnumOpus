@@ -10,7 +10,7 @@ namespace MagnumOpus.Simulation.Systems
         public override void Update(in PixelEntity ntt, ref LevelComponent lvl, ref ExpRewardComponent exp)
         {
             lvl.Experience += exp.Experience;
-            lvl.ChangedTick = Game.CurrentTick;
+            lvl.ChangedTick = PixelWorld.Tick;
             // LeaderBoard.Add(new LeaderBoard.LeaderBoardEntry { Name = ntt.Get<NameTagComponent>().Name, Score = lvl.Experience });
             ntt.Remove<ExpRewardComponent>();
 
@@ -21,12 +21,12 @@ namespace MagnumOpus.Simulation.Systems
             lvl.Experience = 0;
             lvl.ExperienceToNextLevel = (uint)(lvl.ExperienceToNextLevel * 1.25f);
 
-            ref var phy = ref ntt.Get<BodyComponent>();
+            ref var bdy = ref ntt.Get<BodyComponent>();
             ref var vwp = ref ntt.Get<ViewportComponent>();
 
             vwp.Viewport.Width *= 1.03f;
             vwp.Viewport.Height *= 1.03f;
-            phy.ChangedTick = Game.CurrentTick;
+            bdy.ChangedTick = PixelWorld.Tick;
         }
     }
 }

@@ -16,28 +16,29 @@ namespace MagnumOpus.Networking.Packets
         public ushort X, Y;
         public MsgFloorItemType MsgFloorItemType;
 
-        public static byte[] Create(PixelEntity item, MsgFloorItemType type)
+        public static Memory<byte> Create(in PixelEntity item, MsgFloorItemType type)
         {
-            ref readonly var phy = ref item.Get<BodyComponent>();
+            ref readonly var bdy = ref item.Get<BodyComponent>();
             ref readonly var trs = ref item.Get<TransformationComponent>();
+            ref readonly var pos = ref item.Get<PositionComponent>();
 
-            var look = trs.EntityId == item.Id ? trs.Look : phy.Look;
+            var look = trs.EntityId == item.Id ? trs.Look : bdy.Look;
 
             var packet = new MsgFloorItem
             {
                 Size = (ushort)sizeof(MsgFloorItem),
                 Id = 1101,
                 UniqueId = item.Id,
-                X = (ushort)phy.Location.X,
-                Y = (ushort)phy.Location.Y,
+                X = (ushort)pos.Position.X,
+                Y = (ushort)pos.Position.Y,
                 ItemId = look,
                 MsgFloorItemType = type,
             };
             return packet;
         }
-        public static implicit operator byte[](MsgFloorItem msg)
+        public static implicit operator Memory<byte>(MsgFloorItem msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgFloorItem)];
             fixed (byte* p = buffer)
                 *(MsgFloorItem*)p = *&msg;
             return buffer;

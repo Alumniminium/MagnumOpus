@@ -15,9 +15,9 @@ namespace MagnumOpus.Networking.Packets
         public ushort Unknown2;
         public int Param;
 
-        public static implicit operator byte[](MsgStorage msg)
+        public static implicit operator Memory<byte>(MsgStorage msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgStorage)];
             fixed (byte* p = buffer)
                 *(MsgStorage*)p = *&msg;
             return buffer;

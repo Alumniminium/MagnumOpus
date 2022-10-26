@@ -18,7 +18,7 @@ namespace MagnumOpus.Networking.Packets
         public uint Junk4;
         public uint Hash;
 
-        public static byte[] Create(PixelEntity target)
+        public static Memory<byte> Create(in PixelEntity target)
         {
             var packet = stackalloc MsgTick[1];
             packet->Size = (ushort)sizeof(MsgTick);
@@ -31,7 +31,7 @@ namespace MagnumOpus.Networking.Packets
             packet->Junk4 = 0;
             packet->Hash = 0;
 
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgTick)];
             fixed (byte* p = buffer)
                 *(MsgTick*)p = *packet;
             return buffer;
@@ -47,9 +47,9 @@ namespace MagnumOpus.Networking.Packets
                 return ((ushort*)pBuf)[0] ^ 0x9823U;
         }
 
-        public static implicit operator byte[](MsgTick msg)
+        public static implicit operator Memory<byte>(MsgTick msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgTick)];
             fixed (byte* p = buffer)
                 *(MsgTick*)p = *&msg;
             return buffer;

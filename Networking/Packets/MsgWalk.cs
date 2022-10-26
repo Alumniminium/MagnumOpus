@@ -12,7 +12,7 @@ namespace MagnumOpus.Networking.Packets
         public bool Running;
         public ushort Unknown;
 
-        public static byte[] Create(int uniqueId, Direction direction, bool running)
+        public static Memory<byte> Create(int uniqueId, Direction direction, bool running)
         {
             MsgWalk* msgP = stackalloc MsgWalk[1];
 
@@ -23,15 +23,15 @@ namespace MagnumOpus.Networking.Packets
             msgP->Running = running;
             msgP->Unknown = 0;
 
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgWalk)];
             fixed (byte* p = buffer)
                 *(MsgWalk*)p = *msgP;
             return buffer;
         }
 
-        public static implicit operator byte[](MsgWalk msg)
+        public static implicit operator Memory<byte>(MsgWalk msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgWalk)];
             fixed (byte* p = buffer)
                 *(MsgWalk*)p = *&msg;
             return buffer;

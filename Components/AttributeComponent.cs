@@ -7,6 +7,7 @@ namespace MagnumOpus.Simulation.Components
     {
         public readonly int EntityId;
         public uint ChangedTick;
+
         public ushort Strength;
         public ushort Agility;
         public ushort Vitality;

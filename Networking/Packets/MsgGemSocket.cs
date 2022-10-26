@@ -14,7 +14,7 @@ namespace MagnumOpus.Networking.Packets
         public ushort SocketID;
         public ushort RemoveGem;
 
-        public static byte[] Create(int uid, int itemuid, int gemuid, ushort socketid, ushort removegem)
+        public static Memory<byte> Create(int uid, int itemuid, int gemuid, ushort socketid, ushort removegem)
         {
             var msgP = stackalloc MsgGemSocket[1];
             {
@@ -27,7 +27,7 @@ namespace MagnumOpus.Networking.Packets
                 msgP->RemoveGem = removegem;
             }
 
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgGemSocket)];
             fixed (byte* p = buffer)
                 *(MsgGemSocket*)p = *msgP;
             return buffer;

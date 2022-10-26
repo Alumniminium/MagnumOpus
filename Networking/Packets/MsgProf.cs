@@ -13,7 +13,7 @@ namespace MagnumOpus.Networking.Packets
         public uint Level;
         public uint Experience;
 
-        public static byte[] Create(ProfComponent prof)
+        public static Memory<byte> Create(ProfComponent prof)
         {
             var packet = new MsgProf
             {
@@ -26,9 +26,9 @@ namespace MagnumOpus.Networking.Packets
             return packet;
         }
 
-        public static unsafe implicit operator byte[](MsgProf msg)
+        public static unsafe implicit operator Memory<byte>(MsgProf msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgProf)];
             fixed (byte* p = buffer)
                 *(MsgProf*)p = *&msg;
             return buffer;

@@ -27,7 +27,7 @@ namespace MagnumOpus.Networking.Packets
                 return Encoding.ASCII.GetString(ptr, 10).Trim('\0');
         }
 
-        public static implicit operator MsgConnectGame(Memory<byte> msg)
+        public static implicit operator MsgConnectGame(in Memory<byte> msg)
         {
             fixed (byte* ptr = msg.Span)
                 return *(MsgConnectGame*)ptr;

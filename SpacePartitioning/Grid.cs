@@ -34,9 +34,9 @@ namespace SpaceParitioning
         }
 
         // Adds an entity to the grid and puts it in the correct cell
-        public void Add(in PixelEntity entity, ref BodyComponent phy)
+        public void Add(in PixelEntity entity, ref PositionComponent pos)
         {
-            var cell = FindCell(new Vector2(phy.Location.X, phy.Location.Y));
+            var cell = FindCell(new Vector2(pos.Position.X, pos.Position.Y));
             EntityCells.TryAdd(entity, cell.Id);
             if (!CellEntities.TryGetValue(cell.Id, out var list))
             {
@@ -64,10 +64,10 @@ namespace SpaceParitioning
             }
         }
 
-        public void Move(in PixelEntity entity, ref BodyComponent phy)
+        public void Move(in PixelEntity entity, ref PositionComponent pos)
         {
             Remove(in entity);
-            Add(in entity, ref phy);
+            Add(in entity, ref pos);
         }
 
         public void GetVisibleEntities(ref ViewportComponent vwp)

@@ -3,8 +3,7 @@ using MagnumOpus.ECS;
 using MagnumOpus.Simulation.Components;
 using HerstLib.IO;
 using System.Net.Sockets;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
+using System.Text;
 
 namespace MagnumOpus.Networking
 {
@@ -24,12 +23,9 @@ namespace MagnumOpus.Networking
             queue.Enqueue(packet);
         }
 
-        public static void Remove(in PixelEntity player)
-        {
-            Packets.TryRemove(player, out _);
-        }
+        public static void Remove(in PixelEntity player) => Packets.TryRemove(player, out _);
 
-        public static async ValueTask SendAll()
+        public static async void SendAll()
         {
             try
             {
@@ -41,6 +37,19 @@ namespace MagnumOpus.Networking
                         while (queue.Count > 0)
                         {
                             var packet = queue.Dequeue();
+
+                            if(net.UseGameCrypto)
+                            {
+                                var resized = new byte[packet.Length + 8];
+                                packet.CopyTo(resized);
+                                var tqServer = Encoding.ASCII.GetBytes("TQServer");
+                                tqServer.CopyTo(resized, resized.Length-8);
+                                net.GameCrypto.Encrypt(resized);
+                                packet = resized;
+                            }
+                            else
+                                net.AuthCrypto.Encrypt(packet.Span);
+                                
                             await net.Socket.SendAsync(packet, SocketFlags.None, CancellationToken.None);
                             // try
                             // {
@@ -61,7 +70,7 @@ namespace MagnumOpus.Networking
                             //         }
                             //         catch (Exception e)
                             //         {
-                            //             Console.WriteLine(e);
+                            //             FConsole.WriteLine(e);
                             //         }
                             //     }
 
@@ -73,8 +82,8 @@ namespace MagnumOpus.Networking
                             //     {
                             //         if(ntt.Has<PhysicsComponent>())
                             //         {
-                            //             var phy = ntt.Get<PhysicsComponent>();
-                            //             Game.Grids[(int)phy.Location.Z].Remove(ntt);
+                            //             var bdy = ntt.Get<PhysicsComponent>();
+                            //             Game.Grids[(int)pos.Position.Z].Remove(ntt);
                             //         }
                             //         PixelWorld.Destroy(in ntt);
                             //         FConsole.WriteLine(e.Message);
@@ -92,6 +101,8 @@ namespace MagnumOpus.Networking
                     catch (Exception e)
                     {
                         FConsole.WriteLine(e.Message);
+                        queue.Clear();
+                        PixelWorld.Players.Remove(ntt);
                     }
                 }
             }

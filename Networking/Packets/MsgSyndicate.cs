@@ -12,7 +12,7 @@ namespace MagnumOpus.Networking.Packets
         public GuildRequest Type;
         public int Param;
 
-        public static byte[] Create(int param, GuildRequest type)
+        public static Memory<byte> Create(int param, GuildRequest type)
         {
             var msg = new MsgSyndicate
             {
@@ -24,9 +24,9 @@ namespace MagnumOpus.Networking.Packets
             return msg;
         }
 
-        public static implicit operator byte[](MsgSyndicate msg)
+        public static implicit operator Memory<byte>(MsgSyndicate msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgSyndicate)];
             fixed (byte* p = buffer)
                 *(MsgSyndicate*)p = *&msg;
             return buffer;

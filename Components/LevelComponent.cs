@@ -18,7 +18,7 @@ namespace MagnumOpus.Simulation.Components
             Level = level;
             Experience = exp;
             ExperienceToNextLevel = expReq;
-            ChangedTick = Game.CurrentTick;
+            ChangedTick = PixelWorld.Tick;
         }
         public override int GetHashCode()
         {

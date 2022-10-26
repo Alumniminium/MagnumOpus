@@ -18,7 +18,7 @@ namespace MagnumOpus.Networking.Packets
         public GuildRanks Rank;
         public fixed byte LeaderName[16];
 
-        public static byte[] Create(PixelEntity human)
+        public static Memory<byte> Create(in PixelEntity human)
         {
             ref readonly var gld = ref human.Get<GuildComponent>();
             ref readonly var leader = ref PixelWorld.GetEntity(gld.LeaderId);
@@ -40,15 +40,15 @@ namespace MagnumOpus.Networking.Packets
                     msgP->LeaderName[i] = (byte)ntc.Name[i];
             }
 
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgSyndicateSpawn)];
             fixed (byte* p = buffer)
                 *(MsgSyndicateSpawn*)p = *msgP;
             return buffer;
         }
 
-        public static implicit operator byte[](MsgSyndicateSpawn msg)
+        public static implicit operator Memory<byte>(MsgSyndicateSpawn msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgSyndicateSpawn)];
             fixed (byte* p = buffer)
                 *(MsgSyndicateSpawn*)p = *&msg;
             return buffer;

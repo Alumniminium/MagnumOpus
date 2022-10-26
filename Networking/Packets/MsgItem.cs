@@ -1,5 +1,6 @@
 using System.Buffers;
 using System.Runtime.InteropServices;
+using System.Text;
 using MagnumOpus.Enums;
 
 namespace MagnumOpus.Networking.Packets
@@ -7,15 +8,15 @@ namespace MagnumOpus.Networking.Packets
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public unsafe struct MsgItem
     {
-        private ushort Size;
-        private ushort Id;
-        private int UnqiueId;
-        private int Param;
-        private MsgItemType Type;
-        private int Timestamp;
-        private int Value;
+        public ushort Size;
+        public ushort Id;
+        public int UnqiueId;
+        public int Param;
+        public MsgItemType Type;
+        public int Timestamp;
+        public int Value;
 
-        public static MsgItem Create(int uid, int value, int param, MsgItemType type)
+        public static Memory<byte> Create(int uid, int value, int param, int timestamp, MsgItemType type)
         {
             var packet = stackalloc MsgItem[1];
             {
@@ -25,26 +26,26 @@ namespace MagnumOpus.Networking.Packets
                 packet->Param = param;
                 packet->Type = type;
                 packet->Value = value;
-                packet->Timestamp = Environment.TickCount;
+                packet->Timestamp = timestamp;
             }
 
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgItem)];
             fixed (byte* p = buffer)
                 *(MsgItem*)p = *packet;
             return buffer;
         }
 
-        public static implicit operator byte[](MsgItem msg)
+        public static implicit operator Memory<byte>(MsgItem msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgItem)];
             fixed (byte* p = buffer)
                 *(MsgItem*)p = *&msg;
             return buffer;
         }
 
-        public static implicit operator MsgItem(byte[] msg)
+        public static implicit operator MsgItem(in Memory<byte> msg)
         {
-            fixed (byte* p = msg)
+            fixed (byte* p = msg.Span)
                 return *(MsgItem*)p;
         }
     }

@@ -17,7 +17,7 @@ namespace MagnumOpus.ECS
             Children = Array.Empty<PixelEntity>();
         }
 
-        public readonly void AttachChild(PixelEntity child)
+        public readonly void AttachChild(in PixelEntity child)
         {
             var children = Children;
             Array.Resize(ref children, children.Length + 1);

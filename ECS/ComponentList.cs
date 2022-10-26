@@ -9,18 +9,10 @@ namespace MagnumOpus.ECS
             Array[owner.Id] = component;
             PixelWorld.InformChangesFor(in owner);
         }
-        public static bool HasFor(in PixelEntity owner)
-        {
-            return Array[owner.Id].GetHashCode() == owner.Id;
-        }
-
-        public static ref T Get(PixelEntity owner)
-        {
-            return ref Array[owner.Id];
-        }
-
+        public static bool HasFor(in PixelEntity owner) => Array[owner.Id].GetHashCode() == owner.Id;
+        public static ref T Get(PixelEntity owner) => ref Array[owner.Id];
         // called via reflection @ ReflectionHelper.Remove<T>()
-        public static void Remove(PixelEntity owner, bool notify)
+        public static void Remove(in PixelEntity owner, bool notify)
         {
             Array[owner.Id] = new T();
             if (notify)

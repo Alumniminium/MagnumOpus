@@ -70,9 +70,9 @@ namespace MagnumOpus.Networking.Packets
         //     Restrain = item.CustomTextId;
         // }
 
-        public static implicit operator byte[](MsgItemInfoEx msg)
+        public static implicit operator Memory<byte>(MsgItemInfoEx msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgItemInfoEx)];
             fixed (byte* p = buffer)
                 *(MsgItemInfoEx*)p = *&msg;
             return buffer;

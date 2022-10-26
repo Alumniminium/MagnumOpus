@@ -12,7 +12,7 @@ namespace MagnumOpus.Networking.Packets
         public uint DynMapId;
         public uint Flags;
 
-        public static byte[] Create(uint mapId, uint flags)
+        public static Memory<byte> Create(uint mapId, uint flags)
         {
             var packet = stackalloc MsgStatus[1];
             packet->Size = (ushort)sizeof(MsgStatus);
@@ -21,15 +21,15 @@ namespace MagnumOpus.Networking.Packets
             packet->DynMapId = mapId;
             packet->Flags = flags;
 
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgStatus)];
             fixed (byte* p = buffer)
                 *(MsgStatus*)p = *packet;
             return buffer;
         }
 
-        public static implicit operator byte[](MsgStatus msg)
+        public static implicit operator Memory<byte>(MsgStatus msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgStatus)];
             fixed (byte* p = buffer)
                 *(MsgStatus*)p = *&msg;
             return buffer;

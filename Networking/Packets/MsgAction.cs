@@ -23,11 +23,11 @@ namespace MagnumOpus.Networking.Packets
         [FieldOffset(18)]
         public ushort Y;
         [FieldOffset(20)]
-        public ushort Direction;
+        public Direction Direction;
         [FieldOffset(22)]
         public MsgActionType Type;
 
-        public static Memory<byte> Create(int timestamp, int uniqueId, int param, ushort x, ushort y, ushort direction, MsgActionType type)
+        public static Memory<byte> Create(int timestamp, int uniqueId, int param, ushort x, ushort y, Direction direction, MsgActionType type)
         {
             MsgAction msgP = new()
             {
@@ -46,16 +46,12 @@ namespace MagnumOpus.Networking.Packets
 
         public static implicit operator Memory<byte>(MsgAction msg)
         {
-            var buffer = new byte[sizeof(MsgAction) + 8];
+            var buffer = new byte[sizeof(MsgAction)];
             fixed (byte* p = buffer)
                 *(MsgAction*)p = *&msg;
-
-            var tqserver = "TQServer".ToCharArray();
-            for (var i = 0; i < 8; i++)
-                buffer[buffer.Length - 8 + i] = (byte)tqserver[i];
             return buffer;
         }
-        public static implicit operator MsgAction(Memory<byte> buffer)
+        public static implicit operator MsgAction(in Memory<byte> buffer)
         {
             fixed (byte* p = buffer.Span)
                 return *(MsgAction*)p;

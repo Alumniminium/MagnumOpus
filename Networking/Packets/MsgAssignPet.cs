@@ -17,17 +17,18 @@ namespace MagnumOpus.Networking.Packets
         public ushort Y;
         public fixed byte Summoner[16];
 
-        public static byte[] Create(PixelEntity obj, int uid)
+        public static Memory<byte> Create(in PixelEntity obj, int uid)
         {
-            ref readonly var phy = ref obj.Get<BodyComponent>();
+            ref readonly var bdy = ref obj.Get<BodyComponent>();
+            ref readonly var pos = ref obj.Get<PositionComponent>();
             var packet = new MsgAssignPet
             {
                 Size = 36,
                 Id = 2035,
                 Model = 920,
                 AI = 1,
-                X = (ushort)phy.Location.X,
-                Y = (ushort)phy.Location.Y,
+                X = (ushort)pos.Position.X,
+                Y = (ushort)pos.Position.Y,
                 UnqiueId = uid,
             };
             for (byte i = 0; i < "GoldGuard".Length; i++)
@@ -36,9 +37,9 @@ namespace MagnumOpus.Networking.Packets
             return packet;
         }
 
-        public static implicit operator byte[](MsgAssignPet msg)
+        public static implicit operator Memory<byte>(MsgAssignPet msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgAssignPet)];
             fixed (byte* p = buffer)
                 *(MsgAssignPet*)p = *&msg;
             return buffer;

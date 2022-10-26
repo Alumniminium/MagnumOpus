@@ -1,4 +1,3 @@
-using HerstLib.Math;
 using MagnumOpus.ECS;
 using MagnumOpus.Simulation.Components;
 
@@ -8,9 +7,9 @@ namespace MagnumOpus.Simulation.Systems
     {
         public RespawnSystem() : base("Respawn System", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref RespawnTagComponent rtc, ref BodyComponent phy, ref LevelComponent lvl, ref HealthComponent hlt)
+        public override void Update(in PixelEntity ntt, ref RespawnTagComponent rtc, ref BodyComponent bdy, ref LevelComponent lvl, ref HealthComponent hlt)
         {
-            if (rtc.RespawnTimeTick > Game.CurrentTick)
+            if (rtc.RespawnTimeTick > PixelWorld.Tick)
                 return;
 
             lvl.Experience -= rtc.ExpPenalty;
@@ -29,9 +28,9 @@ namespace MagnumOpus.Simulation.Systems
             
             hlt.Health = hlt.MaxHealth;
             // var spawn = SpawnManager.PlayerSpawnPoint;
-            // phy.Location = spawn;
+            // pos.Position = spawn;
             
-            phy.ChangedTick = Game.CurrentTick;
+            bdy.ChangedTick = PixelWorld.Tick;
             ntt.Remove<RespawnTagComponent>();
             var inp = new InputComponent(ntt.Id, default, default, default);
             ntt.Add(ref inp);

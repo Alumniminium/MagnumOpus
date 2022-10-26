@@ -19,9 +19,10 @@ namespace MagnumOpus.Networking.Packets
         public MsgInteractType Type;
         public int Value;
 
-        public static byte[] Create(PixelEntity source, PixelEntity target, MsgInteractType type, int value)
+        public static Memory<byte> Create(in PixelEntity source, PixelEntity target, MsgInteractType type, int value)
         {
-            ref readonly var phy = ref target.Get<BodyComponent>();
+            ref readonly var bdy = ref target.Get<BodyComponent>();
+            ref readonly var pos = ref target.Get<PositionComponent>();
                         
             var msgP = stackalloc MsgInteract[1];
             msgP->Size = (ushort)sizeof(MsgInteract);
@@ -29,17 +30,17 @@ namespace MagnumOpus.Networking.Packets
             msgP->Timestamp = Environment.TickCount;
             msgP->AttackerUniqueId = source.Id;
             msgP->TargetUniqueId = target.Id;
-            msgP->X = (ushort)phy.Location.X;
-            msgP->Y = (ushort)phy.Location.Y;
+            msgP->X = (ushort)pos.Position.X;
+            msgP->Y = (ushort)pos.Position.Y;
             msgP->Type = type;
             msgP->Value = value;
 
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgInteract)];
             fixed (byte* p = buffer)
                 *(MsgInteract*)p = *msgP;
             return buffer;
         }
-        public static byte[] Create(int attackerUniqueId, int targetUniqueId, ushort targetX, ushort targetY, MsgInteractType type, int value)
+        public static Memory<byte> Create(int attackerUniqueId, int targetUniqueId, ushort targetX, ushort targetY, MsgInteractType type, int value)
         {
             var msgP = stackalloc MsgInteract[1];
             msgP->Size = (ushort)sizeof(MsgInteract);
@@ -52,34 +53,34 @@ namespace MagnumOpus.Networking.Packets
             msgP->Type = type;
             msgP->Value = value;
 
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgInteract)];
             fixed (byte* p = buffer)
                 *(MsgInteract*)p = *msgP;
             return buffer;
         }
-        public static byte[] Die(PixelEntity attacker, PixelEntity target)
+        public static Memory<byte> Die(in PixelEntity attacker, PixelEntity target)
         {
-            ref readonly var phy = ref target.Get<BodyComponent>();
+            ref readonly var bdy = ref target.Get<PositionComponent>();
             var msgP = stackalloc MsgInteract[1];
             msgP->Size = 32;
             msgP->Id = 1022;
             msgP->Timestamp = Environment.TickCount;
             msgP->AttackerUniqueId = attacker.Id;
             msgP->TargetUniqueId = target.Id;
-            msgP->X = (ushort)phy.Location.X;
-            msgP->Y = (ushort)phy.Location.Y;
+            msgP->X = (ushort)bdy.Position.X;
+            msgP->Y = (ushort)bdy.Position.Y;
             msgP->Type = MsgInteractType.Death;
             msgP->Value = 0;
 
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgInteract)];
             fixed (byte* p = buffer)
                 *(MsgInteract*)p = *msgP;
             return buffer;
         }
 
-        public static implicit operator byte[](MsgInteract msg)
+        public static implicit operator Memory<byte>(MsgInteract msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgInteract)];
             fixed (byte* p = buffer)
                 *(MsgInteract*)p = *&msg;
             return buffer;

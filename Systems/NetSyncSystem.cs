@@ -30,42 +30,28 @@ namespace MagnumOpus.Simulation.Systems
             }
         }
 
-        public static void SelfUpdate(in PixelEntity ntt)
-        {
-            Update(in ntt, in ntt);
-        }
+        public static void SelfUpdate(in PixelEntity ntt) => Update(in ntt, in ntt);
 
         public static void Update(in PixelEntity ntt, in PixelEntity other)
         {
             ref readonly var syn = ref other.Get<NetSyncComponent>();
+            ref readonly var net = ref ntt.Get<NetSyncComponent>();
             
             if (syn.Fields.HasFlag(SyncThings.Position))
             {
-                ref var phy = ref other.Get<BodyComponent>(); 
-
-                if (Game.CurrentTick == phy.ChangedTick)
-                    ntt.NetSync(MsgWalk.Create(other.Id, phy.Direction, false));
+                ref var bdy = ref other.Get<BodyComponent>(); 
             }
             if (syn.Fields.HasFlag(SyncThings.Health))
             {
                 ref readonly var hlt = ref other.Get<HealthComponent>();
-                if (Game.CurrentTick == hlt.ChangedTick)
-                {
-                    ntt.NetSync(MsgUpdate.Create(other.Id, hlt.Health, MsgUpdateType.Hp));
-                    ntt.NetSync(MsgUpdate.Create(other.Id, hlt.MaxHealth, MsgUpdateType.MaxHp));
-                }
             }
             if (syn.Fields.HasFlag(SyncThings.Level))
             {
                 ref readonly var lvl = ref other.Get<LevelComponent>();
-                if (Game.CurrentTick == lvl.ChangedTick)
-                    ntt.NetSync(MsgUpdate.Create(other.Id, lvl.Level, MsgUpdateType.Level));
             }
             if (syn.Fields.HasFlag(SyncThings.Experience))
             {
                 ref readonly var lvl = ref other.Get<LevelComponent>();
-                if (Game.CurrentTick == lvl.ChangedTick)
-                    ntt.NetSync(MsgUpdate.Create(other.Id, lvl.Experience, MsgUpdateType.Exp));
             }
         }
     }

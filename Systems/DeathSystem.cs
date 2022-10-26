@@ -33,8 +33,8 @@ namespace MagnumOpus.Simulation.Systems
                 return;
             }
 
-            ref readonly var phy = ref ntt.Get<BodyComponent>();
-            Game.Grids[(int)phy.Location.Z].Remove(in ntt);
+            ref readonly var pos = ref ntt.Get<PositionComponent>();
+            Game.Grids[(int)pos.Position.Z].Remove(in ntt);
             PixelWorld.Destroy(in ntt);
         }
     }

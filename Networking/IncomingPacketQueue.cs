@@ -35,7 +35,7 @@ namespace MagnumOpus.Networking
                         queue.Clear();
                         continue;
                     }                    
-                    GamePacketHandler.Process(in ntt, packet);
+                    GamePacketHandler.Process(in ntt, in packet);
                 }
             }
         }

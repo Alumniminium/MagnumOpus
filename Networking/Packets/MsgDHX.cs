@@ -35,23 +35,23 @@ namespace MagnumOpus.Networking.Packets
         [FieldOffset(227)]  
         public fixed byte PublicKey[128];
 
-        public static MsgDHX Create(byte[] civ, byte[] siv, string p, string g, string pubkey)
+        public static MsgDHX Create(in Memory<byte> civ, Memory<byte> siv, string p, string g, string pubkey)
         {
             var dhx = new MsgDHX
             {
                 Size = 352,
                 RandomPadLen = 42,
-                EncryptionIVLen = (uint)8,
-                DecryptionIVLen = (uint)8,
+                EncryptionIVLen = 8,
+                DecryptionIVLen = 8,
                 PrimeModuloLen = (uint)p.Length,
                 GeneratorLen = (uint)g.Length,
                 PublicKeyLen = (uint)pubkey.Length
             };
 
             for (var i = 0; i < 8; i++)
-                dhx.EncryptionIV[i] = civ[i];
+                dhx.EncryptionIV[i] = civ.Span[i];
             for (var i = 0; i < 8; i++)
-                dhx.DecryptionIV[i] = siv[i];
+                dhx.DecryptionIV[i] = siv.Span[i];
             for (var i = 0; i < p.Length; i++)
                 dhx.PrimeModulo[i] = (byte)p[i];
             for (var i = 0; i < g.Length; i++)
@@ -64,11 +64,9 @@ namespace MagnumOpus.Networking.Packets
 
         public static implicit operator Memory<byte>(MsgDHX msg) 
         {
-            var buffer = new byte[sizeof(MsgDHX)+8];
+            var buffer = new byte[sizeof(MsgDHX)];
             fixed (byte* ptr = buffer)
                 *(MsgDHX*)ptr = msg;
-            var tqServerBytes = Encoding.ASCII.GetBytes("TQServer");
-            Array.Copy(tqServerBytes, 0, buffer, buffer.Length-tqServerBytes.Length, tqServerBytes.Length);
             return buffer;
         }
     }

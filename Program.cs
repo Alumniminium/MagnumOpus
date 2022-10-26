@@ -1,7 +1,6 @@
-﻿using System.Diagnostics;
-using System.Net.Sockets;
-using System.Runtime;
+﻿using System.Net.Sockets;
 using System.Text;
+using HerstLib.IO;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking;
@@ -13,14 +12,9 @@ using SpaceParitioning;
 
 internal class Game
 {
-    public const int TargetTps = 30;
-    public static uint CurrentTick;
     public static Dictionary<int, Grid> Grids = new();
 
-    private const string SLEEP = "Sleep";
-    private const string WORLD_UPDATE = "World.Update";
-
-    private static void Main(string[] args)
+    private static void Main()
     {
         var systems = new List<PixelSystem>
             {
@@ -36,27 +30,24 @@ internal class Game
                 new RespawnSystem(),
                 new NetSyncSystem(),
             };
-        PixelWorld.Systems = systems.ToArray();
-
-        GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
-        PerformanceMetrics.RegisterSystem(WORLD_UPDATE);
-        PerformanceMetrics.RegisterSystem(SLEEP);
-        PerformanceMetrics.RegisterSystem(nameof(Game));
+        PixelWorld.SetSystems(systems.ToArray());
+        PixelWorld.SetFPS(30);
+        PixelWorld.RegisterOnSecond(()=> 
+        {
+            var lines = PerformanceMetrics.Draw();
+            // Console.WriteLine(lines);
+            PerformanceMetrics.Restart();
+        });
 
         // Db.LoadBaseResources();
         // SpawnManager.Respawn();
-        var worker = new Thread(SimulationLoopAsync) { IsBackground = true, Priority = ThreadPriority.Highest };
         var loginThread = new Thread(LoginServerLoop) { IsBackground = true, Priority = ThreadPriority.Highest };
         var gameThread = new Thread(GameServerLoop) { IsBackground = true, Priority = ThreadPriority.Highest };
-        worker.Start();
         loginThread.Start();
         gameThread.Start();
+        
         while (true)
-        {
-            Thread.Sleep(1000);
-            //var lines = PerformanceMetrics.Draw();
-            //Console.WriteLine(lines);
-        }
+            PixelWorld.Update();
     }
 
     private static void LoginServerLoop()
@@ -66,9 +57,8 @@ internal class Game
         while (true)
         {
             var client = listener.AcceptTcpClient();
-            var stream = client.GetStream();
-            var reader = new BinaryReader(stream);
-            // var writer = new BinaryWriter(stream);
+            client.Client.NoDelay=true;
+            client.Client.DontFragment = true;
 
             var player = PixelWorld.CreateEntity(EntityType.Player);
             var net = new NetworkComponent(player, client.Client);
@@ -79,9 +69,9 @@ internal class Game
                 break;
 
             IpRegistry.Register(player, ipendpoint.Split(':')[0]);
-            Console.WriteLine($"[LOGIN] Client connected: {client.Client.RemoteEndPoint}");
+            FConsole.WriteLine($"[LOGIN] Client connected: {client.Client.RemoteEndPoint}");
 
-            var count = reader.Read(net.RecvBuffer.Span[..52]);
+            var count = net.Socket.Receive(net.RecvBuffer.Span[..52]);
             var packet = net.RecvBuffer[..count];
             net.AuthCrypto.Decrypt(packet.Span, packet.Span);
             LoginPacketHandler.Process(in player, in packet);
@@ -89,7 +79,7 @@ internal class Game
             try{
             while (client.Connected)
             {
-                count = reader.Read(net.RecvBuffer.Span);
+                count = net.Socket.Receive(net.RecvBuffer.Span);
                 if (count == 0)
                     break;
                 packet = net.RecvBuffer[..count];
@@ -99,7 +89,7 @@ internal class Game
             }
             catch
             {
-                Console.WriteLine($"[LOGIN] Client disconnected: {client.Client.RemoteEndPoint}");
+                FConsole.WriteLine($"[LOGIN] Client disconnected: {client.Client.RemoteEndPoint}");
                 client.Close();
                 client.Dispose();
             }
@@ -112,8 +102,10 @@ internal class Game
         while (true)
         {
             var client = listener.AcceptTcpClient();
+            client.Client.NoDelay=true;
+            client.Client.DontFragment = true;
 
-            Console.WriteLine($"[GAME] Client connected: {client.Client.RemoteEndPoint}");
+            FConsole.WriteLine($"[GAME] Client connected: {client.Client.RemoteEndPoint}");
 
             var ipendpoint = client.Client.RemoteEndPoint?.ToString();
             if (ipendpoint == null)
@@ -124,27 +116,42 @@ internal class Game
                 continue;
 
             ref var net = ref player.Get<NetworkComponent>();
+            net.UseGameCrypto=true;
             net.Socket.Close();
             net.Socket.Dispose();
             net.Socket = client.Client;
 
             net.DiffieHellman.ComputePublicKeyAsync();
             Memory<byte> dhx = MsgDHX.Create(net.ClientIV, net.ServerIV, DiffieHellman.P, DiffieHellman.G, net.DiffieHellman.GetPublicKey());
-
-            net.GameCrypto.Encrypt(dhx.Span, dhx.Span);
-            player.NetSync(dhx);
+            player.NetSync(in dhx);
 
             var count = net.Socket.Receive(net.RecvBuffer.Span);
             var packet = net.RecvBuffer[..count];
-            net.GameCrypto.Decrypt(packet.Span, packet.Span);
+            net.GameCrypto.Decrypt(packet.Span);
 
-            var pubkey = Encoding.ASCII.GetString(ParseResponse(packet));
-            Console.WriteLine(GamePacketHandler.Dump(packet.ToArray()));
-            Console.WriteLine($"Pubkey: {pubkey}");
+            unsafe
+            {
+                byte[] pk;
+                fixed (byte* ptr = packet.Span)
+                {
+                    var size = *(ushort*)(ptr + 7);
+                    var junkSize = *(int*)(ptr + 11);
+                    var pkSize = *(int*)(ptr + 15 + junkSize);
+                    pk = new byte[pkSize];
 
-            net.DiffieHellman.ComputePrivateKey(pubkey);
-            net.GameCrypto.GenerateKeys(net.DiffieHellman.GetPrivateKey());
-            net.GameCrypto.SetIVs(net.ServerIV, net.ClientIV);
+                    pk = new byte[pkSize];
+                    for (var i = 0; i < pkSize; i++)
+                        pk[i] = *(ptr + 19 + junkSize + i);
+                }
+
+                var pubkey = Encoding.ASCII.GetString(pk);
+                FConsole.WriteLine(packet.Dump());
+                FConsole.WriteLine($"Pubkey: {pubkey}");
+
+                net.DiffieHellman.ComputePrivateKey(pubkey);
+                net.GameCrypto.GenerateKeys(net.DiffieHellman.GetPrivateKey());
+                net.GameCrypto.SetIVs(net.ServerIV, net.ClientIV);
+            }
 
             while (true)
             {
@@ -153,7 +160,7 @@ internal class Game
                 if (count == 0)
                     break;
 
-                net.GameCrypto.Decrypt(net.RecvBuffer.Span[..2],net.RecvBuffer.Span[..2]);
+                net.GameCrypto.Decrypt(net.RecvBuffer.Span[..2]);
                 var size = BitConverter.ToUInt16(net.RecvBuffer.Span[..2])+8;
 
                 while(count < size)
@@ -166,87 +173,9 @@ internal class Game
                 }
                 
                 packet = net.RecvBuffer[..size];
-                net.GameCrypto.Decrypt(packet.Span[2..size], packet.Span[2..size]);
-                GamePacketHandler.Process(in player, packet);
+                net.GameCrypto.Decrypt(packet.Span[2..size]);
+                GamePacketHandler.Process(in player, in packet);
             }
         }
-    }
-
-    private static unsafe byte[] ParseResponse(Memory<byte> buffer)
-    {
-        byte[] publicKey;
-        fixed (byte* ptr = buffer.Span)
-        {
-            var length = *(ushort*)(ptr + 7);
-            Console.WriteLine("DH Offset 7: " + length + " | Buffer Size: " + buffer.Length);
-            Console.WriteLine("DH Length: " + (length + 7) + " | Buffer Size: " + buffer.Length);
-            var junkLength = *(int*)(ptr + 11);
-            Console.WriteLine("DH Junk Length: " + junkLength);
-            var publicKeyLength = *(int*)(ptr + 15 + junkLength);
-            Console.WriteLine("DH Key Length: " + publicKeyLength);
-
-            publicKey = new byte[publicKeyLength];
-            for (var i = 0; i < publicKeyLength; i++)
-                publicKey[i] = *(ptr + 19 + junkLength + i);
-        }
-
-        return publicKey;
-    }
-
-    private static async void SimulationLoopAsync()
-    {
-        var sw = Stopwatch.StartNew();
-        var fixedUpdateAcc = 0f;
-        const float fixedUpdateTime = 1f / TargetTps;
-        var onSecond = 0f;
-
-        while (true)
-        {
-            double last;
-            var dt = MathF.Min(1f / TargetTps, (float)sw.Elapsed.TotalSeconds);
-            fixedUpdateAcc += dt;
-            onSecond += dt;
-            sw.Restart();
-
-            IncomingPacketQueue.ProcessAll();
-
-            if (fixedUpdateAcc >= fixedUpdateTime)
-            {
-                for (var i = 0; i < PixelWorld.Systems.Length; i++)
-                {
-                    var system = PixelWorld.Systems[i];
-                    last = sw.Elapsed.TotalMilliseconds;
-                    system.Update(fixedUpdateTime);
-                    PerformanceMetrics.AddSample(system.Name, sw.Elapsed.TotalMilliseconds - last);
-                    last = sw.Elapsed.TotalMilliseconds;
-                    PixelWorld.Update();
-                    PerformanceMetrics.AddSample(WORLD_UPDATE, sw.Elapsed.TotalMilliseconds - last);
-                }
-
-
-                if (onSecond >= 1)
-                {
-                    PerformanceMetrics.Restart();
-                    onSecond = 0;
-                }
-
-                fixedUpdateAcc -= fixedUpdateTime;
-                CurrentTick++;
-                PerformanceMetrics.AddSample(nameof(Game), sw.Elapsed.TotalMilliseconds);
-            }
-            await OutgoingPacketQueue.SendAll();
-
-            Sleep(sw, fixedUpdateTime);
-        }
-    }
-
-    private static void Sleep(Stopwatch sw, float fixedUpdateTime)
-    {
-        double last;
-        var tickTime = sw.Elapsed.TotalMilliseconds;
-        last = sw.Elapsed.TotalMilliseconds;
-        var sleepTime = (int)Math.Max(0, (fixedUpdateTime * 1000) - tickTime);
-        Thread.Sleep(sleepTime);
-        PerformanceMetrics.AddSample(SLEEP, sw.Elapsed.TotalMilliseconds - last);
     }
 }

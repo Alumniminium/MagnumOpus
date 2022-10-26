@@ -7,7 +7,7 @@ namespace MagnumOpus.Helpers
         private static readonly Dictionary<string, PixelEntity> NameToEntity = new ();
         private static readonly Dictionary<PixelEntity, string> EntityToName = new ();
 
-        public static void Register(PixelEntity entity, string name)
+        public static void Register(in PixelEntity entity, string name)
         {
             if (NameToEntity.TryGetValue(name, out var value))
             {
@@ -19,7 +19,7 @@ namespace MagnumOpus.Helpers
             EntityToName.Add(entity, name);
         }
 
-        public static (bool found, string name) GetName(PixelEntity entity)
+        public static (bool found, string name) GetName(in PixelEntity entity)
         {
             return EntityToName.TryGetValue(entity, out var name) ? ((bool found, string name))(true, name) : ((bool found, string name))(false, string.Empty);
         }

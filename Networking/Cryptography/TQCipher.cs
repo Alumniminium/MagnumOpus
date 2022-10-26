@@ -1,16 +1,16 @@
 namespace MagnumOpus.Networking.Cryptography
 {
-        public sealed class TQCipher
+    public sealed class TQCipher
     {
         // Static fields and properties
-        private static byte[] KInit = new byte[0x200];
-        
+        private static readonly Memory<byte> KInit = new byte[0x200];
+
         // Local fields and properties
-        private byte[] K;
-        private byte[] K1 = new byte[0x200];
-        private byte[] K2 = new byte[0x200];
+        private Memory<byte> K;
+        private readonly Memory<byte> K1 = new byte[0x200];
+        private readonly Memory<byte> K2 = new byte[0x200];
         private ushort DecryptCounter, EncryptCounter;
-        
+
         /// <summary>
         /// Add defines how the cipher increments counters. By default, counters are 
         /// incremented without thread-safety for synchronous reads and writes.
@@ -25,10 +25,10 @@ namespace MagnumOpus.Networking.Cryptography
         static TQCipher()
         {
             var seed = new byte[] { 0x9D, 0x0F, 0xFA, 0x13, 0x62, 0x79, 0x5C, 0x6D };
-            for (int i = 0; i < 0x100; i++) 
+            for (int i = 0; i < 0x100; i++)
             {
-                TQCipher.KInit[i] = seed[0];
-                TQCipher.KInit[i + 0x100] = seed[4];
+                KInit.Span[i] = seed[0];
+                KInit.Span[i + 0x100] = seed[4];
                 seed[0] = (byte)((seed[1] + (seed[0] * seed[2])) * seed[0] + seed[3]);
                 seed[4] = (byte)((seed[5] - (seed[4] * seed[6])) * seed[4] + seed[7]);
             }
@@ -43,10 +43,10 @@ namespace MagnumOpus.Networking.Cryptography
         /// </summary>
         public TQCipher()
         {
-            this.Add = this.DefaultIncrement;
-            Buffer.BlockCopy(TQCipher.KInit, 0, this.K1, 0, TQCipher.KInit.Length);
-            Buffer.BlockCopy(TQCipher.KInit, 0, this.K2, 0, TQCipher.KInit.Length);
-            this.K = this.K1;
+            Add = DefaultIncrement;
+            KInit.CopyTo(K1);
+            KInit.CopyTo(K2);
+            K = K1;
         }
 
         /// <summary>
@@ -55,24 +55,24 @@ namespace MagnumOpus.Networking.Cryptography
         /// the game server.
         /// </summary>
         /// <param name="seeds">Array of seeds for generating keys</param>
-        public void GenerateKeys(object[] seeds)
+        public void GenerateKeys(ulong[] seeds)
         {
-            var seed = seeds[0] as ulong?;
+            var seed = seeds[0];
             var a = (uint)(seed >> 32);
-            var b = (uint)(seed);
-            var c = (uint)(((a + b) ^ 0x4321) ^ a);
-            var d = (uint)(c * c);
+            var b = (uint)seed;
+            var c = (a + b) ^ 0x4321 ^ a;
+            var d = c * c;
 
             var temp1 = BitConverter.GetBytes(c);
             var temp2 = BitConverter.GetBytes(d);
             for (int i = 0; i < 0x100; i++)
             {
-                this.K2[i] = (byte)(this.K1[i] ^ temp1[i % 4]);
-                this.K2[i + 0x100] = (byte)(this.K1[i + 0x100] ^ temp2[i % 4]);
+                K2.Span[i] = (byte)(K1.Span[i] ^ temp1[i % 4]);
+                K2.Span[i + 0x100] = (byte)(K1.Span[i + 0x100] ^ temp2[i % 4]);
             }
 
-            this.K = this.K2;
-            this.EncryptCounter = 0;
+            K = K2;
+            EncryptCounter = 0;
         }
 
         /// <summary>
@@ -82,10 +82,7 @@ namespace MagnumOpus.Networking.Cryptography
         /// </summary>
         /// <param name="src">Source span that requires decrypting</param>
         /// <param name="dst">Destination span to contain the decrypted result</param>
-        public void Decrypt(Span<byte> src, Span<byte> dst)
-        {
-            this.XOR(src, dst, this.K, ref this.DecryptCounter);
-        }
+        public void Decrypt(Span<byte> src, Span<byte> dst) => XOR(src, dst, K, ref DecryptCounter);
 
         /// <summary>
         /// Encrypt the specified span by XORing the source span with the cipher's 
@@ -94,10 +91,7 @@ namespace MagnumOpus.Networking.Cryptography
         /// </summary>
         /// <param name="src">Source span that requires encrypting</param>
         /// <param name="dst">Destination span to contain the encrypted result</param>
-        public void Encrypt(Span<byte> src, Span<byte> dst)
-        {
-            this.XOR(src, dst, this.K1, ref this.EncryptCounter);
-        }
+        public void Encrypt(Span<byte> src) => XOR(src, src, K1, ref EncryptCounter);
 
         /// <summary>
         /// XOR sets the destination span of bytes with the result of XORing the source
@@ -108,15 +102,15 @@ namespace MagnumOpus.Networking.Cryptography
         /// <param name="dst">Destination span to contain the decrypted result</param>
         /// <param name="k">Keystream to be used for XORing data</param>
         /// <param name="c">Counter for the direction of the cipher operation</param>
-        private void XOR(Span<byte> src, Span<byte> dst, byte[] k, ref ushort c)
+        private void XOR(Span<byte> src, Span<byte> dst, Memory<byte> k, ref ushort c)
         {
-            var x = this.Add(ref c, src.Length);
+            var x = Add(ref c, src.Length);
             for (int i = 0; i < src.Length; i++)
             {
                 dst[i] = (byte)(src[i] ^ 0xAB);
                 dst[i] = (byte)(dst[i] >> 4 | dst[i] << 4);
-                dst[i] = (byte)(dst[i] ^ k[x & 0xff]);
-                dst[i] = (byte)(dst[i] ^ k[(x >> 8) + 0x100]);
+                dst[i] = (byte)(dst[i] ^ k.Span[x & 0xff]);
+                dst[i] = (byte)(dst[i] ^ k.Span[(x >> 8) + 0x100]);
                 x++;
             }
         }
@@ -132,12 +126,11 @@ namespace MagnumOpus.Networking.Cryptography
         public delegate ushort Increment(ref ushort x, int n);
 
         /// <summary>
-        /// Increments without thread-safety for <see cref="TQCipher.Increment"/>
+        /// Increments without thread-safety for <see cref="Increment"/>
         /// </summary>
         /// <param name="x">Value to be incremented</param>
         /// <param name="n">Amount to increment by</param>
         /// <returns>Returns the previous value.</returns>
-        public ushort DefaultIncrement(ref ushort x, int n) 
-            => (ushort)((x = (ushort)(x + n)) - n);
+        public static ushort DefaultIncrement(ref ushort x, int n) => (ushort)((x = (ushort)(x + n)) - n);
     }
 }

@@ -6,16 +6,16 @@ namespace MagnumOpus.Networking
 {
     public static class NetworkHelper
     {
-        public static void FullSync(PixelEntity to, PixelEntity ntt)
+        public static void FullSync(in PixelEntity to, PixelEntity ntt)
         {
-            ref readonly var phy = ref ntt.Get<BodyComponent>();
+            ref readonly var bdy = ref ntt.Get<BodyComponent>();
             Memory<byte> spawnPacket = MsgSpawn.Create(ntt);
-            to.NetSync(spawnPacket);
+            to.NetSync(in spawnPacket);
         }
-        public static void Broadcast(Memory<byte> packet)
+        public static void Broadcast(in Memory<byte> packet)
         {
             foreach (PixelEntity other in PixelWorld.Players)
-                other.NetSync(packet);
+                other.NetSync(in packet);
         }
     }
 }

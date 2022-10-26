@@ -18,19 +18,20 @@ namespace MagnumOpus.Networking.Packets
         public ushort Sort;
         public ushort Base;
 
-        public static byte[] Create(PixelEntity ntt)
+        public static Memory<byte> Create(in PixelEntity ntt)
         {
-            ref readonly var phy = ref ntt.Get<BodyComponent>();
+            ref readonly var bdy = ref ntt.Get<BodyComponent>();
             ref readonly var npc = ref ntt.Get<NpcComponent>();
+            ref readonly var pos = ref ntt.Get<PositionComponent>();
             
             var packet = new MsgNpcSpawn
             {
                 Size = (ushort)sizeof(MsgNpcSpawn),
                 Id = 2030,
                 UniqueId = ntt.Id,
-                Look = (ushort)phy.Look,
-                X = (ushort)phy.Location.X,
-                Y = (ushort)phy.Location.Y,
+                Look = (ushort)bdy.Look,
+                X = (ushort)pos.Position.X,
+                Y = (ushort)pos.Position.Y,
                 Type = npc.Type,
                 Sort = npc.Sort,
                 Base = npc.Base
@@ -38,9 +39,9 @@ namespace MagnumOpus.Networking.Packets
             return packet;
         }
 
-        public static implicit operator byte[](MsgNpcSpawn msg)
+        public static implicit operator Memory<byte>(MsgNpcSpawn msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgNpcSpawn)];
             fixed (byte* p = buffer)
                 *(MsgNpcSpawn*)p = *&msg;
             return buffer;

@@ -20,10 +20,10 @@ namespace MagnumOpus.Networking.Packets
         public byte Position;
         public fixed byte Spouse[16];
 
-        public static byte[] Create(PixelEntity target)
+        public static Memory<byte> Create(in PixelEntity target)
         {
             ref readonly var trs = ref target.Get<TransformationComponent>();
-            ref readonly var phy = ref target.Get<BodyComponent>();
+            ref readonly var bdy = ref target.Get<BodyComponent>();
             ref readonly var gld = ref target.Get<GuildComponent>();
             ref readonly var mar = ref target.Get<MarriageComponent>();
             ref readonly var pkp = ref target.Get<PkPointComponent>();
@@ -38,7 +38,7 @@ namespace MagnumOpus.Networking.Packets
                 Size = (ushort)sizeof(MsgFriendInfo),
                 Id = 2033,
                 UniqId = target.Id,
-                Look = phy.Look,
+                Look = bdy.Look,
                 Level = lvl.Level,
                 Profession = (byte)pro.Class,
                 PkPoints = pkp.Points,
@@ -52,9 +52,9 @@ namespace MagnumOpus.Networking.Packets
             return packet;
         }
 
-        public static implicit operator byte[](MsgFriendInfo msg)
+        public static implicit operator Memory<byte>(MsgFriendInfo msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgFriendInfo)];
             fixed (byte* p = buffer)
                 *(MsgFriendInfo*)p = *&msg;
             return buffer;

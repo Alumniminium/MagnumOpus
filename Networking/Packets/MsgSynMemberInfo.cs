@@ -15,7 +15,7 @@ namespace MagnumOpus.Networking.Packets
         public GuildRanks Rank;
         public fixed byte Name[16];
 
-        public static byte[] Create(PixelEntity member)
+        public static Memory<byte> Create(in PixelEntity member)
         {
             ref readonly var gld = ref member.Get<GuildComponent>();
             ref readonly var ntc = ref member.Get<NameTagComponent>();
@@ -32,9 +32,9 @@ namespace MagnumOpus.Networking.Packets
             return packet;
         }
 
-        public static implicit operator byte[](MsgSynMemberInfo msg)
+        public static implicit operator Memory<byte>(MsgSynMemberInfo msg)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(MsgUpdate));
+            var buffer = new byte[sizeof(MsgSynMemberInfo)];
             fixed (byte* p = buffer)
                 *(MsgSynMemberInfo*)p = *&msg;
             return buffer;
