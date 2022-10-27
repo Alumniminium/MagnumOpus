@@ -2,7 +2,7 @@ using System.Net.Sockets;
 using MagnumOpus.ECS;
 using MagnumOpus.Networking.Cryptography;
 
-namespace MagnumOpus.Simulation.Components
+namespace MagnumOpus.Components
 {
     [Component]
     public struct NetworkComponent

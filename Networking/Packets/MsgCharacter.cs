@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 using MagnumOpus.ECS;
-using MagnumOpus.Simulation.Components;
+using MagnumOpus.Components;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -70,7 +70,7 @@ namespace MagnumOpus.Networking.Packets
             ref var atr = ref ntt.Get<AttributeComponent>();
             ref var rbn = ref ntt.Get<RebornComponent>();
 
-            ref readonly var partner = ref ConquerWorld.GetEntity(mar.SpouseId);
+            ref readonly var partner = ref PixelWorld.GetEntity(mar.SpouseId);
             ref var sNtc = ref partner.Get<NameTagComponent>();
 
             if (sNtc.Name == null)

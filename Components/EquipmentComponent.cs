@@ -1,6 +1,6 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Simulation.Components
+namespace MagnumOpus.Components
 {
     [Component]
     public struct EquipmentComponent
@@ -18,7 +18,7 @@ namespace MagnumOpus.Simulation.Components
         public EquipmentComponent(int entityId)
         {
             EntityId = entityId;
-            ChangedTick = ConquerWorld.Tick;
+            ChangedTick = PixelWorld.Tick;
             Head = 0;
             Armor = 0;
             MainHand = 0;

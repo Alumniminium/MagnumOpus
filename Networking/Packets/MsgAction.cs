@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using HerstLib.IO;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Simulation.Components;
+using MagnumOpus.Components;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -70,7 +70,7 @@ namespace MagnumOpus.Networking.Packets
                         ref var pos = ref ntt.Get<PositionComponent>();
                         var reply = MsgAction.Create(0, ntt.Id, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
                         ntt.NetSync(in reply);
-                        ConquerWorld.Players.Add(ntt);
+                        PixelWorld.Players.Add(ntt);
                         break;
                     }
                 case MsgActionType.Jump:

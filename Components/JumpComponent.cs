@@ -1,7 +1,7 @@
 using System.Numerics;
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Simulation.Components
+namespace MagnumOpus.Components
 {
     [Component]
     public struct JumpComponent
@@ -15,8 +15,8 @@ namespace MagnumOpus.Simulation.Components
         public JumpComponent(int entityId, ushort x, ushort y)
         {
             EntityId = entityId;
-            ChangedTick = ConquerWorld.Tick;
-            CreatedTick = ConquerWorld.Tick;
+            ChangedTick = PixelWorld.Tick;
+            CreatedTick = PixelWorld.Tick;
             Position = new Vector2(x, y);
             Time = 0;
         }

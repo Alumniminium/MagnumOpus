@@ -4,7 +4,7 @@ using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Cryptography;
 using MagnumOpus.Networking.Packets;
-using MagnumOpus.Simulation.Components;
+using MagnumOpus.Components;
 
 namespace MagnumOpus.Networking
 {
@@ -35,7 +35,7 @@ namespace MagnumOpus.Networking
                     {
                         var msg = (MsgConnectLogin)packet;
                         
-                        var player = ConquerWorld.GetEntity((int)msg.UniqueId);
+                        var player = PixelWorld.GetEntity((int)msg.UniqueId);
                         var filename = msg.GetFileName();
                         FConsole.WriteLine($"[LOGIN/1052] Client Id: {msg.UniqueId}, File: {filename} Contents: {msg.Contents}");
 

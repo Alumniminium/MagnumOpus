@@ -1,6 +1,6 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Simulation.Components
+namespace MagnumOpus.Components
 {
     [Component]
     public struct ManaComponent

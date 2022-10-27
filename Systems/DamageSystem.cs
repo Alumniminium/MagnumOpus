@@ -1,5 +1,5 @@
 using MagnumOpus.ECS;
-using MagnumOpus.Simulation.Components;
+using MagnumOpus.Components;
 
 namespace MagnumOpus.Simulation.Systems
 {
@@ -11,15 +11,15 @@ namespace MagnumOpus.Simulation.Systems
         {
             if (ntt.Has<RespawnTagComponent>())
                 return;
-            if (!ConquerWorld.EntityExists(dmg.AttackerId))
+            if (!PixelWorld.EntityExists(dmg.AttackerId))
                 return;
-            var attacker = ConquerWorld.GetEntity(dmg.AttackerId);
+            var attacker = PixelWorld.GetEntity(dmg.AttackerId);
            
             if (dmg.Damage > 0)
             {
                 var rewardableDamage = Math.Min(dmg.Damage, hlt.Health);
                 hlt.Health -= (ushort)Math.Clamp(hlt.Health, 0, dmg.Damage);
-                hlt.ChangedTick = ConquerWorld.Tick;
+                hlt.ChangedTick = PixelWorld.Tick;
 
                 if (attacker.Has<LevelComponent>())
                 {

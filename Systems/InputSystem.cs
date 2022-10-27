@@ -1,5 +1,5 @@
 using MagnumOpus.ECS;
-using MagnumOpus.Simulation.Components;
+using MagnumOpus.Components;
 
 namespace MagnumOpus.Simulation.Systems
 {

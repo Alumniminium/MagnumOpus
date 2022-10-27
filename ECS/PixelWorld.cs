@@ -4,9 +4,9 @@ using MagnumOpus.Networking;
 
 namespace MagnumOpus.ECS
 {
-    public static class ConquerWorld
+    public static class PixelWorld
     {
-        public const int MaxEntities = 1500_000;
+        public const int MaxEntities = 1_500_000;
         public static int TargetTps { get; private set; } = 30;
         private static float UpdateTime;
 
@@ -26,7 +26,7 @@ namespace MagnumOpus.ECS
         private static Action? OnSecond;
         private static Action? OnTick;
 
-        static ConquerWorld()
+        static PixelWorld()
         {
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
             Entities = new PixelEntity[MaxEntities];
@@ -35,7 +35,7 @@ namespace MagnumOpus.ECS
             PerformanceMetrics.RegisterSystem(nameof(IncomingPacketQueue));
             PerformanceMetrics.RegisterSystem(nameof(OutgoingPacketQueue));
             PerformanceMetrics.RegisterSystem("SLEEP");
-            PerformanceMetrics.RegisterSystem(nameof(ConquerWorld));
+            PerformanceMetrics.RegisterSystem(nameof(PixelWorld));
         }
 
         public static void SetSystems(params PixelSystem[] systems) => Systems = systems;
@@ -126,7 +126,7 @@ namespace MagnumOpus.ECS
             last = Stopwatch.Elapsed.TotalMilliseconds;
             OutgoingPacketQueue.SendAll();
             PerformanceMetrics.AddSample(nameof(OutgoingPacketQueue), Stopwatch.Elapsed.TotalMilliseconds - last);
-            PerformanceMetrics.AddSample(nameof(ConquerWorld), Stopwatch.Elapsed.TotalMilliseconds);
+            PerformanceMetrics.AddSample(nameof(PixelWorld), Stopwatch.Elapsed.TotalMilliseconds);
 
             last = Stopwatch.Elapsed.TotalMilliseconds;
             var sleepTime = (int)Math.Max(0, -1 + (UpdateTime * 1000) - last);

@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Numerics;
 using MagnumOpus.ECS;
-using MagnumOpus.Simulation.Components;
+using MagnumOpus.Components;
 
 namespace SpacePartitioning
 {
@@ -87,7 +87,16 @@ namespace SpacePartitioning
                 {
                     var cell = FindCell(new Vector2(x, y));
                     if (CellEntities.TryGetValue(cell.Id, out var list))
+                    {
+                        foreach(var other in list)
+                        {
+                            ref readonly var pos = ref other.Get<PositionComponent>();
+                            var dist = Vector2.Distance(pos.Position, vwp.Viewport.Location.ToVector2());
+                            if(dist < 16)
+                                vwp.EntitiesVisible.Add(other);
+                        }
                         vwp.EntitiesVisible.AddRange(list);
+                    }
                 }
             vwp.EntitiesVisible.AddRange(StaticEntities);
         }

@@ -2,7 +2,7 @@ using System.Buffers;
 using System.Runtime.InteropServices;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Simulation.Components;
+using MagnumOpus.Components;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -21,7 +21,7 @@ namespace MagnumOpus.Networking.Packets
         public static Memory<byte> Create(in PixelEntity human)
         {
             ref readonly var gld = ref human.Get<GuildComponent>();
-            ref readonly var leader = ref ConquerWorld.GetEntity(gld.LeaderId);
+            ref readonly var leader = ref PixelWorld.GetEntity(gld.LeaderId);
             ref readonly var ntc = ref leader.Get<NameTagComponent>();
 
             MsgSyndicateSpawn* msgP = stackalloc MsgSyndicateSpawn[1];

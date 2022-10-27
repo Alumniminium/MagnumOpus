@@ -1,7 +1,7 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 
-namespace MagnumOpus.Simulation.Components
+namespace MagnumOpus.Components
 {
     [Component]
     public readonly struct WalkComponent
@@ -15,8 +15,8 @@ namespace MagnumOpus.Simulation.Components
         public WalkComponent(int entityId, Direction direction, bool isRunning)
         {
             EntityId = entityId;
-            CreatedTick = ConquerWorld.Tick;
-            ChangedTick = ConquerWorld.Tick;
+            CreatedTick = PixelWorld.Tick;
+            ChangedTick = PixelWorld.Tick;
             Direction = direction;
             IsRunning = isRunning;
         }

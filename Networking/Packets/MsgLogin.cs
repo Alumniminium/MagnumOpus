@@ -3,7 +3,7 @@ using System.Text;
 using HerstLib.IO;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Simulation.Components;
+using MagnumOpus.Components;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -39,8 +39,12 @@ namespace MagnumOpus.Networking.Packets
             FConsole.WriteLine($"[GAME] Client Version: {msg.ClientVersion}, Language: {language}");
             var ntc = new NameTagComponent(ntt.Id, "test");
             var dir = new DirectionComponent(ntt.Id, Direction.South);
+            var vwp = new ViewportComponent(ntt.Id, 8);
+            var syn = new NetSyncComponent(ntt.Id, SyncThings.All);
             ntt.Add(ref ntc);
             ntt.Add(ref dir);
+            ntt.Add(ref vwp);
+            ntt.Add(ref syn);
 
             var ok = MsgText.Create("SYSTEM", "ALLUSERS", "ANSWER_OK", MsgTextType.LoginInformation);
             ntt.NetSync(in ok);

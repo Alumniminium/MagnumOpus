@@ -1,6 +1,6 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Simulation.Components
+namespace MagnumOpus.Components
 {
     [Component]
     public struct ExperienceComponent
@@ -16,7 +16,7 @@ namespace MagnumOpus.Simulation.Components
             EntityId = entityId;
             Experience = exp;
             ExperienceToNextLevel = expReq;
-            ChangedTick = ConquerWorld.Tick;
+            ChangedTick = PixelWorld.Tick;
         }
         public override int GetHashCode() => EntityId;
     }

@@ -1,6 +1,6 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Simulation.Components
+namespace MagnumOpus.Components
 {
     [Component]
     public readonly struct RespawnTagComponent
@@ -12,7 +12,7 @@ namespace MagnumOpus.Simulation.Components
         public RespawnTagComponent(int entityId, uint expPenalty, int respawnTimeDelaySeconds)
         {
             EntityId = entityId;
-            RespawnTimeTick = ConquerWorld.Tick + ConquerWorld.TargetTps * respawnTimeDelaySeconds;
+            RespawnTimeTick = PixelWorld.Tick + PixelWorld.TargetTps * respawnTimeDelaySeconds;
             ExpPenalty = expPenalty;
         }
         

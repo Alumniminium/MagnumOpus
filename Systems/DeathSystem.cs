@@ -1,6 +1,6 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Networking;
-using MagnumOpus.Simulation.Components;
+using MagnumOpus.Components;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
 
@@ -14,9 +14,9 @@ namespace MagnumOpus.Simulation.Systems
         {
             if (dtc.KillerId != 0)
             {
-                if (!ConquerWorld.EntityExists(dtc.KillerId))
+                if (!PixelWorld.EntityExists(dtc.KillerId))
                     return;
-                var killer = ConquerWorld.GetEntity(dtc.KillerId);
+                var killer = PixelWorld.GetEntity(dtc.KillerId);
                 if (killer.Has<NameTagComponent>() && ntt.Has<NameTagComponent>())
                 {
                     ref readonly var killerNameTag = ref killer.Get<NameTagComponent>();
@@ -35,7 +35,7 @@ namespace MagnumOpus.Simulation.Systems
 
             ref readonly var pos = ref ntt.Get<PositionComponent>();
             Game.Grids[pos.Map].Remove(in ntt);
-            ConquerWorld.Destroy(in ntt);
+            PixelWorld.Destroy(in ntt);
         }
     }
 }

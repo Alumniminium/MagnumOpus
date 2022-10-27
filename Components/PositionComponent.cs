@@ -1,7 +1,7 @@
 using System.Numerics;
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Simulation.Components
+namespace MagnumOpus.Components
 {
     [Component]
     public struct PositionComponent
@@ -18,7 +18,7 @@ namespace MagnumOpus.Simulation.Components
             EntityId = nttId;
             Position = position;
             LastPosition = position;
-            ChangedTick = ConquerWorld.Tick;
+            ChangedTick = PixelWorld.Tick;
             Map = map;
         }
 

@@ -1,7 +1,7 @@
 using System.Buffers;
 using System.Runtime.InteropServices;
 using MagnumOpus.ECS;
-using MagnumOpus.Simulation.Components;
+using MagnumOpus.Components;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -30,7 +30,7 @@ namespace MagnumOpus.Networking.Packets
             ref readonly var lvl = ref target.Get<LevelComponent>();
             ref readonly var pro = ref target.Get<ProfessionComponent>();
 
-            ref readonly var spouse = ref ConquerWorld.GetEntity(mar.SpouseId);
+            ref readonly var spouse = ref PixelWorld.GetEntity(mar.SpouseId);
             ref readonly var spouseNtc = ref spouse.Get<NameTagComponent>();
             
             var packet = new MsgFriendInfo

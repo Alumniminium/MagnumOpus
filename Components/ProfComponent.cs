@@ -1,6 +1,6 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Simulation.Components
+namespace MagnumOpus.Components
 {
     [Component]
     public readonly struct ProfComponent
@@ -15,7 +15,7 @@ namespace MagnumOpus.Simulation.Components
         public ProfComponent(int entityId, ushort skillId, ushort level, ushort experience, ushort experienceToNextLevel)
         {
             EntityId = entityId;
-            ChangedTick = ConquerWorld.Tick;
+            ChangedTick = PixelWorld.Tick;
             Id = skillId;
             Level = level;
             Experience = experience;

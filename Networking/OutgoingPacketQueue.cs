@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 using MagnumOpus.ECS;
-using MagnumOpus.Simulation.Components;
+using MagnumOpus.Components;
 using HerstLib.IO;
 using System.Net.Sockets;
 using System.Text;
@@ -102,7 +102,7 @@ namespace MagnumOpus.Networking
                     {
                         FConsole.WriteLine(e.Message);
                         queue.Clear();
-                        ConquerWorld.Players.Remove(ntt);
+                        PixelWorld.Players.Remove(ntt);
                     }
                 }
             }

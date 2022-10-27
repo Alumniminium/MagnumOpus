@@ -1,5 +1,5 @@
 using MagnumOpus.ECS;
-using MagnumOpus.Simulation.Components;
+using MagnumOpus.Components;
 
 namespace MagnumOpus.Simulation.Systems
 {
@@ -21,7 +21,7 @@ namespace MagnumOpus.Simulation.Systems
                 hlt.Health = hlt.MaxHealth;
 
             if (lastHealth != hlt.Health)
-                hlt.ChangedTick = ConquerWorld.Tick;
+                hlt.ChangedTick = PixelWorld.Tick;
         }
     }
 }

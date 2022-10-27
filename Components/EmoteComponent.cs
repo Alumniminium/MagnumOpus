@@ -1,7 +1,7 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 
-namespace MagnumOpus.Simulation.Components
+namespace MagnumOpus.Components
 {
     [Component]
     public struct EmoteComponent
@@ -14,7 +14,7 @@ namespace MagnumOpus.Simulation.Components
         {
             EntityId = entityId;
             Emote = emote;
-            ChangedTick = ConquerWorld.Tick;
+            ChangedTick = PixelWorld.Tick;
         }
         
         public override int GetHashCode() => EntityId;

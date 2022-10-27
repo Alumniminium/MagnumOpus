@@ -1,6 +1,6 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Simulation.Components
+namespace MagnumOpus.Components
 {
 
     [Component]
@@ -14,7 +14,7 @@ namespace MagnumOpus.Simulation.Components
         {
             EntityId = entityId;
             Level = level;
-            ChangedTick = ConquerWorld.Tick;
+            ChangedTick = PixelWorld.Tick;
         }
         public override int GetHashCode() => EntityId;
     }

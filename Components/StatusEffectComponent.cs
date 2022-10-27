@@ -1,6 +1,6 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Simulation.Components
+namespace MagnumOpus.Components
 {
     [Component]
     public struct StatusEffectComponent
@@ -13,7 +13,7 @@ namespace MagnumOpus.Simulation.Components
         public StatusEffectComponent(int entityId)
         {
             EntityId = entityId;
-            ChangedTick = ConquerWorld.Tick;
+            ChangedTick = PixelWorld.Tick;
             Effects = Enums.StatusEffect.None;
         }
 

@@ -1,6 +1,6 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Simulation.Components
+namespace MagnumOpus.Components
 {
     [Component]
     public struct InventoryComponent
@@ -16,7 +16,7 @@ namespace MagnumOpus.Simulation.Components
         public InventoryComponent(int entityId, uint money, uint cps)
         {
             EntityId = entityId;
-            ChangedTick = ConquerWorld.Tick;
+            ChangedTick = PixelWorld.Tick;
             Money = money;
             CPs = cps;
             Items = new PixelEntity[40];

@@ -1,7 +1,7 @@
 using HerstLib.IO;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
-using MagnumOpus.Simulation.Components;
+using MagnumOpus.Components;
 
 namespace MagnumOpus.Simulation.Systems
 {
@@ -12,7 +12,7 @@ namespace MagnumOpus.Simulation.Systems
 
         public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref WalkComponent wlk, ref DirectionComponent dir)
         {
-            if (wlk.ChangedTick == ConquerWorld.Tick)
+            if (wlk.ChangedTick == PixelWorld.Tick)
                 dir.Direction = wlk.Direction;
             else
             {
@@ -22,6 +22,7 @@ namespace MagnumOpus.Simulation.Systems
 
             pos.Position.X += Constants.DeltaX[(int)dir.Direction];
             pos.Position.Y += Constants.DeltaY[(int)dir.Direction];
+            pos.ChangedTick = PixelWorld.Tick;
 
             FConsole.WriteLine($"[{nameof(WalkSystem)}] {ntt.Id} -> {dir.Direction} | {pos.Position}");
         }

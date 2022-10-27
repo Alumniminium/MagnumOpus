@@ -1,7 +1,7 @@
 using System.Buffers;
 using System.Runtime.InteropServices;
 using MagnumOpus.ECS;
-using MagnumOpus.Simulation.Components;
+using MagnumOpus.Components;
 
 namespace MagnumOpus.Networking.Packets
 {

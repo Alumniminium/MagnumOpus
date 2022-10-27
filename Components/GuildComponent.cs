@@ -1,7 +1,7 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 
-namespace MagnumOpus.Simulation.Components
+namespace MagnumOpus.Components
 {
     [Component]
     public struct GuildComponent

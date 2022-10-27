@@ -1,7 +1,7 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 
-namespace MagnumOpus.Simulation.Components
+namespace MagnumOpus.Components
 {
     [Component]
     public struct BodyComponent
@@ -16,7 +16,7 @@ namespace MagnumOpus.Simulation.Components
         public BodyComponent(int entityId, uint look = 1003, Emote emote = Emote.Stand, ushort hair = 310)
         {
             EntityId = entityId;
-            ChangedTick = ConquerWorld.Tick;
+            ChangedTick = PixelWorld.Tick;
             Look = look;
             Emote = emote;
             Hair = hair;

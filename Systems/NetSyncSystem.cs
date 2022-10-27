@@ -1,7 +1,7 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
-using MagnumOpus.Simulation.Components;
+using MagnumOpus.Components;
 
 namespace MagnumOpus.Simulation.Systems
 {
@@ -38,7 +38,7 @@ namespace MagnumOpus.Simulation.Systems
             if (syn.Fields.HasFlag(SyncThings.Walk))
             {
                 ref readonly var wlk = ref other.Get<WalkComponent>();
-                if(wlk.ChangedTick == ConquerWorld.Tick)
+                if(wlk.ChangedTick == PixelWorld.Tick)
                 {
                     var walkMsg = MsgWalk.Create(other.Id, wlk.Direction, wlk.IsRunning);
                     ntt.NetSync(in walkMsg);
@@ -47,7 +47,7 @@ namespace MagnumOpus.Simulation.Systems
             if(syn.Fields.HasFlag(SyncThings.Jump))
             {
                 ref readonly var jmp = ref other.Get<JumpComponent>();
-                if(jmp.CreatedTick == ConquerWorld.Tick)
+                if(jmp.CreatedTick == PixelWorld.Tick)
                 {
                     var jumpMsg = MsgAction.Create(0, ntt.Id, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, dir.Direction, MsgActionType.Jump);
                     ntt.NetSync(in jumpMsg);
@@ -56,20 +56,18 @@ namespace MagnumOpus.Simulation.Systems
             if (syn.Fields.HasFlag(SyncThings.Health) || syn.Fields.HasFlag(SyncThings.MaxHealth))
             {
                 ref readonly var hlt = ref other.Get<HealthComponent>();
-                if(hlt.ChangedTick == ConquerWorld.Tick)
+                if(hlt.ChangedTick == PixelWorld.Tick)
                 {
-                    var updates = new MsgUserAttribValues[2];
-                    updates[0] = new (hlt.Health, MsgUserAttribType.Health);
-                    updates[1] = new (hlt.MaxHealth, MsgUserAttribType.MaxHealth);
-
-                    var healthMsg = MsgUserAttrib.Create(ntt.Id, in updates);
+                    var healthMsg = MsgUserAttrib.Create(ntt.Id, hlt.Health, MsgUserAttribType.Health);
+                    var maxHealthMsg = MsgUserAttrib.Create(ntt.Id, hlt.MaxHealth, MsgUserAttribType.MaxHealth);
                     ntt.NetSync(in healthMsg);
+                    ntt.NetSync(in maxHealthMsg);
                 }
             }
             if (syn.Fields.HasFlag(SyncThings.Level))
             {
                 ref readonly var lvl = ref other.Get<LevelComponent>();
-                if(lvl.ChangedTick == ConquerWorld.Tick)
+                if(lvl.ChangedTick == PixelWorld.Tick)
                 {
                     var lvlMsg = MsgUserAttrib.Create(ntt.Id, lvl.Level, MsgUserAttribType.Level);
                     ntt.NetSync(in lvlMsg);
@@ -78,7 +76,7 @@ namespace MagnumOpus.Simulation.Systems
             if (syn.Fields.HasFlag(SyncThings.Experience))
             {
                 ref readonly var exp = ref other.Get<ExperienceComponent>();
-                if(exp.ChangedTick == ConquerWorld.Tick)
+                if(exp.ChangedTick == PixelWorld.Tick)
                 {
                     var expMsg = MsgUserAttrib.Create(ntt.Id, exp.Experience, MsgUserAttribType.Experience);
                     ntt.NetSync(in expMsg);

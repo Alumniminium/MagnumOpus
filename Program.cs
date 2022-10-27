@@ -6,9 +6,10 @@ using MagnumOpus.Helpers;
 using MagnumOpus.Networking;
 using MagnumOpus.Networking.Cryptography;
 using MagnumOpus.Networking.Packets;
-using MagnumOpus.Simulation.Components;
+using MagnumOpus.Components;
 using MagnumOpus.Simulation.Systems;
 using SpacePartitioning;
+using MagnumOpus.Squiggly;
 
 namespace MagnumOpus
 {
@@ -20,17 +21,31 @@ namespace MagnumOpus
         {
             var systems = new List<PixelSystem>
             {
-                new SpawnSystem(), new LifetimeSystem(),
-                new WalkSystem(), new JumpSystem(),
-                new ViewportSystem(), new InputSystem(),
-                new DamageSystem(), new HealthSystem(),
-                new DropSystem(), new DeathSystem(),
-                new LevelExpSystem(), new RespawnSystem(),
+                new SpawnSystem(), 
+                new LifetimeSystem(),
+                new WalkSystem(), 
+                new JumpSystem(),
+                new ViewportSystem(), 
+                new DamageSystem(), 
+                new HealthSystem(),
+                new DropSystem(), 
+                new DeathSystem(),
+                new LevelExpSystem(), 
+                new RespawnSystem(),
                 new NetSyncSystem(),
             };
-            ConquerWorld.SetSystems(systems.ToArray());
-            ConquerWorld.SetTPS(30);
-            ConquerWorld.RegisterOnSecond(() =>
+            SquigglyDb.LoadMaps();
+            SquigglyDb.LoadPortals();
+            SquigglyDb.LoadLevelExp();
+            SquigglyDb.LoadItemBonus();
+            SquigglyDb.LoadMobs();
+            SquigglyDb.LoadSpawns();
+            SquigglyDb.LoadNpcs();
+            SquigglyDb.Spawn();
+            
+            PixelWorld.SetSystems(systems.ToArray());
+            PixelWorld.SetTPS(30);
+            PixelWorld.RegisterOnSecond(() =>
             {
                 var lines = PerformanceMetrics.Draw();
                 Console.WriteLine(lines);
@@ -43,7 +58,7 @@ namespace MagnumOpus
             gameThread.Start();
 
             while (true)
-                ConquerWorld.Update();
+                PixelWorld.Update();
         }
 
         private static void LoginServerLoop()
@@ -56,7 +71,7 @@ namespace MagnumOpus
                 client.Client.NoDelay = true;
                 client.Client.DontFragment = true;
 
-                var player = ConquerWorld.CreateEntity(EntityType.Player);
+                var player = PixelWorld.CreateEntity(EntityType.Player);
                 var net = new NetworkComponent(player, client.Client);
                 player.Add(ref net);
 
@@ -142,9 +157,6 @@ namespace MagnumOpus
                     }
 
                     var pubkey = Encoding.ASCII.GetString(pk);
-                    FConsole.WriteLine(packet.Dump());
-                    FConsole.WriteLine($"Pubkey: {pubkey}");
-
                     net.DiffieHellman.ComputePrivateKey(pubkey);
                     net.GameCrypto.GenerateKeys(net.DiffieHellman.GetPrivateKey());
                     net.GameCrypto.SetIVs(net.ServerIV, net.ClientIV);

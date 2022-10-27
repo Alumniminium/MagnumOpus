@@ -3,7 +3,7 @@ using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
-using MagnumOpus.Simulation.Components;
+using MagnumOpus.Components;
 
 namespace MagnumOpus.Simulation.Systems
 {
@@ -16,7 +16,7 @@ namespace MagnumOpus.Simulation.Systems
         {
             var dist = (int)Vector2.Distance(pos.Position, jmp.Position);
 
-            if(jmp.ChangedTick == ConquerWorld.Tick)
+            if(jmp.ChangedTick == PixelWorld.Tick)
             {
                 var direction = CoMath.GetDirection(new Vector2(pos.Position.X, pos.Position.Y),new Vector2(jmp.Position.X, jmp.Position.Y));
                 dir.Direction = direction;
@@ -25,6 +25,7 @@ namespace MagnumOpus.Simulation.Systems
                 // Console.WriteLine($"Jumping to {jmp.Position} | Dist: {dist} | Time: {jmp.Time:0.00}");
             }
             pos.Position = Vector2.Lerp(pos.Position, jmp.Position, jmp.Time);
+            pos.ChangedTick = PixelWorld.Tick;
             // Console.WriteLine($"Time: {jmp.Time:0.00}");
             jmp.Time -= deltaTime;
 

@@ -2,7 +2,7 @@ using System.Numerics;
 using MagnumOpus.ECS;
 using Packets.Enums;
 
-namespace MagnumOpus.Simulation.Components
+namespace MagnumOpus.Components
 {
     [Component]
     public struct InputComponent

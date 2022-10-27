@@ -1,6 +1,6 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Networking;
-using MagnumOpus.Simulation.Components;
+using MagnumOpus.Components;
 
 namespace MagnumOpus.Simulation.Systems
 {
@@ -11,8 +11,10 @@ namespace MagnumOpus.Simulation.Systems
 
         public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref ViewportComponent vwp)
         {
-            if (pos.ChangedTick != ConquerWorld.Tick)
+            if (pos.ChangedTick != PixelWorld.Tick)
                 return;
+
+            Game.Grids[pos.Map].Move(in ntt, ref pos);
 
             vwp.Viewport.X = pos.Position.X - vwp.Viewport.Width / 2;
             vwp.Viewport.Y = pos.Position.Y - vwp.Viewport.Height / 2;
@@ -29,38 +31,38 @@ namespace MagnumOpus.Simulation.Systems
 
             // despawn entities not visible anymore and spawn new ones
 
-            for (var i = 0; i < vwp.EntitiesVisibleLast.Count; i++)
-            {
-                var b = vwp.EntitiesVisibleLast[i];
-                var found = false;
-                if (ntt.Id == b.Id)
-                    continue;
+            // for (var i = 0; i < vwp.EntitiesVisibleLast.Count; i++)
+            // {
+            //     var b = vwp.EntitiesVisibleLast[i];
+            //     var found = false;
+            //     if (ntt.Id == b.Id)
+            //         continue;
 
-                for (var j = 0; j < vwp.EntitiesVisible.Count; j++)
-                {
-                    found = vwp.EntitiesVisible[j].Id == b.Id;
-                    if (found)
-                        break;
-                }
+            //     for (var j = 0; j < vwp.EntitiesVisible.Count; j++)
+            //     {
+            //         found = vwp.EntitiesVisible[j].Id == b.Id;
+            //         if (found)
+            //             break;
+            //     }
 
-                if (found)
-                    continue;
-            }
+            //     if (found)
+            //         continue;
+            // }
 
             for (var i = 0; i < vwp.EntitiesVisible.Count; i++)
             {
                 var b = vwp.EntitiesVisible[i];
                 var found = false;
 
-                for (var j = 0; j < vwp.EntitiesVisibleLast.Count; j++)
-                {
-                    found = vwp.EntitiesVisibleLast[j].Id == b.Id;
-                    if (found)
-                        break;
-                }
+                // for (var j = 0; j < vwp.EntitiesVisibleLast.Count; j++)
+                // {
+                //     found = vwp.EntitiesVisibleLast[j].Id == b.Id;
+                //     if (found)
+                //         break;
+                // }
 
-                if (found)
-                    continue;
+                // if (found)
+                //     continue;
 
                 NetworkHelper.FullSync(ntt, b);
             }

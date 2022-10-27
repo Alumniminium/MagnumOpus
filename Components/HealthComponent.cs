@@ -1,6 +1,6 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Simulation.Components
+namespace MagnumOpus.Components
 {
     [Component]
     public struct HealthComponent
@@ -15,7 +15,7 @@ namespace MagnumOpus.Simulation.Components
             EntityId = entityId;
             Health = health;
             MaxHealth = maxHealth;
-            ChangedTick = ConquerWorld.Tick;
+            ChangedTick = PixelWorld.Tick;
         }
         public override int GetHashCode()
         {

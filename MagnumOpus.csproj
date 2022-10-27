@@ -10,6 +10,11 @@
 
   <ItemGroup>
     <PackageReference Include="HerstLib" Version="1.0.0" />
-    <PackageReference Include="BouncyCastle.NetCore" Version="1.8.6" />
+    <PackageReference Include="BouncyCastle.NetCore" Version="1.9.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.0-rc.1.22426.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.0-rc.1.22426.7" />
+  </ItemGroup>
+    <ItemGroup>
+    <!-- <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.0-rc.1.22426.7" /> -->
   </ItemGroup>
 </Project>

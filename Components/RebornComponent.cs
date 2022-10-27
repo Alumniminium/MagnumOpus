@@ -1,6 +1,6 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Simulation.Components
+namespace MagnumOpus.Components
 {
     [Component]
     public struct RebornComponent
@@ -13,7 +13,7 @@ namespace MagnumOpus.Simulation.Components
         public RebornComponent(int entityId)
         {
             EntityId = entityId;
-            ChangedTick = ConquerWorld.Tick;
+            ChangedTick = PixelWorld.Tick;
             Count = 0;
         }
 

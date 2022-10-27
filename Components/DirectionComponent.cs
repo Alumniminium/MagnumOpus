@@ -1,7 +1,7 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 
-namespace MagnumOpus.Simulation.Components
+namespace MagnumOpus.Components
 {
     [Component]
     public struct DirectionComponent
@@ -14,7 +14,7 @@ namespace MagnumOpus.Simulation.Components
         {
             EntityId = entityId;
             Direction = direction;
-            ChangedTick = ConquerWorld.Tick;
+            ChangedTick = PixelWorld.Tick;
         }
 
         public override int GetHashCode() => EntityId;
