@@ -16,6 +16,10 @@ namespace MagnumOpus.Networking.Packets
         public int UniqueId;
         [FieldOffset(12)]
         public int Param;
+        [FieldOffset(12)]
+        public ushort JumpX;
+        [FieldOffset(14)]
+        public ushort JumpY;
         [FieldOffset(16)]
         public int Param2;
         [FieldOffset(16)]

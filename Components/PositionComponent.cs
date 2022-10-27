@@ -9,15 +9,17 @@ namespace MagnumOpus.Simulation.Components
         public readonly int EntityId;
         public uint ChangedTick;
 
-        public Vector3 Position;
-        public Vector3 LastPosition;
+        public Vector2 Position;
+        public Vector2 LastPosition;
+        public int Map;
 
-        public PositionComponent(int nttId, Vector3 position)
+        public PositionComponent(int nttId, Vector2 position, int map)
         {
             EntityId = nttId;
             Position = position;
             LastPosition = position;
             ChangedTick = PixelWorld.Tick;
+            Map = map;
         }
 
         public override int GetHashCode() => EntityId;

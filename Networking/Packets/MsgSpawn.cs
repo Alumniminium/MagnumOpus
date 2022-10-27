@@ -62,6 +62,7 @@ namespace MagnumOpus.Networking.Packets
             ref readonly var pos = ref ntt.Get<PositionComponent>();
             ref readonly var rbn = ref ntt.Get<RebornComponent>();
             ref readonly var eff = ref ntt.Get<StatusEffectComponent>();
+            ref readonly var dir = ref ntt.Get<DirectionComponent>();
 
             if (ntt.Has<DeathTagComponent>())
             {
@@ -87,7 +88,7 @@ namespace MagnumOpus.Networking.Packets
             packet->X = (ushort)pos.Position.X;
             packet->Y = (ushort)pos.Position.Y;
             packet->Hair = bdy.Hair;
-            packet->Direction = bdy.Direction;
+            packet->Direction = dir.Direction;
             packet->Emote = bdy.Emote;
             packet->Reborn = rbn.Count;
             packet->GuildId = (ushort)gld.GuildId;
@@ -112,6 +113,7 @@ namespace MagnumOpus.Networking.Packets
             ref readonly var hlt = ref ntt.Get<HealthComponent>();
             ref readonly var pos = ref ntt.Get<PositionComponent>();
             ref readonly var eff = ref ntt.Get<StatusEffectComponent>();
+            ref readonly var dir = ref ntt.Get<DirectionComponent>();
 
             var packet = stackalloc MsgSpawn[1];
             packet->Size = (ushort)sizeof(MsgSpawn);
@@ -121,7 +123,7 @@ namespace MagnumOpus.Networking.Packets
             packet->StatusEffects = eff.Effects;
             packet->CurrentHp = hlt.Health;
             packet->Level = lvl.Level;
-            packet->Direction = bdy.Direction;
+            packet->Direction = dir.Direction;
             packet->Emote = Emote.Stand;
             packet->StringCount = 1;
             packet->NameLen = (byte)ntc.Name.Trim().Length;

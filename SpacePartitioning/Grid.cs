@@ -3,7 +3,7 @@ using System.Numerics;
 using MagnumOpus.ECS;
 using MagnumOpus.Simulation.Components;
 
-namespace SpaceParitioning
+namespace SpacePartitioning
 {
     public sealed class Grid
     {

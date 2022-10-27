@@ -18,10 +18,7 @@ namespace MagnumOpus.Networking
             queue.Enqueue(packet);
         }
 
-        public static void Remove(in PixelEntity player)
-        {
-            Packets.Remove(player);
-        }
+        public static void Remove(in PixelEntity player) => Packets.Remove(player);
 
         public static void ProcessAll()
         {

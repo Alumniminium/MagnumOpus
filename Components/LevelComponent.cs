@@ -4,25 +4,18 @@ namespace MagnumOpus.Simulation.Components
 {
 
     [Component]
-    public struct LevelComponent
+    public readonly struct LevelComponent
     {
         public readonly int EntityId;
-        public byte Level;
-        public uint ExperienceToNextLevel;
-        public uint Experience;
-        public uint ChangedTick;
+        public readonly uint ChangedTick;
+        public readonly byte Level;
 
-        public LevelComponent(int entityId, byte level=1, uint exp=0, uint expReq=0)
+        public LevelComponent(int entityId, byte level=1)
         {
             EntityId = entityId;
             Level = level;
-            Experience = exp;
-            ExperienceToNextLevel = expReq;
             ChangedTick = PixelWorld.Tick;
         }
-        public override int GetHashCode()
-        {
-            return EntityId;
-        }
+        public override int GetHashCode() => EntityId;
     }
 }

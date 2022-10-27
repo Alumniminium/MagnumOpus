@@ -55,76 +55,78 @@ namespace MagnumOpus.Networking.Packets
         [FieldOffset(68)]
         public fixed byte Name[32];
 
-        public static Memory<byte> Create(in PixelEntity entity)
+        public static Memory<byte> Create(in PixelEntity ntt)
         {
-            ref var bdy = ref entity.Get<BodyComponent>();
-            ref var lvl = ref entity.Get<LevelComponent>();
-            ref var pkp = ref entity.Get<PkPointComponent>();
-            ref var hlt = ref entity.Get<HealthComponent>();
-            ref var mna = ref entity.Get<ManaComponent>();
-            ref var pro = ref entity.Get<ProfessionComponent>();
-            ref var ntc = ref entity.Get<NameTagComponent>();
-            ref var mar = ref entity.Get<MarriageComponent>();
-            ref var inv = ref entity.Get<InventoryComponent>();
-            ref var atr = ref entity.Get<AttributeComponent>();
-            ref var rbn = ref entity.Get<RebornComponent>();
+            ref var bdy = ref ntt.Get<BodyComponent>();
+            ref var lvl = ref ntt.Get<LevelComponent>();
+            ref var exp = ref ntt.Get<ExperienceComponent>();
+            ref var pkp = ref ntt.Get<PkPointComponent>();
+            ref var hlt = ref ntt.Get<HealthComponent>();
+            ref var mna = ref ntt.Get<ManaComponent>();
+            ref var pro = ref ntt.Get<ProfessionComponent>();
+            ref var ntc = ref ntt.Get<NameTagComponent>();
+            ref var mar = ref ntt.Get<MarriageComponent>();
+            ref var inv = ref ntt.Get<InventoryComponent>();
+            ref var atr = ref ntt.Get<AttributeComponent>();
+            ref var rbn = ref ntt.Get<RebornComponent>();
 
             ref readonly var partner = ref PixelWorld.GetEntity(mar.SpouseId);
             ref var sNtc = ref partner.Get<NameTagComponent>();
 
-            if(sNtc.Name == null)
+            if (sNtc.Name == null)
+                sNtc.Name = "None";
+
+            if (bdy.Look == 0)
             {
-                sNtc.Name ="None";
-            }
-            if(ntc.Name == null)
-            {
-                ntc.Name = "None";
+                bdy = new BodyComponent(ntt.Id);
+                ntt.Add(ref bdy);
             }
 
-            if(bdy.Look == 0)
-                bdy.Look = 1003;
-            if(bdy.Emote == 0)
-                bdy.Emote = Enums.Emote.Stand;
-
-            bdy.Hair = 302;
-            
-            if(atr.Statpoints == 0)
+            if (atr.Statpoints == 0)
             {
-                atr.Agility = 10;
-                atr.Strength = 10;
-                atr.Vitality = 10;
-                atr.Spirit = 10;
-                atr.Statpoints = 10;
+                atr = new AttributeComponent(ntt.Id)
+                {
+                    Agility = 10,
+                    Strength = 10,
+                    Vitality = 10,
+                    Spirit = 10,
+                    Statpoints = 10
+                };
+                ntt.Add(ref atr);
             }
 
-            if(hlt.Health == 0)
+            if (hlt.Health == 0)
             {
-                hlt.Health = 100;
-                hlt.MaxHealth = 100;
+                hlt = new HealthComponent(ntt.Id, 100, 100);
+                ntt.Add(ref hlt);
             }
 
-            if(lvl.Level == 0)
+            if (lvl.Level == 0)
             {
-                lvl.Level = 1;
-                lvl.Experience = 0;
+                lvl = new LevelComponent(ntt.Id, 1);
+                ntt.Add(ref lvl);
             }
 
-            if(mna.Mana == 0)
+            if (mna.Mana == 0)
             {
-                mna.Mana = 100;
-                mna.MaxMana = 100;
+                mna = new ManaComponent(ntt.Id)
+                {
+                    Mana = 100,
+                    MaxMana = 100
+                };
+                ntt.Add(ref mna);
             }
-            
+
             var packet = new MsgCharacter
             {
                 Size = (ushort)(sizeof(MsgCharacter) - 30 + ntc.Name.Length + sNtc.Name.Length),
                 Id = 1006,
-                EntityId = entity.Id,
+                EntityId = ntt.Id,
                 Look = bdy.Look,
                 Hair = bdy.Hair,
                 Money = inv.Money,
                 CPs = inv.CPs,
-                Experience = lvl.Experience,
+                Experience = exp.Experience,
                 Strength = atr.Strength,
                 Agility = atr.Agility,
                 Vitality = atr.Vitality,
@@ -151,11 +153,11 @@ namespace MagnumOpus.Networking.Packets
         }
 
         public static implicit operator Memory<byte>(MsgCharacter packet)
-        { 
+        {
             var buffer = new byte[packet.Size];
             fixed (byte* p = buffer)
                 *(MsgCharacter*)p = packet;
-            
+
             return buffer;
         }
     }

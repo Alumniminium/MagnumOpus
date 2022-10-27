@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace SpaceParitioning
+namespace SpacePartitioning
 {
     public readonly struct Cell
     {

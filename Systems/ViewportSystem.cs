@@ -22,7 +22,7 @@ namespace MagnumOpus.Simulation.Systems
             vwp.EntitiesVisibleLast.AddRange(vwp.EntitiesVisible);
             vwp.EntitiesVisible.Clear();
 
-            Game.Grids[(int)pos.Position.Z].GetVisibleEntities(ref vwp);
+            Game.Grids[pos.Map].GetVisibleEntities(ref vwp);
 
             if (ntt.Type != EntityType.Player)
                 return;

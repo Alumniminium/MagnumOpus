@@ -1,4 +1,4 @@
-using System.Globalization;
+using System.Numerics;
 using HerstLib.IO;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -39,7 +39,7 @@ namespace MagnumOpus.Networking
                         ntt.NetSync(in ok);
                         break;
                     }
-                    case PacketType.MsgItem:
+                case PacketType.MsgItem:
                     {
                         var msg = (MsgItem)packet;
 
@@ -108,16 +108,20 @@ namespace MagnumOpus.Networking
                         {
                             case MsgActionType.SendLocation:
                                 {
+                                    if(!ntt.Has<PositionComponent>())
+                                    {
+                                        var pc = new PositionComponent(ntt.Id, new Vector2(438,377),1002);
+                                        ntt.Add(ref pc);
+                                    }
                                     ref var pos = ref ntt.Get<PositionComponent>();
-                                    //var reply = MsgAction.Create(0, ntt.Id, (int)pos.Position.Z, (ushort)pos.Position.X, (ushort)pos.Position.Y, MsgActionType.SendLocation);
-                                    var reply = MsgAction.Create(0, ntt.Id, 1002, 438, 377, 0, msg.Type);
+                                    var reply = MsgAction.Create(0, ntt.Id, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
                                     ntt.NetSync(in reply);
                                     PixelWorld.Players.Add(ntt);
                                     break;
                                 }
                             case MsgActionType.Jump:
                                 {
-                                    var jmp = new JumpComponent(ntt.Id, msg.X, msg.Y);
+                                    var jmp = new JumpComponent(ntt.Id, msg.JumpX, msg.JumpY);
                                     ntt.Add(ref jmp);
                                     // ref var pos = ref ntt.Get<PositionComponent>();
                                     // pos.Position.X = msg.X;
@@ -132,25 +136,28 @@ namespace MagnumOpus.Networking
                             case MsgActionType.SendAssociates:
                             case MsgActionType.SendProficiencies:
                             case MsgActionType.SendSpells:
-                            {
-                                var reply = MsgAction.Create(0, ntt.Id, 0, 0, 0, 0, msg.Type);
-                                ntt.NetSync(in reply);
-                                break;
-                            }
+                                {
+                                    var reply = MsgAction.Create(0, ntt.Id, 0, 0, 0, 0, msg.Type);
+                                    ntt.NetSync(in reply);
+                                    break;
+                                }
                             case MsgActionType.ChangeFacing:
-                            {
-                                var dir = new DirectionComponent(ntt.Id, msg.Direction);
-                                ntt.Add(ref dir);
-                                break;
-                            }
+                                {
+                                    var dir = new DirectionComponent(ntt.Id, msg.Direction);
+                                    ntt.Add(ref dir);
+                                    break;
+                                }
                             case MsgActionType.ChangeAction:
-                            {
-                                var emo = new EmoteComponent(ntt.Id, (Emote)msg.Param);
-                                ntt.Add(ref emo);
-                                break;
-                            }
+                                {
+                                    var emo = new EmoteComponent(ntt.Id, (Emote)msg.Param);
+                                    ntt.Add(ref emo);
+                                    break;
+                                }
                             case MsgActionType.ChangeMap:
-                                break;
+                                {
+
+                                    break;
+                                }
                             case MsgActionType.Teleport:
                                 break;
                             case MsgActionType.LevelUp:
@@ -253,6 +260,29 @@ namespace MagnumOpus.Networking
                                     break;
                                 }
                         }
+                        break;
+                    }
+                    case PacketType.MsgTick:
+                    {
+                        var msg = (MsgTick)packet;
+                        ref readonly var ntc = ref ntt.Get<NameTagComponent>();
+                        if(!ntt.Has<PingComponent>())
+                        {
+                            var ping = new PingComponent(ntt.Id);
+                            ntt.Add(ref ping);
+                        }
+                        ref var pin = ref ntt.Get<PingComponent>();
+
+                        if (ntt.Id != msg.UniqueId)
+                            FConsole.WriteLine($"UID Mismatch! {msg.UniqueId}");
+                        if (msg.Hash != MsgTick.HashName(ntc.Name))
+                            FConsole.WriteLine($"Hash Mismatch! {msg.Hash}");
+
+                        msg.Timestamp ^= msg.UniqueId;
+                        pin.Ping = Math.Abs(msg.Timestamp - pin.LastPing -10000);
+                        pin.LastPing = msg.Timestamp;
+
+                        ntt.NetSync(MsgText.Create("SYSTEM", "PING", $"10s Avg Ping: {pin.Ping}ms", MsgTextType.MiniMap));
                         break;
                     }
                 default:

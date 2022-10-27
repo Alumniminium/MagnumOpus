@@ -2,6 +2,11 @@ using System.Globalization;
 
 namespace MagnumOpus.Helpers
 {
+    public static class Constants
+    {
+        public static readonly sbyte[] DeltaX = {0, -1, -1, -1, 0, 1, 1, 1};
+        public static readonly sbyte[] DeltaY = {1, 1, 0, -1, -1, -1, 0, 1};
+    }
     public static class ByteExt
     {
         public static string Dump(this in Memory<byte> packet)

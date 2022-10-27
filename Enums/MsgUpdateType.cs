@@ -6,14 +6,14 @@
 
 namespace MagnumOpus.Enums
 {
-    public enum MsgUpdateType
+    public enum MsgUserAttribType
     {
-        Hp = 0,
-        MaxHp = 1,
+        Health = 0,
+        MaxHealth = 1,
         CurrentMana = 2,
         MaxMana = 3,
         InvMoney = 4,
-        Exp = 5,
+        Experience = 5,
         PkPoints = 6,
         Class = 7,
         Modifier = 8,

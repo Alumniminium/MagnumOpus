@@ -24,7 +24,7 @@ namespace MagnumOpus.Networking.Packets
             packet->Size = (ushort)sizeof(MsgTick);
             packet->Id = 1012;
             packet->UniqueId = target.Id;
-            packet->Timestamp = Environment.TickCount + 100000;
+            packet->Timestamp = Environment.TickCount;
             packet->Junk1 = 0;
             packet->Junk2 = 0;
             packet->Junk3 = 0;
@@ -37,7 +37,7 @@ namespace MagnumOpus.Networking.Packets
             return buffer;
         }
 
-        private static uint HashName(string name)
+        public static uint HashName(string name)
         {
             if (string.IsNullOrEmpty(name) || name.Length < 4)
                 return 0x9D4B5703;
@@ -53,6 +53,11 @@ namespace MagnumOpus.Networking.Packets
             fixed (byte* p = buffer)
                 *(MsgTick*)p = *&msg;
             return buffer;
+        }
+        public static implicit operator MsgTick (Memory<byte> msg)
+        {
+            fixed (byte* p = msg.Span)
+                return *(MsgTick*)p;
         }
     }
 }

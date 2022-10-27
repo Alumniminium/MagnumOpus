@@ -11,17 +11,15 @@ namespace MagnumOpus.Simulation.Components
         
         internal ushort Hair;
         public uint Look;
-        public Direction Direction;
         internal Emote Emote;
 
-        public BodyComponent(int entityId, Direction direction = Direction.South, uint look = 1003)
+        public BodyComponent(int entityId, uint look = 1003, Emote emote = Emote.Stand, ushort hair = 310)
         {
             EntityId = entityId;
-            Direction = direction;
             ChangedTick = PixelWorld.Tick;
             Look = look;
-            Hair = 0;
-            Emote = Emote.Stand;
+            Emote = emote;
+            Hair = hair;
         }
 
 

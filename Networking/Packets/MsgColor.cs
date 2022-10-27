@@ -2,6 +2,7 @@ using System.Buffers;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using MagnumOpus.ECS;
+using MagnumOpus.Enums;
 using MagnumOpus.Simulation.Components;
 
 namespace MagnumOpus.Networking.Packets
@@ -16,13 +17,14 @@ namespace MagnumOpus.Networking.Packets
         public uint Rgb;
         public ushort X;
         public ushort Y;
-        public ushort Direction;
+        public Direction Direction;
         public uint Type;
 
         public static Memory<byte> Create(in PixelEntity ntt, Color color)
         {
             ref readonly var bdy = ref ntt.Get<BodyComponent>();
             ref readonly var pos = ref ntt.Get<PositionComponent>();
+            ref readonly var dir = ref ntt.Get<DirectionComponent>();
 
             var packet = new MsgColor
             {
@@ -32,26 +34,27 @@ namespace MagnumOpus.Networking.Packets
                 UniqueId = ntt.Id,
                 X = (ushort)pos.Position.X,
                 Y = (ushort)pos.Position.Y,
-                Direction = (ushort)bdy.Direction,
+                Direction = dir.Direction,
                 Rgb = ColorToUInt(color),
                 Type = 104
             };
             return packet;
         }
-        public static Memory<byte> Create(in PixelEntity obj, uint color)
+        public static Memory<byte> Create(in PixelEntity ntt, uint color)
         {
-            ref readonly var bdy = ref obj.Get<BodyComponent>();
-            ref readonly var pos = ref obj.Get<PositionComponent>();
+            ref readonly var bdy = ref ntt.Get<BodyComponent>();
+            ref readonly var pos = ref ntt.Get<PositionComponent>();
+            ref readonly var dir = ref ntt.Get<DirectionComponent>();
 
             var packet = new MsgColor
             {
                 Size = (ushort)sizeof(MsgColor),
                 Id = 1010,
                 Timestamp = Environment.TickCount,
-                UniqueId = obj.Id,
+                UniqueId = ntt.Id,
                 X = (ushort)pos.Position.X,
                 Y = (ushort)pos.Position.Y,
-                Direction = (ushort)bdy.Direction,
+                Direction = dir.Direction,
                 Rgb = color,
                 Type = 104
             };
