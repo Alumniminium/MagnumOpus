@@ -36,7 +36,7 @@ namespace MagnumOpus.ECS
         public override int GetHashCode() => Id;
         public override bool Equals(object? obj) => obj is PixelEntity nttId && nttId.Id == Id;
         public static implicit operator int(in PixelEntity nttId) => nttId.Id;
-        public static implicit operator PixelEntity(int id) => PixelWorld.GetEntity(id);
+        public static implicit operator PixelEntity(int id) => ConquerWorld.GetEntity(id);
         public static bool operator ==(in PixelEntity a, in PixelEntity b) => a.Id == b.Id;
         public static bool operator !=(in PixelEntity a, in PixelEntity b) => a.Id != b.Id;
         public override string ToString() => $"NTT {Id} ({Type})";

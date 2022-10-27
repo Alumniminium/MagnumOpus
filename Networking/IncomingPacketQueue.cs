@@ -27,7 +27,7 @@ namespace MagnumOpus.Networking
                 while (queue.Count > 0)
                 {
                     var packet = queue.Dequeue();
-                    if (!PixelWorld.EntityExists(in ntt))
+                    if (!ConquerWorld.EntityExists(in ntt))
                     {
                         queue.Clear();
                         continue;

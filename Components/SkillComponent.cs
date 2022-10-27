@@ -15,7 +15,7 @@ namespace MagnumOpus.Simulation.Components
         public SkillComponent(int entityId, ushort skillId, ushort level, ushort experience, ushort experienceToNextLevel)
         {
             EntityId = entityId;
-            ChangedTick = PixelWorld.Tick;
+            ChangedTick = ConquerWorld.Tick;
             Id = skillId;
             Level = level;
             Experience = experience;

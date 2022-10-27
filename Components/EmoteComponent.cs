@@ -14,7 +14,7 @@ namespace MagnumOpus.Simulation.Components
         {
             EntityId = entityId;
             Emote = emote;
-            ChangedTick = PixelWorld.Tick;
+            ChangedTick = ConquerWorld.Tick;
         }
         
         public override int GetHashCode() => EntityId;

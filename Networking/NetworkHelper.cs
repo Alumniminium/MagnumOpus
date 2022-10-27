@@ -14,7 +14,7 @@ namespace MagnumOpus.Networking
         }
         public static void Broadcast(in Memory<byte> packet)
         {
-            foreach (PixelEntity other in PixelWorld.Players)
+            foreach (PixelEntity other in ConquerWorld.Players)
                 other.NetSync(in packet);
         }
     }

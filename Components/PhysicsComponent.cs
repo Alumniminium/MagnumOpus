@@ -16,7 +16,7 @@ namespace MagnumOpus.Simulation.Components
         public BodyComponent(int entityId, uint look = 1003, Emote emote = Emote.Stand, ushort hair = 310)
         {
             EntityId = entityId;
-            ChangedTick = PixelWorld.Tick;
+            ChangedTick = ConquerWorld.Tick;
             Look = look;
             Emote = emote;
             Hair = hair;

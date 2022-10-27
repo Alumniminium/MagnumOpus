@@ -13,7 +13,7 @@ namespace MagnumOpus.Simulation.Components
         public RebornComponent(int entityId)
         {
             EntityId = entityId;
-            ChangedTick = PixelWorld.Tick;
+            ChangedTick = ConquerWorld.Tick;
             Count = 0;
         }
 

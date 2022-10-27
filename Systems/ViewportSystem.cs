@@ -11,7 +11,7 @@ namespace MagnumOpus.Simulation.Systems
 
         public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref ViewportComponent vwp)
         {
-            if (pos.ChangedTick != PixelWorld.Tick)
+            if (pos.ChangedTick != ConquerWorld.Tick)
                 return;
 
             vwp.Viewport.X = pos.Position.X - vwp.Viewport.Width / 2;

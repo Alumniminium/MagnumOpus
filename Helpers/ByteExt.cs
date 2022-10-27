@@ -4,8 +4,8 @@ namespace MagnumOpus.Helpers
 {
     public static class Constants
     {
-        public static readonly sbyte[] DeltaX = {0, -1, -1, -1, 0, 1, 1, 1};
-        public static readonly sbyte[] DeltaY = {1, 1, 0, -1, -1, -1, 0, 1};
+        public static readonly int[] DeltaX = {0, -1, -1, -1, 0, 1, 1, 1};
+        public static readonly int[] DeltaY = {1, 1, 0, -1, -1, -1, 0, 1};
     }
     public static class ByteExt
     {

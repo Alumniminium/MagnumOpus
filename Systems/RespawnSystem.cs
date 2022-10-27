@@ -9,7 +9,7 @@ namespace MagnumOpus.Simulation.Systems
 
         public override void Update(in PixelEntity ntt, ref RespawnTagComponent rtc, ref BodyComponent bdy, ref LevelComponent lvl, ref HealthComponent hlt)
         {
-            if (rtc.RespawnTimeTick > PixelWorld.Tick)
+            if (rtc.RespawnTimeTick > ConquerWorld.Tick)
                 return;
 
            

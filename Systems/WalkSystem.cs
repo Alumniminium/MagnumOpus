@@ -1,3 +1,4 @@
+using HerstLib.IO;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Simulation.Components;
@@ -11,7 +12,7 @@ namespace MagnumOpus.Simulation.Systems
 
         public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref WalkComponent wlk, ref DirectionComponent dir)
         {
-            if (wlk.ChangedTick == PixelWorld.Tick)
+            if (wlk.ChangedTick == ConquerWorld.Tick)
                 dir.Direction = wlk.Direction;
             else
             {
@@ -19,8 +20,10 @@ namespace MagnumOpus.Simulation.Systems
                 return;
             }
 
-            pos.Position.X += (ushort)Constants.DeltaX[(sbyte)dir.Direction];
-            pos.Position.Y += (ushort)Constants.DeltaY[(sbyte)dir.Direction];
+            pos.Position.X += Constants.DeltaX[(int)dir.Direction];
+            pos.Position.Y += Constants.DeltaY[(int)dir.Direction];
+
+            FConsole.WriteLine($"[{nameof(WalkSystem)}] {ntt.Id} -> {dir.Direction} | {pos.Position}");
         }
     }
 }

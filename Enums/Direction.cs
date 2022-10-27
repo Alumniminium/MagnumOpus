@@ -6,7 +6,7 @@
 
 namespace MagnumOpus.Enums
 {
-    public enum Direction : sbyte
+    public enum Direction : byte
     {
         SouthWest = 0,
         West = 1,

@@ -15,7 +15,7 @@ namespace MagnumOpus.Simulation.Components
             EntityId = entityId;
             Health = health;
             MaxHealth = maxHealth;
-            ChangedTick = PixelWorld.Tick;
+            ChangedTick = ConquerWorld.Tick;
         }
         public override int GetHashCode()
         {

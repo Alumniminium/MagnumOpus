@@ -21,7 +21,7 @@ namespace MagnumOpus.Networking.Packets
         public static Memory<byte> Create(in PixelEntity human)
         {
             ref readonly var gld = ref human.Get<GuildComponent>();
-            ref readonly var leader = ref PixelWorld.GetEntity(gld.LeaderId);
+            ref readonly var leader = ref ConquerWorld.GetEntity(gld.LeaderId);
             ref readonly var ntc = ref leader.Get<NameTagComponent>();
 
             MsgSyndicateSpawn* msgP = stackalloc MsgSyndicateSpawn[1];

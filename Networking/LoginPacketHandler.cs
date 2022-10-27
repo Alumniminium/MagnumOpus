@@ -35,7 +35,7 @@ namespace MagnumOpus.Networking
                     {
                         var msg = (MsgConnectLogin)packet;
                         
-                        var player = PixelWorld.GetEntity((int)msg.UniqueId);
+                        var player = ConquerWorld.GetEntity((int)msg.UniqueId);
                         var filename = msg.GetFileName();
                         FConsole.WriteLine($"[LOGIN/1052] Client Id: {msg.UniqueId}, File: {filename} Contents: {msg.Contents}");
 

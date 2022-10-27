@@ -102,7 +102,7 @@ namespace MagnumOpus.Networking
                     {
                         FConsole.WriteLine(e.Message);
                         queue.Clear();
-                        PixelWorld.Players.Remove(ntt);
+                        ConquerWorld.Players.Remove(ntt);
                     }
                 }
             }

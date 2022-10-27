@@ -1,7 +1,10 @@
 using System.Buffers;
 using System.Runtime.InteropServices;
 using System.Text;
+using HerstLib.IO;
 using MagnumOpus.ECS;
+using MagnumOpus.Enums;
+using MagnumOpus.Simulation.Components;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -9,7 +12,7 @@ namespace MagnumOpus.Networking.Packets
     public unsafe struct MsgTick
     {
         public ushort Size;
-        public ushort Id;
+        public PacketId Id;
         public int UniqueId;
         public int Timestamp;
         public uint Junk1;
@@ -22,7 +25,7 @@ namespace MagnumOpus.Networking.Packets
         {
             var packet = stackalloc MsgTick[1];
             packet->Size = (ushort)sizeof(MsgTick);
-            packet->Id = 1012;
+            packet->Id = PacketId.MsgTick;
             packet->UniqueId = target.Id;
             packet->Timestamp = Environment.TickCount;
             packet->Junk1 = 0;
@@ -35,6 +38,31 @@ namespace MagnumOpus.Networking.Packets
             fixed (byte* p = buffer)
                 *(MsgTick*)p = *packet;
             return buffer;
+        }
+
+        [PacketHandler(PacketId.MsgTick)]
+        public static void Process(PixelEntity ntt, Memory<byte> packet)
+        {
+            var msg = (MsgTick)packet;
+            ref readonly var ntc = ref ntt.Get<NameTagComponent>();
+            if (!ntt.Has<PingComponent>())
+            {
+                var ping = new PingComponent(ntt.Id);
+                ntt.Add(ref ping);
+            }
+            ref var pin = ref ntt.Get<PingComponent>();
+
+            if (ntt.Id != msg.UniqueId)
+                FConsole.WriteLine($"UID Mismatch! {msg.UniqueId}");
+            if (msg.Hash != HashName(ntc.Name))
+                FConsole.WriteLine($"Hash Mismatch! {msg.Hash}");
+
+            msg.Timestamp ^= msg.UniqueId;
+            pin.Ping = Math.Abs(msg.Timestamp - pin.LastPing - 10000);
+            pin.LastPing = msg.Timestamp;
+            
+            var pingMsg = MsgText.Create("SYSTEM", "PING", $"10s Avg Ping: {pin.Ping}ms", MsgTextType.MiniMap);
+            ntt.NetSync(in pingMsg);
         }
 
         public static uint HashName(string name)
@@ -54,7 +82,7 @@ namespace MagnumOpus.Networking.Packets
                 *(MsgTick*)p = *&msg;
             return buffer;
         }
-        public static implicit operator MsgTick (Memory<byte> msg)
+        public static implicit operator MsgTick(Memory<byte> msg)
         {
             fixed (byte* p = msg.Span)
                 return *(MsgTick*)p;

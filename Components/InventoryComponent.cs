@@ -16,7 +16,7 @@ namespace MagnumOpus.Simulation.Components
         public InventoryComponent(int entityId, uint money, uint cps)
         {
             EntityId = entityId;
-            ChangedTick = PixelWorld.Tick;
+            ChangedTick = ConquerWorld.Tick;
             Money = money;
             CPs = cps;
             Items = new PixelEntity[40];

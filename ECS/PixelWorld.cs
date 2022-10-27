@@ -4,7 +4,7 @@ using MagnumOpus.Networking;
 
 namespace MagnumOpus.ECS
 {
-    public static class PixelWorld
+    public static class ConquerWorld
     {
         public const int MaxEntities = 1500_000;
         public static int TargetTps { get; private set; } = 30;
@@ -26,7 +26,7 @@ namespace MagnumOpus.ECS
         private static Action? OnSecond;
         private static Action? OnTick;
 
-        static PixelWorld()
+        static ConquerWorld()
         {
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
             Entities = new PixelEntity[MaxEntities];
@@ -35,11 +35,11 @@ namespace MagnumOpus.ECS
             PerformanceMetrics.RegisterSystem(nameof(IncomingPacketQueue));
             PerformanceMetrics.RegisterSystem(nameof(OutgoingPacketQueue));
             PerformanceMetrics.RegisterSystem("SLEEP");
-            PerformanceMetrics.RegisterSystem(nameof(PixelWorld));
+            PerformanceMetrics.RegisterSystem(nameof(ConquerWorld));
         }
 
         public static void SetSystems(params PixelSystem[] systems) => Systems = systems;
-        public static void SetFPS(int fps)
+        public static void SetTPS(int fps)
         {
             TargetTps = fps;
             UpdateTime = 1f / TargetTps;
@@ -126,7 +126,7 @@ namespace MagnumOpus.ECS
             last = Stopwatch.Elapsed.TotalMilliseconds;
             OutgoingPacketQueue.SendAll();
             PerformanceMetrics.AddSample(nameof(OutgoingPacketQueue), Stopwatch.Elapsed.TotalMilliseconds - last);
-            PerformanceMetrics.AddSample(nameof(PixelWorld), Stopwatch.Elapsed.TotalMilliseconds);
+            PerformanceMetrics.AddSample(nameof(ConquerWorld), Stopwatch.Elapsed.TotalMilliseconds);
 
             last = Stopwatch.Elapsed.TotalMilliseconds;
             var sleepTime = (int)Math.Max(0, -1 + (UpdateTime * 1000) - last);

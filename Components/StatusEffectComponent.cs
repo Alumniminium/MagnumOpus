@@ -13,7 +13,7 @@ namespace MagnumOpus.Simulation.Components
         public StatusEffectComponent(int entityId)
         {
             EntityId = entityId;
-            ChangedTick = PixelWorld.Tick;
+            ChangedTick = ConquerWorld.Tick;
             Effects = Enums.StatusEffect.None;
         }
 

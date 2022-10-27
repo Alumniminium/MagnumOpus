@@ -19,7 +19,7 @@ namespace MagnumOpus.Simulation.Components
             Viewport = new RectangleF(0, 0, viewDistance, viewDistance);
             EntitiesVisible = new();
             EntitiesVisibleLast = new();
-            ChangedTick = PixelWorld.Tick;
+            ChangedTick = ConquerWorld.Tick;
         }
 
         public override int GetHashCode() => EntityId;

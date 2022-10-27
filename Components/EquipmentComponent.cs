@@ -18,7 +18,7 @@ namespace MagnumOpus.Simulation.Components
         public EquipmentComponent(int entityId)
         {
             EntityId = entityId;
-            ChangedTick = PixelWorld.Tick;
+            ChangedTick = ConquerWorld.Tick;
             Head = 0;
             Armor = 0;
             MainHand = 0;

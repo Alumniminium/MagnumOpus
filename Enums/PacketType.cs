@@ -6,7 +6,7 @@
 
 namespace MagnumOpus.Enums
 {
-    public enum PacketType : short
+    public enum PacketId : short
     {
         MsgRemoteLogin = 1,
         MsgRemoteText = 2,

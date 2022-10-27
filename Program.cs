@@ -20,27 +20,21 @@ namespace MagnumOpus
         {
             var systems = new List<PixelSystem>
             {
-                new SpawnSystem(),
-                new LifetimeSystem(),
-                new JumpSystem(),
-                new ViewportSystem(),
-                new InputSystem(),
-                new DamageSystem(),
-                new HealthSystem(),
-                new DropSystem(),
-                new DeathSystem(),
-                new LevelExpSystem(),
-                new RespawnSystem(),
+                new SpawnSystem(), new LifetimeSystem(),
+                new WalkSystem(), new JumpSystem(),
+                new ViewportSystem(), new InputSystem(),
+                new DamageSystem(), new HealthSystem(),
+                new DropSystem(), new DeathSystem(),
+                new LevelExpSystem(), new RespawnSystem(),
                 new NetSyncSystem(),
             };
-            PixelWorld.SetSystems(systems.ToArray());
-            PixelWorld.SetFPS(30);
-            PixelWorld.RegisterOnSecond(() =>
+            ConquerWorld.SetSystems(systems.ToArray());
+            ConquerWorld.SetTPS(30);
+            ConquerWorld.RegisterOnSecond(() =>
             {
                 var lines = PerformanceMetrics.Draw();
-                // Console.WriteLine(lines);
+                Console.WriteLine(lines);
                 PerformanceMetrics.Restart();
-                Console.WriteLine($"[GC] Gen0: {GC.CollectionCount(0)} Gen1: {GC.CollectionCount(1)} Gen2: {GC.CollectionCount(2)}");
             });
 
             var loginThread = new Thread(LoginServerLoop) { IsBackground = true, Priority = ThreadPriority.Highest };
@@ -49,7 +43,7 @@ namespace MagnumOpus
             gameThread.Start();
 
             while (true)
-                PixelWorld.Update();
+                ConquerWorld.Update();
         }
 
         private static void LoginServerLoop()
@@ -62,7 +56,7 @@ namespace MagnumOpus
                 client.Client.NoDelay = true;
                 client.Client.DontFragment = true;
 
-                var player = PixelWorld.CreateEntity(EntityType.Player);
+                var player = ConquerWorld.CreateEntity(EntityType.Player);
                 var net = new NetworkComponent(player, client.Client);
                 player.Add(ref net);
 

@@ -11,15 +11,15 @@ namespace MagnumOpus.Simulation.Systems
         {
             if (ntt.Has<RespawnTagComponent>())
                 return;
-            if (!PixelWorld.EntityExists(dmg.AttackerId))
+            if (!ConquerWorld.EntityExists(dmg.AttackerId))
                 return;
-            var attacker = PixelWorld.GetEntity(dmg.AttackerId);
+            var attacker = ConquerWorld.GetEntity(dmg.AttackerId);
            
             if (dmg.Damage > 0)
             {
                 var rewardableDamage = Math.Min(dmg.Damage, hlt.Health);
                 hlt.Health -= (ushort)Math.Clamp(hlt.Health, 0, dmg.Damage);
-                hlt.ChangedTick = PixelWorld.Tick;
+                hlt.ChangedTick = ConquerWorld.Tick;
 
                 if (attacker.Has<LevelComponent>())
                 {

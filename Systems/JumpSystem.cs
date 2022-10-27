@@ -16,7 +16,7 @@ namespace MagnumOpus.Simulation.Systems
         {
             var dist = (int)Vector2.Distance(pos.Position, jmp.Position);
 
-            if(jmp.ChangedTick == PixelWorld.Tick)
+            if(jmp.ChangedTick == ConquerWorld.Tick)
             {
                 var direction = CoMath.GetDirection(new Vector2(pos.Position.X, pos.Position.Y),new Vector2(jmp.Position.X, jmp.Position.Y));
                 dir.Direction = direction;
