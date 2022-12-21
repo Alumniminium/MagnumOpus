@@ -28,7 +28,7 @@ namespace MagnumOpus.Networking.Packets
             {
                 Size = (ushort)sizeof(MsgNpcSpawn),
                 Id = 2030,
-                UniqueId = ntt.Id,
+                UniqueId = ntt.NetId,
                 Look = (ushort)bdy.Look,
                 X = (ushort)pos.Position.X,
                 Y = (ushort)pos.Position.Y,

@@ -73,8 +73,8 @@ namespace SpacePartitioning
         public void GetVisibleEntities(ref ViewportComponent vwp)
         {
             var rect = vwp.Viewport;
-            var topLeft = new Vector2(rect.X, rect.Y);
-            var bottomRight = new Vector2(rect.X + rect.Width, rect.Y + rect.Height);
+            var topLeft = new Vector2(rect.Left, rect.Top);
+            var bottomRight = new Vector2(rect.Right, rect.Bottom);
 
             topLeft = Vector2.Clamp(topLeft, Vector2.Zero, new Vector2(Width - 1, Height - 1));
             bottomRight = Vector2.Clamp(bottomRight, Vector2.Zero, new Vector2(Width - 1, Height - 1));
@@ -92,7 +92,7 @@ namespace SpacePartitioning
                         {
                             ref readonly var pos = ref other.Get<PositionComponent>();
                             var dist = Vector2.Distance(pos.Position, vwp.Viewport.Location.ToVector2());
-                            if(dist < 16)
+                            if(dist < 32)
                                 vwp.EntitiesVisible.Add(other);
                         }
                         vwp.EntitiesVisible.AddRange(list);

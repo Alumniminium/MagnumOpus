@@ -21,17 +21,9 @@ namespace MagnumOpus
         {
             var systems = new List<PixelSystem>
             {
-                new SpawnSystem(), 
-                new LifetimeSystem(),
                 new WalkSystem(), 
                 new JumpSystem(),
                 new ViewportSystem(), 
-                new DamageSystem(), 
-                new HealthSystem(),
-                new DropSystem(), 
-                new DeathSystem(),
-                new LevelExpSystem(), 
-                new RespawnSystem(),
                 new NetSyncSystem(),
             };
             SquigglyDb.LoadMaps();
@@ -44,11 +36,11 @@ namespace MagnumOpus
             SquigglyDb.Spawn();
             
             PixelWorld.SetSystems(systems.ToArray());
-            PixelWorld.SetTPS(30);
+            PixelWorld.SetTPS(60);
             PixelWorld.RegisterOnSecond(() =>
             {
                 var lines = PerformanceMetrics.Draw();
-                Console.WriteLine(lines);
+                // Console.WriteLine(lines);
                 PerformanceMetrics.Restart();
             });
 
@@ -64,6 +56,7 @@ namespace MagnumOpus
         private static void LoginServerLoop()
         {
             TcpListener listener = new(System.Net.IPAddress.Any, 9958);
+            FConsole.WriteLine($"[LOGIN] Listening on port {9958}...");
             listener.Start();
             while (true)
             {
@@ -110,6 +103,7 @@ namespace MagnumOpus
         private static void GameServerLoop()
         {
             TcpListener listener = new(System.Net.IPAddress.Any, 5816);
+            FConsole.WriteLine($"[GAME] Listening on port {5816}...");
             listener.Start();
             while (true)
             {

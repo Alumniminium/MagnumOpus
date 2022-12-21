@@ -5,7 +5,7 @@ namespace MagnumOpus.Networking
 {
     public static class NetworkHelper
     {
-        public static void FullSync(in PixelEntity to, PixelEntity ntt)
+        public static void FullSync(in PixelEntity to, in PixelEntity ntt)
         {
             Memory<byte> spawnPacket = MsgSpawn.Create(ntt);
             to.NetSync(in spawnPacket);

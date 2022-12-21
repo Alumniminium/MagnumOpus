@@ -22,13 +22,13 @@ namespace MagnumOpus.Networking.Packets
             ref readonly var trs = ref item.Get<TransformationComponent>();
             ref readonly var pos = ref item.Get<PositionComponent>();
 
-            var look = trs.EntityId == item.Id ? trs.Look : bdy.Look;
+            var look = trs.EntityId == item.NetId ? trs.Look : bdy.Look;
 
             var packet = new MsgFloorItem
             {
                 Size = (ushort)sizeof(MsgFloorItem),
                 Id = 1101,
-                UniqueId = item.Id,
+                UniqueId = item.NetId,
                 X = (ushort)pos.Position.X,
                 Y = (ushort)pos.Position.Y,
                 ItemId = look,

@@ -50,7 +50,7 @@ namespace MagnumOpus.Squiggly
                         if(!Collections.Maps.TryGetValue(pos.Map, out var map))
                             continue;
 
-                        Game.Grids[pos.Map] = new Grid(map.Width,map.Height, 50,50);
+                        Game.Grids[pos.Map] = new Grid(map.Width,map.Height, 10,10);
                     }
                     Game.Grids[pos.Map].Add(obj.Id, ref pos);
                 }

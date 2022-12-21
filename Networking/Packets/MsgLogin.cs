@@ -37,9 +37,9 @@ namespace MagnumOpus.Networking.Packets
             var msg = (MsgLogin)packet;
             var language = msg.GetLanguage();
             FConsole.WriteLine($"[GAME] Client Version: {msg.ClientVersion}, Language: {language}");
-            var ntc = new NameTagComponent(ntt.Id, "test");
+            var ntc = new NameTagComponent(ntt.NetId, "test");
             var dir = new DirectionComponent(ntt.Id, Direction.South);
-            var vwp = new ViewportComponent(ntt.Id, 8);
+            var vwp = new ViewportComponent(ntt.Id, 32);
             var syn = new NetSyncComponent(ntt.Id, SyncThings.All);
             ntt.Add(ref ntc);
             ntt.Add(ref dir);

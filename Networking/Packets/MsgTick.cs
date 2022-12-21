@@ -26,7 +26,7 @@ namespace MagnumOpus.Networking.Packets
             var packet = stackalloc MsgTick[1];
             packet->Size = (ushort)sizeof(MsgTick);
             packet->Id = PacketId.MsgTick;
-            packet->UniqueId = target.Id;
+            packet->UniqueId = target.NetId;
             packet->Timestamp = Environment.TickCount;
             packet->Junk1 = 0;
             packet->Junk2 = 0;
@@ -52,7 +52,7 @@ namespace MagnumOpus.Networking.Packets
             }
             ref var pin = ref ntt.Get<PingComponent>();
 
-            if (ntt.Id != msg.UniqueId)
+            if (ntt.NetId != msg.UniqueId)
                 FConsole.WriteLine($"UID Mismatch! {msg.UniqueId}");
             if (msg.Hash != HashName(ntc.Name))
                 FConsole.WriteLine($"Hash Mismatch! {msg.Hash}");

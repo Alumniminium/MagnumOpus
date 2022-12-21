@@ -21,7 +21,7 @@ namespace MagnumOpus.Networking.Packets
             {
                 Size = (ushort)sizeof(MsgNpc),
                 Id = 2031,
-                UniqId = target.Id,
+                UniqId = target.NetId,
                 Param = param,
                 Action = action,
                 Type = 26

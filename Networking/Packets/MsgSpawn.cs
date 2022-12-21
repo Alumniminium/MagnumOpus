@@ -75,7 +75,7 @@ namespace MagnumOpus.Networking.Packets
             var packet = stackalloc MsgSpawn[1];
             packet->Size = (ushort)sizeof(MsgSpawn);
             packet->Id = 1014;
-            packet->UniqueId = ntt.Id;
+            packet->UniqueId = ntt.NetId;
             packet->Look = bdy.Look;
             packet->StatusEffects = eff.Effects;
             packet->GuildRank = gld.Rank;
@@ -118,7 +118,7 @@ namespace MagnumOpus.Networking.Packets
             var packet = stackalloc MsgSpawn[1];
             packet->Size = (ushort)sizeof(MsgSpawn);
             packet->Id = 1014;
-            packet->UniqueId = ntt.Id;
+            packet->UniqueId = ntt.NetId;
             packet->Look = bdy.Look;
             packet->StatusEffects = eff.Effects;
             packet->CurrentHp = hlt.Health;

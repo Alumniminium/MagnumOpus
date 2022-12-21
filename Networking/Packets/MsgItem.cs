@@ -86,7 +86,7 @@ namespace MagnumOpus.Networking.Packets
                 case MsgItemType.ParticleEffect:
                     break;
                 case MsgItemType.Ping:
-                    var reply = MsgItem.Create(ntt.Id, msg.Value, msg.Param, msg.Timestamp, MsgItemType.Ping);
+                    var reply = MsgItem.Create(ntt.NetId, msg.Value, msg.Param, msg.Timestamp, MsgItemType.Ping);
                     var tick = MsgTick.Create(in ntt);
                     ntt.NetSync(in reply);
                     ntt.NetSync(in tick);

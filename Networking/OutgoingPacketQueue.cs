@@ -21,6 +21,7 @@ namespace MagnumOpus.Networking
             }
             // lock (SyncRoot)
             queue.Enqueue(packet);
+            // SendAll();
         }
 
         public static void Remove(in PixelEntity player) => Packets.TryRemove(player, out _);
@@ -51,51 +52,6 @@ namespace MagnumOpus.Networking
                                 net.AuthCrypto.Encrypt(packet.Span);
                                 
                             await net.Socket.SendAsync(packet, SocketFlags.None, CancellationToken.None);
-                            // try
-                            // {
-                            //     var bigPacketIndex = 0;
-                            //     var bigPacket = new Memory<byte>(new byte[MAX_PACKET_SIZE]);
-
-                            //     while (queue.Count != 0 && bigPacketIndex + MemoryMarshal.Read<ushort>(queue.Peek().Span) < MAX_PACKET_SIZE)
-                            //     {
-                            //         try
-                            //         {
-                            //             var packet = queue.Dequeue();
-                            //             var size = MemoryMarshal.Read<ushort>(packet.Span);
-                            //             var id = MemoryMarshal.Read<ushort>(packet.Span[2..]);
-                            //             if(size != packet.Length)
-                            //                 Debugger.Break();
-                            //             packet.Span[..size].CopyTo(bigPacket.Span[bigPacketIndex..]);
-                            //             bigPacketIndex += size;
-                            //         }
-                            //         catch (Exception e)
-                            //         {
-                            //             FConsole.WriteLine(e);
-                            //         }
-                            //     }
-
-                            //     try
-                            //     {
-                            //         await net.Socket.SendAsync(bigPacket[..bigPacketIndex]).ConfigureAwait(false);
-                            //     }
-                            //     catch (Exception e)
-                            //     {
-                            //         if(ntt.Has<PhysicsComponent>())
-                            //         {
-                            //             var bdy = ntt.Get<PhysicsComponent>();
-                            //             Game.Grids[(int)pos.Position.Z].Remove(ntt);
-                            //         }
-                            //         PixelWorld.Destroy(in ntt);
-                            //         FConsole.WriteLine(e.Message);
-                            //     }
-
-                            //     if (!net.Socket.Connected)
-                            //         break;
-                            // }
-                            // catch (Exception e)
-                            // {
-                            //     FConsole.WriteLine(e.Message);
-                            // }
                         }
                     }
                     catch (Exception e)

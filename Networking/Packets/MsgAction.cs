@@ -68,22 +68,9 @@ namespace MagnumOpus.Networking.Packets
                             ntt.Add(ref pc);
                         }
                         ref var pos = ref ntt.Get<PositionComponent>();
-                        var reply = MsgAction.Create(0, ntt.Id, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
+                        var reply = MsgAction.Create(0, ntt.NetId, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
                         ntt.NetSync(in reply);
                         PixelWorld.Players.Add(ntt);
-                        break;
-                    }
-                case MsgActionType.Jump:
-                    {
-                        var jmp = new JumpComponent(ntt.Id, msg.JumpX, msg.JumpY);
-                        ntt.Add(ref jmp);
-                        // ref var pos = ref ntt.Get<PositionComponent>();
-                        // pos.Position.X = msg.X;
-                        // pos.Position.Y = msg.Y;
-                        // pos.ChangedTick = PixelWorld.Tick;
-
-                        // var reply = MsgAction.Create(0, ntt.Id, (ushort)pos.Position.Z, msg.X, msg.Y, 0, msg.Type);
-                        // ntt.NetSync(in reply);
                         break;
                     }
                 case MsgActionType.SendItems:
@@ -91,7 +78,7 @@ namespace MagnumOpus.Networking.Packets
                 case MsgActionType.SendProficiencies:
                 case MsgActionType.SendSpells:
                     {
-                        var reply = MsgAction.Create(0, ntt.Id, 0, 0, 0, 0, msg.Type);
+                        var reply = MsgAction.Create(0, ntt.NetId, 0, 0, 0, 0, msg.Type);
                         ntt.NetSync(in reply);
                         break;
                     }
@@ -105,6 +92,13 @@ namespace MagnumOpus.Networking.Packets
                     {
                         var emo = new EmoteComponent(ntt.Id, (Emote)msg.Param);
                         ntt.Add(ref emo);
+                        break;
+                    }
+                case MsgActionType.Jump:
+                    {
+                        var jmp = new JumpComponent(ntt.Id, msg.JumpX, msg.JumpY);
+                        ntt.Add(ref jmp);
+                        ntt.NetSync(memory[0..sizeof(MsgAction)]);
                         break;
                     }
                 case MsgActionType.ChangeMap:
@@ -209,7 +203,7 @@ namespace MagnumOpus.Networking.Packets
                 default:
                     {
                         FConsole.WriteLine($"[GAME] Unhandled MsgActionType: {(int)msg.Type}/{msg.Type}");
-                        var reply = Create(msg.Timestamp, ntt.Id, msg.Param, msg.X, msg.Y, msg.Direction, msg.Type);
+                        var reply = Create(msg.Timestamp, ntt.NetId, msg.Param, msg.X, msg.Y, msg.Direction, msg.Type);
                         ntt.NetSync(in reply);
                         break;
                     }

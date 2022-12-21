@@ -27,7 +27,7 @@ namespace MagnumOpus.Networking.Packets
             ref readonly var hlt = ref owner.Get<HealthComponent>();
             ref readonly var trs = ref owner.Get<TransformationComponent>();
 
-            var look = trs.EntityId == owner.Id ? trs.Look : bdy.Look;
+            var look = trs.EntityId == owner.NetId ? trs.Look : bdy.Look;
 
             var packet = new MsgTeamUpdate
             {
@@ -36,7 +36,7 @@ namespace MagnumOpus.Networking.Packets
                 Action = addMember,
                 Amount = 1,
                 Unknown = 16,
-                UniqueId = owner.Id,
+                UniqueId = owner.NetId,
                 Look = look,
                 MaxHp = hlt.MaxHealth,
                 CurHp = hlt.Health

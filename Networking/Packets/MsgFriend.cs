@@ -29,7 +29,7 @@ namespace MagnumOpus.Networking.Packets
                 IsOnline = status,
                 Unknow1 = 0,
                 Unknow2 = 0,
-                UniqId = target.Id,
+                UniqId = target.NetId,
             };
             for (byte i = 0; i < ntc.Name.Length; i++)
                 packet.Name[i] = (byte)ntc.Name[i];

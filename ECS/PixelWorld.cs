@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Runtime;
+using MagnumOpus.Helpers;
 using MagnumOpus.Networking;
 
 namespace MagnumOpus.ECS
@@ -52,7 +53,7 @@ namespace MagnumOpus.ECS
         {
             if (AvailableArrayIndicies.TryPop(out var arrayIndex))
             {
-                Entities[arrayIndex] = new PixelEntity(arrayIndex, type, parentId);
+                Entities[arrayIndex] = new PixelEntity(arrayIndex, IdGenerator.Get(type), type, parentId);
                 return ref Entities[arrayIndex];
             }
             throw new IndexOutOfRangeException("Failed to pop an array index");

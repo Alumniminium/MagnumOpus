@@ -28,8 +28,8 @@ namespace MagnumOpus.Networking.Packets
             msgP->Size = (ushort)sizeof(MsgInteract);
             msgP->Id = 1022;
             msgP->Timestamp = Environment.TickCount;
-            msgP->AttackerUniqueId = source.Id;
-            msgP->TargetUniqueId = target.Id;
+            msgP->AttackerUniqueId = source.NetId;
+            msgP->TargetUniqueId = target.NetId;
             msgP->X = (ushort)pos.Position.X;
             msgP->Y = (ushort)pos.Position.Y;
             msgP->Type = type;
@@ -65,8 +65,8 @@ namespace MagnumOpus.Networking.Packets
             msgP->Size = 32;
             msgP->Id = 1022;
             msgP->Timestamp = Environment.TickCount;
-            msgP->AttackerUniqueId = attacker.Id;
-            msgP->TargetUniqueId = target.Id;
+            msgP->AttackerUniqueId = attacker.NetId;
+            msgP->TargetUniqueId = target.NetId;
             msgP->X = (ushort)bdy.Position.X;
             msgP->Y = (ushort)bdy.Position.Y;
             msgP->Type = MsgInteractType.Death;

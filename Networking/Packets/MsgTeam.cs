@@ -20,7 +20,7 @@ namespace MagnumOpus.Networking.Packets
                 Size = (ushort)sizeof(MsgTeam),
                 Id = 1023,
                 Mode = action,
-                TargetUniqueId = human.Id
+                TargetUniqueId = human.NetId
             };
             return msg;
         }

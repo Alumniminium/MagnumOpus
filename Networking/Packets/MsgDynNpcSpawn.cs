@@ -30,7 +30,7 @@ namespace MagnumOpus.Networking.Packets
             {
                 Size = (ushort)sizeof(MsgDynNpcSpawn),
                 Id = 1109,
-                UniqueId = ntt.Id,
+                UniqueId = ntt.NetId,
                 CurrentHp = hlt.Health,
                 MaximumHp = hlt.MaxHealth,
                 X = (short)pos.Position.X,

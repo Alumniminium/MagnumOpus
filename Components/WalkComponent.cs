@@ -10,14 +10,16 @@ namespace MagnumOpus.Components
         public readonly uint CreatedTick;
         public readonly uint ChangedTick;
         public readonly Direction Direction;
+        public readonly byte RawDirection;
         public readonly bool IsRunning;
 
-        public WalkComponent(int entityId, Direction direction, bool isRunning)
+        public WalkComponent(int entityId, byte direction, bool isRunning)
         {
             EntityId = entityId;
             CreatedTick = PixelWorld.Tick;
             ChangedTick = PixelWorld.Tick;
-            Direction = direction;
+            RawDirection = direction;
+            Direction = (Direction)(direction%8);
             IsRunning = isRunning;
         }
 

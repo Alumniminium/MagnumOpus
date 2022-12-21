@@ -5,13 +5,15 @@ namespace MagnumOpus.ECS
     public readonly struct PixelEntity
     {
         public readonly int Id;
+        public readonly int NetId;
         public readonly EntityType Type;
         public readonly int ParentId;
         public readonly PixelEntity[] Children;
         
-        public PixelEntity(int id, EntityType type, int parentId = -1)
+        public PixelEntity(int id, int netId, EntityType type, int parentId = -1)
         {
             Id = id;
+            NetId = netId;
             Type = type;
             ParentId = parentId;
             Children = Array.Empty<PixelEntity>();

@@ -121,7 +121,7 @@ namespace MagnumOpus.Networking.Packets
             {
                 Size = (ushort)(sizeof(MsgCharacter) - 30 + ntc.Name.Length + sNtc.Name.Length),
                 Id = 1006,
-                EntityId = ntt.Id,
+                EntityId = ntt.NetId,
                 Look = bdy.Look,
                 Hair = bdy.Hair,
                 Money = inv.Money,

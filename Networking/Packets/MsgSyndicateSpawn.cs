@@ -28,7 +28,7 @@ namespace MagnumOpus.Networking.Packets
 
             msgP->Size = (ushort)sizeof(MsgSyndicateSpawn);
             msgP->Id = 1106;
-            if (gld.EntityId == human.Id)
+            if (gld.EntityId == human.NetId)
             {
                 msgP->UniqueId = gld.GuildId;
                 msgP->Donation = gld.Donation;

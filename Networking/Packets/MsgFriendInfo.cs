@@ -37,7 +37,7 @@ namespace MagnumOpus.Networking.Packets
             {
                 Size = (ushort)sizeof(MsgFriendInfo),
                 Id = 2033,
-                UniqId = target.Id,
+                UniqId = target.NetId,
                 Look = bdy.Look,
                 Level = lvl.Level,
                 Profession = (byte)pro.Class,
