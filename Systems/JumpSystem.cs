@@ -15,28 +15,28 @@ namespace MagnumOpus.Simulation.Systems
 
         public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref JumpComponent jmp, ref DirectionComponent dir)
         {
-            // if(jmp.ChangedTick == PixelWorld.Tick)
-            // {
-            //     var dist = (int)Vector2.Distance(pos.Position, jmp.Position);
-            //     var direction = CoMath.GetDirection(new Vector2(pos.Position.X, pos.Position.Y),new Vector2(jmp.Position.X, jmp.Position.Y));
-            //     dir.Direction = direction;
+            if (jmp.ChangedTick == PixelWorld.Tick)
+            {
+                var dist = (int)Vector2.Distance(pos.Position, jmp.Position);
+                var direction = CoMath.GetDirection(new Vector2(pos.Position.X, pos.Position.Y), new Vector2(jmp.Position.X, jmp.Position.Y));
+                dir.Direction = direction;
 
-            //     jmp.Time = CoMath.GetJumpTime(dist);
-            //     // Console.WriteLine($"Jumping to {jmp.Position} | Dist: {dist} | Time: {jmp.Time:0.00}");
-            // }
+                jmp.Time = CoMath.GetJumpTime(dist);
+                Console.WriteLine($"Jumping to {jmp.Position} | Dist: {dist} | Time: {jmp.Time:0.00}");
+            }
 
-            // pos.Position = Vector2.Lerp(pos.Position, jmp.Position, jmp.Time);
+            pos.Position = Vector2.Lerp(pos.Position, jmp.Position, jmp.Time);
             pos.ChangedTick = PixelWorld.Tick;
-            // Console.WriteLine($"Time: {jmp.Time:0.00}");
-            // jmp.Time -= deltaTime;
+            Console.WriteLine($"Time: {jmp.Time:0.00}");
+            jmp.Time -= deltaTime;
 
-            // if(jmp.Time <= 0)
-            // {
-            pos.Position = jmp.Position;
-            // ntt.NetSync(MsgAction.Create((int)PixelWorld.Tick, ntt.NetId, pos.Map, (ushort)jmp.Position.X, (ushort)jmp.Position.Y, dir.Direction, MsgActionType.Jump));
-            ntt.Remove<JumpComponent>();
-            FConsole.WriteLine($"[{nameof(JumpSystem)}] {ntt.NetId} -> {dir.Direction} | {pos.Position}");
-            // }
+            if (jmp.Time <= 0)
+            {
+                pos.Position = jmp.Position;
+                ntt.NetSync(MsgAction.Create((int)PixelWorld.Tick, ntt.NetId, 0, (ushort)jmp.Position.X, (ushort)jmp.Position.Y, dir.Direction, MsgActionType.Jump));
+                ntt.Remove<JumpComponent>();
+                FConsole.WriteLine($"[{nameof(JumpSystem)}] {ntt.NetId} -> {dir.Direction} | {pos.Position}");
+            }
         }
     }
 }

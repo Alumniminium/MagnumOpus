@@ -1,3 +1,4 @@
+using MagnumOpus.Components;
 using MagnumOpus.Networking;
 
 namespace MagnumOpus.ECS
@@ -34,7 +35,24 @@ namespace MagnumOpus.ECS
         public readonly bool Has<T, T2, T3, T4, T5>() where T : struct where T2 : struct where T3 : struct where T4 : struct where T5 : struct => Has<T, T2, T3, T4>() && Has<T5>();
         public readonly void Remove<T>() => ReflectionHelper.Remove<T>(in this);
         public readonly void Recycle() => ReflectionHelper.RecycleComponents(in this);
-        public readonly void NetSync(in Memory<byte> packet) => OutgoingPacketQueue.Add(in this, in packet);
+        public readonly void NetSync(in Memory<byte> packet, bool broadcast = false)
+        {
+            if(broadcast)
+            {
+                ref readonly var vwp = ref Get<ViewportComponent>();
+                for (var i = 0; i < vwp.EntitiesVisible.Count; i++)
+                {
+                    var b = vwp.EntitiesVisible[i];
+                    if (b.Type != EntityType.Player)
+                        continue;
+
+                    b.NetSync(in packet, false);
+                }
+            }
+            else
+                OutgoingPacketQueue.Add(in this, in packet);
+        }
+
         public override int GetHashCode() => Id;
         public override bool Equals(object? obj) => obj is PixelEntity nttId && nttId.Id == Id;
         public static implicit operator int(in PixelEntity nttId) => nttId.Id;

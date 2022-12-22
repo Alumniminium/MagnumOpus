@@ -35,24 +35,6 @@ namespace MagnumOpus.Simulation.Systems
             ref readonly var pos = ref ntt.Get<PositionComponent>();
             ref readonly var dir = ref ntt.Get<DirectionComponent>();
             
-            // if (syn.Fields.HasFlag(SyncThings.Walk))
-            // {
-            //     ref readonly var wlk = ref other.Get<WalkComponent>();
-            //     if(wlk.ChangedTick == PixelWorld.Tick)
-            //     {
-            //         var walkMsg = MsgWalk.Create(other.NetId, wlk.RawDirection, wlk.IsRunning);
-            //         ntt.NetSync(in walkMsg);
-            //     }
-            // }
-            if(syn.Fields.HasFlag(SyncThings.Jump))
-            {
-                ref readonly var jmp = ref other.Get<JumpComponent>();
-                if(jmp.CreatedTick == PixelWorld.Tick)
-                {
-                    var jumpMsg = MsgAction.Create(0, ntt.NetId, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, dir.Direction, MsgActionType.Jump);
-                    ntt.NetSync(in jumpMsg);
-                }
-            }
             if (syn.Fields.HasFlag(SyncThings.Health) || syn.Fields.HasFlag(SyncThings.MaxHealth))
             {
                 ref readonly var hlt = ref other.Get<HealthComponent>();

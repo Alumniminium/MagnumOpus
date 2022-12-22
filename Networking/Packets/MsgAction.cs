@@ -98,7 +98,6 @@ namespace MagnumOpus.Networking.Packets
                     {
                         var jmp = new JumpComponent(ntt.Id, msg.JumpX, msg.JumpY);
                         ntt.Add(ref jmp);
-                        ntt.NetSync(memory[0..sizeof(MsgAction)]);
                         break;
                     }
                 case MsgActionType.ChangeMap:

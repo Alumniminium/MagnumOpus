@@ -29,7 +29,6 @@ namespace MagnumOpus.Simulation.Systems
                 var rtc = new RespawnTagComponent(ntt.Id, 1000, 5);
                 ntt.Add(ref rtc);
                 ntt.Remove<DeathTagComponent>();
-                ntt.Remove<InputComponent>();
                 return;
             }
 

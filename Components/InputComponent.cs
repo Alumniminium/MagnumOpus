@@ -1,29 +1,26 @@
 using System.Numerics;
 using MagnumOpus.ECS;
-using Packets.Enums;
+using MagnumOpus.Enums;
 
 namespace MagnumOpus.Components
 {
     [Component]
-    public struct InputComponent
+    public struct BrainComponent
     {
         public readonly int EntityId;
-        public Vector2 MovementAxis;
-        public Vector2 MouseDir;
-        public PlayerInput ButtonStates;
-        public bool DidBoostLastFrame;
+        public BrainState State;
+        public int TargetId;
+        public Vector2 TargetPosition;
+        public int SleepTicks;
 
-        public InputComponent(int entityId, Vector2 movement, Vector2 mousePos, PlayerInput buttonState = PlayerInput.None)
+        
+        public BrainComponent(int entityId)
         {
             EntityId = entityId;
-            MovementAxis = movement;
-            MouseDir = mousePos;
-            ButtonStates = buttonState;
-            DidBoostLastFrame = false;
+            State = BrainState.Idle;
+            SleepTicks = 0;
         }
-        public override int GetHashCode()
-        {
-            return EntityId;
-        }
+
+        public override int GetHashCode() => EntityId;
     }
 }

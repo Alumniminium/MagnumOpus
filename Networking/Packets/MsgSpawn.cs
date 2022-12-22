@@ -46,8 +46,7 @@ namespace MagnumOpus.Networking.Packets
             return ntt.Type switch
             {
                 EntityType.Player => CreatePlayer(ntt),
-                EntityType.Monster => CreateMonster(ntt),
-                _ => default,
+                EntityType.Monster => CreateMonster(ntt)
             };
         }
 

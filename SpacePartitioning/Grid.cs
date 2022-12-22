@@ -92,7 +92,7 @@ namespace SpacePartitioning
                         {
                             ref readonly var pos = ref other.Get<PositionComponent>();
                             var dist = Vector2.Distance(pos.Position, vwp.Viewport.Location.ToVector2());
-                            if(dist < 32)
+                            if(dist <= vwp.Viewport.Width/2)
                                 vwp.EntitiesVisible.Add(other);
                         }
                         vwp.EntitiesVisible.AddRange(list);

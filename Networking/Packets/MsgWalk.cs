@@ -79,6 +79,11 @@ namespace MagnumOpus.Networking.Packets
             ntt.Add(ref wlk);
         }
 
+        internal static Memory<byte> Create(int netId, object rawDirection, bool isRunning)
+        {
+            throw new NotImplementedException();
+        }
+
         public static implicit operator Memory<byte>(MsgWalk msg)
         {
             var buffer = new byte[sizeof(MsgWalk)];

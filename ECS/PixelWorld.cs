@@ -58,6 +58,15 @@ namespace MagnumOpus.ECS
             }
             throw new IndexOutOfRangeException("Failed to pop an array index");
         }
+        public static ref PixelEntity CreateEntityWithNetId(EntityType type, int netId = 0)
+        {
+            if (AvailableArrayIndicies.TryPop(out var arrayIndex))
+            {
+                Entities[arrayIndex] = new PixelEntity(arrayIndex, netId, type, -1);
+                return ref Entities[arrayIndex];
+            }
+            throw new IndexOutOfRangeException("Failed to pop an array index");
+        }
         public static ref PixelEntity GetEntity(int nttId) => ref Entities[nttId];
 
         public static bool EntityExists(int nttId) => Entities[nttId].Id == nttId;

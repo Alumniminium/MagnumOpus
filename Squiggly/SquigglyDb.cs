@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using System.Numerics;
-using MagnumOpus.Enums;
-using MagnumOpus.ECS;
 using MagnumOpus.Components;
+using MagnumOpus.ECS;
+using MagnumOpus.Enums;
 using SpacePartitioning;
 
 namespace MagnumOpus.Squiggly
@@ -33,10 +33,11 @@ namespace MagnumOpus.Squiggly
                     var dir = new DirectionComponent(obj.Id, (Direction)Random.Shared.Next(0, 9));
                     var hp = new HealthComponent(obj.Id, prefab.Health, prefab.MaxHealth);
                     var sync = new NetSyncComponent(obj.Id, SyncThings.All);
-                    var ntc  = new NameTagComponent(obj.Id, prefab.Name);
+                    var ntc = new NameTagComponent(obj.Id, prefab.Name);
+                    var vwp = new ViewportComponent(obj.Id, 8f);
 
-                    pos.Position.X = (ushort)Random.Shared.Next(spawn.Value.Xstart - 10,spawn.Value.Xstart + spawn.Value.Xend + 10);
-                    pos.Position.Y = (ushort)Random.Shared.Next(spawn.Value.Ystart - 10,spawn.Value.Ystart + spawn.Value.Yend + 10);
+                    pos.Position.X = (ushort)Random.Shared.Next(spawn.Value.Xstart - 10, spawn.Value.Xstart + spawn.Value.Xend + 10);
+                    pos.Position.Y = (ushort)Random.Shared.Next(spawn.Value.Ystart - 10, spawn.Value.Ystart + spawn.Value.Yend + 10);
                     obj.Add(ref spw);
                     obj.Add(ref pos);
                     obj.Add(ref bdy);
@@ -44,13 +45,20 @@ namespace MagnumOpus.Squiggly
                     obj.Add(ref hp);
                     obj.Add(ref sync);
                     obj.Add(ref ntc);
+                    obj.Add(ref vwp);
 
-                    if(!Game.Grids.TryGetValue(pos.Map, out var g))
+                    if (prefab.AIType == 0)
                     {
-                        if(!Collections.Maps.TryGetValue(pos.Map, out var map))
+                        var brn = new BrainComponent(obj.Id);
+                        obj.Add(ref brn);
+                    }
+
+                    if (!Game.Grids.TryGetValue(pos.Map, out var g))
+                    {
+                        if (!Collections.Maps.TryGetValue(pos.Map, out var map))
                             continue;
 
-                        Game.Grids[pos.Map] = new Grid(map.Width,map.Height, 10,10);
+                        Game.Grids[pos.Map] = new Grid(map.Width, map.Height, 10, 10);
                     }
                     Game.Grids[pos.Map].Add(obj.Id, ref pos);
                 }
@@ -74,7 +82,7 @@ namespace MagnumOpus.Squiggly
                         cqmap.name.Trim(),
                         new Tuple<ushort, ushort, ushort>((ushort)cqmap.portal0_x, (ushort)cqmap.portal0_y, (ushort)cqmap.reborn_map),
                         cqmap.Width,
-                        cqmap.Height,new Dictionary<ushort, CqPortal>()
+                        cqmap.Height, new Dictionary<ushort, CqPortal>()
                     );
                     Collections.Maps.Add((ushort)cqmap.id, map);
                 }
@@ -103,6 +111,21 @@ namespace MagnumOpus.Squiggly
                         cqNpc.task2, cqNpc.task3, cqNpc.task4, cqNpc.task5, cqNpc.task6, cqNpc.task7);
 
                     Collections.Npcs.Add(npc.UniqueId, npc);
+                    var ntt = PixelWorld.CreateEntityWithNetId(EntityType.Npc, (int)cqNpc.id);
+                    var pos = new PositionComponent(ntt.Id, new Vector2(cqNpc.cellx, cqNpc.celly), cqNpc.mapid);
+                    var bdy = new BodyComponent(ntt.Id, cqNpc.lookface);
+                    var npcc = new NpcComponent(ntt.Id, npc.Base, npc.Type, npc.Sort);
+                    ntt.Add(ref pos);
+                    ntt.Add(ref bdy);
+                    ntt.Add(ref npcc);
+                    if (!Game.Grids.TryGetValue(pos.Map, out var g))
+                    {
+                        if (!Collections.Maps.TryGetValue(pos.Map, out var map))
+                            continue;
+
+                        Game.Grids[pos.Map] = new Grid(map.Width, map.Height, 10, 10);
+                    }
+                    Game.Grids[pos.Map].Add(ntt.Id, ref pos);
                 }
             }
             sw.Stop();

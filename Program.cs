@@ -16,6 +16,8 @@ namespace MagnumOpus
     internal class Game
     {
         public static Dictionary<int, Grid> Grids = new();
+        public static TcpListener GameListener;
+        public static TcpListener LoginListener;
 
         private static void Main()
         {
@@ -23,7 +25,8 @@ namespace MagnumOpus
             {
                 new WalkSystem(), 
                 new JumpSystem(),
-                new ViewportSystem(), 
+                new ViewportSystem(),
+                new BasicAISystem(),
                 new NetSyncSystem(),
             };
             SquigglyDb.LoadMaps();
@@ -32,17 +35,24 @@ namespace MagnumOpus
             SquigglyDb.LoadItemBonus();
             SquigglyDb.LoadMobs();
             SquigglyDb.LoadSpawns();
-            SquigglyDb.LoadNpcs();
             SquigglyDb.Spawn();
+            SquigglyDb.LoadNpcs();
             
             PixelWorld.SetSystems(systems.ToArray());
-            PixelWorld.SetTPS(60);
+            PixelWorld.SetTPS(30);
             PixelWorld.RegisterOnSecond(() =>
             {
                 var lines = PerformanceMetrics.Draw();
-                // Console.WriteLine(lines);
+                Console.WriteLine(lines);
                 PerformanceMetrics.Restart();
             });
+
+            LoginListener = new(System.Net.IPAddress.Any, 9958);
+            FConsole.WriteLine($"[LOGIN] Listening on port {9958}...");
+            LoginListener.Start();
+            GameListener = new(System.Net.IPAddress.Any, 5816);
+            FConsole.WriteLine($"[GAME] Listening on port {5816}...");
+            GameListener.Start();
 
             var loginThread = new Thread(LoginServerLoop) { IsBackground = true, Priority = ThreadPriority.Highest };
             var gameThread = new Thread(GameServerLoop) { IsBackground = true, Priority = ThreadPriority.Highest };
@@ -55,12 +65,9 @@ namespace MagnumOpus
 
         private static void LoginServerLoop()
         {
-            TcpListener listener = new(System.Net.IPAddress.Any, 9958);
-            FConsole.WriteLine($"[LOGIN] Listening on port {9958}...");
-            listener.Start();
             while (true)
             {
-                var client = listener.AcceptTcpClient();
+                var client = LoginListener.AcceptTcpClient();
                 client.Client.NoDelay = true;
                 client.Client.DontFragment = true;
 
@@ -102,12 +109,9 @@ namespace MagnumOpus
         }
         private static void GameServerLoop()
         {
-            TcpListener listener = new(System.Net.IPAddress.Any, 5816);
-            FConsole.WriteLine($"[GAME] Listening on port {5816}...");
-            listener.Start();
             while (true)
             {
-                var client = listener.AcceptTcpClient();
+                var client = GameListener.AcceptTcpClient();
                 client.Client.NoDelay = true;
                 client.Client.DontFragment = true;
 
