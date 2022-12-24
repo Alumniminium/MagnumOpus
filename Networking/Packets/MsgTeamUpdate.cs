@@ -46,13 +46,5 @@ namespace MagnumOpus.Networking.Packets
 
             return packet;
         }
-
-        public static implicit operator Memory<byte>(MsgTeamUpdate msg)
-        {
-            var buffer = new byte[sizeof(MsgTeamUpdate)];
-            fixed (byte* p = buffer)
-                *(MsgTeamUpdate*)p = *&msg;
-            return buffer;
-        }
     }
 }

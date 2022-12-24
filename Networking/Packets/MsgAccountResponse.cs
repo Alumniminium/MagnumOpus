@@ -4,7 +4,7 @@ using System.Text;
 namespace MagnumOpus.Networking.Packets
 {
     [StructLayout(LayoutKind.Explicit, Pack = 1)]
-    public unsafe struct MsgAccountResponse
+    public unsafe  struct MsgAccountResponse
     {
         [FieldOffset(0)]
         public ushort Size;
@@ -35,14 +35,6 @@ namespace MagnumOpus.Networking.Packets
                 packet.ServerIP[i] = ipBytes[i];
 
             return packet;
-        }
-
-        public static implicit operator Memory<byte>(MsgAccountResponse packet)
-        {
-            var size = sizeof(MsgAccountResponse);
-            var memory = new Memory<byte>(new byte[size]);
-            MemoryMarshal.Write(memory.Span, ref packet);
-            return memory;
         }
     }
 }

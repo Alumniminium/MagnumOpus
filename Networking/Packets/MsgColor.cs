@@ -20,7 +20,7 @@ namespace MagnumOpus.Networking.Packets
         public Direction Direction;
         public uint Type;
 
-        public static Memory<byte> Create(in PixelEntity ntt, Color color)
+        public static MsgColor Create(in PixelEntity ntt, Color color)
         {
             ref readonly var bdy = ref ntt.Get<BodyComponent>();
             ref readonly var pos = ref ntt.Get<PositionComponent>();
@@ -40,7 +40,7 @@ namespace MagnumOpus.Networking.Packets
             };
             return packet;
         }
-        public static Memory<byte> Create(in PixelEntity ntt, uint color)
+        public static MsgColor Create(in PixelEntity ntt, uint color)
         {
             ref readonly var bdy = ref ntt.Get<BodyComponent>();
             ref readonly var pos = ref ntt.Get<PositionComponent>();
@@ -61,17 +61,6 @@ namespace MagnumOpus.Networking.Packets
             return packet;
         }
 
-        private static uint ColorToUInt(Color color)
-        {
-            return (uint)((color.A << 24) | (color.R << 16) | (color.G << 8) | (color.B << 0));
-        }
-
-        public static unsafe implicit operator Memory<byte>(MsgColor msg)
-        {
-            var buffer = new byte[sizeof(MsgColor)];
-            fixed (byte* p = buffer)
-                *(MsgColor*)p = *&msg;
-            return buffer;
-        }
+        private static uint ColorToUInt(Color c) => (uint)((c.A << 24) | (c.R << 16) | (c.G << 8) | (c.B << 0));
     }
 }

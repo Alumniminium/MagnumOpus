@@ -5,7 +5,7 @@ namespace MagnumOpus.Helpers
 {
     public static class IdGenerator
     {
-        public static Dictionary<EntityType, Stack<int>> Ids;
+        static readonly Dictionary<EntityType, Stack<int>> Ids;
         
         static IdGenerator()
         {

@@ -14,7 +14,6 @@ namespace MagnumOpus.Simulation.Systems
         {
             if (pos.ChangedTick != PixelWorld.Tick)
                 return;
-            Game.Grids[pos.Map].Move(in ntt, ref pos);
 
             vwp.Viewport.X = pos.Position.X - vwp.Viewport.Width / 2;
             vwp.Viewport.Y = pos.Position.Y - vwp.Viewport.Height / 2;
@@ -24,7 +23,7 @@ namespace MagnumOpus.Simulation.Systems
             vwp.EntitiesVisible.Clear();
 
             Game.Grids[pos.Map].GetVisibleEntities(ref vwp);
-            FConsole.WriteLine($"[{nameof(ViewportSystem)}] {ntt.Id} -> {vwp.EntitiesVisible.Count} entities visible");
+            // FConsole.WriteLine($"[{nameof(ViewportSystem)}] {ntt.Id} -> {vwp.EntitiesVisible.Count} entities visible");
 
             if (ntt.Type != EntityType.Player)
                 return;
@@ -33,14 +32,16 @@ namespace MagnumOpus.Simulation.Systems
             {
                 var b = vwp.EntitiesVisible[i];
 
-                if(vwp.EntitiesVisibleLast.Contains(b))
-                    continue;
                 if(b.Has<BrainComponent>())
                 {
                     ref var brn = ref b.Get<BrainComponent>();
                     if(brn.State == Enums.BrainState.Idle)
                         brn.State = Enums.BrainState.WakingUp;
                 }
+
+                if(vwp.EntitiesVisibleLast.Contains(b))
+                    continue;
+                
                 NetworkHelper.FullSync(in ntt, in b);
             }
         }

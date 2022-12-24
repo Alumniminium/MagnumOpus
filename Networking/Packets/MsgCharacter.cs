@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using System.Text;
 using MagnumOpus.ECS;
 using MagnumOpus.Components;
 
@@ -55,7 +54,7 @@ namespace MagnumOpus.Networking.Packets
         [FieldOffset(68)]
         public fixed byte Name[32];
 
-        public static Memory<byte> Create(in PixelEntity ntt)
+        public static MsgCharacter Create(in PixelEntity ntt)
         {
             ref var bdy = ref ntt.Get<BodyComponent>();
             ref var lvl = ref ntt.Get<LevelComponent>();
@@ -73,8 +72,7 @@ namespace MagnumOpus.Networking.Packets
             ref readonly var partner = ref PixelWorld.GetEntity(mar.SpouseId);
             ref var sNtc = ref partner.Get<NameTagComponent>();
 
-            if (sNtc.Name == null)
-                sNtc.Name = "None";
+            sNtc.Name ??= "None";
 
             if (bdy.Look == 0)
             {
@@ -116,7 +114,6 @@ namespace MagnumOpus.Networking.Packets
                 };
                 ntt.Add(ref mna);
             }
-
             var packet = new MsgCharacter
             {
                 Size = (ushort)(sizeof(MsgCharacter) - 30 + ntc.Name.Length + sNtc.Name.Length),
@@ -139,7 +136,7 @@ namespace MagnumOpus.Networking.Packets
                 Class = (byte)pro.Class,
                 Reborn = rbn.Count,
                 ShowName = true,
-                StringCount = 2,
+                StringCount = 2
             };
 
             packet.Name[0] = (byte)ntc.Name.Length;
@@ -150,15 +147,6 @@ namespace MagnumOpus.Networking.Packets
             for (int i = 0; i < sNtc.Name.Length; i++)
                 packet.Name[ntc.Name.Length + 2 + i] = (byte)sNtc.Name[i];
             return packet;
-        }
-
-        public static implicit operator Memory<byte>(MsgCharacter packet)
-        {
-            var buffer = new byte[packet.Size];
-            fixed (byte* p = buffer)
-                *(MsgCharacter*)p = packet;
-
-            return buffer;
         }
     }
 }

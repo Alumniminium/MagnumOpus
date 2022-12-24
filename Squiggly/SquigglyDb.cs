@@ -47,13 +47,13 @@ namespace MagnumOpus.Squiggly
                     obj.Add(ref ntc);
                     obj.Add(ref vwp);
 
-                    if (prefab.AIType == 0)
+                    if (prefab.Look != 900 && prefab.Look != 910 )
                     {
                         var brn = new BrainComponent(obj.Id);
                         obj.Add(ref brn);
                     }
 
-                    if (!Game.Grids.TryGetValue(pos.Map, out var g))
+                    if (!Game.Grids.ContainsKey(pos.Map))
                     {
                         if (!Collections.Maps.TryGetValue(pos.Map, out var map))
                             continue;
@@ -115,10 +115,12 @@ namespace MagnumOpus.Squiggly
                     var pos = new PositionComponent(ntt.Id, new Vector2(cqNpc.cellx, cqNpc.celly), cqNpc.mapid);
                     var bdy = new BodyComponent(ntt.Id, cqNpc.lookface);
                     var npcc = new NpcComponent(ntt.Id, npc.Base, npc.Type, npc.Sort);
+                    var sync = new NetSyncComponent(ntt.Id, SyncThings.All);
                     ntt.Add(ref pos);
                     ntt.Add(ref bdy);
                     ntt.Add(ref npcc);
-                    if (!Game.Grids.TryGetValue(pos.Map, out var g))
+                    ntt.Add(ref sync);
+                    if (!Game.Grids.ContainsKey(pos.Map))
                     {
                         if (!Collections.Maps.TryGetValue(pos.Map, out var map))
                             continue;

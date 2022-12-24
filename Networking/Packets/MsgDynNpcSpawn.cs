@@ -19,7 +19,7 @@ namespace MagnumOpus.Networking.Packets
         public ushort Type;
         public ushort Base;
 
-        public static Memory<byte> Create(in PixelEntity ntt)
+        public static MsgDynNpcSpawn Create(in PixelEntity ntt)
         {
             ref readonly var bdy = ref ntt.Get<BodyComponent>();
             ref readonly var hlt = ref ntt.Get<HealthComponent>();
@@ -40,14 +40,6 @@ namespace MagnumOpus.Networking.Packets
                 Base = npc.Base
             };
             return packet;
-        }
-
-        public static implicit operator Memory<byte>(MsgDynNpcSpawn msg)
-        {
-            var buffer = new byte[sizeof(MsgDynNpcSpawn)];
-            fixed (byte* p = buffer)
-                *(MsgDynNpcSpawn*)p = *&msg;
-            return buffer;
         }
     }
 }

@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Numerics;
 using MagnumOpus.ECS;
 using MagnumOpus.Components;
+using System.Drawing;
 
 namespace SpacePartitioning
 {
@@ -92,7 +93,7 @@ namespace SpacePartitioning
                         {
                             ref readonly var pos = ref other.Get<PositionComponent>();
                             var dist = Vector2.Distance(pos.Position, vwp.Viewport.Location.ToVector2());
-                            if(dist <= vwp.Viewport.Width/2)
+                            if(vwp.Viewport.IntersectsWith(new RectangleF((int)pos.Position.X, (int)pos.Position.Y, 1, 1)))//dist <= vwp.Viewport.Width)
                                 vwp.EntitiesVisible.Add(other);
                         }
                         vwp.EntitiesVisible.AddRange(list);

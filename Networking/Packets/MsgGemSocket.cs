@@ -14,23 +14,19 @@ namespace MagnumOpus.Networking.Packets
         public ushort SocketID;
         public ushort RemoveGem;
 
-        public static Memory<byte> Create(int uid, int itemuid, int gemuid, ushort socketid, ushort removegem)
+        public static MsgGemSocket Create(int uid, int itemuid, int gemuid, ushort socketid, ushort removegem)
         {
-            var msgP = stackalloc MsgGemSocket[1];
+            var msgP = new MsgGemSocket
             {
-                msgP->Size = (ushort)sizeof(MsgGemSocket);
-                msgP->Id = 1027;
-                msgP->UnqiueId = uid;
-                msgP->ItemUID = itemuid;
-                msgP->GemUID = gemuid;
-                msgP->SocketID = socketid;
-                msgP->RemoveGem = removegem;
-            }
-
-            var buffer = new byte[sizeof(MsgGemSocket)];
-            fixed (byte* p = buffer)
-                *(MsgGemSocket*)p = *msgP;
-            return buffer;
+                Size = (ushort)sizeof(MsgGemSocket),
+                Id = 1027,
+                UnqiueId = uid,
+                ItemUID = itemuid,
+                GemUID = gemuid,
+                SocketID = socketid,
+                RemoveGem = removegem,
+            };
+            return msgP;
         }
     }
 }

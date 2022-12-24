@@ -20,7 +20,7 @@ namespace MagnumOpus.Networking.Packets
         public byte Position;
         public fixed byte Spouse[16];
 
-        public static Memory<byte> Create(in PixelEntity target)
+        public static MsgFriendInfo Create(in PixelEntity target)
         {
             ref readonly var trs = ref target.Get<TransformationComponent>();
             ref readonly var bdy = ref target.Get<BodyComponent>();
@@ -50,14 +50,6 @@ namespace MagnumOpus.Networking.Packets
             for (byte i = 0; i < spouseNtc.Name.Length; i++)
                 packet.Spouse[i] = (byte)spouseNtc.Name[i];
             return packet;
-        }
-
-        public static implicit operator Memory<byte>(MsgFriendInfo msg)
-        {
-            var buffer = new byte[sizeof(MsgFriendInfo)];
-            fixed (byte* p = buffer)
-                *(MsgFriendInfo*)p = *&msg;
-            return buffer;
         }
     }
 }

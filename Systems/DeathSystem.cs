@@ -21,7 +21,7 @@ namespace MagnumOpus.Simulation.Systems
                 {
                     ref readonly var killerNameTag = ref killer.Get<NameTagComponent>();
                     ref readonly var killedNameTag = ref ntt.Get<NameTagComponent>();
-                    NetworkHelper.Broadcast(MsgText.Create(killerNameTag.Name, killedNameTag.Name, $"{killedNameTag.Name} was killed by {killerNameTag.Name}", MsgTextType.Service));
+                    // NetworkHelper.Broadcast(MsgText.Create(killerNameTag.Name, killedNameTag.Name, $"{killedNameTag.Name} was killed by {killerNameTag.Name}", MsgTextType.Service));
                 }
             }
             if (ntt.Type == EntityType.Player)

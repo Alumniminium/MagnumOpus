@@ -13,7 +13,7 @@ namespace MagnumOpus.Networking.Packets
         public uint Level;
         public uint Experience;
 
-        public static Memory<byte> Create(ProfComponent prof)
+        public static MsgProf Create(ProfComponent prof)
         {
             var packet = new MsgProf
             {
@@ -24,14 +24,6 @@ namespace MagnumOpus.Networking.Packets
                 Level = prof.Level
             };
             return packet;
-        }
-
-        public static unsafe implicit operator Memory<byte>(MsgProf msg)
-        {
-            var buffer = new byte[sizeof(MsgProf)];
-            fixed (byte* p = buffer)
-                *(MsgProf*)p = *&msg;
-            return buffer;
         }
     }
 }

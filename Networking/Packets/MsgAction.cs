@@ -1,5 +1,4 @@
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using HerstLib.IO;
 using MagnumOpus.ECS;
@@ -36,7 +35,7 @@ namespace MagnumOpus.Networking.Packets
         [FieldOffset(22)]
         public MsgActionType Type;
 
-        public static Memory<byte> Create(int timestamp, int uniqueId, int param, ushort x, ushort y, Direction direction, MsgActionType type)
+        public static MsgAction Create(int timestamp, int uniqueId, int param, ushort x, ushort y, Direction direction, MsgActionType type)
         {
             MsgAction msgP = new()
             {
@@ -52,11 +51,26 @@ namespace MagnumOpus.Networking.Packets
             };
             return msgP;
         }
+        public static MsgAction CreateJump(in PixelEntity ntt, in JumpComponent jmp)
+        {
+            MsgAction msgP = new()
+            {
+                Size = (ushort)sizeof(MsgAction),
+                Id = 1010,
+                Timestamp = (int)PixelWorld.Tick,
+                UniqueId = ntt.NetId,
+                JumpX = (ushort)jmp.Position.X,
+                JumpY = (ushort)jmp.Position.Y,
+                Direction = 0,
+                Type = MsgActionType.Jump
+            };
+            return msgP;
+        }
 
         [PacketHandler(PacketId.MsgAction)]
         public static void Process(PixelEntity ntt, Memory<byte> memory)
         {
-            var msg = (MsgAction)memory;
+            var msg = Co2Packet.Deserialze<MsgAction>(in memory);
             
             switch (msg.Type)
             {
@@ -69,7 +83,7 @@ namespace MagnumOpus.Networking.Packets
                         }
                         ref var pos = ref ntt.Get<PositionComponent>();
                         var reply = MsgAction.Create(0, ntt.NetId, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
-                        ntt.NetSync(in reply);
+                        ntt.NetSync(ref reply);
                         PixelWorld.Players.Add(ntt);
                         break;
                     }
@@ -79,7 +93,7 @@ namespace MagnumOpus.Networking.Packets
                 case MsgActionType.SendSpells:
                     {
                         var reply = MsgAction.Create(0, ntt.NetId, 0, 0, 0, 0, msg.Type);
-                        ntt.NetSync(in reply);
+                        ntt.NetSync(ref reply);
                         break;
                     }
                 case MsgActionType.ChangeFacing:
@@ -203,23 +217,10 @@ namespace MagnumOpus.Networking.Packets
                     {
                         FConsole.WriteLine($"[GAME] Unhandled MsgActionType: {(int)msg.Type}/{msg.Type}");
                         var reply = Create(msg.Timestamp, ntt.NetId, msg.Param, msg.X, msg.Y, msg.Direction, msg.Type);
-                        ntt.NetSync(in reply);
+                        ntt.NetSync(ref reply);
                         break;
                     }
             }
-        }
-
-        public static implicit operator Memory<byte>(MsgAction msg)
-        {
-            var buffer = new byte[msg.Size];
-            fixed(byte* ptr = buffer)
-                *(MsgAction*)ptr = msg;
-            return buffer;
-        }
-        public static implicit operator MsgAction(in Memory<byte> buffer)
-        {
-            fixed (byte* p = buffer.Span)
-                return *(MsgAction*)p;
         }
     }
 }

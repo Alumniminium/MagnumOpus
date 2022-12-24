@@ -34,12 +34,12 @@ namespace MagnumOpus.Networking.Packets
         [PacketHandler(PacketId.MsgLogin)]
         public static void Process(PixelEntity ntt, Memory<byte> packet)
         {
-            var msg = (MsgLogin)packet;
+            var msg = Co2Packet.Deserialze<MsgLogin>(packet);
             var language = msg.GetLanguage();
             FConsole.WriteLine($"[GAME] Client Version: {msg.ClientVersion}, Language: {language}");
             var ntc = new NameTagComponent(ntt.NetId, "test");
             var dir = new DirectionComponent(ntt.Id, Direction.South);
-            var vwp = new ViewportComponent(ntt.Id, 32);
+            var vwp = new ViewportComponent(ntt.Id, 24);
             var syn = new NetSyncComponent(ntt.Id, SyncThings.All);
             ntt.Add(ref ntc);
             ntt.Add(ref dir);
@@ -50,13 +50,8 @@ namespace MagnumOpus.Networking.Packets
             ntt.NetSync(in ok);
 
             var info = MsgCharacter.Create(ntt);
-            ntt.NetSync(in info);
-        }
-
-        public static implicit operator MsgLogin(in Memory<byte> msg)
-        {
-            fixed (byte* ptr = msg.Span)
-                return *(MsgLogin*)ptr;
+            var serialized = Co2Packet.Serialze(ref info, info.Size);
+            ntt.NetSync(in serialized);
         }
     }
 }

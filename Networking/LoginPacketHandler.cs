@@ -18,7 +18,7 @@ namespace MagnumOpus.Networking
             {
                 case 1051:
                     {
-                        var msgAccount = (MsgAccount)packet;
+                        var msgAccount = Co2Packet.Deserialze<MsgAccount>(packet);
                         var username = msgAccount.GetUsername();
                         RivestCipher5.Decrypt(msgAccount.Password, 16);
                         var password = msgAccount.GetPassword();
@@ -26,14 +26,14 @@ namespace MagnumOpus.Networking
 
                         FConsole.WriteLine($"[LOGIN/1051] Account: {username}, Pass: {password}, Server: {server}");
 
-                        Memory<byte> response = MsgAccountResponse.Create("192.168.0.10", 5816, (uint)ntt.NetId, (uint)ntt.NetId);
+                        var response = MsgAccountResponse.Create("192.168.0.10", 5816, (uint)ntt.Id, (uint)ntt.Id);
                         ref readonly var net = ref ntt.Get<NetworkComponent>();
-                        ntt.NetSync(in response);
+                        ntt.NetSync(ref response);
                         break;
                     }
                 case 1052:
                     {
-                        var msg = (MsgConnectLogin)packet;
+                        var msg = Co2Packet.Deserialze<MsgConnectLogin>(packet);
                         
                         var player = PixelWorld.GetEntity((int)msg.UniqueId);
                         var filename = msg.GetFileName();

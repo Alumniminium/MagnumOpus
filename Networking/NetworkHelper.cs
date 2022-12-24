@@ -9,19 +9,14 @@ namespace MagnumOpus.Networking
         {
             if (ntt.Type == EntityType.Npc)
             {
-                Memory<byte> spawnPacket = MsgNpcSpawn.Create(ntt);
-                to.NetSync(in spawnPacket);
+                var spawnPacket = MsgNpcSpawn.Create(ntt);
+                to.NetSync(ref spawnPacket);
             }
             else
             {
-                Memory<byte> spawnPacket = MsgSpawn.Create(ntt);
-                to.NetSync(in spawnPacket);
+                var spawnPacket = MsgSpawn.Create(ntt);
+                to.NetSync(ref spawnPacket);
             }
-        }
-        public static void Broadcast(in Memory<byte> packet)
-        {
-            foreach (PixelEntity other in PixelWorld.Players)
-                other.NetSync(in packet);
         }
     }
 }

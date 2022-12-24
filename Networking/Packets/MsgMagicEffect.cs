@@ -78,13 +78,5 @@ namespace MagnumOpus.Networking.Packets
 
         //     return buffer;
         // }
-
-        public static implicit operator Memory<byte>(MsgMagicEffect msg)
-        {
-            var buffer = new byte[sizeof(MsgMagicEffect)];
-            fixed (byte* p = buffer)
-                *(MsgMagicEffect*)p = *&msg;
-            return buffer;
-        }
     }
 }

@@ -15,7 +15,7 @@ namespace MagnumOpus.Networking.Packets
         public MsgNpcAction Action;//12
         public short Type;//14
 
-        public static Memory<byte> Create(in PixelEntity target, ushort param, MsgNpcAction action)
+        public static MsgNpc Create(in PixelEntity target, ushort param, MsgNpcAction action)
         {
             var packet = new MsgNpc
             {
@@ -27,14 +27,6 @@ namespace MagnumOpus.Networking.Packets
                 Type = 26
             };
             return packet;
-        }
-
-        public static unsafe implicit operator Memory<byte>(MsgNpc msg)
-        {
-            var buffer = new byte[sizeof(MsgNpc)];
-            fixed (byte* p = buffer)
-                *(MsgNpc*)p = *&msg;
-            return buffer;
         }
     }
 }

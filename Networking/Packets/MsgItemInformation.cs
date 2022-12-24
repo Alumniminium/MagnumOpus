@@ -87,13 +87,5 @@ namespace MagnumOpus.Networking.Packets
         //     Enchant = item.Enchant;
         //     Restrain = item.CustomTextId;
         // }
-
-        public static implicit operator Memory<byte>(MsgItemInformation msg)
-        {
-            var buffer = new byte[sizeof(MsgItemInformation)];
-            fixed (byte* p = buffer)
-                *(MsgItemInformation*)p = *&msg;
-            return buffer;
-        }
     }
 }

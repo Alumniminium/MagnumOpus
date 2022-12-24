@@ -61,13 +61,5 @@ namespace MagnumOpus.Networking.Packets
 
             return dhx;
         }
-
-        public static implicit operator Memory<byte>(MsgDHX msg) 
-        {
-            var buffer = new byte[sizeof(MsgDHX)];
-            fixed (byte* ptr = buffer)
-                *(MsgDHX*)ptr = msg;
-            return buffer;
-        }
     }
 }

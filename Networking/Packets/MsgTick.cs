@@ -21,29 +21,27 @@ namespace MagnumOpus.Networking.Packets
         public uint Junk4;
         public uint Hash;
 
-        public static Memory<byte> Create(in PixelEntity target)
+        public static MsgTick Create(in PixelEntity target)
         {
-            var packet = stackalloc MsgTick[1];
-            packet->Size = (ushort)sizeof(MsgTick);
-            packet->Id = PacketId.MsgTick;
-            packet->UniqueId = target.NetId;
-            packet->Timestamp = Environment.TickCount;
-            packet->Junk1 = 0;
-            packet->Junk2 = 0;
-            packet->Junk3 = 0;
-            packet->Junk4 = 0;
-            packet->Hash = 0;
-
-            var buffer = new byte[sizeof(MsgTick)];
-            fixed (byte* p = buffer)
-                *(MsgTick*)p = *packet;
-            return buffer;
+            var msg = new MsgTick
+            {
+                Size = (ushort)sizeof(MsgTick),
+                Id = PacketId.MsgTick,
+                UniqueId = target.NetId,
+                Timestamp = Environment.TickCount,
+                Junk1 = 0,
+                Junk2 = 0,
+                Junk3 = 0,
+                Junk4 = 0,
+                Hash = 0,
+            };
+            return msg;
         }
 
         [PacketHandler(PacketId.MsgTick)]
-        public static void Process(PixelEntity ntt, Memory<byte> packet)
+        public static void Process(PixelEntity ntt, Memory<byte> memory)
         {
-            var msg = (MsgTick)packet;
+            var msg = Co2Packet.Deserialze<MsgTick>(memory);
             ref readonly var ntc = ref ntt.Get<NameTagComponent>();
             if (!ntt.Has<PingComponent>())
             {
@@ -73,19 +71,6 @@ namespace MagnumOpus.Networking.Packets
             var buffer = Encoding.GetEncoding("iso-8859-1").GetBytes(name);
             fixed (byte* pBuf = buffer)
                 return ((ushort*)pBuf)[0] ^ 0x9823U;
-        }
-
-        public static implicit operator Memory<byte>(MsgTick msg)
-        {
-            var buffer = new byte[sizeof(MsgTick)];
-            fixed (byte* p = buffer)
-                *(MsgTick*)p = *&msg;
-            return buffer;
-        }
-        public static implicit operator MsgTick(Memory<byte> msg)
-        {
-            fixed (byte* p = msg.Span)
-                return *(MsgTick*)p;
         }
     }
 }

@@ -15,8 +15,8 @@ namespace MagnumOpus.Simulation.Systems
         {
             if (brn.State == BrainState.Idle)
                 return;
-            
-            if(brn.State == BrainState.Sleeping)
+
+            if (brn.State == BrainState.Sleeping)
             {
                 brn.SleepTicks--;
 
@@ -46,13 +46,16 @@ namespace MagnumOpus.Simulation.Systems
             }
 
             if (brn.TargetId == 0)
+            {
+                brn.State = BrainState.Idle;
                 return;
+            }
 
             ref readonly var target = ref PixelWorld.GetEntity(brn.TargetId);
             ref readonly var targetPos = ref target.Get<PositionComponent>();
 
             var distance = Vector2.Distance(pos.Position, targetPos.Position);
-            if(distance > 16)
+            if (distance > 16)
             {
                 brn.TargetId = 0;
                 brn.State = BrainState.Idle;
@@ -66,9 +69,9 @@ namespace MagnumOpus.Simulation.Systems
 
             if (brn.State == BrainState.Approaching)
             {
-                var dir = CoMath.GetRawDirection(targetPos.Position,pos.Position);
+                var dir = CoMath.GetRawDirection(targetPos.Position, pos.Position);
 
-                var wlk = new WalkComponent(ntt.Id, dir, true);
+                var wlk = new WalkComponent(ntt.Id, dir, false);
                 ntt.Add(ref wlk);
             }
 

@@ -15,14 +15,6 @@ namespace MagnumOpus.Networking.Packets
         public ushort Unknown2;
         public int Param;
 
-        public static implicit operator Memory<byte>(MsgStorage msg)
-        {
-            var buffer = new byte[sizeof(MsgStorage)];
-            fixed (byte* p = buffer)
-                *(MsgStorage*)p = *&msg;
-            return buffer;
-        }
-
         public static MsgStorage Create(int uniqueId, MsgStorageAction action)
         {
             var msg = new MsgStorage

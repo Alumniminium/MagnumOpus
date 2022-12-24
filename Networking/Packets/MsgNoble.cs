@@ -12,7 +12,7 @@ namespace MagnumOpus.Networking.Packets
         public uint Param;
         //public uint Type;
 
-        public static Memory<byte> Create(uint action, uint param)
+        public static MsgNoble Create(uint action, uint param)
         {
             var packet = new MsgNoble
             {
@@ -22,14 +22,6 @@ namespace MagnumOpus.Networking.Packets
                 Param = param
             };
             return packet;
-        }
-
-        public static unsafe implicit operator Memory<byte>(MsgNoble msg)
-        {
-            var buffer = new byte[sizeof(MsgNoble)];
-            fixed (byte* p = buffer)
-                *(MsgNoble*)p = *&msg;
-            return buffer;
         }
     }
 }

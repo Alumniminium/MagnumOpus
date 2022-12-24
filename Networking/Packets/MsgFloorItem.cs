@@ -16,7 +16,7 @@ namespace MagnumOpus.Networking.Packets
         public ushort X, Y;
         public MsgFloorItemType MsgFloorItemType;
 
-        public static Memory<byte> Create(in PixelEntity item, MsgFloorItemType type)
+        public static MsgFloorItem Create(in PixelEntity item, MsgFloorItemType type)
         {
             ref readonly var bdy = ref item.Get<BodyComponent>();
             ref readonly var trs = ref item.Get<TransformationComponent>();
@@ -35,13 +35,6 @@ namespace MagnumOpus.Networking.Packets
                 MsgFloorItemType = type,
             };
             return packet;
-        }
-        public static implicit operator Memory<byte>(MsgFloorItem msg)
-        {
-            var buffer = new byte[sizeof(MsgFloorItem)];
-            fixed (byte* p = buffer)
-                *(MsgFloorItem*)p = *&msg;
-            return buffer;
         }
     }
 }

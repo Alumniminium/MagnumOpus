@@ -41,16 +41,20 @@ namespace MagnumOpus.Networking.Packets
         public byte NameLen;
         public fixed byte Name[16];
 
-        public static Memory<byte> Create(in PixelEntity ntt)
+        public static MsgSpawn Create(in PixelEntity ntt)
         {
             return ntt.Type switch
             {
                 EntityType.Player => CreatePlayer(ntt),
-                EntityType.Monster => CreateMonster(ntt)
+                EntityType.Monster => CreateMonster(ntt),
+                EntityType.Npc => throw new NotImplementedException(),
+                EntityType.Item => throw new NotImplementedException(),
+                EntityType.Trap => throw new NotImplementedException(),
+                EntityType.Other => throw new NotImplementedException(),
             };
         }
 
-        public static Memory<byte> CreatePlayer(in PixelEntity ntt)
+        public static MsgSpawn CreatePlayer(in PixelEntity ntt)
         {
             ref readonly var bdy = ref ntt.Get<BodyComponent>();
             ref readonly var ntc = ref ntt.Get<NameTagComponent>();
@@ -71,39 +75,37 @@ namespace MagnumOpus.Networking.Packets
                     AddTransform(bdy.Look, 98);
             }
 
-            var packet = stackalloc MsgSpawn[1];
-            packet->Size = (ushort)sizeof(MsgSpawn);
-            packet->Id = 1014;
-            packet->UniqueId = ntt.NetId;
-            packet->Look = bdy.Look;
-            packet->StatusEffects = eff.Effects;
-            packet->GuildRank = gld.Rank;
-            packet->Head = eqc.Head;
-            packet->Armor = eqc.Armor;
-            packet->MainHand = eqc.MainHand;
-            packet->OffHand = eqc.OffHand;
-            packet->CurrentHp = hlt.Health;
-            packet->Level = lvl.Level;
-            packet->X = (ushort)pos.Position.X;
-            packet->Y = (ushort)pos.Position.Y;
-            packet->Hair = bdy.Hair;
-            packet->Direction = dir.Direction;
-            packet->Emote = bdy.Emote;
-            packet->Reborn = rbn.Count;
-            packet->GuildId = (ushort)gld.GuildId;
-            packet->StringCount = 1;
+            var msg = new MsgSpawn
+            {
+                Size = (ushort)sizeof(MsgSpawn),
+                Id = 1014,
+                UniqueId = ntt.NetId,
+                Look = bdy.Look,
+                StatusEffects = eff.Effects,
+                GuildRank = gld.Rank,
+                Head = eqc.Head,
+                Armor = eqc.Armor,
+                MainHand = eqc.MainHand,
+                OffHand = eqc.OffHand,
+                CurrentHp = hlt.Health,
+                Level = lvl.Level,
+                X = (ushort)pos.Position.X,
+                Y = (ushort)pos.Position.Y,
+                Hair = bdy.Hair,
+                Direction = dir.Direction,
+                Emote = bdy.Emote,
+                Reborn = rbn.Count,
+                GuildId = (ushort)gld.GuildId,
+                StringCount = 1,
+                NameLen = (byte)ntc.Name.Length,
+            };
 
-            packet->NameLen = (byte)ntc.Name.Length;
             for (byte i = 0; i < ntc.Name.Length; i++)
-                packet->Name[i] = (byte)ntc.Name[i];
-
-            var buffer = new byte[sizeof(MsgSpawn)];
-            fixed (byte* p = buffer)
-                *(MsgSpawn*)p = *packet;
-            return buffer;
+                msg.Name[i] = (byte)ntc.Name[i];
+            return msg;
         }
 
-        public static Memory<byte> CreateMonster(in PixelEntity ntt)
+        public static MsgSpawn CreateMonster(in PixelEntity ntt)
         {
             ref readonly var bdy = ref ntt.Get<BodyComponent>();
             ref readonly var ntc = ref ntt.Get<NameTagComponent>();
@@ -114,38 +116,29 @@ namespace MagnumOpus.Networking.Packets
             ref readonly var eff = ref ntt.Get<StatusEffectComponent>();
             ref readonly var dir = ref ntt.Get<DirectionComponent>();
 
-            var packet = stackalloc MsgSpawn[1];
-            packet->Size = (ushort)sizeof(MsgSpawn);
-            packet->Id = 1014;
-            packet->UniqueId = ntt.NetId;
-            packet->Look = bdy.Look;
-            packet->StatusEffects = eff.Effects;
-            packet->CurrentHp = hlt.Health;
-            packet->Level = lvl.Level;
-            packet->Direction = dir.Direction;
-            packet->Emote = Emote.Stand;
-            packet->StringCount = 1;
-            packet->NameLen = (byte)ntc.Name.Trim().Length;
-            packet->X = (ushort)pos.Position.X;
-            packet->Y = (ushort)pos.Position.Y;
+            var msg = new MsgSpawn
+            {
+                Size = (ushort)sizeof(MsgSpawn),
+                Id = 1014,
+                UniqueId = ntt.NetId,
+                Look = bdy.Look,
+                StatusEffects = eff.Effects,
+                CurrentHp = hlt.Health,
+                Level = lvl.Level,
+                Direction = dir.Direction,
+                Emote = Emote.Stand,
+                StringCount = 1,
+                NameLen = (byte)ntc.Name.Trim().Length,
+                X = (ushort)pos.Position.X,
+                Y = (ushort)pos.Position.Y,
+            };
             for (byte i = 0; i < ntc.Name.Trim().Length; i++)
-                packet->Name[i] = (byte)ntc.Name.Trim()[i];
+                msg.Name[i] = (byte)ntc.Name.Trim()[i];
 
-            var buffer = new byte[sizeof(MsgSpawn)];
-            fixed (byte* p = buffer)
-                *(MsgSpawn*)p = *packet;
-            return buffer;
+            return msg;
         }
         
         public static uint AddTransform(uint look, long transformId) => (uint)(transformId * 10000000L + look % 10000000L);
         public static uint DelTransform(uint look) => look % 10000000;
-
-        public static implicit operator Memory<byte>(MsgSpawn msg)
-        {
-            var buffer = new byte[sizeof(MsgSpawn)];
-            fixed (byte* p = buffer)
-                *(MsgSpawn*)p = *&msg;
-            return buffer;
-        }
     }
 }

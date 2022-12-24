@@ -18,7 +18,7 @@ namespace MagnumOpus.Networking.Packets
         public short Unknow2;
         public fixed byte Name[16];
 
-        public static Memory<byte> Create(in PixelEntity target, MsgFriendActionType action, MsgFriendStatusType status)
+        public static MsgFriend Create(in PixelEntity target, MsgFriendActionType action, MsgFriendStatusType status)
         {
             ref readonly var ntc = ref target.Get<NameTagComponent>();
             var packet = new MsgFriend
@@ -34,14 +34,6 @@ namespace MagnumOpus.Networking.Packets
             for (byte i = 0; i < ntc.Name.Length; i++)
                 packet.Name[i] = (byte)ntc.Name[i];
             return packet;
-        }
-
-        public static implicit operator Memory<byte>(MsgFriend msg)
-        {
-            var buffer = new byte[sizeof(MsgFriend)];
-            fixed (byte* p = buffer)
-                *(MsgFriend*)p = *&msg;
-            return buffer;
         }
     }
 }

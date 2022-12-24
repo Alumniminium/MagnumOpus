@@ -27,7 +27,6 @@ namespace MagnumOpus
                 new JumpSystem(),
                 new ViewportSystem(),
                 new BasicAISystem(),
-                new NetSyncSystem(),
             };
             SquigglyDb.LoadMaps();
             SquigglyDb.LoadPortals();
@@ -43,7 +42,7 @@ namespace MagnumOpus
             PixelWorld.RegisterOnSecond(() =>
             {
                 var lines = PerformanceMetrics.Draw();
-                Console.WriteLine(lines);
+                // Console.WriteLine(lines);
                 PerformanceMetrics.Restart();
             });
 
@@ -132,8 +131,8 @@ namespace MagnumOpus
                 net.Socket = client.Client;
 
                 net.DiffieHellman.ComputePublicKeyAsync();
-                Memory<byte> dhx = MsgDHX.Create(net.ClientIV, net.ServerIV, DiffieHellman.P, DiffieHellman.G, net.DiffieHellman.GetPublicKey());
-                ntt.NetSync(in dhx);
+                var dhx = MsgDHX.Create(net.ClientIV, net.ServerIV, DiffieHellman.P, DiffieHellman.G, net.DiffieHellman.GetPublicKey());
+                ntt.NetSync(ref dhx);
 
                 var count = net.Socket.Receive(net.RecvBuffer.Span);
                 var packet = net.RecvBuffer[..count];

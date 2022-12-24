@@ -17,7 +17,7 @@ namespace MagnumOpus.Networking.Packets
         public ushort Y;
         public fixed byte Summoner[16];
 
-        public static Memory<byte> Create(in PixelEntity obj, int uid)
+        public static MsgAssignPet Create(in PixelEntity obj, int uid)
         {
             ref readonly var bdy = ref obj.Get<BodyComponent>();
             ref readonly var pos = ref obj.Get<PositionComponent>();
@@ -35,14 +35,6 @@ namespace MagnumOpus.Networking.Packets
                 packet.Summoner[i] = (byte)"GoldGuard"[i];
 
             return packet;
-        }
-
-        public static implicit operator Memory<byte>(MsgAssignPet msg)
-        {
-            var buffer = new byte[sizeof(MsgAssignPet)];
-            fixed (byte* p = buffer)
-                *(MsgAssignPet*)p = *&msg;
-            return buffer;
         }
     }
 }

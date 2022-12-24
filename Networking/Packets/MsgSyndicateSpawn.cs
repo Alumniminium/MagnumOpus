@@ -45,13 +45,5 @@ namespace MagnumOpus.Networking.Packets
                 *(MsgSyndicateSpawn*)p = *msgP;
             return buffer;
         }
-
-        public static implicit operator Memory<byte>(MsgSyndicateSpawn msg)
-        {
-            var buffer = new byte[sizeof(MsgSyndicateSpawn)];
-            fixed (byte* p = buffer)
-                *(MsgSyndicateSpawn*)p = *&msg;
-            return buffer;
-        }
     }
 }

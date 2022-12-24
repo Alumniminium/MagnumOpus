@@ -10,20 +10,15 @@ namespace MagnumOpus.Squiggly
         {
             using var db = new SquigglyContext();
             cq_passway target = null;
-            foreach (var cqPassway in db.cq_passway)
+            foreach (var cqPassway in db.cq_passway.Where(x => x.passway_mapid == mapid))
             {
-                if (cqPassway.mapid != mapid)
-                    continue;
-
                 if (cqPassway.passway_idx == portalId)
                     target = cqPassway;
             }
 
             cq_portal portal = null;
-            foreach (var cqportal in db.cq_portal)
+            foreach (var cqportal in db.cq_portal.Where(x => x.mapid == mapid))
             {
-                if (cqportal.mapid != target.passway_mapid)
-                    continue;
                 if (cqportal.portal_idx == target.passway_mapportal)
                     portal = cqportal;
             }

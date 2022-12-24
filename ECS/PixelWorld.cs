@@ -79,6 +79,9 @@ namespace MagnumOpus.ECS
 
         private static void DestroyInternal(in PixelEntity ntt)
         {
+            if(ChangedThisTick.Contains(ntt))
+                ChangedThisTick.Remove(ntt);
+
             foreach (var child in ntt.Children)
                 DestroyInternal(child);
 
@@ -121,7 +124,6 @@ namespace MagnumOpus.ECS
                     ChangedThisTick.Clear();
                     PerformanceMetrics.AddSample(system.Name, Stopwatch.Elapsed.TotalMilliseconds - last);
                     last = Stopwatch.Elapsed.TotalMilliseconds;
-
                 }
 
                 if (TimeAcc >= 1)

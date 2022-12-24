@@ -19,9 +19,11 @@ namespace MagnumOpus.Simulation.Systems
             
             pos.ChangedTick = PixelWorld.Tick;
             dir.Direction = wlk.Direction;
-            ntt.NetSync(MsgWalk.Create(ntt.NetId, wlk.Direction, wlk.IsRunning), true);
+            var msg = MsgWalk.Create(ntt.NetId, wlk.Direction, wlk.IsRunning);
             FConsole.WriteLine($"[{nameof(WalkSystem)}] {ntt.NetId} -> {wlk.Direction} -> {pos.Position}");
             ntt.Remove<WalkComponent>();
+            Game.Grids[pos.Map].Move(in ntt, ref pos);
+            ntt.NetSync(ref msg, true);
         }
     }
 }

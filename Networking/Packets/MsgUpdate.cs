@@ -14,28 +14,18 @@ namespace MagnumOpus.Networking.Packets
         public MsgUserAttribType Type;
         public ulong Value;
 
-        public static implicit operator Memory<byte>(MsgUserAttrib msg)
+        public static MsgUserAttrib Create(int entityId, ulong value, MsgUserAttribType type)
         {
-            var buffer = new byte[sizeof(MsgUserAttrib)];
-            fixed (byte* p = buffer)
-                *(MsgUserAttrib*)p = *&msg;
-            return buffer;
-        }
-
-        public static Memory<byte> Create(int entityId, ulong value, MsgUserAttribType type)
-        {
-            var packet = stackalloc MsgUserAttrib[1];
-            packet->Size = (ushort)(sizeof(MsgUserAttrib));
-            packet->Id = 1017;
-            packet->UniqueId = entityId;
-            packet->Amount = 1;
-            packet->Type = type;
-            packet->Value = value;
-    
-            var buffer = new byte[packet->Size];
-            fixed (byte* p = buffer)
-                *(MsgUserAttrib*)p = *packet;
-            return buffer;
+            var packet = new MsgUserAttrib
+            {
+                Size = (ushort)sizeof(MsgUserAttrib),
+                Id = 1017,
+                UniqueId = entityId,
+                Amount = 1,
+                Type = type,
+                Value = value,
+            };
+            return packet;
         }
     }
 }

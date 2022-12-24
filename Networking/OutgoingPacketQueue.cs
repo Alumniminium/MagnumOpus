@@ -19,9 +19,9 @@ namespace MagnumOpus.Networking
                 queue = new Queue<Memory<byte>>();
                 Packets.TryAdd(player, queue);
             }
-            // lock (SyncRoot)
-            queue.Enqueue(packet);
-            // SendAll();
+            var copy = new byte[packet.Length];
+            packet.CopyTo(copy);
+            queue.Enqueue(copy);
         }
 
         public static void Remove(in PixelEntity player) => Packets.TryRemove(player, out _);

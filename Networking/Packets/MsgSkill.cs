@@ -13,7 +13,7 @@ namespace MagnumOpus.Networking.Packets
         public ushort SkillId;
         public ushort Level;
 
-        public static Memory<byte> Create(SkillComponent skill)
+        public static MsgSkill Create(SkillComponent skill)
         {
             var packet = new MsgSkill
             {
@@ -24,14 +24,6 @@ namespace MagnumOpus.Networking.Packets
                 Level = skill.Level
             };
             return packet;
-        }
-
-        public static unsafe implicit operator Memory<byte>(MsgSkill msg)
-        {
-            var buffer = new byte[sizeof(MsgSkill)];
-            fixed (byte* p = buffer)
-                *(MsgSkill*)p = *&msg;
-            return buffer;
         }
     }
 }

@@ -23,11 +23,5 @@ namespace MagnumOpus.Networking.Packets
             fixed (byte* ptr = FileName)
                 return Encoding.ASCII.GetString(ptr, 16).Trim('\0');
         }
-
-        public static implicit operator MsgConnectLogin(in Memory<byte> msg)
-        {
-            fixed (byte* ptr = msg.Span)
-                return *(MsgConnectLogin*)ptr;
-        }
     }
 }

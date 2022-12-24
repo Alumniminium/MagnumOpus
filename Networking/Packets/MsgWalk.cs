@@ -1,10 +1,10 @@
 using System.Buffers;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using HerstLib.IO;
+using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Components;
-using System.Diagnostics;
 using MagnumOpus.Helpers;
 
 namespace MagnumOpus.Networking.Packets
@@ -26,75 +26,50 @@ namespace MagnumOpus.Networking.Packets
         public byte Type;
         [FieldOffset(10)]
         public ushort IDK;
-        
-        public static Memory<byte> Create(int uniqueId, byte direction, bool running)
+
+        public static MsgWalk Create(int uniqueId, byte direction, bool running)
         {
-            MsgWalk* msgP = stackalloc MsgWalk[1];
-
-            msgP->Size = (ushort)sizeof(MsgWalk);
-            msgP->Id = 1005;
-            msgP->UniqueId = uniqueId;
-            msgP->RawDirection = direction;
-            msgP->Type = running ? (byte)1 : (byte)0;
-            msgP->IDK = (ushort)PixelWorld.Tick;
-
-            var buffer = new byte[sizeof(MsgWalk)];
-            fixed (byte* p = buffer)
-                *(MsgWalk*)p = *msgP;
-            return buffer;
+            var msg = new MsgWalk
+            {
+                Size = (ushort)sizeof(MsgWalk),
+                Id = 1005,
+                UniqueId = uniqueId,
+                RawDirection = direction,
+                Type = running ? (byte)1 : (byte)0,
+                IDK = (ushort)PixelWorld.Tick,
+            }; 
+            return msg;
         }
-        public static Memory<byte> Create(int uniqueId, Direction direction, bool running)
+        public static MsgWalk Create(int uniqueId, Direction direction, bool running)
         {
-            MsgWalk* msgP = stackalloc MsgWalk[1];
-
-            msgP->Size = (ushort)sizeof(MsgWalk);
-            msgP->Id = 1005;
-            msgP->UniqueId = uniqueId;
-            msgP->Direction =direction;
-            msgP->Type = running ? (byte)1 : (byte)0;
-            msgP->IDK = (ushort)PixelWorld.Tick;
-
-            var buffer = new byte[sizeof(MsgWalk)];
-            fixed (byte* p = buffer)
-                *(MsgWalk*)p = *msgP;
-            return buffer;
+            var msg = new MsgWalk
+            {
+                Size = (ushort)sizeof(MsgWalk),
+                Id = 1005,
+                UniqueId = uniqueId,
+                Direction = direction,
+                Type = running ? (byte)1 : (byte)0,
+                IDK = (ushort)PixelWorld.Tick,
+            }; 
+            return msg;
         }
 
         [PacketHandler(PacketId.MsgWalk)]
         public static void Process(PixelEntity ntt, Memory<byte> packet)
         {
-            var msg = (MsgWalk)packet;
-            FConsole.WriteLine($"IDK:{msg.IDK}");
+            var msg = Co2Packet.Deserialze<MsgWalk>(packet);
             if (ntt.NetId != msg.UniqueId)
                 FConsole.WriteLine($"[{nameof(MsgWalk)}] UID Mismatch! Packet: {msg.UniqueId}, ntt: {ntt.NetId}");
 
-            if(ntt.Has<WalkComponent>())
+            if (ntt.Has<WalkComponent>())
             {
                 ref var pos = ref ntt.Get<PositionComponent>();
                 pos.ChangedTick = PixelWorld.Tick;
-                ntt.NetSync(MsgAction.Create((int)PixelWorld.Tick, ntt.NetId, 0, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.South, MsgActionType.Kickback));
-                return;
+                var kickback = MsgAction.Create((int)PixelWorld.Tick, ntt.NetId, 0, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.South, MsgActionType.Kickback);
+                ntt.NetSync(ref kickback);
             }
             var wlk = new WalkComponent(ntt.Id, msg.RawDirection, msg.Type == 1);
             ntt.Add(ref wlk);
-        }
-
-        internal static Memory<byte> Create(int netId, object rawDirection, bool isRunning)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static implicit operator Memory<byte>(MsgWalk msg)
-        {
-            var buffer = new byte[sizeof(MsgWalk)];
-            fixed (byte* p = buffer)
-                *(MsgWalk*)p = *&msg;
-            return buffer;
-        }
-        public static implicit operator MsgWalk(Memory<byte> buffer)
-        {
-            fixed (byte* p = buffer.Span)
-                return *(MsgWalk*)p;
         }
     }
 }

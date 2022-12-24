@@ -1,8 +1,8 @@
 using System.Buffers;
 using System.Runtime.InteropServices;
+using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Components;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -19,71 +19,58 @@ namespace MagnumOpus.Networking.Packets
         public MsgInteractType Type;
         public int Value;
 
-        public static Memory<byte> Create(in PixelEntity source, PixelEntity target, MsgInteractType type, int value)
+        public static MsgInteract Create(in PixelEntity source, PixelEntity target, MsgInteractType type, int value)
         {
             ref readonly var bdy = ref target.Get<BodyComponent>();
             ref readonly var pos = ref target.Get<PositionComponent>();
-                        
-            var msgP = stackalloc MsgInteract[1];
-            msgP->Size = (ushort)sizeof(MsgInteract);
-            msgP->Id = 1022;
-            msgP->Timestamp = Environment.TickCount;
-            msgP->AttackerUniqueId = source.NetId;
-            msgP->TargetUniqueId = target.NetId;
-            msgP->X = (ushort)pos.Position.X;
-            msgP->Y = (ushort)pos.Position.Y;
-            msgP->Type = type;
-            msgP->Value = value;
 
-            var buffer = new byte[sizeof(MsgInteract)];
-            fixed (byte* p = buffer)
-                *(MsgInteract*)p = *msgP;
-            return buffer;
+            var msg = new MsgInteract
+            {
+                Size = (ushort)sizeof(MsgInteract),
+                Id = 1022,
+                Timestamp = Environment.TickCount,
+                AttackerUniqueId = source.NetId,
+                TargetUniqueId = target.NetId,
+                X = (ushort)pos.Position.X,
+                Y = (ushort)pos.Position.Y,
+                Type = type,
+                Value = value,
+            };
+            return msg;
         }
-        public static Memory<byte> Create(int attackerUniqueId, int targetUniqueId, ushort targetX, ushort targetY, MsgInteractType type, int value)
+        public static MsgInteract Create(int attackerUniqueId, int targetUniqueId, ushort targetX, ushort targetY, MsgInteractType type, int value)
         {
-            var msgP = stackalloc MsgInteract[1];
-            msgP->Size = (ushort)sizeof(MsgInteract);
-            msgP->Id = 1022;
-            msgP->Timestamp = Environment.TickCount;
-            msgP->AttackerUniqueId = attackerUniqueId;
-            msgP->TargetUniqueId = targetUniqueId;
-            msgP->X = targetX;
-            msgP->Y = targetY;
-            msgP->Type = type;
-            msgP->Value = value;
-
-            var buffer = new byte[sizeof(MsgInteract)];
-            fixed (byte* p = buffer)
-                *(MsgInteract*)p = *msgP;
-            return buffer;
+            var msg = new MsgInteract
+            {
+                Size = (ushort)sizeof(MsgInteract),
+                Id = 1022,
+                Timestamp = Environment.TickCount,
+                AttackerUniqueId = attackerUniqueId,
+                TargetUniqueId = targetUniqueId,
+                X = targetX,
+                Y = targetY,
+                Type = type,
+                Value = value,
+            };
+            return msg;
         }
-        public static Memory<byte> Die(in PixelEntity attacker, PixelEntity target)
+        public static MsgInteract Die(in PixelEntity attacker, PixelEntity target)
         {
             ref readonly var bdy = ref target.Get<PositionComponent>();
-            var msgP = stackalloc MsgInteract[1];
-            msgP->Size = 32;
-            msgP->Id = 1022;
-            msgP->Timestamp = Environment.TickCount;
-            msgP->AttackerUniqueId = attacker.NetId;
-            msgP->TargetUniqueId = target.NetId;
-            msgP->X = (ushort)bdy.Position.X;
-            msgP->Y = (ushort)bdy.Position.Y;
-            msgP->Type = MsgInteractType.Death;
-            msgP->Value = 0;
+            var msg = new MsgInteract
+            {
+                Size = 32,
+                Id = 1022,
+                Timestamp = Environment.TickCount,
+                AttackerUniqueId = attacker.NetId,
+                TargetUniqueId = target.NetId,
+                X = (ushort)bdy.Position.X,
+                Y = (ushort)bdy.Position.Y,
+                Type = MsgInteractType.Death,
+                Value = 0,
+            };
 
-            var buffer = new byte[sizeof(MsgInteract)];
-            fixed (byte* p = buffer)
-                *(MsgInteract*)p = *msgP;
-            return buffer;
-        }
-
-        public static implicit operator Memory<byte>(MsgInteract msg)
-        {
-            var buffer = new byte[sizeof(MsgInteract)];
-            fixed (byte* p = buffer)
-                *(MsgInteract*)p = *&msg;
-            return buffer;
+            return msg;
         }
     }
 }

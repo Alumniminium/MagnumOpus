@@ -17,29 +17,25 @@ namespace MagnumOpus.Networking.Packets
         public int Timestamp;
         public int Value;
 
-        public static Memory<byte> Create(int uid, int value, int param, int timestamp, MsgItemType type)
+        public static MsgItem Create(int uid, int value, int param, int timestamp, MsgItemType type)
         {
-            var packet = stackalloc MsgItem[1];
+            var msg = new MsgItem
             {
-                packet->Size = (ushort)sizeof(MsgItem);
-                packet->Id = 1009;
-                packet->UnqiueId = uid;
-                packet->Param = param;
-                packet->Type = type;
-                packet->Value = value;
-                packet->Timestamp = timestamp;
-            }
-
-            var buffer = new byte[sizeof(MsgItem)];
-            fixed (byte* p = buffer)
-                *(MsgItem*)p = *packet;
-            return buffer;
+                Size = (ushort)sizeof(MsgItem),
+                Id = 1009,
+                UnqiueId = uid,
+                Param = param,
+                Type = type,
+                Value = value,
+                Timestamp = timestamp,
+            };
+            return msg;
         }
 
         [PacketHandler(PacketId.MsgItem)]
-        public static void Process(PixelEntity ntt, Memory<byte> packet)
+        public static void Process(PixelEntity ntt, Memory<byte> memory)
         {
-            var msg = (MsgItem)packet;
+            var msg = Co2Packet.Deserialze<MsgItem>(in memory);
 
             switch (msg.Type)
             {
@@ -87,29 +83,15 @@ namespace MagnumOpus.Networking.Packets
                     break;
                 case MsgItemType.Ping:
                     var reply = MsgItem.Create(ntt.NetId, msg.Value, msg.Param, msg.Timestamp, MsgItemType.Ping);
-                    var tick = MsgTick.Create(in ntt);
-                    ntt.NetSync(in reply);
-                    ntt.NetSync(in tick);
+                    // var tick = MsgTick.Create(in ntt);
+                    ntt.NetSync(ref reply);
+                    // ntt.NetSync(ref tick);
                     break;
                 case MsgItemType.Enchant:
                     break;
                 case MsgItemType.BoothAddCp:
                     break;
             }
-        }
-
-        public static implicit operator Memory<byte>(MsgItem msg)
-        {
-            var buffer = new byte[sizeof(MsgItem)];
-            fixed (byte* p = buffer)
-                *(MsgItem*)p = *&msg;
-            return buffer;
-        }
-
-        public static implicit operator MsgItem(in Memory<byte> msg)
-        {
-            fixed (byte* p = msg.Span)
-                return *(MsgItem*)p;
         }
     }
 }

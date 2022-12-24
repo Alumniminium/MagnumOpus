@@ -34,7 +34,5 @@ namespace MagnumOpus.Networking.Packets
             fixed (byte* ptr = Server)
                 return Encoding.ASCII.GetString(ptr, 16).Trim('\0');
         }
-
-        public static implicit operator MsgAccount(in Memory<byte> memory) => MemoryMarshal.Read<MsgAccount>(memory.Span);
     }
 }
