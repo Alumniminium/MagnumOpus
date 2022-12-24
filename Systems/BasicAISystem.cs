@@ -3,6 +3,7 @@ using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
+using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
@@ -54,7 +55,7 @@ namespace MagnumOpus.Simulation.Systems
             ref readonly var target = ref PixelWorld.GetEntity(brn.TargetId);
             ref readonly var targetPos = ref target.Get<PositionComponent>();
 
-            var distance = Vector2.Distance(pos.Position, targetPos.Position);
+            var distance = (int)Vector2.Distance(pos.Position, targetPos.Position);
             if (distance > 16)
             {
                 brn.TargetId = 0;
@@ -62,7 +63,7 @@ namespace MagnumOpus.Simulation.Systems
                 return;
             }
 
-            if (distance > 2)
+            if (distance > 1)
                 brn.State = BrainState.Approaching;
             else
                 brn.State = BrainState.Attacking;
@@ -74,9 +75,15 @@ namespace MagnumOpus.Simulation.Systems
                 var wlk = new WalkComponent(ntt.Id, dir, false);
                 ntt.Add(ref wlk);
             }
+            if(brn.State == BrainState.Attacking)
+            {
+                var msg = MsgInteract.Create(in ntt, in target, MsgInteractType.Physical, 1);
+                target.NetSync(ref msg, true);
+                //TODO: Actually implement
+            }
 
             brn.State = BrainState.Sleeping;
-            brn.SleepTicks = PixelWorld.TargetTps * 2;
+            brn.SleepTicks = (int)(PixelWorld.TargetTps * 2.5f);
         }
     }
 }

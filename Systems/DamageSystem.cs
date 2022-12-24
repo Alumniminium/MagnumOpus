@@ -1,5 +1,6 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Components;
+using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
@@ -9,31 +10,21 @@ namespace MagnumOpus.Simulation.Systems
 
         public override void Update(in PixelEntity ntt, ref HealthComponent hlt, ref DamageComponent dmg)
         {
-            if (ntt.Has<RespawnTagComponent>())
-                return;
-            if (!PixelWorld.EntityExists(dmg.AttackerId))
-                return;
-            var attacker = PixelWorld.GetEntity(dmg.AttackerId);
-           
-            if (dmg.Damage > 0)
+            hlt.Health -= (ushort)dmg.Damage;
+
+            if(hlt.Health <= 0)
             {
-                var rewardableDamage = Math.Min(dmg.Damage, hlt.Health);
-                hlt.Health -= (ushort)Math.Clamp(hlt.Health, 0, dmg.Damage);
-                hlt.ChangedTick = PixelWorld.Tick;
-
-                if (attacker.Has<LevelComponent>())
-                {
-                    var exp = new ExpRewardComponent(ntt.Id, (uint)rewardableDamage);
-                    attacker.Add(ref exp);
-                }
-
-                if (hlt.Health <= 0)
-                {
-                    var dtc = new DeathTagComponent(ntt.Id, dmg.AttackerId);
-                    ntt.Add(ref dtc);
-                }
+                hlt.Health = 0;
+                var dtc = new DeathTagComponent(ntt.Id, dmg.Attacker);
+                ntt.Add(ref dtc);
             }
+
             ntt.Remove<DamageComponent>();
+            var expReward = new ExpRewardComponent(dmg.Attacker, (ushort)dmg.Damage);
+            dmg.Attacker.Add(ref expReward);
+
+            var healthUpdate = MsgUserAttrib.Create(ntt.NetId, (ushort)hlt.Health, Enums.MsgUserAttribType.Health);
+            ntt.NetSync(ref healthUpdate, true);
         }
     }
 }

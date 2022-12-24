@@ -39,7 +39,7 @@ namespace MagnumOpus.Networking
                         {
                             var packet = queue.Dequeue();
                             var id = BitConverter.ToInt16(packet.Span[2..4]);
-                            FConsole.WriteLine($"Sending {id} to {ntt.Id}...");
+                            // FConsole.WriteLine($"Sending {id} to {ntt.Id}...");
                             if(net.UseGameCrypto)
                             {
                                 var resized = new byte[packet.Length + 8];

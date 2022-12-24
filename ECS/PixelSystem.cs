@@ -5,7 +5,7 @@ namespace MagnumOpus.ECS
         protected PixelSystem(string name, int threads = 1) : base(name, threads) { }
         protected override bool MatchesFilter(in PixelEntity nttId)
         {
-            return nttId.Has<T>();
+            return nttId.Has<T>()&& base.MatchesFilter(in nttId);
         }
 
         protected override void Update()
@@ -25,7 +25,7 @@ namespace MagnumOpus.ECS
         protected PixelSystem(string name, int threads = 1) : base(name, threads) { }
         protected override bool MatchesFilter(in PixelEntity nttId)
         {
-            return nttId.Has<T, T2>();
+            return nttId.Has<T, T2>()&& base.MatchesFilter(in nttId);
         }
 
         protected override void Update()
@@ -44,7 +44,7 @@ namespace MagnumOpus.ECS
         protected PixelSystem(string name, int threads = 1) : base(name, threads) { }
         protected override bool MatchesFilter(in PixelEntity nttId)
         {
-            return nttId.Has<T, T2, T3>();
+            return nttId.Has<T, T2, T3>()&& base.MatchesFilter(in nttId);
         }
 
         protected override void Update()
@@ -65,7 +65,7 @@ namespace MagnumOpus.ECS
         protected PixelSystem(string name, int threads = 1) : base(name, threads) { }
         protected override bool MatchesFilter(in PixelEntity nttId)
         {
-            return nttId.Has<T, T2, T3, T4>();
+            return nttId.Has<T, T2, T3, T4>()&& base.MatchesFilter(in nttId);
         }
 
         protected override void Update()
@@ -87,7 +87,7 @@ namespace MagnumOpus.ECS
         protected PixelSystem(string name, int threads = 1) : base(name, threads) { }
         protected override bool MatchesFilter(in PixelEntity nttId)
         {
-            return nttId.Has<T, T2, T3, T4, T5>();
+            return nttId.Has<T, T2, T3, T4, T5>() && base.MatchesFilter(in nttId);
         }
 
         protected override void Update()
@@ -129,7 +129,8 @@ namespace MagnumOpus.ECS
         protected virtual void PostUpdate() { }
         protected virtual void Update() { }
         protected virtual void PreUpdate() { }
-        protected abstract bool MatchesFilter(in PixelEntity nttId);
+        protected virtual bool MatchesFilter(in PixelEntity nttId)=> nttId.Id != 0;
+        
         internal void EntityChanged(in PixelEntity ntt)
         {
             var isMatch = MatchesFilter(in ntt);

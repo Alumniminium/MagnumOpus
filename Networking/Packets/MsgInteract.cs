@@ -1,5 +1,6 @@
 using System.Buffers;
 using System.Runtime.InteropServices;
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -19,7 +20,7 @@ namespace MagnumOpus.Networking.Packets
         public MsgInteractType Type;
         public int Value;
 
-        public static MsgInteract Create(in PixelEntity source, PixelEntity target, MsgInteractType type, int value)
+        public static MsgInteract Create(in PixelEntity source, in PixelEntity target, MsgInteractType type, int value)
         {
             ref readonly var bdy = ref target.Get<BodyComponent>();
             ref readonly var pos = ref target.Get<PositionComponent>();
@@ -71,6 +72,33 @@ namespace MagnumOpus.Networking.Packets
             };
 
             return msg;
+        }
+
+        [PacketHandler(PacketId.MsgInteraction)]
+        public static void Process(PixelEntity ntt, Memory<byte> memory)
+        {
+            var msg = Co2Packet.Deserialze<MsgInteract>(memory);
+
+            switch(msg.Type)
+            {
+                case MsgInteractType.Archer:
+                case MsgInteractType.Physical:
+                {
+                    if(ntt.NetId != msg.AttackerUniqueId)
+                    {
+                        FConsole.WriteLine($"[MsgInteract] HAX! {ntt.NetId} != {msg.AttackerUniqueId}");
+                        return;
+                    }
+
+                    var target = PixelWorld.GetEntityByNetId(msg.TargetUniqueId);
+                    
+                    // TODO: check if target not invalid
+
+                    var atk = new AttackComponent(ntt.Id, in target, msg.Type);
+                    ntt.Add(ref atk);
+                    break;
+                }
+            }
         }
     }
 }

@@ -14,16 +14,18 @@ namespace MagnumOpus.Simulation.Systems
         {
             var deltaX = Constants.DeltaX[(int)wlk.Direction];
             var deltaY = Constants.DeltaY[(int)wlk.Direction];
+            pos.ChangedTick = PixelWorld.Tick;
             pos.Position.X += deltaX;
             pos.Position.Y += deltaY;
-            
-            pos.ChangedTick = PixelWorld.Tick;
             dir.Direction = wlk.Direction;
-            var msg = MsgWalk.Create(ntt.NetId, wlk.Direction, wlk.IsRunning);
-            FConsole.WriteLine($"[{nameof(WalkSystem)}] {ntt.NetId} -> {wlk.Direction} -> {pos.Position}");
-            ntt.Remove<WalkComponent>();
+
             Game.Grids[pos.Map].Move(in ntt, ref pos);
+            
+            var msg = MsgWalk.Create(ntt.NetId, wlk.Direction, wlk.IsRunning);
             ntt.NetSync(ref msg, true);
+            ntt.Remove<WalkComponent>();
+
+            // FConsole.WriteLine($"[{nameof(WalkSystem)}] {ntt.NetId} -> {wlk.Direction} -> {pos.Position}");
         }
     }
 }

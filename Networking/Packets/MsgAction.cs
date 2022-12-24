@@ -35,6 +35,18 @@ namespace MagnumOpus.Networking.Packets
         [FieldOffset(22)]
         public MsgActionType Type;
 
+        public static MsgAction RemoveEntity(int uniqueId)
+        {
+            MsgAction msgP = new()
+            {
+                Size = (ushort)sizeof(MsgAction),
+                Id = 1010,
+                Timestamp = (int)PixelWorld.Tick,
+                UniqueId = uniqueId,
+                Type = MsgActionType.RemoveEntity
+            };
+            return msgP;
+        }
         public static MsgAction Create(int timestamp, int uniqueId, int param, ushort x, ushort y, Direction direction, MsgActionType type)
         {
             MsgAction msgP = new()

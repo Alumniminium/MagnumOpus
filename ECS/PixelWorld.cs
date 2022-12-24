@@ -12,6 +12,7 @@ namespace MagnumOpus.ECS
         private static float UpdateTime;
 
         private static readonly PixelEntity[] Entities;
+        private static readonly Dictionary<int, int> NetIdToEntityIndex = new();
         private static readonly Stack<int> AvailableArrayIndicies;
         private static readonly Stack<PixelEntity> ToBeRemoved = new();
         public static readonly List<PixelEntity> Players = new();
@@ -53,7 +54,9 @@ namespace MagnumOpus.ECS
         {
             if (AvailableArrayIndicies.TryPop(out var arrayIndex))
             {
-                Entities[arrayIndex] = new PixelEntity(arrayIndex, IdGenerator.Get(type), type, parentId);
+                var netId = IdGenerator.Get(type);
+                Entities[arrayIndex] = new PixelEntity(arrayIndex, netId, type, parentId);
+                NetIdToEntityIndex.Add(netId, arrayIndex);
                 return ref Entities[arrayIndex];
             }
             throw new IndexOutOfRangeException("Failed to pop an array index");
@@ -63,15 +66,22 @@ namespace MagnumOpus.ECS
             if (AvailableArrayIndicies.TryPop(out var arrayIndex))
             {
                 Entities[arrayIndex] = new PixelEntity(arrayIndex, netId, type, -1);
+                NetIdToEntityIndex.Add(netId, arrayIndex);
                 return ref Entities[arrayIndex];
             }
             throw new IndexOutOfRangeException("Failed to pop an array index");
         }
-        public static ref PixelEntity GetEntity(int nttId) => ref Entities[nttId];
+        public static ref PixelEntity GetEntity(int nttId)=> ref Entities[nttId];
+
+        public static ref PixelEntity GetEntityByNetId(int netId)
+        {
+            if (!NetIdToEntityIndex.TryGetValue(netId, out var index))
+                return ref Entities[0];
+                
+            return ref Entities[index];
+        }
 
         public static bool EntityExists(int nttId) => Entities[nttId].Id == nttId;
-
-        public static bool EntityExists(in PixelEntity ntt) => Entities[ntt.Id].Id == ntt.Id;
 
         public static void InformChangesFor(in PixelEntity ntt) => ChangedThisTick.Add(ntt);
 
@@ -90,6 +100,7 @@ namespace MagnumOpus.ECS
             OutgoingPacketQueue.Remove(in ntt);
             IncomingPacketQueue.Remove(in ntt);
             ntt.Recycle();
+            NetIdToEntityIndex.Remove(ntt.NetId);
             Entities[ntt.Id] = default;
 
             for (int i = 0; i < Systems.Length; i++)

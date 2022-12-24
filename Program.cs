@@ -27,6 +27,11 @@ namespace MagnumOpus
                 new JumpSystem(),
                 new ViewportSystem(),
                 new BasicAISystem(),
+                new AttackSystem(),
+                new DamageSystem(),
+                new HealthSystem(),
+                new ExpRewardSystem(),
+                new DeathSystem(),
             };
             SquigglyDb.LoadMaps();
             SquigglyDb.LoadPortals();
@@ -42,7 +47,7 @@ namespace MagnumOpus
             PixelWorld.RegisterOnSecond(() =>
             {
                 var lines = PerformanceMetrics.Draw();
-                // Console.WriteLine(lines);
+                Console.WriteLine(lines);
                 PerformanceMetrics.Restart();
             });
 

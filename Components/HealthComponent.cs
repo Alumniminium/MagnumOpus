@@ -7,8 +7,8 @@ namespace MagnumOpus.Components
     {
         public readonly int EntityId;
         public uint ChangedTick;
-        public ushort Health;
-        public ushort MaxHealth;
+        public int Health;
+        public int MaxHealth;
 
         public HealthComponent(int entityId, ushort health, ushort maxHealth)
         {

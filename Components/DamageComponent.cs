@@ -6,13 +6,13 @@ namespace MagnumOpus.Components
     public struct DamageComponent
     {
         public readonly int EntityId;
-        public readonly int AttackerId;
-        public float Damage;
+        public readonly PixelEntity Attacker;
+        public int Damage;
 
-        public DamageComponent(int entityId, int attackerId, float damage)
+        public DamageComponent(in PixelEntity attacked, in PixelEntity attacker, int damage)
         {
-            EntityId = entityId;
-            AttackerId = attackerId;
+            EntityId = attacked.Id;
+            Attacker = attacker;
             Damage = damage;
         }
         public override int GetHashCode()

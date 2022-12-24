@@ -23,6 +23,7 @@ namespace MagnumOpus.Simulation.Systems
             vwp.EntitiesVisible.Clear();
 
             Game.Grids[pos.Map].GetVisibleEntities(ref vwp);
+            
             // FConsole.WriteLine($"[{nameof(ViewportSystem)}] {ntt.Id} -> {vwp.EntitiesVisible.Count} entities visible");
 
             if (ntt.Type != EntityType.Player)

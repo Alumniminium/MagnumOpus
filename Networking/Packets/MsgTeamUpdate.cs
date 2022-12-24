@@ -38,8 +38,8 @@ namespace MagnumOpus.Networking.Packets
                 Unknown = 16,
                 UniqueId = owner.NetId,
                 Look = look,
-                MaxHp = hlt.MaxHealth,
-                CurHp = hlt.Health
+                MaxHp = (ushort)hlt.MaxHealth,
+                CurHp = (ushort)hlt.Health
             };
             for (byte i = 0; i < ntc.Name.Length; i++)
                 packet.TargetName[i] = (byte)ntc.Name[i];

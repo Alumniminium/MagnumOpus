@@ -6,11 +6,12 @@ namespace MagnumOpus.Components
     public readonly struct DeathTagComponent
     {
         public readonly int EntityId;
-        public readonly int KillerId;
-        public DeathTagComponent(int entityId, int killerId)
+        public readonly PixelEntity Killer;
+        
+        public DeathTagComponent(int entityId, in PixelEntity killer)
         {
             EntityId = entityId;
-            KillerId = killerId;
+            Killer = killer;
         }
         public override int GetHashCode() => EntityId;
     }

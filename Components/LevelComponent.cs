@@ -4,11 +4,11 @@ namespace MagnumOpus.Components
 {
 
     [Component]
-    public readonly struct LevelComponent
+    public struct LevelComponent
     {
         public readonly int EntityId;
-        public readonly uint ChangedTick;
-        public readonly byte Level;
+        public uint ChangedTick;
+        public byte Level;
 
         public LevelComponent(int entityId, byte level=1)
         {

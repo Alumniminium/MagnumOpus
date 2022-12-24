@@ -69,10 +69,10 @@ namespace MagnumOpus.Networking.Packets
             ref var atr = ref ntt.Get<AttributeComponent>();
             ref var rbn = ref ntt.Get<RebornComponent>();
 
-            ref readonly var partner = ref PixelWorld.GetEntity(mar.SpouseId);
-            ref var sNtc = ref partner.Get<NameTagComponent>();
-
-            sNtc.Name ??= "None";
+            var spouseName = "None";
+            // ref readonly var partner = ref PixelWorld.GetEntity(mar.SpouseId);
+            // ref var sNtc = ref partner.Get<NameTagComponent>();
+            // sNtc.Name ??= "None";
 
             if (bdy.Look == 0)
             {
@@ -116,7 +116,7 @@ namespace MagnumOpus.Networking.Packets
             }
             var packet = new MsgCharacter
             {
-                Size = (ushort)(sizeof(MsgCharacter) - 30 + ntc.Name.Length + sNtc.Name.Length),
+                Size = (ushort)(sizeof(MsgCharacter) - 30 + ntc.Name.Length + spouseName.Length),
                 Id = 1006,
                 EntityId = ntt.NetId,
                 Look = bdy.Look,
@@ -129,7 +129,7 @@ namespace MagnumOpus.Networking.Packets
                 Vitality = atr.Vitality,
                 Spirit = atr.Spirit,
                 Statpoints = atr.Statpoints,
-                Health = hlt.Health,
+                Health = (ushort)hlt.Health,
                 Mana = mna.Mana,
                 PkPoints = pkp.Points,
                 Level = lvl.Level,
@@ -143,9 +143,9 @@ namespace MagnumOpus.Networking.Packets
             for (int i = 0; i < ntc.Name.Length; i++)
                 packet.Name[i + 1] = (byte)ntc.Name[i];
 
-            packet.Name[1 + ntc.Name.Length] = (byte)sNtc.Name.Length;
-            for (int i = 0; i < sNtc.Name.Length; i++)
-                packet.Name[ntc.Name.Length + 2 + i] = (byte)sNtc.Name[i];
+            packet.Name[1 + ntc.Name.Length] = (byte)spouseName.Length;
+            for (int i = 0; i < spouseName.Length; i++)
+                packet.Name[ntc.Name.Length + 2 + i] = (byte)spouseName[i];
             return packet;
         }
     }
