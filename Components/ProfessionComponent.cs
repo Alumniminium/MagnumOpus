@@ -7,7 +7,7 @@ namespace MagnumOpus.Components
     public struct ProfessionComponent
     {
         public readonly int EntityId;
-        public readonly ClasseName Class;
+        public ClasseName Class;
 
         public ProfessionComponent(int entityId, ClasseName profession)
         {

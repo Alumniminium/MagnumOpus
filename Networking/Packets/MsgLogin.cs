@@ -50,7 +50,7 @@ namespace MagnumOpus.Networking.Packets
             ntt.NetSync(in ok);
 
             var info = MsgCharacter.Create(ntt);
-            var serialized = Co2Packet.Serialze(ref info, info.Size);
+            var serialized = Co2Packet.Serialize(ref info, info.Size);
             ntt.NetSync(in serialized);
         }
     }

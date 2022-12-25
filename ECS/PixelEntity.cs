@@ -37,7 +37,7 @@ namespace MagnumOpus.ECS
         public readonly void Recycle() => ReflectionHelper.RecycleComponents(in this);
         public readonly void NetSync<T>(ref T packet, bool broadcast = false) where T : unmanaged
         {
-            var serialized = Co2Packet.Serialze(ref packet);
+            var serialized = Co2Packet.Serialize(ref packet);
             NetSync(in serialized, broadcast);
         }
         public readonly void NetSync(in Memory<byte> packet, bool broadcast = false)
@@ -61,8 +61,6 @@ namespace MagnumOpus.ECS
 
         public override int GetHashCode() => Id;
         public override bool Equals(object? obj) => obj is PixelEntity nttId && nttId.Id == Id;
-        public static implicit operator int(in PixelEntity nttId) => nttId.Id;
-        public static implicit operator PixelEntity(int id) => PixelWorld.GetEntity(id);
         public static bool operator ==(in PixelEntity a, in PixelEntity b) => a.Id == b.Id;
         public static bool operator !=(in PixelEntity a, in PixelEntity b) => a.Id != b.Id;
         public override string ToString() => $"NTT {Id} ({Type})";

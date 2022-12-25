@@ -12,6 +12,7 @@ namespace MagnumOpus.Components
         internal ushort Hair;
         public uint Look;
         internal Emote Emote;
+        public ushort FaceId;
 
         public BodyComponent(int entityId, uint look = 1003, Emote emote = Emote.Stand, ushort hair = 310)
         {

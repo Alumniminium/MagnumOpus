@@ -1,8 +1,8 @@
 using System.Collections.Concurrent;
-using System.Numerics;
-using MagnumOpus.ECS;
-using MagnumOpus.Components;
 using System.Drawing;
+using System.Numerics;
+using MagnumOpus.Components;
+using MagnumOpus.ECS;
 
 namespace SpacePartitioning
 {
@@ -15,8 +15,6 @@ namespace SpacePartitioning
         public readonly int CellHeight;
         public readonly ConcurrentDictionary<PixelEntity, int> EntityCells = new();
         public readonly ConcurrentDictionary<int, List<PixelEntity>> CellEntities = new();
-        public readonly List<PixelEntity> StaticEntities = new();
-
         public Grid(int mapWidth, int mapHeight, int cellWidth, int cellHeight)
         {
             Width = mapWidth;
@@ -89,17 +87,14 @@ namespace SpacePartitioning
                     var cell = FindCell(new Vector2(x, y));
                     if (CellEntities.TryGetValue(cell.Id, out var list))
                     {
-                        foreach(var other in list)
+                        foreach (var other in list)
                         {
                             ref readonly var pos = ref other.Get<PositionComponent>();
-                            var dist = Vector2.Distance(pos.Position, vwp.Viewport.Location.ToVector2());
-                            if(vwp.Viewport.IntersectsWith(new RectangleF((int)pos.Position.X, (int)pos.Position.Y, 1, 1)))//dist <= vwp.Viewport.Width)
+                            if (vwp.Viewport.IntersectsWith(new RectangleF((int)pos.Position.X, (int)pos.Position.Y, 1, 1)))
                                 vwp.EntitiesVisible.Add(other);
                         }
-                        vwp.EntitiesVisible.AddRange(list);
                     }
                 }
-            vwp.EntitiesVisible.AddRange(StaticEntities);
         }
 
         public Cell FindCell(Vector2 v)

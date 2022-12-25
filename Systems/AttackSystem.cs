@@ -31,7 +31,7 @@ namespace MagnumOpus.Simulation.Systems
                     // TODO: calculate damage
 
                     var damage = Random.Shared.Next(1,10);
-                    var dmg = new DamageComponent(atk.Target, ntt.Id, damage);
+                    var dmg = new DamageComponent(in atk.Target, in ntt, damage);
                     atk.Target.Add(ref dmg);
 
                     var atkPacket = MsgInteract.Create(in ntt, in atk.Target, MsgInteractType.Physical, damage);
@@ -48,7 +48,7 @@ namespace MagnumOpus.Simulation.Systems
                     // TODO: calculate damage
 
                     var damage = Random.Shared.Next(1,10);
-                    var dmg = new DamageComponent(ntt.Id, ntt.Id, damage);
+                    var dmg = new DamageComponent(in atk.Target, in ntt, damage);
                     atk.Target.Add(ref dmg);
 
                     var atkPacket = MsgInteract.Create(in ntt, in atk.Target, MsgInteractType.Archer, damage);

@@ -20,7 +20,7 @@ namespace MagnumOpus.Simulation.Systems
             }
 
             ntt.Remove<DamageComponent>();
-            var expReward = new ExpRewardComponent(dmg.Attacker, (ushort)dmg.Damage);
+            var expReward = new ExpRewardComponent(in dmg.Attacker, (ushort)dmg.Damage);
             dmg.Attacker.Add(ref expReward);
 
             var healthUpdate = MsgUserAttrib.Create(ntt.NetId, (ushort)hlt.Health, Enums.MsgUserAttribType.Health);

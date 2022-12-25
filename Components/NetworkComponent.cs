@@ -17,10 +17,10 @@ namespace MagnumOpus.Components
         public readonly Memory<byte> ClientIV = new byte[8];
         public readonly Memory<byte> ServerIV = new byte[8];
 
-        public NetworkComponent(int entityId, Socket socket)
+        public NetworkComponent(in PixelEntity ntt, Socket socket)
         {
             UseGameCrypto=false;
-            EntityId = entityId;
+            EntityId = ntt.Id;
             Socket = socket;
             RecvBuffer = new byte[1024];
             ClientIV = new byte[8];

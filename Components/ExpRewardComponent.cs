@@ -8,14 +8,12 @@ namespace MagnumOpus.Components
         public readonly int EntityId;
         public readonly uint Experience;
 
-        public ExpRewardComponent(int entityId, uint experience)
+        public ExpRewardComponent(in PixelEntity ntt, uint experience)
         {
-            EntityId = entityId;
+            EntityId = ntt.Id;
             Experience = experience;
         }
-        public override int GetHashCode()
-        {
-            return EntityId;
-        }
+        
+        public override int GetHashCode() => EntityId;
     }
 }

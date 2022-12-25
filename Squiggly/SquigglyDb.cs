@@ -60,7 +60,7 @@ namespace MagnumOpus.Squiggly
 
                         Game.Grids[pos.Map] = new Grid(map.Width, map.Height, 10, 10);
                     }
-                    Game.Grids[pos.Map].Add(obj.Id, ref pos);
+                    Game.Grids[pos.Map].Add(in obj, ref pos);
                 }
             }
             sw.Stop();
@@ -127,7 +127,7 @@ namespace MagnumOpus.Squiggly
 
                         Game.Grids[pos.Map] = new Grid(map.Width, map.Height, 10, 10);
                     }
-                    Game.Grids[pos.Map].Add(ntt.Id, ref pos);
+                    Game.Grids[pos.Map].Add(in ntt, ref pos);
                 }
             }
             sw.Stop();

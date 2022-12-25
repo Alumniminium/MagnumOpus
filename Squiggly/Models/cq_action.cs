@@ -7,13 +7,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-    #pragma warning disable CS8618
-    #pragma warning disable IDE1006
+#pragma warning disable CS8618
+#pragma warning disable IDE1006
 namespace MagnumOpus.Squiggly.Models
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     public class cq_action
     {
         public virtual long id { get; set; }

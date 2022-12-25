@@ -69,6 +69,11 @@ namespace MagnumOpus.Networking.Packets
             ref var atr = ref ntt.Get<AttributeComponent>();
             ref var rbn = ref ntt.Get<RebornComponent>();
 
+            inv.Money = 1000;
+            inv.CPs = 100;
+            lvl.Level = 1;
+            pro.Class = Enums.ClasseName.WaterMaster;
+
             var spouseName = "None";
             // ref readonly var partner = ref PixelWorld.GetEntity(mar.SpouseId);
             // ref var sNtc = ref partner.Get<NameTagComponent>();
@@ -136,7 +141,7 @@ namespace MagnumOpus.Networking.Packets
                 Class = (byte)pro.Class,
                 Reborn = rbn.Count,
                 ShowName = true,
-                StringCount = 2
+                StringCount = 2,
             };
 
             packet.Name[0] = (byte)ntc.Name.Length;
