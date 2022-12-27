@@ -110,7 +110,6 @@ namespace MagnumOpus.Squiggly
                         cqNpc.mapid, cqNpc.sort, cqNpc.@base, cqNpc.type, cqNpc.lookface, cqNpc.name.Trim(), cqNpc.task0, cqNpc.task1,
                         cqNpc.task2, cqNpc.task3, cqNpc.task4, cqNpc.task5, cqNpc.task6, cqNpc.task7);
 
-                    Collections.Npcs.Add(npc.UniqueId, npc);
                     var ntt = PixelWorld.CreateEntityWithNetId(EntityType.Npc, (int)cqNpc.id);
                     var pos = new PositionComponent(ntt.Id, new Vector2(cqNpc.cellx, cqNpc.celly), cqNpc.mapid);
                     var bdy = new BodyComponent(ntt.Id, cqNpc.lookface);
@@ -131,7 +130,7 @@ namespace MagnumOpus.Squiggly
                 }
             }
             sw.Stop();
-            Debug.WriteLine($"[SquigglyLite] Loaded {Collections.Npcs.Count}\t Npcs in {sw.Elapsed.TotalMilliseconds}ms");
+            Debug.WriteLine($"[SquigglyLite] Loaded \t Npcs in {sw.Elapsed.TotalMilliseconds}ms");
         }
         public static void LoadMobs()
         {

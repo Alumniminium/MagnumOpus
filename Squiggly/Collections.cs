@@ -4,7 +4,6 @@ namespace MagnumOpus.Squiggly
     {
         public static Dictionary<int, CqPortal> Portals { get; set; } = new();
         public static Dictionary<int, CqMap> Maps { get; set; } = new();
-        public static Dictionary<int, CqNpc> Npcs { get; set; } = new();
         public static Dictionary<int, CqMonster> BaseMonsters { get; set; } = new();
         public static Dictionary<int, CqMonster> Monsters { get; set; } = new();
         public static Dictionary<int, CqSpawnGenerator> Spawns { get; set; } = new();
