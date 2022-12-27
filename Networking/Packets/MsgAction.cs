@@ -4,6 +4,7 @@ using HerstLib.IO;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Components;
+using MagnumOpus.Helpers;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -47,13 +48,13 @@ namespace MagnumOpus.Networking.Packets
             };
             return msgP;
         }
-        public static MsgAction Create(int timestamp, int uniqueId, int param, ushort x, ushort y, Direction direction, MsgActionType type)
+        public static MsgAction Create(int uniqueId, int param, ushort x, ushort y, Direction direction, MsgActionType type)
         {
             MsgAction msgP = new()
             {
                 Size = (ushort)sizeof(MsgAction),
                 Id = 1010,
-                Timestamp = timestamp,
+                Timestamp = (int)PixelWorld.Tick,
                 UniqueId = uniqueId,
                 Param = param,
                 X = x,
@@ -90,21 +91,22 @@ namespace MagnumOpus.Networking.Packets
                     {
                         if (!ntt.Has<PositionComponent>())
                         {
-                            var pc = new PositionComponent(ntt.Id, new Vector2(438, 377), 1002);
+                            var pc = new PositionComponent(ntt.Id, new Vector2(230, 192), 1002);
                             ntt.Add(ref pc);
                         }
                         ref var pos = ref ntt.Get<PositionComponent>();
-                        var reply = MsgAction.Create(0, ntt.NetId, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
+                        var reply = Create(ntt.NetId, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
                         ntt.NetSync(ref reply);
                         PixelWorld.Players.Add(ntt);
                         break;
                     }
+                case MsgActionType.ConfirmGuild:
                 case MsgActionType.SendItems:
                 case MsgActionType.SendAssociates:
                 case MsgActionType.SendProficiencies:
                 case MsgActionType.SendSpells:
                     {
-                        var reply = MsgAction.Create(0, ntt.NetId, 0, 0, 0, 0, msg.Type);
+                        var reply = Create(ntt.NetId, 0, 0, 0, 0, msg.Type);
                         ntt.NetSync(ref reply);
                         break;
                     }
@@ -126,109 +128,17 @@ namespace MagnumOpus.Networking.Packets
                         ntt.Add(ref jmp);
                         break;
                     }
-                case MsgActionType.ChangeMap:
-                    {
-
-                        break;
-                    }
-                case MsgActionType.Teleport:
+                case MsgActionType.EnterPortalChangeMap:
+                {
+                    var tpc = new PortalComponent(ntt.Id, msg.X, msg.Y);
+                    ntt.Add(ref tpc);
                     break;
-                case MsgActionType.LevelUp:
-                    break;
-                case MsgActionType.XpClear:
-                    break;
-                case MsgActionType.Revive:
-                    break;
-                case MsgActionType.DelRole:
-                    break;
-                case MsgActionType.SetKillMode:
-                    break;
-                case MsgActionType.ConfirmGuild:
-                    break;
-                case MsgActionType.Mine:
-                    break;
-                case MsgActionType.TeamMemberPos:
-                    break;
-                case MsgActionType.QueryEntity:
-                    break;
-                case MsgActionType.AbortMagic:
-                    break;
-                case MsgActionType.MapARGB:
-                    break;
-                case MsgActionType.MapStatus:
-                    break;
-                case MsgActionType.QueryTeamMember:
-                    break;
-                case MsgActionType.Kickback:
-                    break;
-                case MsgActionType.DropMagic:
-                    break;
-                case MsgActionType.DropSkill:
-                    break;
-                case MsgActionType.CreateBooth:
-                    break;
-                case MsgActionType.SuspendBooth:
-                    break;
-                case MsgActionType.ResumeBooth:
-                    break;
-                case MsgActionType.LeaveBooth:
-                    break;
-                case MsgActionType.PostCommand:
-                    break;
-                case MsgActionType.QueryEquipment:
-                    break;
-                case MsgActionType.AbortTransform:
-                    break;
-                case MsgActionType.EndFly:
-                    break;
-                case MsgActionType.GetMoney:
-                    break;
-                case MsgActionType.QueryEnemy:
-                    break;
-                case MsgActionType.OpenDialog:
-                    break;
-                case MsgActionType.GuardJump:
-                    break;
-                case MsgActionType.SpawnEffect:
-                    break;
-                case MsgActionType.RemoveEntity:
-                    break;
-                case MsgActionType.TeleportReply:
-                    break;
-                case MsgActionType.DeathConfirmation:
-                    break;
-                case MsgActionType.QueryAssociateInfo:
-                    break;
-                case MsgActionType.ChangeFace:
-                    break;
-                case MsgActionType.ItemsDetained:
-                    break;
-                case MsgActionType.NinjaStep:
-                    break;
-                case MsgActionType.HideInterface:
-                    break;
-                case MsgActionType.OpenUpgrade:
-                    break;
-                case MsgActionType.AwayFromKeyboard:
-                    break;
-                case MsgActionType.PathFinding:
-                    break;
-                case MsgActionType.DragonBallDropped:
-                    break;
-                case MsgActionType.TableState:
-                    break;
-                case MsgActionType.TablePot:
-                    break;
-                case MsgActionType.TablePlayerCount:
-                    break;
-                case MsgActionType.QueryFriendEquip:
-                    break;
-                case MsgActionType.QueryStatInfo:
-                    break;
+                }
                 default:
                     {
                         FConsole.WriteLine($"[GAME] Unhandled MsgActionType: {(int)msg.Type}/{msg.Type}");
-                        var reply = Create(msg.Timestamp, ntt.NetId, msg.Param, msg.X, msg.Y, msg.Direction, msg.Type);
+                        FConsole.WriteLine(memory.Dump());
+                        var reply = Create(ntt.NetId, msg.Param, msg.X, msg.Y, msg.Direction, msg.Type);
                         ntt.NetSync(ref reply);
                         break;
                     }

@@ -61,12 +61,15 @@ namespace MagnumOpus.Networking.Packets
             
             FConsole.WriteLine($"Task: {cq_task.id}, Next: {cq_task.id_next}, Fail: {cq_task.id_nextfail}");
 
-            cq_action task = null;
-            var nextId = cq_task.id_next;
+            cq_action task;
+            if(!cq_task.id_next.HasValue)
+                return;
+
+            var nextId = (long)cq_task.id_next;
             
             do
             {
-                task = ctx.cq_action.Find(nextId);
+                task = ctx.cq_action.Find((long)nextId);
                 
                 if (task == null)
                     break;

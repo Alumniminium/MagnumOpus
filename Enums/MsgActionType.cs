@@ -16,7 +16,7 @@ namespace MagnumOpus.Enums
         SendSpells = 78,
         ChangeFacing = 79,
         ChangeAction = 81,
-        ChangeMap = 85,
+        EnterPortalChangeMap = 85,
         Teleport = 86,
         LevelUp = 92,
         XpClear = 93,

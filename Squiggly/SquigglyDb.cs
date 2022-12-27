@@ -3,6 +3,7 @@ using System.Numerics;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using MagnumOpus.Squiggly.Models;
 using SpacePartitioning;
 
 namespace MagnumOpus.Squiggly
@@ -215,11 +216,27 @@ namespace MagnumOpus.Squiggly
                 foreach (var cqPortal in db.cq_portal.AsQueryable())
                 {
                     var portal = new CqPortal(cqPortal.mapid, cqPortal.portal_x, cqPortal.portal_y, cqPortal.id, cqPortal.portal_idx);
-                    Collections.Portals.Add(portal.Id, portal);
+                    Collections.CqPortal.Add(portal);
+                }
+                foreach(var dmapPortal in db.Dmap_Portals.AsQueryable())
+                {
+                    var portal = new Dmap_Portals()
+                    {
+                        Id = dmapPortal.Id,
+                        MapId = dmapPortal.MapId,
+                        PortalId = dmapPortal.PortalId,
+                        X = dmapPortal.X,
+                        Y = dmapPortal.Y,
+                    };
+                    Collections.DmapPortals.Add(portal);
+                }
+                foreach(var passway in db.cq_passway)
+                {
+                    Collections.CqPassway.Add(passway);
                 }
             }
             sw.Stop();
-            Debug.WriteLine($"[SquigglyLite] Loaded {Collections.Portals.Count}\t Portals in {sw.Elapsed.TotalMilliseconds}ms");
+            Debug.WriteLine($"[SquigglyLite] Loaded {Collections.CqPortal.Count}\t Portals in {sw.Elapsed.TotalMilliseconds}ms");
         }
 
         public static void LoadItemBonus()

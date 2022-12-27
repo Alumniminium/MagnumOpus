@@ -65,7 +65,7 @@ namespace MagnumOpus.Networking.Packets
             {
                 ref var pos = ref ntt.Get<PositionComponent>();
                 pos.ChangedTick = PixelWorld.Tick;
-                var kickback = MsgAction.Create((int)PixelWorld.Tick, ntt.NetId, 0, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.South, MsgActionType.Kickback);
+                var kickback = MsgAction.Create(ntt.NetId, 0, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.South, MsgActionType.Kickback);
                 ntt.NetSync(ref kickback);
             }
             var wlk = new WalkComponent(ntt.Id, msg.RawDirection, msg.Type == 1);

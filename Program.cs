@@ -25,6 +25,7 @@ namespace MagnumOpus
             {
                 new WalkSystem(),
                 new JumpSystem(),
+                new PortalSystem(),
                 new ViewportSystem(),
                 new BasicAISystem(),
                 new AttackSystem(),

@@ -1,6 +1,6 @@
 namespace MagnumOpus.Squiggly
 {
-    public readonly struct CqPortal
+    public class CqPortal
     {
         public readonly int MapId;
         public readonly int X;

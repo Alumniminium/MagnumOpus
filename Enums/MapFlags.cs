@@ -1,26 +1,23 @@
-﻿// -------- Yi --------
-// Project: Library File: MapFlags.cs 
-// Created: 27/10/2015/2015 at 3:09 PM
-// Last Edit: 08/12/2015 at 12:31 PM
-// By: Buddha
-
-namespace MagnumOpus.Enums
+﻿namespace MagnumOpus.Enums
 {
     [Flags]
-    public enum MapFlags
+    public enum MapFlags : uint
     {
-        None = 0x0000,
-        NoPkpNoFlash = 0x0001, //No PKPoints, Not Flashing...
-        RecordDisable = 0x0004, //Do not save this position, save the previous
-        NoPk = 0x0008, //Can't PK
-        EnablePlayerShop = 0x0010, //Can create booth
-        DisableTeams = 0x0020, //Can't create team
-        DisableScrolls = 0x0040, //Can't use scroll
-        GuildMap = 0x0080, //Syndicate MapId
-        Prison = 0x0100, //Prison MapId
-        DisableFly = 0x0200, //Can't fly
-        Family = 0x0400, //Family MapId
-        Mine = 0x0800, //Mine MapId
-        NewbieProtect = 0x4000 //Newbie protection
+        None                = 0b0, // MAPTYPE_NORMAL
+        NoPkpNoFlash        = 0b1, // MAPTYPE_PKFIELD: No PKPoints, Not Flashing...
+        NoChangeMap         = 0b10, // MAPTYPE_CHGMAP_DISABLE: Can't change map
+        RecordDisable       = 0b100, // MAPTYPE_RECORD_DISABLE: Do not save this position, save the previous
+        NoPk                = 0b1000, // MAPTYPE_PK_DISABLE: Can't PK
+        EnablePlayerShop    = 0b10000, // MAPTYPE_BOOTH_ENABLE: Can create booth
+        DisableTeams        = 0b100000, // MAPTYPE_TEAM_DISABLE: Can't create team
+        DisableScrolls      = 0b1000000, // MAPTYPE_TELEPORT_DISABLE: Can't use scroll
+        GuildMap            = 0b10000000, // MAPTYPE_SYN_MAP: Syndicate MapId
+        Prison              = 0b100000000, // MAPTYPE_PRISON_MAP: Prison MapId
+        DisableFly          = 0b1000000000, // MAPTYPE_WING_DISABLE: Can't fly
+        Family              = 0b10000000000, // MAPTYPE_FAMILY: Family MapId
+        Mine                = 0b100000000000, // MAPTYPE_MINEFIELD: Mine MapId
+        MAPTYPE_PKGAME      = 0b1000000000000, // MAPTYPE_PKGAME: PK Game MapId
+        MAPTYPE_NEVERWOUND  = 0b10000000000000, // MAPTYPE_NEVERWOUND: Never Wound
+        NewbieProtect       = 0b100000000000000, // MAPTYPE_DEADISLAND: Newbie protection
     }
 }
