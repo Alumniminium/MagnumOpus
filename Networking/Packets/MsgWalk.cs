@@ -55,9 +55,9 @@ namespace MagnumOpus.Networking.Packets
         }
 
         [PacketHandler(PacketId.MsgWalk)]
-        public static void Process(PixelEntity ntt, Memory<byte> packet)
+        public static void Process(PixelEntity ntt, Memory<byte> memory)
         {
-            var msg = Co2Packet.Deserialze<MsgWalk>(packet);
+            var msg = Co2Packet.Deserialze<MsgWalk>(memory);
             if (ntt.NetId != msg.UniqueId)
                 FConsole.WriteLine($"[{nameof(MsgWalk)}] UID Mismatch! Packet: {msg.UniqueId}, ntt: {ntt.NetId}");
 
@@ -66,7 +66,9 @@ namespace MagnumOpus.Networking.Packets
                 ref var pos = ref ntt.Get<PositionComponent>();
                 pos.ChangedTick = PixelWorld.Tick;
                 var kickback = MsgAction.Create(ntt.NetId, 0, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.South, MsgActionType.Kickback);
-                ntt.NetSync(ref kickback);
+                ntt.NetSync(ref kickback,true);
+                // IncomingPacketQueue.Add(in ntt, in memory);
+                return;
             }
             var wlk = new WalkComponent(ntt.Id, msg.RawDirection, msg.Type == 1);
             ntt.Add(ref wlk);

@@ -9,7 +9,7 @@ namespace MagnumOpus.Components
         public readonly int EntityId;
         public readonly PixelEntity Target;
         public readonly MsgInteractType AttackType;
-        public int SleepTicks;
+        public uint SleepTicks;
 
         public AttackComponent(int nttId, in PixelEntity target, MsgInteractType attackType)
         {

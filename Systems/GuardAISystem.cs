@@ -1,0 +1,97 @@
+using System.Numerics;
+using MagnumOpus.Components;
+using MagnumOpus.ECS;
+using MagnumOpus.Enums;
+using MagnumOpus.Helpers;
+
+namespace MagnumOpus.Simulation.Systems
+{
+    public sealed class GuardAISystem : PixelSystem<PositionComponent, ViewportComponent, GuardComponent, BrainComponent>
+    {
+        public GuardAISystem() : base("Guard AI System", threads: 1) { }
+        protected override bool MatchesFilter(in PixelEntity ntt) => ntt.Type == EntityType.Monster && base.MatchesFilter(in ntt);
+
+        public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref ViewportComponent vwp, ref GuardComponent grd, ref BrainComponent brn)
+        {
+            if (brn.State == BrainState.Sleeping)
+            {
+                brn.SleepTicks--;
+
+                if (brn.SleepTicks > 0)
+                    return;
+                else
+                    brn.State = BrainState.WakingUp;
+            }
+
+            if (brn.State == BrainState.WakingUp)
+            {
+                vwp.EntitiesVisible.Clear();
+                Game.Grids[pos.Map].GetVisibleEntities(ref vwp);
+
+                for (var i = 0; i < vwp.EntitiesVisible.Count; i++)
+                {
+                    var b = vwp.EntitiesVisible[i];
+
+                    if (b.Type != EntityType.Monster)
+                        continue;
+
+                    if (b.Has<GuardComponent>())
+                        continue;
+
+                    ref readonly var targetPos = ref b.Get<PositionComponent>();
+
+                    var distance = (int)Vector2.Distance(grd.Position, targetPos.Position);
+                    if (distance > 18)
+                        continue;
+
+                    brn.TargetId = b.Id;
+                    brn.TargetPosition = targetPos.Position;
+                    brn.State = BrainState.Approaching;
+                    break;
+                }
+            }
+
+            if (brn.TargetId == 0)
+            {
+                if (pos.Position != grd.Position)
+                {
+                    brn.TargetPosition = grd.Position;
+                    brn.State = BrainState.Approaching;
+                }
+            }
+            else
+            {
+                if(!PixelWorld.EntityExists(brn.TargetId))
+                {
+                    brn.TargetId = 0;
+                    return;
+                }
+
+                var distance = (int)Vector2.Distance(pos.Position, brn.TargetPosition);
+
+                if (distance > 1)
+                    brn.State = BrainState.Approaching;
+                else
+                    brn.State = BrainState.Attacking;
+            }
+
+            if (brn.State == BrainState.Approaching)
+            {
+                var dir = CoMath.GetRawDirection(brn.TargetPosition, pos.Position);
+
+                var wlk = new WalkComponent(ntt.Id, dir, true);
+                ntt.Add(ref wlk);
+            }
+
+            if (brn.State == BrainState.Attacking)
+            {
+                ref readonly var _target = ref PixelWorld.GetEntity(brn.TargetId);
+                var atk = new AttackComponent(ntt.Id, in _target, MsgInteractType.Physical);
+                ntt.Add(ref atk);
+            }
+
+            brn.State = BrainState.Sleeping;
+            brn.SleepTicks = (int)(PixelWorld.TargetTps * 0.5f);
+        }
+    }
+}

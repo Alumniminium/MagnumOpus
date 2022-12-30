@@ -14,9 +14,6 @@ namespace MagnumOpus.Components
             EntityId = entityId;
             Fields = fields;
         }
-        public override int GetHashCode()
-        {
-            return EntityId;
-        }
+        public override int GetHashCode() => EntityId;
     }
 }

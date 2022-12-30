@@ -4,6 +4,7 @@ using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
+using MagnumOpus.Networking;
 using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
@@ -16,15 +17,18 @@ namespace MagnumOpus.Simulation.Systems
         public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref JumpComponent jmp, ref DirectionComponent dir)
         {
             pos.ChangedTick = PixelWorld.Tick;
-            var direction = CoMath.GetDirection(pos.Position, new Vector2(jmp.Position.X, jmp.Position.Y));
+            dir.ChangedTick = PixelWorld.Tick;
+
+            var direction = CoMath.GetDirection(new Vector2(jmp.Position.X, jmp.Position.Y),pos.Position);
             dir.Direction = direction;
 
             pos.Position = jmp.Position;
             Game.Grids[pos.Map].Move(in ntt, ref pos);
-
-            var msg = MsgAction.CreateJump(in ntt, in jmp);
-            ntt.NetSync(ref msg, true);
-            ntt.Remove<JumpComponent>();
+            
+            var text = $"{direction} -> {pos.Position}";
+            var msgText = MsgText.Create(in ntt, text, MsgTextType.Talk);
+            var serialized = Co2Packet.Serialize(ref msgText, msgText.Size);
+            ntt.NetSync(serialized);
         }
     }
 }

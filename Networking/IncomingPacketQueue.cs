@@ -4,33 +4,28 @@ namespace MagnumOpus.Networking
 {
     public static class IncomingPacketQueue
     {
-        private static readonly Dictionary<PixelEntity, Queue<Memory<byte>>> Packets = new();
+        private static readonly Dictionary<PixelEntity, Queue<Memory<byte>>> Queues = new();
         public static void Add(in PixelEntity player, in Memory<byte> packet)
         {
-            if (!Packets.TryGetValue(player, out var queue))
+            if (!Queues.TryGetValue(player, out var queue))
             {
                 queue = new Queue<Memory<byte>>();
-                Packets.Add(player, queue);
+                Queues.Add(player, queue);
             }
             if (packet.IsEmpty)
                 return;
             queue.Enqueue(packet);
         }
 
-        public static void Remove(in PixelEntity player) => Packets.Remove(player);
+        public static void Remove(in PixelEntity player) => Queues.Remove(player);
 
         public static void ProcessAll()
         {
-            foreach (var (ntt, queue) in Packets)
+            foreach (var (ntt, queue) in Queues)
             {
                 while (queue.Count > 0)
                 {
                     var packet = queue.Dequeue();
-                    if (!PixelWorld.EntityExists(ntt.Id))
-                    {
-                        queue.Clear();
-                        continue;
-                    }
                     GamePacketHandler.Process(in ntt, in packet);
                 }
             }

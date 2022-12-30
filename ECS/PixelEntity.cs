@@ -38,9 +38,9 @@ namespace MagnumOpus.ECS
         public readonly void NetSync<T>(ref T packet, bool broadcast = false) where T : unmanaged
         {
             var serialized = Co2Packet.Serialize(ref packet);
-            NetSync(in serialized, broadcast);
+            NetSync(serialized, broadcast);
         }
-        public readonly void NetSync(in Memory<byte> packet, bool broadcast = false)
+        public readonly void NetSync(Memory<byte> packet, bool broadcast = false)
         {
             if(Type == EntityType.Player)
                 OutgoingPacketQueue.Add(in this, in packet);
@@ -52,6 +52,14 @@ namespace MagnumOpus.ECS
                 {
                     var b = vwp.EntitiesVisible[i];
                     if (b.Type != EntityType.Player || b.Id == Id)
+                        continue;
+
+                    OutgoingPacketQueue.Add(in b, in packet);
+                }
+                 for (var i = 0; i < vwp.EntitiesVisibleLast.Count; i++)
+                {
+                    var b = vwp.EntitiesVisibleLast[i];
+                    if (b.Type != EntityType.Player || b.Id == Id || vwp.EntitiesVisible.Contains(b))
                         continue;
 
                     OutgoingPacketQueue.Add(in b, in packet);

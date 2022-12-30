@@ -21,7 +21,7 @@ namespace MagnumOpus.Squiggly
                     return;
 
                 if (monster.Look != 900 && monster.Look != 910)
-                    amount = (ushort)(amount * 9);
+                    amount = (ushort)(amount * 4);
 
                 for (var i = 0; i < amount; i++)
                 {
@@ -35,10 +35,18 @@ namespace MagnumOpus.Squiggly
                     var hp = new HealthComponent(obj.Id, prefab.Health, prefab.MaxHealth);
                     var sync = new NetSyncComponent(obj.Id, SyncThings.All);
                     var ntc = new NameTagComponent(obj.Id, prefab.Name);
-                    var vwp = new ViewportComponent(obj.Id, 8f);
+                    var vwp = new ViewportComponent(obj.Id, 18f);
 
                     pos.Position.X = (ushort)Random.Shared.Next(spawn.Value.Xstart - 10, spawn.Value.Xstart + spawn.Value.Xend + 10);
                     pos.Position.Y = (ushort)Random.Shared.Next(spawn.Value.Ystart - 10, spawn.Value.Ystart + spawn.Value.Yend + 10);
+
+                    if(monster.Look == 900 || monster.Look == 910)
+                    {
+                        pos.Position = new Vector2(spawn.Value.Xstart, spawn.Value.Ystart);
+                        var grd = new GuardComponent(obj.Id, pos.Position);
+                        obj.Add(ref grd);
+                    }
+
                     obj.Add(ref spw);
                     obj.Add(ref pos);
                     obj.Add(ref bdy);
@@ -48,11 +56,8 @@ namespace MagnumOpus.Squiggly
                     obj.Add(ref ntc);
                     obj.Add(ref vwp);
 
-                    if (prefab.Look != 900 && prefab.Look != 910 )
-                    {
                         var brn = new BrainComponent(obj.Id);
                         obj.Add(ref brn);
-                    }
 
                     if (!Game.Grids.ContainsKey(pos.Map))
                     {

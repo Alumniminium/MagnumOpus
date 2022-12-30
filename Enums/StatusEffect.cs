@@ -13,7 +13,7 @@ namespace MagnumOpus.Enums
         StarOfAccuracy  = 0b10000000,
         MagicShield     = 0b100000000,
         Stigma          = 0b1000000000,
-        Die             = 0b10000000000,
+        Dead             = 0b10000000000,
         Fade            = 0b100000000000,
         XpAccuracy      = 0b1000000000000,
         XpShield        = 0b10000000000000,

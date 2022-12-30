@@ -80,7 +80,7 @@ namespace MagnumOpus.Networking.Packets
                 {
                     var textPacket = Create(npc, 0, MsgTaskDialogAction.Text, task.param.Replace("~", " "));
                     var textMem = Co2Packet.Serialize(ref textPacket, textPacket.Size);
-                    ntt.NetSync(in textMem);
+                    ntt.NetSync(textMem);
                 }
 
                 if (task.type == 102)
@@ -89,7 +89,7 @@ namespace MagnumOpus.Networking.Packets
                     // var optionId = int.Parse(task.param.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries)[1]);
                     var optionPacket = Create(npc, 255, MsgTaskDialogAction.Link, text);
                     var optionMem = Co2Packet.Serialize(ref optionPacket, optionPacket.Size);
-                    ntt.NetSync(in optionMem);
+                    ntt.NetSync(optionMem);
                 }
                 if (task.type == 104)
                 {
@@ -97,19 +97,19 @@ namespace MagnumOpus.Networking.Packets
                     var faceId = byte.Parse(task.param.Trim().Split(' ')[2]);
                     facePacket.Avatar = faceId;
                     var faceMem = Co2Packet.Serialize(ref facePacket, facePacket.Size);
-                    ntt.NetSync(in faceMem);
+                    ntt.NetSync(faceMem);
                 }
                 if (task.type == 120)
                 {
                     var showPacket = Create(npc, 0, MsgTaskDialogAction.Create);
                     var showMem = Co2Packet.Serialize(ref showPacket, showPacket.Size);
-                    ntt.NetSync(in showMem);
+                    ntt.NetSync(showMem);
                 }
 
                 if (task.id_next == 0)
                     break;
             }
-            while (nextId != 0);
+            while (nextId != 0); // copilot is a bit 
         }
     }
 }

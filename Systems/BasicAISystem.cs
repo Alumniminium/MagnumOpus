@@ -10,7 +10,7 @@ namespace MagnumOpus.Simulation.Systems
     public sealed class BasicAISystem : PixelSystem<PositionComponent, ViewportComponent, BrainComponent>
     {
         public BasicAISystem() : base("Basic AI System", threads: 1) { }
-        protected override bool MatchesFilter(in PixelEntity ntt) => ntt.Type == EntityType.Monster && base.MatchesFilter(in ntt);
+        protected override bool MatchesFilter(in PixelEntity ntt) => ntt.Type == EntityType.Monster && !ntt.Has<GuardComponent>() && base.MatchesFilter(in ntt);
 
         public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref ViewportComponent vwp, ref BrainComponent brn)
         {
@@ -77,9 +77,8 @@ namespace MagnumOpus.Simulation.Systems
             }
             if(brn.State == BrainState.Attacking)
             {
-                var msg = MsgInteract.Create(in ntt, in target, MsgInteractType.Physical, 1);
-                target.NetSync(ref msg, true);
-                //TODO: Actually implement
+                var atk = new AttackComponent(ntt.Id, in target, MsgInteractType.Physical);
+                ntt.Add(ref atk);
             }
 
             brn.State = BrainState.Sleeping;

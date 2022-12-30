@@ -6,7 +6,6 @@ namespace MagnumOpus.Components
     public struct HealthComponent
     {
         public readonly int EntityId;
-        public uint ChangedTick;
         public int Health;
         public int MaxHealth;
 
@@ -15,11 +14,7 @@ namespace MagnumOpus.Components
             EntityId = entityId;
             Health = health;
             MaxHealth = maxHealth;
-            ChangedTick = PixelWorld.Tick;
         }
-        public override int GetHashCode()
-        {
-            return EntityId;
-        }
+        public override int GetHashCode() => EntityId;
     }
 }

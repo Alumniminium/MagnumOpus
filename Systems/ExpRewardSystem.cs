@@ -20,7 +20,6 @@ namespace MagnumOpus.Simulation.Systems
                 lvl.Level++;
                 lvl.ChangedTick = PixelWorld.Tick;
                 hlt.Health = hlt.MaxHealth;
-                hlt.ChangedTick = PixelWorld.Tick;
 
                 var lvlUp = MsgUserAttrib.Create(ntt.NetId, lvl.Level, Enums.MsgUserAttribType.Level);
                 ntt.NetSync(ref lvlUp, false);

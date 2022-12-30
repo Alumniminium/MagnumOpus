@@ -1,10 +1,10 @@
-using MagnumOpus.ECS;
+using System.Numerics;
+using HerstLib.IO;
 using MagnumOpus.Components;
+using MagnumOpus.ECS;
+using MagnumOpus.Networking.Packets;
 using MagnumOpus.Squiggly;
 using MagnumOpus.Squiggly.Models;
-using HerstLib.IO;
-using MagnumOpus.Networking.Packets;
-using System.Numerics;
 
 namespace MagnumOpus.Simulation.Systems
 {
@@ -19,23 +19,26 @@ namespace MagnumOpus.Simulation.Systems
             var y = ptc.Y;
 
             var entry = Collections.DmapPortals.FirstOrDefault(p => p.MapId == mapId && Math.Abs(p.X - x) < 5 && Math.Abs(p.Y - y) < 5);
-            if(entry == null)
+            if (entry == null)
             {
                 FConsole.WriteLine($"PortalSystem: No Dmap Portal found at {ptc.X}, {ptc.Y} on map {mapId}");
+                ntt.Remove<PortalComponent>();
                 return;
             }
 
             var passway = Collections.CqPassway.FirstOrDefault(x => x.mapid == mapId && x.passway_idx == entry.PortalId);
-            if(passway == null)
+            if (passway == null)
             {
                 FConsole.WriteLine($"PortalSystem: No Passway for {entry.PortalId} on map {mapId}");
+                ntt.Remove<PortalComponent>();
                 return;
             }
 
             var exit = Collections.CqPortal.FirstOrDefault(x => x.MapId == passway.passway_mapid && x.IdX == passway.passway_mapportal);
-            if(exit == null)
+            if (exit == null)
             {
                 FConsole.WriteLine($"PortalSystem: No Exit Portal for {passway.passway_mapid} on map {passway.passway_mapportal}");
+                ntt.Remove<PortalComponent>();
                 return;
             }
 
@@ -45,10 +48,10 @@ namespace MagnumOpus.Simulation.Systems
 
             FConsole.WriteLine($"PortalSystem: Teleported {ntt.NetId} to {exit.MapId} at {exit.X}, {exit.Y}");
 
-            var tpP = MsgAction.Create(ntt.NetId, exit.MapId, (ushort)exit.X,(ushort)exit.Y,Enums.Direction.South, Enums.MsgActionType.SendLocation);
+            var tpP = MsgAction.Create(ntt.NetId, exit.MapId, (ushort)exit.X, (ushort)exit.Y, Enums.Direction.South, Enums.MsgActionType.SendLocation);
             ntt.NetSync(ref tpP);
             var mapStatus = MsgStatus.Create((uint)exit.MapId, (uint)Enums.MapFlags.None);
-            ntt.NetSync(in mapStatus);
+            ntt.NetSync(mapStatus);
 
             ntt.Remove<PortalComponent>();
         }

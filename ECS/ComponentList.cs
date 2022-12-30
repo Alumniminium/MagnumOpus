@@ -14,7 +14,7 @@ namespace MagnumOpus.ECS
         // called via reflection @ ReflectionHelper.Remove<T>()
         public static void Remove(PixelEntity owner, bool notify)
         {
-            Array[owner.Id] = new T();
+            Array[owner.Id] = default;
             if (notify)
                 PixelWorld.InformChangesFor(in owner);
         }

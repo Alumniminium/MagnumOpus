@@ -37,24 +37,32 @@ namespace MagnumOpus.Networking.Packets
             var msg = Co2Packet.Deserialze<MsgLogin>(packet);
             var language = msg.GetLanguage();
             FConsole.WriteLine($"[GAME] Client Version: {msg.ClientVersion}, Language: {language}");
-            var ntc = new NameTagComponent(ntt.NetId, "test");
+            ref readonly var net = ref ntt.Get<NetworkComponent>();
+            var ntc = new NameTagComponent(ntt.NetId, net.Username);
             var dir = new DirectionComponent(ntt.Id, Direction.South);
-            var vwp = new ViewportComponent(ntt.Id, 24);
+            var emo = new EmoteComponent(ntt.Id, Emote.Dance);
+            var vwp = new ViewportComponent(ntt.Id, 40);
             var syn = new NetSyncComponent(ntt.Id, SyncThings.All);
+            var pos = new PositionComponent(ntt.Id, new System.Numerics.Vector2(438,377), 1002);
+            var eff = new StatusEffectComponent(ntt.Id);
             ntt.Add(ref ntc);
             ntt.Add(ref dir);
             ntt.Add(ref vwp);
             ntt.Add(ref syn);
+            ntt.Add(ref emo);
+            ntt.Add(ref pos);
+            ntt.Add(ref eff);
 
             var ok = MsgText.Create("SYSTEM", "ALLUSERS", "ANSWER_OK", MsgTextType.LoginInformation);
-            ntt.NetSync(in ok);
+            var okserialized = Co2Packet.Serialize(ref ok, ok.Size);
+            ntt.NetSync(okserialized);
 
             var info = MsgCharacter.Create(ntt);
             var serialized = Co2Packet.Serialize(ref info, info.Size);
-            ntt.NetSync(in serialized);
+            ntt.NetSync(serialized);
 
             var msgStatus = MsgStatus.Create(1002,3282567244);
-            ntt.NetSync(in msgStatus);
+            ntt.NetSync(msgStatus);
         }
     }
 }

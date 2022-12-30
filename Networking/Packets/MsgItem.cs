@@ -1,8 +1,10 @@
 using System.Buffers;
 using System.Runtime.InteropServices;
 using System.Text;
+using HerstLib.IO;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using MagnumOpus.Helpers;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -39,57 +41,15 @@ namespace MagnumOpus.Networking.Packets
 
             switch (msg.Type)
             {
-                case MsgItemType.BuyItemAddItem:
-                    break;
-                case MsgItemType.SellItem:
-                    break;
-                case MsgItemType.RemoveInventory:
-                    break;
-                case MsgItemType.EquipItem:
-                    break;
-                case MsgItemType.SetEquipPosition:
-                    break;
-                case MsgItemType.UnEquipItem:
-                    break;
-                case MsgItemType.ShowWarehouseMoney:
-                    break;
-                case MsgItemType.DepositWarehouseMoney:
-                    break;
-                case MsgItemType.WithdrawWarehouseMoney:
-                    break;
-                case MsgItemType.DropGold:
-                    break;
-                case MsgItemType.RepairItem:
-                    break;
-                case MsgItemType.UpdateDurability:
-                    break;
-                case MsgItemType.RemoveEquipment:
-                    break;
-                case MsgItemType.UpgradeDragonball:
-                    break;
-                case MsgItemType.UpgradeMeteor:
-                    break;
-                case MsgItemType.ShowVendingList:
-                    break;
-                case MsgItemType.AddVendingItem:
-                    break;
-                case MsgItemType.RemoveVendingItem:
-                    break;
-                case MsgItemType.BuyVendingItem:
-                    break;
-                case MsgItemType.UpdateArrowCount:
-                    break;
-                case MsgItemType.ParticleEffect:
-                    break;
                 case MsgItemType.Ping:
                     var reply = MsgItem.Create(ntt.NetId, msg.Value, msg.Param, msg.Timestamp, MsgItemType.Ping);
                     // var tick = MsgTick.Create(in ntt);
                     ntt.NetSync(ref reply);
                     // ntt.NetSync(ref tick);
                     break;
-                case MsgItemType.Enchant:
-                    break;
-                case MsgItemType.BoothAddCp:
+                default:
+                    FConsole.WriteLine($"Unhandled MsgItem type: {msg.Type}");
+                    FConsole.WriteLine(memory.Dump());
                     break;
             }
         }

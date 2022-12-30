@@ -1,8 +1,10 @@
 using System.Collections.Concurrent;
 using System.Drawing;
 using System.Numerics;
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
+using MagnumOpus.Helpers;
 
 namespace SpacePartitioning
 {
@@ -72,6 +74,7 @@ namespace SpacePartitioning
         public void GetVisibleEntities(ref ViewportComponent vwp)
         {
             var rect = vwp.Viewport;
+            var center = new Vector2(rect.X + rect.Width / 2, rect.Y + rect.Height / 2);
             var topLeft = new Vector2(rect.Left, rect.Top);
             var bottomRight = new Vector2(rect.Right, rect.Bottom);
 
@@ -89,9 +92,15 @@ namespace SpacePartitioning
                     {
                         foreach (var other in list)
                         {
+                            if(other.Id == vwp.EntityId)
+                                continue;
+                            
                             ref readonly var pos = ref other.Get<PositionComponent>();
-                            if (vwp.Viewport.IntersectsWith(new RectangleF((int)pos.Position.X, (int)pos.Position.Y, 1, 1)))
+                            var distance = Vector2.Distance(pos.Position, center);
+                            if (distance <= 18)
                                 vwp.EntitiesVisible.Add(other);
+
+                            // FConsole.WriteLine($"[{nameof(Grid)}] {vwp.EntityId} -> {other.Id} -> {distance}");
                         }
                     }
                 }

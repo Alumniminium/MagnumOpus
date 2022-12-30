@@ -8,7 +8,7 @@ namespace MagnumOpus.ECS
     public static class PixelWorld
     {
         public const int MaxEntities = 1_500_000;
-        public static int TargetTps { get; private set; } = 30;
+        public static uint TargetTps { get; private set; } = 30;
         private static float UpdateTime;
 
         private static readonly PixelEntity[] Entities;
@@ -41,7 +41,7 @@ namespace MagnumOpus.ECS
         }
 
         public static void SetSystems(params PixelSystem[] systems) => Systems = systems;
-        public static void SetTPS(int fps)
+        public static void SetTPS(uint fps)
         {
             TargetTps = fps;
             UpdateTime = 1f / TargetTps;
@@ -71,13 +71,13 @@ namespace MagnumOpus.ECS
             }
             throw new IndexOutOfRangeException("Failed to pop an array index");
         }
-        public static ref PixelEntity GetEntity(int nttId)=> ref Entities[nttId];
+        public static ref PixelEntity GetEntity(int nttId) => ref Entities[nttId];
 
         public static ref PixelEntity GetEntityByNetId(int netId)
         {
             if (!NetIdToEntityIndex.TryGetValue(netId, out var index))
                 return ref Entities[0];
-                
+
             return ref Entities[index];
         }
 
@@ -89,7 +89,7 @@ namespace MagnumOpus.ECS
 
         private static void DestroyInternal(in PixelEntity ntt)
         {
-            if(ChangedThisTick.Contains(ntt))
+            if (ChangedThisTick.Contains(ntt))
                 ChangedThisTick.Remove(ntt);
 
             foreach (var child in ntt.Children)
@@ -114,11 +114,18 @@ namespace MagnumOpus.ECS
             Stopwatch.Restart();
             double last = Stopwatch.Elapsed.TotalMilliseconds;
 
-            IncomingPacketQueue.ProcessAll();
             PerformanceMetrics.AddSample(nameof(IncomingPacketQueue), Stopwatch.Elapsed.TotalMilliseconds - last);
 
             if (UpdateTimeAcc >= UpdateTime)
             {
+                IncomingPacketQueue.ProcessAll();
+
+                foreach (var ntt in ChangedThisTick)
+                {
+                    for (int x = 0; x < Systems.Length; x++)
+                        Systems[x].EntityChanged(in ntt);
+                }
+
                 UpdateTimeAcc -= UpdateTime;
                 for (int i = 0; i < Systems.Length; i++)
                 {

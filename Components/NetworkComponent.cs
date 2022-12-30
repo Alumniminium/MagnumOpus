@@ -16,6 +16,7 @@ namespace MagnumOpus.Components
         public readonly DiffieHellman DiffieHellman = new ();
         public readonly Memory<byte> ClientIV = new byte[8];
         public readonly Memory<byte> ServerIV = new byte[8];
+        public string Username;
 
         public NetworkComponent(in PixelEntity ntt, Socket socket)
         {
@@ -25,7 +26,7 @@ namespace MagnumOpus.Components
             RecvBuffer = new byte[1024];
             ClientIV = new byte[8];
             ServerIV = new byte[8];
-
+            Username = string.Empty;
             Random.Shared.NextBytes(ClientIV.Span);
             Random.Shared.NextBytes(ServerIV.Span);
         }

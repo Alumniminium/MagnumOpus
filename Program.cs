@@ -23,16 +23,21 @@ namespace MagnumOpus
         {
             var systems = new List<PixelSystem>
             {
+                new BasicAISystem(),
+                new GuardAISystem(),
                 new WalkSystem(),
                 new JumpSystem(),
+                new DirectionSystem(),
+                new EmoteSystem(),
                 new PortalSystem(),
                 new ViewportSystem(),
-                new BasicAISystem(),
                 new AttackSystem(),
                 new DamageSystem(),
                 new HealthSystem(),
                 new ExpRewardSystem(),
                 new DeathSystem(),
+                new ReviveSystem(),
+                new NetSyncSystem(),
             };
             SquigglyDb.LoadMaps();
             SquigglyDb.LoadPortals();
@@ -48,7 +53,7 @@ namespace MagnumOpus
             PixelWorld.RegisterOnSecond(() =>
             {
                 var lines = PerformanceMetrics.Draw();
-                // Console.WriteLine(lines);
+                // Console.WriteLine(lines);2
                 PerformanceMetrics.Restart();
             });
 
@@ -71,9 +76,6 @@ namespace MagnumOpus
             while (true)
             {
                 var client = LoginListener.AcceptTcpClient();
-                client.Client.NoDelay = true;
-                client.Client.DontFragment = true;
-
                 var player = PixelWorld.CreateEntity(EntityType.Player);
                 var net = new NetworkComponent(in player, client.Client);
                 player.Add(ref net);
@@ -90,11 +92,11 @@ namespace MagnumOpus
                 net.AuthCrypto.Decrypt(packet.Span, packet.Span);
                 LoginPacketHandler.Process(in player, in packet);
 
-                new Thread(() => NewMethod(in player)).Start();
+                new Thread(() => LoginClientLoop(in player)).Start();
             }
         }
 
-        private static void NewMethod(in PixelEntity player)
+        private static void LoginClientLoop(in PixelEntity player)
         {
             ref var net = ref player.Get<NetworkComponent>();
             try
@@ -122,8 +124,6 @@ namespace MagnumOpus
             while (true)
             {
                 var client = GameListener.AcceptTcpClient();
-                client.Client.NoDelay = true;
-                client.Client.DontFragment = true;
 
                 FConsole.WriteLine($"[GAME] Client connected: {client.Client.RemoteEndPoint}");
 
@@ -170,36 +170,54 @@ namespace MagnumOpus
                     net.GameCrypto.SetIVs(net.ServerIV, net.ClientIV);
                 }
 
-                new Thread(() => NewMethod1(in ntt)).Start();
+                new Thread(() => GameClientLoop(in ntt)).Start();
+                // GameClientLoop(in ntt);
             }
         }
 
-        private static void NewMethod1(in PixelEntity ntt)
+        private static void GameClientLoop(in PixelEntity ntt)
         {
             ref var net = ref ntt.Get<NetworkComponent>();
             while (true)
             {
-                var count = net.Socket.Receive(net.RecvBuffer.Span[..2]);
-
-                if (count == 0)
-                    break;
-
-                net.GameCrypto.Decrypt(net.RecvBuffer.Span[..2]);
-                var size = BitConverter.ToUInt16(net.RecvBuffer.Span[..2]) + 8;
-
-                while (count < size)
+                try
                 {
-                    var received = net.Socket.Receive(net.RecvBuffer.Span[count..size]);
-                    count += received;
+                    var count = net.Socket.Receive(net.RecvBuffer.Span[..1]);
 
-                    if (received == 0)
+                    if (count == 0)
                         break;
-                }
+                        
+                    count += net.Socket.Receive(net.RecvBuffer.Span[1..2]);
 
-                var packet = net.RecvBuffer[..size];
-                net.GameCrypto.Decrypt(packet.Span[2..size]);
-                IncomingPacketQueue.Add(in ntt, in packet);
+                    net.GameCrypto.Decrypt(net.RecvBuffer.Span[..count]);
+                    var size = BitConverter.ToUInt16(net.RecvBuffer.Span[..count]) + 8;
+
+                    while (count < size)
+                    {
+                        var received = net.Socket.Receive(net.RecvBuffer.Span[count..size]);
+                        count += received;
+
+                        if (received == 0)
+                            break;
+                    }
+
+                    var packet = net.RecvBuffer[..size];
+                    Span<byte> copy = new byte[size];
+                    packet.Span.CopyTo(copy);
+
+                    net.GameCrypto.Decrypt(copy[2..size]);
+                    IncomingPacketQueue.Add(in ntt, copy.ToArray());
+                }
+                catch
+                {
+                    FConsole.WriteLine($"[GAME] Client disconnected: {net.Username}");
+                    break;
+                }
             }
+            
+            net.Socket.Close();
+            net.Socket.Dispose();
+            PixelWorld.Destroy(in ntt);
         }
     }
 }

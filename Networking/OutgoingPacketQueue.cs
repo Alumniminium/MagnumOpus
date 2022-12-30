@@ -4,6 +4,7 @@ using MagnumOpus.Components;
 using HerstLib.IO;
 using System.Net.Sockets;
 using System.Text;
+using MagnumOpus.Enums;
 
 namespace MagnumOpus.Networking
 {
@@ -35,11 +36,17 @@ namespace MagnumOpus.Networking
                     try
                     {
                         var net = ntt.Get<NetworkComponent>();
+                        if(net.Socket == null || !net.Socket.Connected)
+                        {
+                            queue.Clear();
+                            PixelWorld.Players.Remove(ntt);
+                            continue;
+                        }
                         while (queue.Count > 0)
                         {
                             var packet = queue.Dequeue();
                             var id = BitConverter.ToInt16(packet.Span[2..4]);
-                            // FConsole.WriteLine($"Sending {id} to {ntt.Id}...");
+                            // FConsole.WriteLine($"Sending {(PacketId)id} {id} (Size: {packet.Length}) to {ntt.Id}...");
                             if(net.UseGameCrypto)
                             {
                                 var resized = new byte[packet.Length + 8];

@@ -44,6 +44,7 @@ namespace MagnumOpus.Simulation.Systems
                     continue;
                 
                 NetworkHelper.FullSync(in ntt, in b);
+                NetworkHelper.FullSync(in b, in b);
             }
         }
     }

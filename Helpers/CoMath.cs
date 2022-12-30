@@ -5,6 +5,10 @@ namespace MagnumOpus.Helpers
 {
     public static class CoMath
     {
+        public static double GetDistance(Vector2 start, Vector2 end)
+        {
+            return Math.Sqrt((start.X - end.X) * (start.X - end.X) + (start.Y - end.Y) * (start.Y - end.Y));
+        }
         public static Direction GetDirection(Vector2 end, Vector2 start) => (Direction)(GetRawDirection(end, start) % 8);
         public static byte GetRawDirection(Vector2 end, Vector2 start)
         {
