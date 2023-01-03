@@ -91,7 +91,7 @@ namespace MagnumOpus.Simulation.Systems
             }
 
             brn.State = BrainState.Sleeping;
-            brn.SleepTicks = (int)(PixelWorld.TargetTps * 0.5f);
+            brn.SleepTicks = (int)(PixelWorld.TargetTps * 0.33f);
         }
     }
 }

@@ -5,8 +5,8 @@ namespace MagnumOpus.Squiggly.Models
     public class cq_task
     {
         public long id { get; set; }
-        public long? id_next { get; set; }
-        public long? id_nextfail { get; set; }
+        public long id_next { get; set; }
+        public long id_nextfail { get; set; }
         public string itemname1 { get; set; }
         public string itemname2 { get; set; }
         public long? money { get; set; }

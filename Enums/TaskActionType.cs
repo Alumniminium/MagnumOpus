@@ -1,6 +1,6 @@
 namespace MagnumOpus.Enums
 {
-    public enum TaskActionType
+    public enum TaskActionType : long
     {
         // System
         ACTION_SYS_FIRST = 100,

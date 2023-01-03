@@ -23,8 +23,6 @@ namespace MagnumOpus.Simulation.Systems
             var deltaY = Constants.DeltaY[(int)wlk.Direction];
             pos.Position.X += deltaX;
             pos.Position.Y += deltaY;
-
-            Game.Grids[pos.Map].Move(in ntt, ref pos);
             
             var text = $"{wlk.Direction} -> {pos.Position}";
             var msgText = MsgText.Create(in ntt, text, MsgTextType.Talk);

@@ -23,7 +23,6 @@ namespace MagnumOpus.Simulation.Systems
             dir.Direction = direction;
 
             pos.Position = jmp.Position;
-            Game.Grids[pos.Map].Move(in ntt, ref pos);
             
             var text = $"{direction} -> {pos.Position}";
             var msgText = MsgText.Create(in ntt, text, MsgTextType.Talk);
