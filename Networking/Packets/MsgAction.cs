@@ -111,9 +111,19 @@ namespace MagnumOpus.Networking.Packets
                 case MsgActionType.SendItems:
                 case MsgActionType.SendAssociates:
                 case MsgActionType.SendProficiencies:
-                case MsgActionType.SendSpells:
                     {
                         FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId}");
+                        ntt.NetSync(memory[..msg.Size]);
+                        break;
+                    }
+                case MsgActionType.SendSpells:
+                    {
+                        ref readonly var sbc = ref ntt.Get<SpellBookComponent>();
+                        foreach(var spell in sbc.Spells)
+                        {
+                            var reply = MsgSkill.Create(spell.Key, spell.Value.exp, spell.Value.lvl);
+                            ntt.NetSync(ref reply);
+                        }
                         ntt.NetSync(memory[..msg.Size]);
                         break;
                     }

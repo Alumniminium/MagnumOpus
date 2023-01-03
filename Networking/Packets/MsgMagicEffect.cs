@@ -1,5 +1,7 @@
 using System.Buffers;
 using System.Runtime.InteropServices;
+using MagnumOpus.Components;
+using MagnumOpus.ECS;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -53,30 +55,27 @@ namespace MagnumOpus.Networking.Packets
         //     return packets;
         // }
 
-        // public static Memory<byte> Create(in PixelEntity attacker, PixelEntity target, int damage)
-        // {
-        //     ref readonly var bdy = ref attacker.Get<PhysicsComponent>();
-        //     var packet = stackalloc MsgMagicEffect[1];
-        //     {
-        //         packet->Size = 40;
-        //         packet->Id = 1105;
-        //         packet->UniqId = attacker.Id;
-        //         packet->Param = (int)bdy.Direction;
-        //         packet->Type = attacker.CurrentSkill.Id;
-        //         packet->Level = attacker.CurrentSkill.Level;
-        //         packet->TargetCount = 1;
-        //     };
-        //     packet->Targets[0] = target.Id;
-        //     packet->Targets[1] = damage;
-        //     packet->Targets[2] = 0;
+        public static Memory<byte> Create(in PixelEntity attacker, in PixelEntity target, int damage, ushort skillId, byte skillLevel)
+        {
+            var packet = stackalloc MsgMagicEffect[1];
+            {
+                packet->Size = 28;
+                packet->Id = 1105;
+                packet->UniqId = attacker.NetId;
+                packet->Param = (int)attacker.Get<DirectionComponent>().Direction;
+                packet->Type = skillId;
+                packet->Level = skillLevel;
+                packet->TargetCount = 1;
+            };
+            packet->Targets[0] = target.NetId;
+            packet->Targets[1] = damage;
+            packet->Targets[2] = 0;
 
+            var buffer = new byte[28];
+            fixed (byte* p = buffer)
+                *(MsgMagicEffect*)p = *packet;
 
-
-        //     var buffer = new byte[sizeof(MsgUpdate));
-        //     fixed (byte* p = buffer)
-        //         *(MsgMagicEffect*)p = *packet;
-
-        //     return buffer;
-        // }
+            return buffer;
+        }
     }
 }

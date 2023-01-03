@@ -1,8 +1,6 @@
-using System.Numerics;
 using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
-using MagnumOpus.Networking.Packets;
 using MagnumOpus.Squiggly;
 using MagnumOpus.Squiggly.Models;
 
@@ -42,16 +40,8 @@ namespace MagnumOpus.Simulation.Systems
                 return;
             }
 
-            pos.Position = new Vector2(exit.X, exit.Y);
-            pos.Map = exit.MapId;
-            pos.ChangedTick = PixelWorld.Tick;
-
-            FConsole.WriteLine($"PortalSystem: Teleported {ntt.NetId} to {exit.MapId} at {exit.X}, {exit.Y}");
-
-            var tpP = MsgAction.Create(ntt.NetId, exit.MapId, (ushort)exit.X, (ushort)exit.Y, Enums.Direction.South, Enums.MsgActionType.SendLocation);
-            ntt.NetSync(ref tpP);
-            var mapStatus = MsgStatus.Create((uint)exit.MapId, (uint)Enums.MapFlags.None);
-            ntt.NetSync(mapStatus);
+            var tpc = new TeleportComponent(ntt.Id, (ushort)exit.X, (ushort)exit.Y, (ushort)exit.MapId);
+            ntt.Add(ref tpc);
 
             ntt.Remove<PortalComponent>();
         }

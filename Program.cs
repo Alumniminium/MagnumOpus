@@ -30,6 +30,7 @@ namespace MagnumOpus
                 new DirectionSystem(),
                 new EmoteSystem(),
                 new PortalSystem(),
+                new TeleportSystem(),
                 new ViewportSystem(),
                 new AttackSystem(),
                 new DamageSystem(),

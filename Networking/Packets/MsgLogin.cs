@@ -1,9 +1,9 @@
 using System.Runtime.InteropServices;
 using System.Text;
 using HerstLib.IO;
+using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Components;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -45,6 +45,12 @@ namespace MagnumOpus.Networking.Packets
             var syn = new NetSyncComponent(ntt.Id, SyncThings.All);
             var pos = new PositionComponent(ntt.Id, new System.Numerics.Vector2(438,377), 1002);
             var eff = new StatusEffectComponent(ntt.Id);
+            var inv = new InventoryComponent(ntt.Id, 1000, 0);
+            var lvl = new LevelComponent(ntt.Id, 1);
+            var pro = new ProfessionComponent(ntt.Id, ClasseName.InternTaoist);
+            var sbc = new SpellBookComponent(ntt.Id);
+            sbc.Spells.Add(1000, (0, 0, 0));
+            sbc.Spells.Add(1005, (0, 0, 0));
             ntt.Add(ref ntc);
             ntt.Add(ref dir);
             ntt.Add(ref vwp);
@@ -52,6 +58,10 @@ namespace MagnumOpus.Networking.Packets
             ntt.Add(ref emo);
             ntt.Add(ref pos);
             ntt.Add(ref eff);
+            ntt.Add(ref sbc);
+            ntt.Add(ref inv);
+            ntt.Add(ref lvl);
+            ntt.Add(ref pro);
 
             var ok = MsgText.Create("SYSTEM", "ALLUSERS", "ANSWER_OK", MsgTextType.LoginInformation);
             var okserialized = Co2Packet.Serialize(ref ok, ok.Size);

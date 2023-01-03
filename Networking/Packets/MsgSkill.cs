@@ -1,6 +1,7 @@
 using System.Buffers;
 using System.Runtime.InteropServices;
 using MagnumOpus.Components;
+using SQLitePCL;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -13,15 +14,15 @@ namespace MagnumOpus.Networking.Packets
         public ushort SkillId;
         public ushort Level;
 
-        public static MsgSkill Create(SkillComponent skill)
+        public static MsgSkill Create(ushort skillId, uint exp, ushort lvl)
         {
             var packet = new MsgSkill
             {
                 Size = (ushort)sizeof(MsgSkill),
                 Id = 1103,
-                SkillId = skill.Id,
-                Experience = skill.Experience,
-                Level = skill.Level
+                SkillId = skillId,
+                Experience = exp,
+                Level = lvl
             };
             return packet;
         }

@@ -16,9 +16,6 @@ namespace MagnumOpus.Components
             DecreaseTime = decreaseTime;
         }
 
-        public override int GetHashCode()
-        {
-            return EntityId;
-        }
+        public override int GetHashCode() => EntityId;
     }
 }
