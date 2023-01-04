@@ -82,8 +82,6 @@ namespace MagnumOpus.Networking.Packets
             to = to.Replace("\0", "");
             message = message.Replace("\0", "");
 
-
-            // ReSharper disable once UseObjectOrCollectionInitializer
             var packet = new MsgText
             {
                 Size = (ushort)(29 + from.Length + to.Length + message.Length),
