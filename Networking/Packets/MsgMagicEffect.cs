@@ -11,7 +11,9 @@ namespace MagnumOpus.Networking.Packets
         public ushort Size;
         public ushort Id;
         public int UniqId;
-        public int Param; //TargetUID || (X, Y)
+        // public int Param; //TargetUID || (X, Y)
+        public ushort X;
+        public ushort Y;
         public ushort Type;
         public short Level;
         public int TargetCount;
@@ -57,25 +59,30 @@ namespace MagnumOpus.Networking.Packets
 
         public static Memory<byte> Create(in PixelEntity attacker, in PixelEntity target, int damage, ushort skillId, byte skillLevel)
         {
-            var packet = stackalloc MsgMagicEffect[1];
+            var buffer = new byte[sizeof(MsgMagicEffect)];
+            var packet = new MsgMagicEffect()
             {
-                packet->Size = 28;
-                packet->Id = 1105;
-                packet->UniqId = attacker.NetId;
-                packet->Param = (int)attacker.Get<DirectionComponent>().Direction;
-                packet->Type = skillId;
-                packet->Level = skillLevel;
-                packet->TargetCount = 1;
+                Size = 28,
+                Id = 1105,
+                UniqId = attacker.NetId,
+                // Param = (int)attacker.Get<DirectionComponent>().Direction,
+                X = (ushort)target.Get<PositionComponent>().Position.X,
+                Y = (ushort)target.Get<PositionComponent>().Position.Y,
+                Type = skillId,
+                Level = skillLevel,
+                TargetCount = 1
             };
-            packet->Targets[0] = target.NetId;
-            packet->Targets[1] = damage;
-            packet->Targets[2] = 0;
+            unsafe
+            {
+                packet.Targets[0] = target.NetId;
+                packet.Targets[1] = damage;
+                packet.Targets[2] = 0;
+                fixed (byte* p = buffer)
+                    *(MsgMagicEffect*)p = packet;
+            }
 
-            var buffer = new byte[28];
-            fixed (byte* p = buffer)
-                *(MsgMagicEffect*)p = *packet;
 
-            return buffer;
+            return buffer.AsMemory()[..packet.Size];
         }
     }
 }

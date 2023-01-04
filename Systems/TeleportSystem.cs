@@ -21,7 +21,7 @@ namespace MagnumOpus.Simulation.Systems
             var tpP = MsgAction.Create(ntt.NetId, tpc.Map, tpc.X, tpc.Y, Enums.Direction.South, Enums.MsgActionType.SendLocation);
             ntt.NetSync(ref tpP);
             var mapStatus = MsgStatus.Create(tpc.Map, (uint)Enums.MapFlags.None);
-            ntt.NetSync(mapStatus);
+            ntt.NetSync(in mapStatus);
 
             ntt.Remove<TeleportComponent>();
         }
