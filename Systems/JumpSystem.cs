@@ -19,15 +19,33 @@ namespace MagnumOpus.Simulation.Systems
             pos.ChangedTick = PixelWorld.Tick;
             dir.ChangedTick = PixelWorld.Tick;
 
-            var direction = CoMath.GetDirection(new Vector2(jmp.Position.X, jmp.Position.Y),pos.Position);
-            dir.Direction = direction;
-
-            pos.Position = jmp.Position;
+            var direction = CoMath.GetDirection(new Vector2(jmp.Position.X, jmp.Position.Y), pos.Position);
+            var distance  = (int)CoMath.GetDistance(new Vector2(jmp.Position.X, jmp.Position.Y), pos.Position);
+            var jumpTime  = PixelWorld.TargetTps * CoMath.GetJumpTime(distance);
             
-            var text = $"{direction} -> {pos.Position}";
-            var msgText = MsgText.Create(in ntt, text, MsgTextType.Talk);
-            var serialized = Co2Packet.Serialize(ref msgText, msgText.Size);
-            ntt.NetSync(serialized);
+            if (jmp.CreatedTick + jumpTime < PixelWorld.Tick)
+            {
+                pos.Position = jmp.Position;
+                ntt.Remove<JumpComponent>();
+            }
+            else
+            {
+                pos.Position = Vector2.Lerp(pos.Position, jmp.Position, 2 / jumpTime);
+            }
+            var eff = MsgFloorItem.Create(PixelWorld.Tick, (ushort)pos.Position.X, (ushort)pos.Position.Y, 12, MsgFloorItemType.DisplayEffect);
+            var deff = MsgFloorItem.Create(PixelWorld.Tick-1, (ushort)pos.Position.X, (ushort)pos.Position.Y, 12, MsgFloorItemType.RemoveEffect);
+            ntt.NetSync(ref eff, true);
+            ntt.NetSync(ref deff, true);
+
+            // var text = $"{direction} -> {pos.Position}";
+            // var msgText = MsgText.Create(in ntt, text, MsgTextType.Talk);
+
+            if (jmp.CreatedTick == PixelWorld.Tick)
+            {
+                dir.Direction = direction;
+                var packet = MsgAction.CreateJump(in ntt, in jmp);
+                ntt.NetSync(ref packet, true);
+            }
         }
     }
 }

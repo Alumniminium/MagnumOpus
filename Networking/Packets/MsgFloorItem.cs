@@ -1,8 +1,8 @@
 using System.Buffers;
 using System.Runtime.InteropServices;
+using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Components;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -11,7 +11,7 @@ namespace MagnumOpus.Networking.Packets
     {
         public ushort Size;
         public ushort Id;
-        public int UniqueId;
+        public uint UniqueId;
         public uint ItemId;
         public ushort X, Y;
         public MsgFloorItemType MsgFloorItemType;
@@ -28,9 +28,23 @@ namespace MagnumOpus.Networking.Packets
             {
                 Size = (ushort)sizeof(MsgFloorItem),
                 Id = 1101,
-                UniqueId = item.NetId,
+                UniqueId = (uint)item.NetId,
                 X = (ushort)pos.Position.X,
                 Y = (ushort)pos.Position.Y,
+                ItemId = look,
+                MsgFloorItemType = type,
+            };
+            return packet;
+        }
+        public static MsgFloorItem Create(uint uid, ushort x, ushort y, uint look, MsgFloorItemType type)
+        {
+            var packet = new MsgFloorItem
+            {
+                Size = (ushort)sizeof(MsgFloorItem),
+                Id = 1101,
+                UniqueId = uid,
+                X = x,
+                Y = y,
                 ItemId = look,
                 MsgFloorItemType = type,
             };

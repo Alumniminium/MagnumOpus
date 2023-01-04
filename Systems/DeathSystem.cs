@@ -40,6 +40,7 @@ namespace MagnumOpus.Simulation.Systems
             ntt.NetSync(ref update, true);
 
             dtc.Killer.Remove<AttackComponent>();
+            ntt.Remove<AttackComponent>();
             
             ref readonly var pos = ref ntt.Get<PositionComponent>();
             Game.Grids[pos.Map].Remove(in ntt);

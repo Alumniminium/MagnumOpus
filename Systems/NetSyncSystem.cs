@@ -21,13 +21,13 @@ namespace MagnumOpus.Simulation.Systems
                 ntt.NetSync(ref pkt, true);
                 ntt.Remove<WalkComponent>();
             }
-            if(syn.Fields.HasFlag(SyncThings.Jump) && ntt.Has<JumpComponent>())
-            {
-                ref readonly var jmp = ref ntt.Get<JumpComponent>();
-                var msg = MsgAction.CreateJump(in ntt, in jmp);
-                ntt.NetSync(ref msg, true);
-                ntt.Remove<JumpComponent>();
-            }
+            // if(syn.Fields.HasFlag(SyncThings.Jump) && ntt.Has<JumpComponent>())
+            // {
+            //     ref readonly var jmp = ref ntt.Get<JumpComponent>();
+            //     var msg = MsgAction.CreateJump(in ntt, in jmp);
+            //     ntt.NetSync(ref msg, true);
+            //     ntt.Remove<JumpComponent>();
+            // }
         }
     }
 }

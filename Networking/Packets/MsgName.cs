@@ -29,31 +29,20 @@ namespace MagnumOpus.Networking.Packets
             return Out;
         }
 
-        public static Memory<byte> Create(int data, string[] Params, MsgNameType action)
+        public static Memory<byte> Create(ushort x, ushort y, string param, MsgNameType action)
         {
-            var strLength = 0;
-            for (var i = 0; i < Params.Length; i++)
-            {
-                strLength += Params[i].Length + 1;
-            }
-
-            var Out = new byte[12 + strLength];
+            var Out = new byte[13 + param.Length];
             fixed (byte* p = Out)
             {
                 *(short*)(p + 0) = (short)Out.Length;
                 *(short*)(p + 2) = 1015;
-                *(int*)(p + 4) = data;
+                *(ushort*)(p + 4) = x;
+                *(ushort*)(p + 6) = y;
                 *(p + 8) = (byte)action;
-                *(p + 9) = (byte)Params.Length;
-
-                var pos = 10;
-                for (var x = 0; x < Params.Length; x++)
-                {
-                    *(p + pos) = (byte)Params[x].Length;
-                    for (byte i = 0; i < (byte)Params[x].Length; i++)
-                        *(p + pos + 1 + i) = (byte)Params[x][i];
-                    pos += Params[x].Length + 1;
-                }
+                *(p + 9) = 0x01;
+                *(p + 10) = (byte)param.Length;
+                for (byte i = 0; i < (byte)param.Length; i++)
+                    *(p + 11 + i) = (byte)param[i];
             }
             return Out;
         }
