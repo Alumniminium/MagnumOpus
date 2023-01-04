@@ -19,7 +19,7 @@ namespace MagnumOpus.Enums
         Modifier = 8,
         Stamina = 9,
         StatPoints = 11,
-        Model = 12,
+        Look = 12,
         Level = 13,
         Spirit = 14,
         Vitality = 15,

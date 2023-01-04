@@ -40,11 +40,17 @@ namespace MagnumOpus.Simulation.Systems
                     if (b.Type != EntityType.Player)
                         continue;
 
+                    ref readonly var bEff = ref b.Get<StatusEffectComponent>();
+
+                    if (bEff.Effects.HasFlag(StatusEffect.Dead))
+                        brn.TargetId = 0;
+
                     brn.TargetId = b.Id;
                     brn.State = BrainState.Approaching;
                     break;
                 }
             }
+
 
             if (brn.TargetId == 0)
             {
@@ -54,6 +60,17 @@ namespace MagnumOpus.Simulation.Systems
 
             ref readonly var target = ref PixelWorld.GetEntity(brn.TargetId);
             ref readonly var targetPos = ref target.Get<PositionComponent>();
+            ref readonly var targetEff = ref target.Get<StatusEffectComponent>();
+
+            if (targetEff.Effects.HasFlag(StatusEffect.Dead))
+                brn.TargetId = 0;
+
+            if (brn.TargetId == 0)
+            {
+                brn.State = BrainState.Idle;
+                return;
+            }
+
 
             var distance = (int)Vector2.Distance(pos.Position, targetPos.Position);
             if (distance > 16)
