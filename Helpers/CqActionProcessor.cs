@@ -168,6 +168,18 @@ namespace MagnumOpus.Helpers
                         ntt.NetSync(optionMem);
                         return action.id_next;
                     }
+                case TaskActionType.ACTION_MENUEDIT:
+                {
+                        ref var tac = ref ntt.Get<TaskComponent>();
+                        tac.OptionCount++;
+                        var text = action.param.Trim().Split(' ')[2];
+                        var optionId = int.Parse(action.param.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries)[1]);
+                        var optionPacket = MsgTaskDialog.Create(in tac.Npc, tac.OptionCount, MsgTaskDialogAction.Edit, text);
+                        var optionMem = Co2Packet.Serialize(ref optionPacket, optionPacket.Size);
+                        tac.Options[tac.OptionCount] = (int)optionId;
+                        ntt.NetSync(optionMem);
+                        return action.id_next;
+                }
                 case TaskActionType.ACTION_MENUPIC:
                     {
                         ref readonly var tac = ref ntt.Get<TaskComponent>();
@@ -259,6 +271,34 @@ namespace MagnumOpus.Helpers
 
                     return action.id_next;
                 }
+                case TaskActionType.ACTION_USER_HAIR:
+                {
+                    var parameters = action.param.Trim().Split(' ');
+                    var style = parameters[1];
+                    ref var hair = ref ntt.Get<BodyComponent>();
+                    var color = (hair.Hair / 100) * 100;
+                    hair.Hair = (ushort)(color + int.Parse(style));
+
+                    var msg = MsgUserAttrib.Create(ntt.NetId, hair.Hair, MsgUserAttribType.HairStyle);
+                    ntt.NetSync(ref msg, true);
+                    return action.id_next;
+                }
+                case TaskActionType.ACTION_USER_MEDIAPLAY:
+                    {
+                        var parameters = action.param.Trim().Split(' ');
+                        var media = parameters[1];
+                        var msg = MsgName.Create(ntt.NetId, media, (byte)MsgNameType.Sound);
+                        ntt.NetSync(in msg);
+                        return action.id_next;
+                    }
+                case TaskActionType.ACTION_USER_EFFECT:
+                    {
+                        var parameters = action.param.Trim().Split(' ');
+                        var effect = parameters[1];
+                        var msg = MsgName.Create(ntt.NetId, effect, (byte)MsgNameType.RoleEffect);
+                        ntt.NetSync(in msg, true);
+                        return action.id_next;
+                    }
                 default:
                     FConsole.WriteLine($"[FAIL] Unknown task type: {taskType}");
                     FConsole.WriteLine($"| - Task:     {action.id}");

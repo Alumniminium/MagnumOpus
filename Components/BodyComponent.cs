@@ -21,6 +21,7 @@ namespace MagnumOpus.Components
             Look = look;
             Emote = emote;
             Hair = hair;
+            FaceId = 6;
         }
 
 

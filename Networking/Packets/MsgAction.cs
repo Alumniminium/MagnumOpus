@@ -127,6 +127,13 @@ namespace MagnumOpus.Networking.Packets
                         ntt.NetSync(memory[..msg.Size]);
                         break;
                     }
+                    case MsgActionType.ChangeFace:
+                    {
+                        ref var bdy = ref ntt.Get<BodyComponent>();
+                        bdy.FaceId = (ushort)msg.Param;
+                        ntt.NetSync(memory[..msg.Size], true);
+                        break;
+                    }
                 case MsgActionType.ChangeFacing:
                     {
                         FConsole.WriteLine($"[GAME] ChangeFacing: {ntt.NetId} -> {msg.Direction}");

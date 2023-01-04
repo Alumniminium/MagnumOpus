@@ -38,7 +38,8 @@ namespace MagnumOpus.Networking.Packets
             var language = msg.GetLanguage();
             FConsole.WriteLine($"[GAME] Client Version: {msg.ClientVersion}, Language: {language}");
             ref readonly var net = ref ntt.Get<NetworkComponent>();
-            var ntc = new NameTagComponent(ntt.NetId, net.Username);
+            var bdy = new BodyComponent(ntt.Id);
+            var ntc = new NameTagComponent(ntt.Id, net.Username);
             var dir = new DirectionComponent(ntt.Id, Direction.South);
             var emo = new EmoteComponent(ntt.Id, Emote.Dance);
             var vwp = new ViewportComponent(ntt.Id, 40);
@@ -51,6 +52,7 @@ namespace MagnumOpus.Networking.Packets
             var sbc = new SpellBookComponent(ntt.Id);
             sbc.Spells.Add(1000, (0, 0, 0));
             sbc.Spells.Add(1005, (0, 0, 0));
+            ntt.Add(ref bdy);
             ntt.Add(ref ntc);
             ntt.Add(ref dir);
             ntt.Add(ref vwp);

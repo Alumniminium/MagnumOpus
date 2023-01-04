@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
-using MagnumOpus.ECS;
 using MagnumOpus.Components;
+using MagnumOpus.ECS;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -74,11 +74,8 @@ namespace MagnumOpus.Networking.Packets
             // ref var sNtc = ref partner.Get<NameTagComponent>();
             // sNtc.Name ??= "None";
 
-            if (bdy.Look == 0)
-            {
-                bdy = new BodyComponent(ntt.Id);
-                ntt.Add(ref bdy);
-            }
+            var look = bdy.Look;
+            look = (uint)(bdy.FaceId * 10_000 + bdy.Look);
 
             if (atr.Statpoints == 0)
             {
@@ -119,7 +116,7 @@ namespace MagnumOpus.Networking.Packets
                 Size = (ushort)(sizeof(MsgCharacter) - 30 + ntc.Name.Length + spouseName.Length),
                 Id = 1006,
                 EntityId = ntt.NetId,
-                Look = bdy.Look,
+                Look = look,
                 Hair = bdy.Hair,
                 Money = inv.Money,
                 CPs = inv.CPs,

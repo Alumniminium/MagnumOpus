@@ -1,9 +1,9 @@
 using System.Buffers;
 using System.Runtime.InteropServices;
 using System.Text;
+using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Components;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -68,20 +68,22 @@ namespace MagnumOpus.Networking.Packets
             ref readonly var eff = ref ntt.Get<StatusEffectComponent>();
             ref readonly var dir = ref ntt.Get<DirectionComponent>();
 
+            var look = bdy.Look;
+            look = (uint)(bdy.FaceId * 10_000 + bdy.Look);
             if (ntt.Has<DeathTagComponent>())
             {
                 if (bdy.Look % 10000 == 2001 || bdy.Look % 10000 == 2002)
-                    AddTransform(bdy.Look,99);
+                    look = AddTransform(bdy.Look,99);
                 else
-                    AddTransform(bdy.Look, 98);
+                    look = AddTransform(bdy.Look, 98);
             }
-
+            
             var msg = new MsgSpawn
             {
                 Size = (ushort)sizeof(MsgSpawn),
                 Id = 1014,
                 UniqueId = ntt.NetId,
-                Look = bdy.Look,
+                Look = look,
                 StatusEffects = eff.Effects,
                 GuildRank = gld.Rank,
                 Head = eqc.Head,

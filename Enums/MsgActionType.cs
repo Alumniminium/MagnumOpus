@@ -86,13 +86,14 @@ namespace MagnumOpus.Enums
         /// </summary>
         RemoveEntity = 135,
         TeleportReply = 138,
+        ChangeFace = 142,
         DeathConfirmation = 145,
         /// <summary>
         /// [148]
         /// Data1 = FriendId
         /// </summary>
         QueryAssociateInfo = 148,
-        ChangeFace = 151,
+        // ChangeFace = 151,
         ItemsDetained = 155,
         NinjaStep = 156,
         HideInterface = 158,
