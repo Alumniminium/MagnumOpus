@@ -1,5 +1,6 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using MagnumOpus.Squiggly.Models;
 
 namespace MagnumOpus.Components
 {

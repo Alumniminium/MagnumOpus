@@ -27,6 +27,8 @@ namespace MagnumOpus.Simulation.Systems
             {
                 vwp.EntitiesVisible.Clear();
                 Game.Grids[pos.Map].GetVisibleEntities(ref vwp);
+                var closestDistance = int.MaxValue;
+                var closestEntity = default(PixelEntity);
 
                 for (var i = 0; i < vwp.EntitiesVisible.Count; i++)
                 {
@@ -41,13 +43,19 @@ namespace MagnumOpus.Simulation.Systems
                     ref readonly var targetPos = ref b.Get<PositionComponent>();
 
                     var distance = (int)Vector2.Distance(grd.Position, targetPos.Position);
-                    if (distance > 18)
+                    if (distance > 18 || distance > closestDistance)
                         continue;
 
-                    brn.TargetId = b.Id;
-                    brn.TargetPosition = targetPos.Position;
+                    closestDistance = distance;
+                    closestEntity = b;
+                }
+
+                if (closestEntity.Id != 0)
+                {
+                    ref readonly var tpos = ref closestEntity.Get<PositionComponent>();
+                    brn.TargetId = closestEntity.Id;
+                    brn.TargetPosition = tpos.Position;
                     brn.State = BrainState.Approaching;
-                    break;
                 }
             }
 
@@ -61,7 +69,7 @@ namespace MagnumOpus.Simulation.Systems
             }
             else
             {
-                if(!PixelWorld.EntityExists(brn.TargetId))
+                if (!PixelWorld.EntityExists(brn.TargetId))
                 {
                     brn.TargetId = 0;
                     return;

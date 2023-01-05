@@ -3,19 +3,17 @@ using MagnumOpus.ECS;
 namespace MagnumOpus.Components
 {
     [Component]
-    public struct DropResourceComponent
+    public struct DropRequestComponent
     {
         public readonly int EntityId;
-        public byte Amount;
+        public byte ItemNetId;
 
-        public DropResourceComponent(int entityId, int amount)
+        public DropRequestComponent(int entityId, int itemNetId)
         {
             EntityId = entityId;
-            Amount = (byte)amount;
+            ItemNetId = (byte)itemNetId;
         }
-        public override int GetHashCode()
-        {
-            return EntityId;
-        }
+        
+        public override int GetHashCode() => EntityId;
     }
 }

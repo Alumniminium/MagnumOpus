@@ -37,6 +37,12 @@ namespace MagnumOpus.Squiggly
                     var ntc = new NameTagComponent(obj.Id, prefab.Name);
                     var vwp = new ViewportComponent(obj.Id, 18f);
 
+                    if(prefab.CQAction != 0)
+                    {
+                        var cq = new CqActionComponent(obj.Id, prefab.CQAction);
+                        obj.Add(ref cq);
+                    }
+
                     pos.Position.X = (ushort)Random.Shared.Next(spawn.Value.Xstart - 10, spawn.Value.Xstart + spawn.Value.Xend + 10);
                     pos.Position.Y = (ushort)Random.Shared.Next(spawn.Value.Ystart - 10, spawn.Value.Ystart + spawn.Value.Yend + 10);
 
@@ -91,6 +97,11 @@ namespace MagnumOpus.Squiggly
                         cqmap.Height, new Dictionary<ushort, CqPortal>()
                     );
                     Collections.Maps.Add((ushort)cqmap.id, map);
+                    if(!Game.Grids.TryGetValue((ushort)cqmap.id, out var grid))
+                    {
+                        grid = new Grid(cqmap.Width, cqmap.Height, 10, 10);
+                        Game.Grids.Add((ushort)cqmap.id, grid);
+                    }
                 }
                 foreach (var dportal in db.Dmap_Portals)
                 {

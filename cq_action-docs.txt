@@ -1,0 +1,457 @@
+// action list
+// paled, 2003.1.25
+
+////////////////////////////////////////////////////////////////////////
+// “%%” the expression may demonstrate “%” the mark
+// “%nnXXX” the expression demonstration width, all left alines.Ultra long according to the virtual length demonstration.(example id is 1234 NPC " %6id " demonstration is " 1234 “)
+
+// system part //////////////////
+const char PARAM_DATE_STAMP[] = “date_stamp”;					// uses in calculating only
+const char PARAM_TIME[] = “time”;						// uses in calculating only
+const char ACCEPT_STR_[] = “accept”;						// client side uploading substring // %accept0 ~ %accept3
+
+// ITEM part //////////////////
+const char PARA_ITEM_TYPE[] = “item_type”;
+const char PARA_ITEM_DATA[] = “item_data”;
+
+// NPC part //////////////////
+const char PARA_DATASTR[] = “datastr”;
+const char PARA_DATA_[] = “data”;							// %data0 ~ %data3
+const char PARA_NAME[] = “name”;							// npc name
+const char PARA_NPC_ID[] = “id”;								// npc id in database
+const char PARA_NPC_X[] = “npc_x”;
+const char PARA_NPC_Y[] = “npc_y”;
+const char PARA_NPC_OWNERID[] = “npc_ownerid”;
+
+// USER part ////////////////
+const char PARA_USER_ID[] = “user_id”;
+const char PARA_USER_MAPID[] = “user_map_id”;
+const char PARA_USER_MAPX[] = “user_map_x”;
+const char PARA_USER_MAPY[] = “user_map_y”;
+const char PARA_USER_HOME[] = “user_home_id”;
+const char PARA_SYN_ID[] = “syn_id”;
+const char PARA_SYN_NAME[] = “syn_name”;
+const char PARA_USER_NAME[] = “user_name”;
+const char PARA_MATE_NAME[] = “mate_name”;
+const char PARA_MAP_OWNER_ID[] = “map_owner_id”;
+const char PARA_MAP_OWNER_TYPE[] = “map_owner_type”;
+const char PARA_ALLY_SYN_[] = “ally_syn”;						// %ally_syn0 ~ %ally_syn4
+const char PARA_ENEMY_SYN_[] = “enemy_syn”;						// %enemy_syn0 ~ %enemy_syn4
+const char PARA_TUTOREXP_[] = “tutor_exp”;						// teacher experiences
+const char PARA_STUDENT_EXP_[] = “student_exp”;					// apprentice contributes experience
+const char PARA_EXPLOIT_[] = “exploit”;						// meritorious service value
+// faction part
+const char PARA_AVAILABLE_FUND[] = “available_fund”;					// extraction faction may assign the fund
+// user iter part ////////////////
+const char PARA_ITER_VALUE[] = “iter_value”;
+const char PARA_ITER_SYN_NAME[] = “iter_syn_name”;
+const char PARA_ITER_SYN_LEADER[] = “iter_syn_leader”;
+const char PARA_ITER_SYN_MONEY[] = “iter_syn_money”;
+const char PARA_ITER_SYN_AMOUNT[] = “iter_syn_amount”;
+const char PARA_ITER_SYN_FEALTY[] = “iter_syn_fealty”;
+const char PARA_ITER_MEMBER_NAME[] = “iter_member_name”;				// %iter is plays family ID, the returns plays the family name
+const char PARA_ITER_MEMBER_RANK[] = “iter_member_rank”;				// %iter is plays family ID, the returns plays the family rank title
+const char PARA_ITER_MEMBER_PROFFER[] = “iter_member_proffer”;
+const char PARA_ITER_WANTED[] = “iter_wanted”;
+const char PARA_ITER_POLICEWANTED[] = “iter_police_wanted”;
+const char PARA_ITER_GEMSUPQUALITY[] = “iter_upquality_gem”;
+const char PARA_ITER_GEMSUPLEVEL[] = “iter_uplevel_gem”;
+const char PARA_ITER_COST_DURRECOVER[] = “iter_cost_durrecover”;			// 
+const char PARA_ITER_GAME_CARD[] = “iter_game_card”;					// 
+const char PARA_ITER_GAME_CARD2[] = “iter_game_card2”;				// 
+
+const char PARA_ITER_TABLE_DATASTR[] = “iter_table_datastr”;
+const char PARA_ITER_TABLE_DATA_[] = “iter_table_data”;				// %iter_table_data0 ~ %iter_table_data3
+
+const char PARA_ITER_ITEM_DATA[] = “iter_item_data”;
+
+//--- duty system's iter---begin
+const char PARA_ITER_TASK_USERNAME[] = “iter_task_username”;		// returns plays family's cq_user in the table name field
+const char PARA_ITER_TASK_COMPLETENUM[] = “iter_task_completenum”;  // to end of mission number of times value, returns end of mission number of times
+const char PARA_ITER_TASK_BEGINTIME[] = “iter_task_begintime”;    // to duty beginning time value, returns duty beginning time
+//--- duty system's iter---end
+
+////////////////////////////////////////////////////////////////////////
+enum {
+		// system part, need user ptr --------------------------------------------------------------------------
+		ACTION_SYS_FIRST = 100,
+		ACTION_MENUTEXT = 101, // menu text.data:Demonstrated that the number of lines (default is 0), param= " text " (may elect): Demonstrates the text, this type may contain the blank space, may also be the white line.
+		ACTION_MENULINK = 102, // menu ultra link."text task_id align": align (may elect): Alines the pattern default (/0:Alines left; 5:Mediation; 9:Alines right; a(1-9)b(2-8):Does not line feed, starts from a/b line width place to demonstrate, 9 to aline right)
+		ACTION_MENUEDIT = 103, // menu input frame."len task_id text": len:May input length;text (may elect):Demonstration writing, align:Alines the pattern default (:Writing in left, positive integer:Input frame inserting in the writing several character place).* explained:If has many input frames, by the contact surface with the round button discrimination, each time only uploads.
+		ACTION_MENUPIC = 104, // menu picture."x y pic_id task_id":task_id (may elect):Expressed that the picture may “press”.The picture does not demonstrate the text in the region.
+		ACTION_MENUBUTTON = 110, // menu button, form with ultra link.
+		ACTION_MENULISTPART = 111, // menu tabulation item."task_id iter text...", after playing the family spot chooses the tabulation, will trigger task_id, and iter will fill in plays in family's %iter variable.
+		ACTION_MENUCREATE = 120, // menu foundation.“cancel_task_id” (may elect): Forcefully when closure menu triggers TASK
+		ACTION_RAND = 121, // examines along with the probability."data1 data2".“10 100 " the expression has 1/10 opportunity is true.
+		ACTION_RANDACTION = 122, // stochastic Action “action0 action1… action7 " altogether 8, select a execution stochastically
+		ACTION_CHKTIME = 123, // data is the time type 0- inspection current server detail time “%d-%d-%d %d:%d %d-%d-%d %d:%d”; 1- inspection year some day time " %d-%d %d:%d %d-%d %d:%d ", 2- inspection month some day time " %d %d:%d %d %d:%d ", 3- inspection week some day time " %d %d:%d %d %d:%d ", 4- inspection date time " %d:%d %d:%d ", 5- inspection hour " %d %d " (each hour several point several point)
+		ACTION_POSTCMD = 124, // to the client side transmission contact surface order, data is the order serial number
+		ACTION_BROCASTMSG = 125, // entire server broadcast writing news, data is the channel, para is a content
+		ACTION_MESSAGEBOX = 126, // lets the client side spring the dialog box.data is the dialog box type (0-99), param= writing string parameter.
+		ACTION_SYS_LIMIT = 199,
+
+		// npc part, need npc ptr --------------------------------------------------------------------------
+		ACTION_NPC_FIRST = 200,
+		ACTION_NPC_ATTR = 201, // revises or the examination duty NPC attribute.“attr opt data npc_id”, at least 3 parameters.If assigns npc_id, this NPC must in the local sheet series.attr may choose " ownerid " (=, ==), “ownertype” (=, ==), “lookface” (=, ==), “data?”(=, +=, ==, <, <=, >, >=, pass. pass may let DateStamp which in the field saves fluctuate certain number of days. data may be " accept "), “datastr” (=, ==), “life” (=), “maxlife” (=)
+// ACTION_NPC_REQUESTSHIFT = 202, // notice client side translates NPC.param="idNextTask".
+// ACTION_NPC_SHIFT = 203, // translates current NPC.Limits moves with the map.Limits dynamic NPC.
+		ACTION_NPC_ERASE = 205, // deletes current NPC.Limits dynamic NPC.Attention:After the deletion, do not NPC carry on the operation regarding this again.dwData is not 0, indicated that deletes the local chart all type is dwData NPC.param="idMap type": The deletion assigns map's certain NPC.
+		ACTION_NPC_MODIFY = 206, // cross thread revision assigns duty NPC the attribute."npc_id attr opt data".attr may choose " lookface " (=), “data?”(=), “datastr” (=)
+		ACTION_NPC_RESETSYNOWNER = 207, // reset faction map's master.Uses in the faction symbolizing NPC only.Statistical faction success first fills in OWNER_ID, simultaneously eliminates all successes.All attack automatic stopping.(has not stopped map's fight symbol)
+		ACTION_NPC_FIND_NEXT_TABLE = 208, // search next tabulation item, reads in ID TASK_ITERATOR.Uses in the belt tabulation only NPC.param= " type ", corresponds cq_table the type field.
+		ACTION_NPC_ADD_TABLE = 209, // will increase one when the tabulation, type and idKey same will be deleted in advance (idKey will be 0, deletion).Uses in the belt tabulation only NPC.param= " type idKey data0 data1 data2 data3 szData ", at least 2 parameters.
+		ACTION_NPC_DEL_TABLE = 210, // deletes all from the tabulation conforms to the condition item, does not exist also returns to true.Uses in the belt tabulation only NPC.param= " type idKey data0 data1 data2 data3 szData ", 2 parameters, the parameter is at least 0 expressions does not match, is not 0 identical will delete with the tabulation.When does not have param, deletes (record which the current record iterator assigns), always returns to true.
+		ACTION_NPC_DEL_INVALID = 211, // deletes all expired items from the tabulation, does not exist also returns to true.Uses in the belt tabulation only NPC.param= " type idx ", idx expressed that which data the date (%date_stamp) does deposit.[for example idx is 3 expression dates deposits in data3, in all data3 date will be smaller than today date item will be deleted.]
+		ACTION_NPC_TABLE_AMOUNT = 212, // inspects the tabulation the number of terms, when >=data returns to when false,<data returns to true.param is insignificant.
+		ACTION_NPC_SYS_AUCTION = 213, // LW lets NPC start the systematic racket to buy, DATA is NPC ID, param is the prompt which the system starts officially
+		ACTION_NPC_DRESS_SYNCLOTHING = 214, // puts on the faction clothing
+		ACTION_NPC_TAKEOFF_SYNCLOTHING = 215, // takes off the faction clothing
+		ACTION_NPC_AUCTIONING = 216, // judges whether also has the goods to auction DATA is the NPC ID, PARAM:type:0. expression examination system auction goods, 1. expression examinations play the family goods
+		ACTION_NPC_LIMIT = 299,		
+
+		// map part, need curr map --------------------------------------------------------------------------
+		ACTION_MAP_FIRST = 300,
+		ACTION_MAP_MOVENPC = 301, // moves npc to the map, the position which assigns (uses in only fixed NPC), data is npc ID which assigns, param is “idMap nPosX nPosY”.Attention:Transportably to this map's (0,0) coordinates, with the aim of hiding NPC.
+		ACTION_MAP_MAPUSER = 302, // judges assigns in map's user population, data is assigns map ID, param is “cmd opt data”,
+													// cmd support " map_user " and " alive_user ", opt may be " ==, <=, >= ", data is a quantity
+		ACTION_MAP_BROCASTMSG = 303, // broadcast message, data is map id, szParam is the broadcast news
+		ACTION_MAP_DROPITEM = 304, // map produces assigns the goods, szParam is " idItemType idMap nPosX nPosY "
+		ACTION_MAP_SETSTATUS = 305, // establishment map condition, supports EVENT.param= " mapid status_bit data ", status_bit = {STATUS_WAR=1,}, data=0 or 1.
+		ACTION_MAP_ATTRIB = 306, // inspects, revises map's attribute.param= " field opt data idMap ", parameter 3, default are the current maps at least.field= " synid " (opt= " == ", “=”).field= " status” (opt= " test”, “set”, “reset”).field= " type” (opt= " test”).field= " res_lev” (opt= " =”, “==”, “<”).field= " mapdoc” (opt= " =”, “==”), portal0_x(=), portal0_y(=), field = " castle” (opt= " ==”)
+		ACTION_MAP_REGION_MONSTER = 307, // inspects assigns the map or in current map's some region monster quantity.param="map_id region_x region_y region_cx region_cy monster_type opt data".map_id is when 0 indicated that takes the current map, monster_type is 0 expressions does not inspect the type, the opt support “==” and “<”.
+
+		ACTION_MAP_CHANGEWEATHER = 310, // revises plays the family in the REGION weather.param= " Type Intensity Dir Color KeepSecs ", Type, Intensity=0~999, Dir=0~359, Color=0x00RRGGBB, KeepSecs=seconds
+		ACTION_MAP_CHANGELIGHT = 311, // revises plays the family map's brightness.param= " idmap light secs ", light=0xAARRGGBB (the 0xFFFFFFFF expression restores), secs is 0: Expresses the permanent change
+		ACTION_MAP_MAPEFFECT = 312, // is assigning map's assigned location demonstration map special effect, param = “idMap x y EffectName”
+		ACTION_MAP_CREATEMAP = 313, // founds a map, links on current NPC (npc to be LINK_NPC), needs to play the family object.param="name owner_type owner_id mapdoc type portal_x portal_y reborn_map reborn_portal res_lev".partal refers to the entrypoint coordinates, res_lev expressed that the map rank (uses in promotion).
+		ACTION_MAP_FIREWORKS = 314, // sets off the fireworks
+
+		ACTION_MAP_LIMIT = 399,
+
+		// item action only part, need pUser+pItem ptr --------------------------------------------------------------------------
+		ACTION_ITEMONLY_FIRST = 400,
+		ACTION_ITEM_REQUESTLAYNPC = 401, // notice client side lays aside NPC.param= " idNextTask type sort lookface region ", at least 4 parameters.region expresses cq_region type
+		ACTION_ITEM_COUNTNPC = 402, // inspects with map's NPC quantity.param= " field data opt num ", field= " name " (according to name), “type” (according to type), “all” (all NPC), “furniture” (furniture), the name or the type which data= must count (all and furniture fills in 0), opt= " <”, “==”.
+		ACTION_ITEM_LAYNPC = 403, // founds NPC, after founding successfully, this NPC will be the current mission NPC, owner_id automatic setup or plays family ID for faction ID.param="name type sort lookface ownertype  life region base linkid  task0 task0 ... task7  data0 data1 data2 data3 datastr".At least 5 parameters.Target's rank places in data3.
+		ACTION_ITEM_DELTHIS = 498, // deletes the current mission goods.Attention:Must be last ACTION.
+		ACTION_ITEMONLY_LIMIT = 499,
+
+		// user item part, need user ptr --------------------------------------------------------------------------
+		ACTION_ITEM_FIRST = 500,
+		ACTION_ITEM_ADD = 501, // increase goods.data=itemtype_id, param= " amount_limit ident gem1 gem2 magic1 magic2 magic3 data warghostexp gemtype availabletime ", param may abbreviate, all default values are 0 (expression revision)
+		ACTION_ITEM_DEL = 502, // deletion goods.when data=itemtype_id, param is not 0, but the superimposition class goods will simultaneously delete many.Or data is the thing commodity name which the 0, param expression must delete.
+		ACTION_ITEM_CHECK = 503, // examination goods.when data=itemtype_id, param is not 0, simultaneously inspects the goods quantity (or durableness), this goods must meet the requirements quantity (or durableness) only then good.Or data is the thing commodity name which the 0, param expression must look.
+		ACTION_ITEM_HOLE = 504, // weapon burrow.the param support “ChkHole HoleNum” or " MakeHole HoleNum ", Num is 1 or 2
+		ACTION_ITEM_REPAIR = 505, // equips the repair.data is assigns the equipment the position.
+		ACTION_ITEM_MULTIDEL = 506, // deletes many kinds of goods, param is “idType0 idType1 num”, namely deletes num idType0-idType1 the goods.
+		ACTION_ITEM_MULTICHK = 507, // examines many kinds of goods, param is “idType0 idType1 num”, namely examines num idType0-idType1 the goods.
+		ACTION_ITEM_LEAVESPACE = 508, // inspection knapsack surplus space.param="space weight packtype"
+													// packtype value scope is 50 ~ 53
+													// 50:Ordinary goods knapsack
+													// 51:Evil spirit soul gem knapsack
+													// 52:Imaginary beastly egg knapsack
+													// 53:Imaginary beastly knapsack
+
+		ACTION_ITEM_UPEQUIPMENT = 509, // equips the operation, the param form is " cmd position ", 
+													// cmd support " up_lev ", “up_quality”, “recover_dur”
+													// position is equips the position, the definition is as follows
+													/* ITEMPOSITION_HELMET = 1;
+														ITEMPOSITION_NECKLACE = 2;
+														ITEMPOSITION_ARMOR = 3;
+														ITEMPOSITION_WEAPONR = 4;
+														ITEMPOSITION_WEAPONL = 5;
+														ITEMPOSITION_RINGR = 6;
+														ITEMPOSITION_RINGL = 7;
+														ITEMPOSITION_SHOES = 8;
+														ITEMPOSITION_MOUNT = 9*/
+
+		ACTION_ITEM_EQUIPTEST = 510, // goods quality restriction, 
+													// param “equip_pos cmd opt num”, 
+													// equip_pos with on position definition, 
+													// cmd support " level ", “quality”, “durability”, “max_dur”
+													// opt support " ==, >=, <= ",
+													when // num is the data, cmd is " durability " and " max_dur ", -1 is the maximum value
+		ACTION_ITEM_EQUIPEXIST = 511, // equips the existence examination, data is equips the position
+		ACTION_ITEM_EQUIPCOLOR = 512, // equipment color change, param = “equip_pos color”, equip_pos supports as follows
+													/* ITEMPOSITION_HELMET = 1;
+														ITEMPOSITION_ARMOR = 3;
+														ITEMPOSITION_WEAPONL = 5; */// ITEMPOSITION_WEAPONL must be the shield only then has an effect
+		ACTION_ITEM_FIND = 513, // searches goods, type has in user iterator.data=itemtype_id.Or data is the thing commodity name which the 0, param expression must search.
+		ACTION_ENCASH_CHIP = 514, // changes money with the chip, Qian Shu in Item Data field
+		ACTION_ITEM_LIMIT = 599,
+
+		// user npc only part, need not user ptr --------------------------------------------------------------------------
+		ACTION_NPCONLY_FIRST = 600,
+		ACTION_NPCONLY_CREATENEW_PET= 601, // founds MONSTER, OWNERID, OWNERTYPE and NPC is the same.param= " x y generator_id type data name ", at least 4 parameters, if has name to change name.generator uses in controlling the monster sphere of action, in cq_generator type is insignificant.xth, y local chart absolute coordinate.
+		ACTION_NPCONLY_DELETE_PET = 602, // deletes the local chart all MONSTER, OWNERID, OWNERTYPE and NPC is the same.param= " type data name ", 1 parameter, data is not at least 0 pieces simultaneously matches data, if has name simultaneously to match the name.
+		ACTION_NPCONLY_MAGICEFFECT = 603, // NPC sends a black magic effect.param="source_id magic_type magic_level target_id data"
+		ACTION_NPCONLY_MAGICEFFECT2 = 604, // NPC sends a ground effect black magic.param= " source_id magic_type magic_level x y target_id data ", at least 5 parameters.
+		ACTION_NPCONLY_LIMIT = 699,
+
+		// user syndicate part --------------------------------------------------------------------------
+		ACTION_SYN_FIRST = 700,
+		////////////////////////////////////////////////////////
+		// faction Action reorganization
+		ACTION_SYN_CREATE = 701, // creates the gang, plays the family to input the faction name.param= " level money leave_money ", three parameters to need to play the family rank, needs the cash number, after the faction is founded, -odd cash number.
+		ACTION_SYN_DESTROY = 702, // dismisses.Carries out Action to play the family for regimental commander, divides regimental commander, platoon commander's time, separately indicated dissolves the faction, divides the group, the division
+		ACTION_SYN_DONATE = 703, // donates money, needs an input frame.
+		ACTION_SYN_CREATE_SUB = 708, // creates the child to help (armed forces regimental commanders to carry out is foundation divides group, divides regimental commander to carry out is founds division),
+													// plays the family to input the faction name (length not to be bigger than 16BYTE).
+		ACTION_SYN_COMBINE_SUB = 710, // merges the sub-faction.Carries out Action to play the family is the sub-faction's gang host, merges to the father faction
+		ACTION_SYN_ATTR = 717, // inspects and the revision faction attribute, the parameter is not smaller than 3, default faction ID is current plays family's faction ID.
+													// param= " szField szOpt data syn_id ", szField may elect:
+													// fund:“money” (opt may choose " += ", “<”), 
+													// prestige:“repute” (opt may choose " += ", “<”),
+													// population:“membernum” (opt is " < "),
+													// father faction:“fealty” (opt is " == "),
+													// rank:“level” (opt may choose " = ", “+=”, “<”, “==”)
+		ACTION_SYN_ALLOCATE_SYNFUND = 729, // assignment faction fund.Needs to play the family data concrete amount (most not to surpass consolidated fund 50%)
+		ACTION_SYN_RENAME = 731, // heavy naming faction.Must be the sub-faction, the reason faction's gang main execution
+		////////////////////////////////////////////////////////
+
+		ACTION_SYN_DEMISE = 704, // turns over the throne to another, allows armed forces regimental commanders to turn over the throne to another only, divides regimental commander and the platoon commanders does not permit.
+													// plays the family to lose joins a group the numerous names.param= “level”, indicated that accepts turns over the throne to another the rank which plays the family to need
+		ACTION_SYN_SET_ASSISTANT = 705, // promotes for the vice-gang host, plays the family to lose joins a group the numerous names.
+		ACTION_SYN_CLEAR_RANK = 706, // relieve fromduty, plays the family to lose joins a group the numerous names.
+		ACTION_SYN_PRESENT_MONEY = 707, // wastes money for other factions.Helps the main input money quantity, other faction's ID is TASK_ITERATOR (see also ACTION_SYN_FIND_BY_NAME).Wastes money cannot be short in 10000
+		ACTION_SYN_CHANGE_LEADER = 709, // renews the sub-faction's gang host.The gang advocates peace the faction new gang host to form a team, loses the child by previous marriage faction name.param= level, request new gang main rank
+		ACTION_SYN_ANTAGONIZE = 711, // antagonizes people, plays the family to input the faction name.
+		ACTION_SYN_CLEAR_ANTAGONIZE = 712, // eliminates antagonizes people, plays the family to input the faction name.
+		ACTION_SYN_ALLY = 713, // forms an alliance, requests two gang hosts to form a team
+		ACTION_SYN_CLEAR_ALLY = 714, // relieves forms an alliance, plays the family to input the faction name.
+		ACTION_SYN_KICKOUT_MEMBER = 715, // helps the audiences according to the name dismissal, plays the family to lose joins a group the numerous names.
+		ACTION_SYN_CREATENEW_PET = 716, // (becomes invalid) founds a faction protection beast.param= " generator_id type data ", at least two parameters, if has accept to change name.generator uses in controlling the monster sphere of action, in cq_generator type is insignificant.
+		ACTION_SYN_CHANGESYN = 718, // helps the audiences to transfer the hall mouth.The hall mouth extension hall mouth, the hall mouth and always helps to transfer mutually.Needs to help the audiences and the hall main (or helps to form a team main), an extension person.Needs to input the hall mouth name which must change over to (or faction name).Before transferring, the position will be cancelled automatically.
+		ACTION_SYN_CHANGE_SUBNAME = 719, // revision hall mouth name, is restricted in the name to surpass 6 bytes only the hall mouths.Otherwise returns to FALSE.(temporary function)
+
+		ACTION_SYN_FIND_NEXT_SYN = 720, the // search next faction, reads in ID TASK_ITERATOR
+		ACTION_SYN_FIND_BY_NAME = 721, // according to the name search faction, plays the family to input the faction name.Reads in TASK_ITERATOR ID
+		ACTION_SYN_FIND_NEXT_SYNMEMBER = 722, // search next gang audiences, read in ID TASK_ITERATOR
+		ACTION_SYN_SAINT = 724, // Saint knight rolls promotion operation “=, >=”
+		ACTION_SYN_RANK = 726, // revises RANK, ACCEPT= " rank name ".Revises RANK=50 only and below.param= " the RANK50 rank limits RANK40 30 20 10 ", param is spatial, then does not limit.
+				
+		ACTION_SYN_UPMEMBERLEVEL =728,
+		ACTION_SYN_APPLLY_ATTACKSYN =730, // applies to attack the faction
+		
+		ACTION_SYN_LIMIT = 799,
+
+		// monster part --------------------------------------------------------------------------
+		ACTION_MST_FIRST = 800,
+		ACTION_MST_DROPITEM = 801, after // monster kills, is fallen the goods or the money, param “dropitem itemtype " or " dropmoney money "
+													after //monster kills, is fallen the trap, param “droptrap traptype lifeperiod”.
+		ACTION_MST_MAGIC = 802, // inspection magic arts.
+													// param “check type” (has studied type type magic arts), 
+													// “check type level” (has studied type type magic arts, and rank is the level level), 
+													// “learn type” (learns type kind of magic arts, rank is 0),
+													// “uplevel type” (type kind of magic arts rise first-level)
+		ACTION_MST_LIMIT = 899,		
+
+		// user attr part --------------------------------------------------------------------------
+		ACTION_USER_FIRST = 1000,
+		ACTION_USER_ATTR = 1001, // plays family member's revision and the inspection."attr opt data".attr may choose
+													// “life” (+=, ==, <),
+													// “mana” (+=, ==, <),
+													// “money” (+=, ==, <),
+													// “exp” (+=, ==, <),
+													// “pk” (+=, ==, <),
+													// “profession” (==, set, >=, <=),
+													// “level”, (+=, ==, <),
+													// “force”, (+=, ==, <),
+													// “dexterity”, (+=, ==, <)
+													// “speed”, (+=, ==, <),
+													// “health”, (+=, ==, <),
+													// “soul”, (+=, ==, <),
+													// “rank”, (==, <),
+													// “rankshow”, (==, <),
+													// “iterator”, (=, <=, +=, ==),
+													// “crime” (==, set)
+													// “gamecard” (==, >=, <=)
+													// “gamecard2” (==, >=, <=)
+													// “xp” (+=)
+													// “metempsychosis” (==, <)
+// // “nobility_rank” (==, <, +=, =) // 
+													// “mercenary_rank” (==, <, +=) // mercenary soldier rank
+													// “mercenary_exp” (==, <, +=) // mercenary soldier experiences
+													// “exploit” (==, <, +=) // meritorious service value
+													// “maxlifepercent” (+=, ==, <) // biggest life thousand point ratio 
+													// “turor_exp” (==, <, +=, =)
+													// “tutor_level” (==, <, +=, =)
+													// “syn_proffer” (<, +=, =) // faction degree of contribution
+													// “maxeudemon” (<, +=, =) // may summon the imaginary beastly number most greatly
+
+		ACTION_USER_FULL = 1002, // will play family's attribute to top up.“attr”.attr may choose " life ", “mana”
+		ACTION_USER_CHGMAP = 1003, // cuts map param “idMap nPosX nPosY bPrisonChk”, bPrisonChk is may choose the parameter, default may not leave the jail, the establishment is 1 may leave
+		ACTION_USER_RECORDPOINT = 1004, // saves plot point param “idMap nMapX nMapY”
+		ACTION_USER_HAIR = 1005, // “color num”
+													// “style num”
+		ACTION_USER_CHGMAPRECORD = 1006, // cuts the map to the plot point
+		ACTION_USER_CHGLINKMAP = 1007, // cuts the map to the NPC link map.Needs to have the NPC object.
+
+		ACTION_USER_TALK = 1010, // to plays the family to send the MSGTALK news.in param is the news content, data is the channel,
+													// const unsigned short _TXTATR_NORMAL =2000;
+													// const unsigned short _TXTATR_ACTION =_TXTATR_NORMAL+2;	// acts
+													// const unsigned short _TXTATR_SYSTEM =_TXTATR_NORMAL+5;	// system
+													// const unsigned short _TXTATR_TALK =_TXTATR_NORMAL+7;	// talks
+													// const unsigned short _TXTATR_GM =_TXTATR_NORMAL+11;	// GM channel
+													// const unsigned short _TXTATR_WEBPAGE =_TXTATR_NORMAL+105;	// opens URL
+		ACTION_USER_MAGIC = 1020, // inspection magic arts.param may be:
+													// “check type” (plays family to study type type magic arts),
+													// “check type level” (plays family to study type type magic arts, and rank is the level level),
+													// “learn type” (plays family to learn type kind of magic arts, rank is 0),
+													// “uplevel type” (plays family's type kind of magic arts to rise first-level)
+													// “addexp type exp” (plays family's type kind of magic arts to increase a exp experience)
+		ACTION_USER_WEAPONSKILL = 1021, // “check type level”, inspection of arms skill type and rank, whether >= rank
+													// “learn type level”, the study assigns the type and the rank skill
+		ACTION_USER_LOG = 1022, // preserves assigns the information and leads the trigger information to gm log (name and id), the information assigns in param
+													// for instance “the %s all day long sword duty and obtains the gem”, in param %s is preserves the trigger information the position
+		ACTION_USER_BONUS = 1023, // takes a prize.
+		ACTION_USER_DIVORCE = 1024, // divorces
+		ACTION_USER_MARRIAGE = 1025, // marriage inspection, married returns to 1, unmarried returns to 0
+		ACTION_USER_SEX = 1026, // sex inspection, male returns to 1, the female returns to 0
+		ACTION_USER_EFFECT = 1027, // triggers action the character attaches assigns the special effect, param is " opt effect ", the opt support " self ", “couple”, “team”, “target”, effect is the special effect name
+		ACTION_USER_TASKMASK = 1028, // task the mask related operation, param is " opt idx ", opt is the operation, supports " chk ", “add”, “clr”, idx is the mission number, the value (0-31)
+		ACTION_USER_MEDIAPLAY = 1029, // media broadcast, param is " opt media ", opt support “play, broacast”, “media " for media filename
+		ACTION_USER_SUPERMANLIST = 1030, // inquires the unparalleled tabulation, the initial value has in TASK_ITERATOR.param= " idNextTask number ", idNextTask is the next TASK value, number each time downloads several tabulation items.
+		ACTION_USER_CHKIN_CARD = 1031, // deletes plays on the family body's game card goods, increases a game card record
+		ACTION_USER_CHKOUT_CARD = 1032, // increases game card goods for to play the family, deletes a game card record
+		ACTION_USER_CREATEMAP = 1033, // founds a map, links plays on family's home_id, needs to play the family object.param="name owner_type owner_id mapdoc type portal_x portal_y reborn_map reborn_portal res_lev".partal refers to the entrypoint coordinates, res_lev expressed that the map rank (uses in promotion).
+		ACTION_USER_ENTER_HOME = 1034, // gets own home.
+		ACTION_USER_ENTER_MATE_HOME = 1035, // returns to the spouse the family.
+		ACTION_USER_CHKIN_CARD2 = 1036, // deletes plays on the family body's game card 2 goods, increases a game card 2 record
+		ACTION_USER_CHKOUT_CARD2 = 1037, // increases game card 2 goods for to play the family, deletes a game card 2 record
+		ACTION_USER_FLY_NEIGHBOR = 1038, // searches _ROLE_NEIGHBOR_DOOR type in the place sheet series NPC, cuts the screen immediately to this NPC place.param= " serial ", serial is refers to data3 the value.
+		When ACTION_USER_UNLEARN_MAGIC = 1039, // reincarnation, puts behind the black magic skill, this skill future may again “the sudden enlightenment”.param= " type1 type2… “, at least a parameter, most 20 parameters.
+		ACTION_USER_REBIRTH = 1040, // is reincarnated.If has transferred or the rank insufficient person, will be defeated.The inspection plays the family whether already to transfer the duty, the occupation request, the rank request.The automatic revision plays on the family occupation, the rank, the body equips the rank, redistributes the points.param="nProf nLook"
+													the // following function completes by other ACTION:Duty reward;15th, 40, 100 levels take office the reward;Saddle horse reward;Momentarily returns to the city;Skill reward.
+		ACTION_USER_WEBPAGE = 1041, // notice client side opens the homepage.param= " http://....“
+		ACTION_USER_BBS = 1042, // in the BBS call-board, increases a SYSTEM channel artificially the news, the message plays the family name.Needs the USER object, each USER retains one only.param is the news content.
+		When ACTION_USER_UNLEARN_SKILL = 1043, // reincarnation, puts behind all weapon skill, this skill future may again “the sudden enlightenment”.
+		When ACTION_USER_DROP_MAGIC = 1044, // reincarnation, deletes the black magic skill.param= " type1 type2… “, at least a parameter, most 20 parameters.
+		ACTION_USER_OPEN_DIALOG = 1046, // notice client side opens a contact surface.data=idDialog.param= " task_id0 task_id1 task_id2 task_id3… “, may not have param, most 20 task_id, task_id cannot be 0, permission client side choice next TASK.When does not have param, the client side can upload only “TASK which the client side may trigger”.When has param, cq_task.client_active must be 0.
+		ACTION_USER_CHGMAP_REBORN = 1047, // cuts the screen to the reactivating spot.
+// ACTION_USER_ADD_WPG_BADGE = 1048, // increase week PK match faith token, the first faith token type increase which found according to the body on.This goods must be may superimpose.Most gives two only.
+		ACTION_USER_DEL_WPG_BADGE = 1049, // deletes all week PK match faith token.
+		ACTION_USER_CHK_WPG_BADGE = 1050, // inspects plays on the family body only then param type goods (quantity to be able to have one only), does not have other week PK match faith token.param is the spatial expression cannot have any week PK match faith token.
+		ACTION_USER_TAKESTUDENTEXP = 1051, // withdraws the experience which the apprentice contributes.Plays the family to return to the empirical value which pszAccept assigns to need to withdraw, deducts teacher to experience automatically.
+
+		ACTION_USER_CHGTO_MAINMAP = 1052, // to main map's reactivating reactivating
+		ACTION_USER_CHGTO_RANDOMPOS = 1053, // character flies on the current map the random coordinates (this spot not to be able stochastically to have covers code)
+
+
+		//--- duty system, logger task detail---begin
+
+		ACTION_USER_TASK_MANAGER = 1080, /////////////////////////////////////////////////
+													////data:Mission number,
+													//param: 'new' (for foundation new record)
+													// 'delete' (deletion record)
+													// 'isexit' (duty whether existence)
+													/////////////////////////////////////////////////
+		
+		ACTION_USER_TASK_OPE =1081, /////////////////////////////////////////////////
+													//data: Mission number, if data == -1, then the following operation is aims at findnext to carry on
+													//param: 'ope opt data', data (value)
+													// ope(phase) opt (>=, ==, +=, =) to duty stage operation										
+													// ope(completenum) opt (>=, ==, +=, =) to end of mission number of times operation		
+													// ope(begintime) opt (>=, ==, +=, =, reset) to duty beginning time operation, regarding += when take the second as the parameter;Regarding " >=, ==, = " when take " yyyy-mm-dd hh:mm:ss " as the form												
+													// reset expression establishes the duty beginning time as the current time
+		ACTION_USER_TASK_LOCALTIME = 1082, /////////////////////////////////////////////////////////
+													//data: Mission number,      
+													//param: `second number', current time and duty beginning time comparison action;If the current time and the duty difference of beginning time is bigger than param, otherwise then returns to true. to return to false
+													//////////////////////////////////////////////////////////////////////
+
+		ACTION_USER_TASK_FIND = 1083, // to plays the family duty to carry on the inquiry, the record is defers to userid, taskid rises the foreword the set
+													//param: 'find taskid phase completenum ';According to duty ID, the stage, completes the number of times inquiry concrete record; at the same time phase and cocompletenum for - 1:00, inquires only conforms to the taskid record
+													// 'findnext';Inquiry next record
+		//--- duty system, logger task detail---end
+
+		
+		// team part. when * does not have the troop, will return to false.Following ACTION must trigger by party chief,
+		// operation object for each member (including party chief, the member cannot usually) in a screen scope.
+		// pays attention:When must all members true, only then returns to true;Otherwise returns to false 
+		// * ---------------------------------------------------------------
+		ACTION_TEAM_BROADCAST = 1101, // to broadcasts a news in the troop channel.param= news.
+		ACTION_TEAM_ATTR = 1102, // inspection 'OR' operation member attribute.
+													// param= " field opt data ", 
+													// field= " money " (+=, <, >, ==), 
+													// field= " level " (<, >, ==), 
+													// field= " count " (including party chief's member quantity, <, ==), 
+													// field= " count_near " (including party chief's member quantity, in local chart, must live, <, ==), 
+													// field= " mate " (needs field only, must live), 
+													// field= " friend " (needs field only, must live), 
+		ACTION_TEAM_LEAVESPACE = 1103, // inspection knapsack surplus space, param= " space weight packtype ".
+													// packtype is the knapsack type which needs to inspect, the value scope 50~53
+		ACTION_TEAM_ITEM_ADD = 1104, // increase goods.data=itemtype_id
+		ACTION_TEAM_ITEM_DEL = 1105, // deletion goods.data=itemtype_id
+		ACTION_TEAM_ITEM_CHECK = 1106, // examination goods.data=itemtype_id
+		ACTION_TEAM_CHGMAP = 1107, // forms a team cuts the screen (to contain party chief), uses in the identical place sheet series cutting the screen only, all people must live.param="mapid x y"
+		
+		ACTION_TEAM_CHK_ISLEADER = 1501, // inspects whether is party chief, does not need the parameter
+		ACTION_USER_LIMIT = 1999,
+
+		// event part, need not any ptr --------------------------------------------------------------------------
+		ACTION_EVENT_FIRST = 2000,
+		ACTION_EVENT_SETSTATUS = 2001, // establishment map condition.param= " mapid status_bit data ", status_bit = {STATUS_WAR=1,}, data=0 or 1.
+		ACTION_EVENT_DELNPC_GENID = 2002, // (becomes invalid) deletes MONSTER.param="idMap idGen".
+		ACTION_EVENT_COMPARE = 2003, // compares each kind of attribute."data1 opt data2".data1, data2 are the belt % general parameters, according to belt sign digit comparison.opt may choose " == ", “<”, “<=”
+		ACTION_EVENT_COMPARE_UNSIGNED = 2004, // compares each kind of attribute."data1 opt data2".data1, data2 are the belt % general parameters, according to non-sign digit comparison.opt may choose " == ", “<”, “<=”
+		ACTION_EVENT_CHANGEWEATHER = 2005, // revises assigns REGION the weather.param= " idMap idRegion Type Intensity Dir Color KeepSecs ", Type, Intensity=0~999, Dir=0~359, Color=0x00RRGGBB, KeepSecs=seconds
+		ACTION_EVENT_CREATEPET = 2006, // founds MONSTER.param= " nOwnerType idOwner idMap nPosX nPosY idGen idType nData szName ", at least 7 parameters, if has accept to change name, otherwise names with name.generator uses in controlling the monster sphere of action, in cq_generator type is insignificant.when idOwner is 0, does not save the plate.
+		ACTION_EVENT_CREATENEW_NPC = 2007, // founds NPC.param="name type sort lookface ownertype ownerid  mapid posx posy  life base linkid  task0 task0 ... task7  data0 data1 data2 data3 datastr".At least 9 parameters.
+		ACTION_EVENT_COUNTMONSTER = 2008, // inspects with map's MONSTER quantity.param= " idMap field data opt num ", field= " name " (according to name), “gen_id” (according to type), the name or the type which data= must count, opt= " <”, “==”.
+		ACTION_EVENT_DELETEMONSTER = 2009, // deletes some map's MONSTER.param= " idMap type data name ", at least two parameters.If data is not 0 pieces simultaneously matches data, if has name simultaneously to match name.
+		ACTION_EVENT_BBS = 2010, // in the BBS call-board, increases a SYSTEM channel artificially the news, the message “SYSTEM”.param is the news content.
+		ACTION_EVENT_ERASE = 2011, // deletes assigns NPC.Limits dynamic NPC.Attention:After the deletion, do not carry on the operation again to this kind of NPC.param="idMap type": The deletion assigns map's all types is type NPC.
+		ACTION_EVENT_LIMIT = 2099,
+
+		// event part, need not any ptr --------------------------------------------------------------------------
+		ACTION_TRAP_FIRST = 2100,
+		ACTION_TRAP_CREATE = 2101, // founds a trap.param="type look owner_id map_id pos_x pos_y data".
+		ACTION_TRAP_ERASE = 2102, // deletes a trap.param= "", deletes the current trap.Attention:After the deletion, do not operate this trap again.
+		ACTION_TRAP_COUNT = 2103, // examination type is the type trap quantity, is smaller than count returns to true.param="map_id pos_x pos_y pos_cx pos_cy count type".
+		ACTION_TRAP_ATTR = 2104, // revision trap's attribute (does not save plate).param="id field opt num".field: “type” (opt: “=”), “look” (opt: “=”).
+		ACTION_TRAP_LIMIT = 2199,
+
+		// wanted list part  --------------------------------------------------------------------------
+		ACTION_WANTED_FIRST = 3000,
+		ACTION_WANTED_NEXT = 3001, under // search posts a reward, reads in idx TASK_ITERATOR
+		ACTION_WANTED_NAME = 3002, // plays the family to return to pszAccept to assign to post a reward the name, uses with the ACTION_WANTED_NEW association.
+		ACTION_WANTED_BONUTY = 3003, // plays the family to return to pszAccept to assign the amount, uses with the ACTION_WANTED_NEW association.
+		ACTION_WANTED_NEW = 3004, // produces newly through CUser::m_WantedInfo posts a reward the record, with on 2 action union use.
+		ACTION_WANTED_ORDER = 3005, // receives in pszAccept to assign to post a reward
+		ACTION_WANTED_CANCEL = 3006, // cancels in pszAccept by 2 time of prices to assign to post a reward
+		ACTION_WANTED_MODIFYID = 3007, // plays the family to return to pszAccept to assign the revision to post a reward id.
+		ACTION_WANTED_SUPERADD = 3008, // plays the family to return to pszAccept to assign the money which the supplement posts a reward, with ACTION_WANTED_ID union use.
+		ACTION_POLICEWANTED_NEXT = 3010, under // search the official posts a reward, reads in idx TASK_ITERATOR
+		ACTION_POLICEWANTED_ORDER = 3011, // publishes the results (in pszAccept to assign serial number)
+		ACTION_POLICEWANTED_CHECK = 3012, // inspects triggers the human whether to be issued a warrant for arrest by the government authorities
+		ACTION_WANTED_LIMIT = 3099,	
+		
+		// ghost gem magic part  ----------------------------------------------------------------------------------
+		ACTION_MAGIC_FIRST = 4000,
+		ACTION_MAGIC_ATTACHSTATUS = 4001, // supplement condition, szParam= " status power secs times "		                                          	
+		
+		ACTION_MAGIC_ATTACK = 4002, // black magic attack, data=magictype, szParam= " magiclevel "
+													// requests in the magictype table to have the corresponding data
+													// supports at present the black magic type includes:
+													// MAGICSORT_DETACHSTATUS
+													// MAGICSORT_STEAL
+		ACTION_MAGIC_LIMIT = 4099,
+
+};
+
+
+Now forcer really did all the work by translating some old server sources long ago:handsdown:, but it seems that not everyone jumped in found all the cool things you can do in cq_action. :rtfm: This is an explanation of one of those cool things:
+
+Lets take a look at the candy db for some cq_action with type 121 or 122:
+id	id_next	id_nextfail	type	data	param
+660000	660001	660018	121	0	1 5
+660001	0	    0	    122	0	660039 660039 660040 660040 660041 660041 660042 660042
+660002	0	    0	    122	0	660030 660030 660031 660031 660032 660032 660033 660033
+660018	660002	660019	121	0	1 4
+660019	660003	660020	121	0	1 3
+
+So I will explain line by line:
+In the first line, you have a 1 in 5 chance of of passing. If you pass, you go to line 660001. If you fail (4 in 5 chance) you go to line 660018.
+Lets say you beat the odds and you passed. You go to line 660001. There the server picks randomly from the list of cq_action to go to from the ids given in the parameter separated by spaces. As you can see, you have a 2 in 8 chance of getting any one of the four id actions given. You can use your imagination where these actions go to. They each could be, for example, a different amount of ep awarded.
+So lets say you didn't beat the 1 in 5 odds and you didn't pass the first line. You get sent to line 660018. Now you get a 1 in 4 chance to pass. Yay! If you pass, it is the same scenario as you faced if you passed the first line, but with different actions. Perhaps here they might have PPs instead of EPs on the first line. If you were to fail, you would get sent to 660019 which is a 1 in 3 chance, ect, ect, ect.
+So now that I spelled it out for everyone, you should all be able to use these effectively and all make super creative and unique events from now on :D

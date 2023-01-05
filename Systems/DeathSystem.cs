@@ -1,6 +1,7 @@
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using MagnumOpus.Helpers;
 using MagnumOpus.Networking;
 using MagnumOpus.Networking.Packets;
 
@@ -34,7 +35,13 @@ namespace MagnumOpus.Simulation.Systems
             }
 
             if(ntt.Type == EntityType.Monster)
+            {
                 eff.Effects |= StatusEffect.Fade;
+                ref readonly var cqc = ref ntt.Get<CqActionComponent>();
+                
+                long action = cqc.cq_Action;
+                while((action = CqActionProcessor.Process(in ntt, CqProcessor.GetAction(action))) != 0);
+            }
 
             var update = MsgUserAttrib.Create(ntt.NetId, (ulong)eff.Effects, MsgUserAttribType.StatusEffect);
             ntt.NetSync(ref update, true);

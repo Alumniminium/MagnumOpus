@@ -2,6 +2,7 @@ using System.Buffers;
 using System.Runtime.InteropServices;
 using System.Text;
 using HerstLib.IO;
+using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
@@ -16,10 +17,10 @@ namespace MagnumOpus.Networking.Packets
         public int UnqiueId;
         public int Param;
         public MsgItemType Type;
-        public int Timestamp;
+        public uint Timestamp;
         public int Value;
 
-        public static MsgItem Create(int uid, int value, int param, int timestamp, MsgItemType type)
+        public static MsgItem Create(int uid, int value, int param, uint timestamp, MsgItemType type)
         {
             var msg = new MsgItem
             {
@@ -47,6 +48,12 @@ namespace MagnumOpus.Networking.Packets
                     ntt.NetSync(ref reply);
                     // ntt.NetSync(ref tick);
                     break;
+                case MsgItemType.RemoveInventory:
+                {
+                    var drc = new DropRequestComponent(ntt.Id, msg.Value);
+                    ntt.Add(ref drc);
+                    break;
+                }
                 default:
                     FConsole.WriteLine($"Unhandled MsgItem type: {msg.Type}");
                     FConsole.WriteLine(memory.Dump());

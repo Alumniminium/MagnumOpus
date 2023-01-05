@@ -1,5 +1,7 @@
 using System.Buffers;
 using System.Runtime.InteropServices;
+using MagnumOpus.Components;
+using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 
 namespace MagnumOpus.Networking.Packets
@@ -7,85 +9,48 @@ namespace MagnumOpus.Networking.Packets
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct MsgItemInformation
     {
-        public readonly ushort Size;
-        public readonly ushort Id;
-        public readonly int UniqueId;
-        public readonly int ItemId;
-        public readonly ushort CurrentDurability;
-        public readonly ushort MaxiumumDurability;
-        public readonly MsgItemInfoAction Action;
-        public readonly byte Ident;
-        public readonly MsgItemPosition Position;
-        public readonly int Unknow1;
-        public readonly byte Gem1;
-        public readonly byte Gem2;
-        public readonly RebornItemEffect RebornEffect;
-        public readonly byte Magic2;
-        public readonly byte Plus;
-        public readonly byte Bless;
-        public readonly byte Enchant;
-        public readonly int Restrain;
+        public ushort Size;
+        public ushort Id;
+        public int UniqueId;
+        public int ItemId;
+        public ushort CurrentDurability;
+        public ushort MaxiumumDurability;
+        public MsgItemInfoAction Action;
+        public byte Ident;
+        public MsgItemPosition Position;
+        public int Unknow1;
+        public byte Gem1;
+        public byte Gem2;
+        public RebornItemEffect RebornEffect;
+        public byte Magic2;
+        public byte Plus;
+        public byte Bless;
+        public byte Enchant;
+        public int Restrain;
 
-        // public MsgItemInformation(in PixelEntity item, MsgItemPosition position = MsgItemPosition.Inventory) : this()
-        // {
-        //     Size = (ushort)sizeof(MsgItemInformation);
-        //     Id = 1008;
-        //     UniqueId = item.Id;
-        //     ItemId = item.ItemId;
-        //     CurrentDurability = item.CurrentDurability;
-        //     MaxiumumDurability = item.MaximumDurability;
-        //     Action = MsgItemInfoAction.AddItem;
-        //     Ident = 0;
-        //     Position = position;
-        //     Gem1 = item.Gem1;
-        //     Gem2 = item.Gem2;
-        //     RebornEffect = item.RebornEffect;
-        //     Magic2 = 0;
-        //     Bless = item.Bless;
-        //     Plus = item.Plus;
-        //     Enchant = item.Enchant;
-        //     Restrain = item.CustomTextId;
-        // }
-
-        // public MsgItemInformation(in PixelEntity owner, PixelEntity item, MsgItemPosition position, MsgItemInfoAction action = MsgItemInfoAction.OtherPlayerEquipement) : this()
-        // {
-        //     Size = (ushort)sizeof(MsgItemInformation);
-        //     Id = 1008;
-        //     UniqueId = owner.Id;
-        //     ItemId = item.ItemId;
-        //     CurrentDurability = item.CurrentDurability;
-        //     MaxiumumDurability = item.MaximumDurability;
-        //     Action = action;
-        //     Ident = 0;
-        //     Position = position;
-        //     Gem1 = item.Gem1;
-        //     Gem2 = item.Gem2;
-        //     RebornEffect = item.RebornEffect;
-        //     Magic2 = 0;
-        //     Bless = item.Bless;
-        //     Plus = item.Plus;
-        //     Enchant = item.Enchant;
-        //     Restrain = item.CustomTextId;
-        // }
-        // public MsgItemInformation(in PixelEntity item, MsgItemInfoAction action = MsgItemInfoAction.AddItem, MsgItemPosition position = MsgItemPosition.Inventory) : this()
-        // {
-        //     Size = (ushort)sizeof(MsgItemInformation);
-        //     Id = 1008;
-        //     UniqueId = item.Id;
-        //     ItemId = item.ItemId;
-        //     CurrentDurability = item.CurrentDurability;
-        //     MaxiumumDurability = item.MaximumDurability;
-        //     Action = action;
-        //     Ident = 0;
-        //     Position = position;
-        //     Gem1 = item.Gem1;
-        //     Gem2 = item.Gem2;
-        //     RebornEffect = item.RebornEffect;
-        //     Magic2 = 0;
-        //     Bless = item.Bless;
-        //     Plus = item.Plus;
-        //     Enchant = item.Enchant;
-        //     Restrain = item.CustomTextId;
-        // }
+        public static MsgItemInformation Create(in PixelEntity ntt, MsgItemInfoAction action = MsgItemInfoAction.AddItem, MsgItemPosition position = MsgItemPosition.Inventory)
+        {
+            var item = ntt.Get<ItemComponent>();
+            var msg = new MsgItemInformation{
+            Size = (ushort)sizeof(MsgItemInformation),
+            Id = 1008,
+            UniqueId = ntt.NetId,
+            ItemId = item.Id,
+            CurrentDurability = item.CurrentDurability,
+            MaxiumumDurability = item.MaximumDurability,
+            Action = action,
+            Ident = 0,
+            Position = position,
+            Gem1 = item.Gem1,
+            Gem2 = item.Gem2,
+            RebornEffect = item.RebornEffect,
+            Magic2 = 0,
+            Bless = item.Bless,
+            Plus = item.Plus,
+            Enchant = item.Enchant,
+            Restrain = item.CustomTextId
+            };
+            return msg;
+        }
     }
 }

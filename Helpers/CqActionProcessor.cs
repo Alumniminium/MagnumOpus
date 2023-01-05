@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Timers;
 using HerstLib.IO;
 using MagnumOpus.Components;
@@ -113,6 +114,8 @@ namespace MagnumOpus.Helpers
                         if(result >= 0)
                         {
                             x.Class = (ClasseName)result;
+                            var pak = MsgUserAttrib.Create(ntt.NetId, (byte)x.Class, MsgUserAttribType.Class);
+                            ntt.NetSync(ref pak);
                             return true;
                         }
                         return false;
@@ -131,12 +134,52 @@ namespace MagnumOpus.Helpers
                         if(result >= 0)
                         {
                             x.Level = (byte)result;
+                            var pak = MsgUserAttrib.Create(ntt.NetId, x.Level, MsgUserAttribType.Level);
+                            ntt.NetSync(ref pak);
                             return true;
                         }
                         return false;
                     }
                     if(BooleanAttrOpts.TryGetValue(op, out var boolFunc))
                         return boolFunc((long)x.Level, targetVal);
+                    return false;
+                }
+            },
+            { "life", (ntt, targetVal, op) =>
+                {
+                    ref var x = ref ntt.Get<HealthComponent>();
+                    if(AttrOpts.TryGetValue(op, out var func))
+                    {
+                        var result = func((long)x.Health, targetVal);
+                        if(result >= 0)
+                        {
+                            x.Health = (byte)result;
+                            var pak = MsgUserAttrib.Create(ntt.NetId, (ulong)x.Health, MsgUserAttribType.Health);
+                            ntt.NetSync(ref pak);
+                            return true;
+                        }
+                        return false;
+                    }
+                    if(BooleanAttrOpts.TryGetValue(op, out var boolFunc))
+                        return boolFunc((long)x.Health, targetVal);
+                    return false;
+                }
+            },
+            { "metempsychosis", (ntt, targetVal, op) =>
+                {
+                    ref var x = ref ntt.Get<RebornComponent>();
+                    if(AttrOpts.TryGetValue(op, out var func))
+                    {
+                        var result = func((long)x.Count, targetVal);
+                        if(result >= 0)
+                        {
+                            x.Count = (byte)result;
+                            return true;
+                        }
+                        return false;
+                    }
+                    if(BooleanAttrOpts.TryGetValue(op, out var boolFunc))
+                        return boolFunc((long)x.Count, targetVal);
                     return false;
                 }
             }
@@ -151,9 +194,11 @@ namespace MagnumOpus.Helpers
                 case TaskActionType.ACTION_MENUTEXT:
                     {
                         ref readonly var tac = ref ntt.Get<TaskComponent>();
-                        var textPacket = MsgTaskDialog.Create(in tac.Npc, 0, MsgTaskDialogAction.Text, action.param.Replace("~", " ").Trim());
+                        var text = action.param.Replace("~", " ").Trim();
+                        var textPacket = MsgTaskDialog.Create(in tac.Npc, 0, MsgTaskDialogAction.Text, text);
                         var textMem = Co2Packet.Serialize(ref textPacket, textPacket.Size);
                         ntt.NetSync(textMem);
+                        FConsole.WriteLine(text);
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_MENULINK:
@@ -166,10 +211,11 @@ namespace MagnumOpus.Helpers
                         var optionMem = Co2Packet.Serialize(ref optionPacket, optionPacket.Size);
                         tac.Options[tac.OptionCount] = (int)optionId;
                         ntt.NetSync(optionMem);
+                        FConsole.WriteLine(text);
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_MENUEDIT:
-                {
+                    {
                         ref var tac = ref ntt.Get<TaskComponent>();
                         tac.OptionCount++;
                         var text = action.param.Trim().Split(' ')[2];
@@ -178,8 +224,9 @@ namespace MagnumOpus.Helpers
                         var optionMem = Co2Packet.Serialize(ref optionPacket, optionPacket.Size);
                         tac.Options[tac.OptionCount] = (int)optionId;
                         ntt.NetSync(optionMem);
+                        FConsole.WriteLine(text);
                         return action.id_next;
-                }
+                    }
                 case TaskActionType.ACTION_MENUPIC:
                     {
                         ref readonly var tac = ref ntt.Get<TaskComponent>();
@@ -206,7 +253,13 @@ namespace MagnumOpus.Helpers
                         var operation = parameters[1];
                         var targetVal = long.Parse(parameters[2]);
 
-                        var result = AttrVals[attribute](ntt, targetVal, operation);
+                        if (!AttrVals.TryGetValue(attribute, out var func))
+                        {
+                            FConsole.WriteLine($"Unknown attribute {attribute}");
+                            return action.id_nextfail;
+                        }
+                        var result = func(ntt, targetVal, operation);
+                        FConsole.WriteLine($"if ({attribute} {operation} {targetVal}) -> {result}");
                         return result ? action.id_next : action.id_nextfail;
                     }
                 case TaskActionType.ACTION_USER_CHGMAP:
@@ -249,40 +302,40 @@ namespace MagnumOpus.Helpers
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_USER_MAGIC:
-                {
-                    var parameters = action.param.Trim().Split(' ');
-                    var op = parameters[0];
-                    var skillId = ushort.Parse(parameters[1]);
-
-                    ref var sbc = ref ntt.Get<SpellBookComponent>();
-
-                    if (op == "check")
                     {
-                        if(sbc.Spells.ContainsKey(skillId))
-                            return action.id_next;
-                        return action.id_nextfail;
-                    }
-                    if(op == "learn")
-                    {
-                        sbc.Spells.Add(skillId, (0,0,0));
-                        var msg = MsgSkill.Create(skillId, 0,0);
-                        ntt.NetSync(ref msg);
-                    }
+                        var parameters = action.param.Trim().Split(' ');
+                        var op = parameters[0];
+                        var skillId = ushort.Parse(parameters[1]);
 
-                    return action.id_next;
-                }
+                        ref var sbc = ref ntt.Get<SpellBookComponent>();
+
+                        if (op == "check")
+                        {
+                            if (sbc.Spells.ContainsKey(skillId))
+                                return action.id_next;
+                            return action.id_nextfail;
+                        }
+                        if (op == "learn")
+                        {
+                            sbc.Spells.Add(skillId, (0, 0, 0));
+                            var msg = MsgSkill.Create(skillId, 0, 0);
+                            ntt.NetSync(ref msg);
+                        }
+
+                        return action.id_next;
+                    }
                 case TaskActionType.ACTION_USER_HAIR:
-                {
-                    var parameters = action.param.Trim().Split(' ');
-                    var style = parameters[1];
-                    ref var hair = ref ntt.Get<BodyComponent>();
-                    var color = (hair.Hair / 100) * 100;
-                    hair.Hair = (ushort)(color + int.Parse(style));
+                    {
+                        var parameters = action.param.Trim().Split(' ');
+                        var style = parameters[1];
+                        ref var hair = ref ntt.Get<BodyComponent>();
+                        var color = (hair.Hair / 100) * 100;
+                        hair.Hair = (ushort)(color + int.Parse(style));
 
-                    var msg = MsgUserAttrib.Create(ntt.NetId, hair.Hair, MsgUserAttribType.HairStyle);
-                    ntt.NetSync(ref msg, true);
-                    return action.id_next;
-                }
+                        var msg = MsgUserAttrib.Create(ntt.NetId, hair.Hair, MsgUserAttribType.HairStyle);
+                        ntt.NetSync(ref msg, true);
+                        return action.id_next;
+                    }
                 case TaskActionType.ACTION_USER_MEDIAPLAY:
                     {
                         var parameters = action.param.Trim().Split(' ');
@@ -299,6 +352,147 @@ namespace MagnumOpus.Helpers
                         ntt.NetSync(in msg, true);
                         return action.id_next;
                     }
+                case TaskActionType.ACTION_RAND:
+                    {
+                        var parameters = action.param.Trim().Split(' ');
+                        var a = int.Parse(parameters[0]);
+                        var b = int.Parse(parameters[1]);
+
+                        var chance = a / (float)b;
+                        var result = Random.Shared.NextSingle();
+                        if (result < chance)
+                            return action.id_next;
+
+                        return action.id_nextfail;
+                    }
+                case TaskActionType.ACTION_RANDACTION:
+                    {
+                        var parameters = action.param.Trim().Split(' ');
+                        var idx = Random.Shared.Next(0, 8);
+                        var next = long.Parse(parameters[idx]);
+                        return next;
+                    }
+                case TaskActionType.ACTION_MAP_MOVENPC:
+                    {
+                        return action.id_next;
+                    }
+                case TaskActionType.ACTION_MST_DROPITEM:
+                    {
+                        var parameters = action.param.Trim().Split(' ');
+                        var itemId = uint.Parse(parameters[1]);
+
+                        ref readonly var pos = ref ntt.Get<PositionComponent>();
+
+                        var msg = MsgFloorItem.Create(PixelWorld.Tick, (ushort)(pos.Position.X + Random.Shared.Next(-2, 3)), (ushort)(pos.Position.Y + Random.Shared.Next(-2, 3)), itemId, MsgFloorItemType.Create);
+                        ntt.NetSync(ref msg, true);
+                        return action.id_next;
+                    }
+                case TaskActionType.ACTION_USER_TALK:
+                    {
+                        var msg = MsgText.Create("SYSTEM", "ALLUSERS", action.param.Trim(), (MsgTextType)action.data);
+                        var srz = Co2Packet.Serialize(ref msg, msg.Size);
+                        ntt.NetSync(in srz, true);
+                        return action.id_next;
+                    }
+                case TaskActionType.ACTION_ITEM_CHECK:
+                    {
+                        ref readonly var inv = ref ntt.Get<InventoryComponent>();
+                        for (int i = 0; i < inv.Items.Length; i++)
+                        {
+                            ref readonly var item = ref inv.Items[i].Get<ItemComponent>();
+                            if (item.Id == action.data)
+                                return action.id_next;
+                        }
+                        return action.id_next; // ERROR: should be id_nextfail, just for testing its not
+                    }
+                case TaskActionType.ACTION_ITEM_MULTICHK:
+                    {
+                        var parameters = action.param.Trim().Split(' ');
+                        var startId = int.Parse(parameters[0]);
+                        var endId = int.Parse(parameters[1]);
+                        var chkCount = int.Parse(parameters[2]);
+                        var chkRange = Enumerable.Range(startId, endId - startId + 1).ToArray();
+
+                        var count = 0;
+
+                        ref readonly var inv = ref ntt.Get<InventoryComponent>();
+                        for (int i = 0; i < inv.Items.Length; i++)
+                        {
+                            ref readonly var item = ref inv.Items[i].Get<ItemComponent>();
+                            if (chkRange.Contains(item.Id))
+                                count++;
+                        }
+
+                        if (count >= chkCount)
+                            return action.id_next;
+
+                        return action.id_next; // ERROR: should be id_nextfail, just for testing its not
+                    }
+                case TaskActionType.ACTION_ITEM_MULTIDEL:
+                    {
+                        var parameters = action.param.Trim().Split(' ');
+                        var startId = int.Parse(parameters[0]);
+                        var endId = int.Parse(parameters[1]);
+                        var chkCount = int.Parse(parameters[2]);
+                        var chkRange = Enumerable.Range(startId, endId - startId + 1).ToArray();
+
+                        var count = 0;
+
+                        ref readonly var inv = ref ntt.Get<InventoryComponent>();
+                        for (int i = 0; i < inv.Items.Length; i++)
+                        {
+                            ref readonly var item = ref inv.Items[i].Get<ItemComponent>();
+                            
+                            if (chkRange.Contains(item.Id))
+                            {
+                                var msg = MsgItem.Create(ntt.NetId, inv.Items[i].NetId,inv.Items[i].NetId,PixelWorld.Tick, MsgItemType.RemoveInventory);
+                                ntt.NetSync(ref msg);
+                                count++;
+                                inv.Items[i] = default;
+                            }
+                            if (count >= chkCount)
+                                return action.id_next;
+                        }
+                        return action.id_next; // ERROR: should be id_nextfail, just for testing its not
+                    }
+                    case TaskActionType.ACTION_ITEM_LEAVESPACE:
+                    {
+                        ref readonly var inv = ref ntt.Get<InventoryComponent>();
+                        var chkCount = action.data;
+
+                        for (int i = 0; i < inv.Items.Length; i++)
+                        {
+                            if (inv.Items[i].NetId == 0)
+                                chkCount--;
+                        }
+
+                        if (chkCount <= 0)
+                            return action.id_next;
+                        
+                        return action.id_next;
+                    }
+                    case TaskActionType.ACTION_ITEM_ADD:
+                    {
+                        ref readonly var inv = ref ntt.Get<InventoryComponent>();
+                        var itemId = action.data;
+
+                        ref var itemNtt = ref PixelWorld.CreateEntity(EntityType.Item);
+                        var item = new ItemComponent(itemNtt.Id, itemId, 1,1,0,0,0,0,0,0,RebornItemEffect.None, 0);
+                        itemNtt.Add(ref item);
+                        
+                        for(int i = 0; i < inv.Items.Length; i++)
+                        {
+                            if (inv.Items[i].NetId != 0)
+                                continue;
+                            
+                            inv.Items[i] = itemNtt;
+                            var msg = MsgItemInformation.Create(in itemNtt, MsgItemInfoAction.AddItem, MsgItemPosition.Inventory);
+                            ntt.NetSync(ref msg);
+                            return action.id_next;
+                        }
+
+                        return action.id_nextfail;
+                    }
                 default:
                     FConsole.WriteLine($"[FAIL] Unknown task type: {taskType}");
                     FConsole.WriteLine($"| - Task:     {action.id}");
@@ -306,7 +500,6 @@ namespace MagnumOpus.Helpers
                     FConsole.WriteLine($"| - Data:     {action.data}");
                     FConsole.WriteLine($"| - Next:     {action.id_next}");
                     FConsole.WriteLine($"| - Fail:     {action.id_nextfail}");
-                    Console.Beep();
                     return action.id_nextfail;
             }
         }
