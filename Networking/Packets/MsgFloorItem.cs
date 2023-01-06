@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using Microsoft.VisualStudio.TextTemplating;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -12,17 +13,14 @@ namespace MagnumOpus.Networking.Packets
         public ushort Size;
         public ushort Id;
         public uint UniqueId;
-        public uint ItemId;
+        public int ItemId;
         public ushort X, Y;
         public MsgFloorItemType MsgFloorItemType;
 
         public static MsgFloorItem Create(in PixelEntity item, MsgFloorItemType type)
         {
-            ref readonly var bdy = ref item.Get<BodyComponent>();
-            ref readonly var trs = ref item.Get<TransformationComponent>();
             ref readonly var pos = ref item.Get<PositionComponent>();
-
-            var look = trs.EntityId == item.NetId ? trs.Look : bdy.Look;
+            ref readonly var itemComponent = ref item.Get<ItemComponent>();
 
             var packet = new MsgFloorItem
             {
@@ -31,12 +29,12 @@ namespace MagnumOpus.Networking.Packets
                 UniqueId = (uint)item.NetId,
                 X = (ushort)pos.Position.X,
                 Y = (ushort)pos.Position.Y,
-                ItemId = look,
+                ItemId = itemComponent.Id,
                 MsgFloorItemType = type,
             };
             return packet;
         }
-        public static MsgFloorItem Create(uint uid, ushort x, ushort y, uint look, MsgFloorItemType type)
+        public static MsgFloorItem Create(uint uid, ushort x, ushort y, int look, MsgFloorItemType type)
         {
             var packet = new MsgFloorItem
             {

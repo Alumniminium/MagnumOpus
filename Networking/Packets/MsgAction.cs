@@ -103,12 +103,13 @@ namespace MagnumOpus.Networking.Packets
 
                         var reply = Create(ntt.NetId, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
                         ntt.NetSync(ref reply);
+                        FConsole.WriteLine($"[GAME] SendLocation: {ntt.NetId} -> {reply.X}, {reply.Y}");
+
                         PixelWorld.Players.Add(ntt);
                         break;
                     }
                 case MsgActionType.LeaveBooth:
                 case MsgActionType.ConfirmGuild:
-                case MsgActionType.SendItems:
                 case MsgActionType.SendAssociates:
                 case MsgActionType.SendProficiencies:
                     {
@@ -116,6 +117,21 @@ namespace MagnumOpus.Networking.Packets
                         ntt.NetSync(memory[..msg.Size]);
                         break;
                     }
+                case MsgActionType.SendItems:
+                {
+                    ref readonly var inv = ref ntt.Get<InventoryComponent>();
+
+                    foreach (var item in inv.Items)
+                    {
+                        ref readonly var itemComp = ref item.Get<ItemComponent>();
+                        var reply = MsgItem.Create(item.NetId, itemComp.Id, itemComp.Id, 0, MsgItemType.BuyItemAddItem);
+                        var reply2 = MsgItemInformation.Create(in item);
+                        ntt.NetSync(ref reply);
+                        ntt.NetSync(ref reply2);
+                    }
+
+                    break;
+                }
                 case MsgActionType.SendSpells:
                     {
                         ref readonly var sbc = ref ntt.Get<SpellBookComponent>();

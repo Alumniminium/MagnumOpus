@@ -65,6 +65,12 @@ namespace MagnumOpus.Networking.Packets
             ntt.Add(ref lvl);
             ntt.Add(ref pro);
 
+            var testItem = PixelWorld.CreateEntity(EntityType.Item);
+            var itemComp = new ItemComponent(testItem.Id, 1001020,0,0,0,0,0,0,0,0,0,0);
+            testItem.Add(ref itemComp);
+            
+            inv.Items[0] = testItem;
+
             var ok = MsgText.Create("SYSTEM", "ALLUSERS", "ANSWER_OK", MsgTextType.LoginInformation);
             var okserialized = Co2Packet.Serialize(ref ok, ok.Size);
             ntt.NetSync(okserialized);

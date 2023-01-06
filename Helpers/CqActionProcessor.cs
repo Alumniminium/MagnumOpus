@@ -379,12 +379,17 @@ namespace MagnumOpus.Helpers
                 case TaskActionType.ACTION_MST_DROPITEM:
                     {
                         var parameters = action.param.Trim().Split(' ');
-                        var itemId = uint.Parse(parameters[1]);
+                        var itemId = int.Parse(parameters[1]);
+                        
+                        ref var itemNtt = ref PixelWorld.CreateEntity(EntityType.Item);
+                        var itemComp = new ItemComponent(itemNtt.Id, itemId,0,0,0,0,0,0,0,0,0,0);
+                        itemNtt.Add(ref itemComp);
 
-                        ref readonly var pos = ref ntt.Get<PositionComponent>();
+                        var drc = new DropRequestComponent(ntt.Id, itemNtt.NetId);
+                        ntt.Add(ref drc);
 
-                        var msg = MsgFloorItem.Create(PixelWorld.Tick, (ushort)(pos.Position.X + Random.Shared.Next(-2, 3)), (ushort)(pos.Position.Y + Random.Shared.Next(-2, 3)), itemId, MsgFloorItemType.Create);
-                        ntt.NetSync(ref msg, true);
+                        FConsole.WriteLine($"DropRequestComponent added to {ntt.Id} for item {itemId}");
+
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_USER_TALK:
@@ -492,6 +497,24 @@ namespace MagnumOpus.Helpers
                         }
 
                         return action.id_nextfail;
+                    }
+                    case TaskActionType.ACTION_ITEM_DEL:
+                    {
+                        ref readonly var inv = ref ntt.Get<InventoryComponent>();
+                        var itemId = action.data;
+
+                        for (int i = 0; i < inv.Items.Length; i++)
+                        {
+                            if (inv.Items[i].NetId != itemId)
+                                continue;
+
+                            var removeInv = MsgItem.Create(inv.Items[i].NetId, inv.Items[i].NetId, inv.Items[i].NetId, PixelWorld.Tick, Enums.MsgItemType.RemoveInventory);
+                            ntt.NetSync(ref removeInv);
+                            inv.Items[i] = default;
+                            return action.id_nextfail;
+                        }
+
+                        return action.id_next; // ERROR: should be id_nextfail, just for testing its not
                     }
                 default:
                     FConsole.WriteLine($"[FAIL] Unknown task type: {taskType}");

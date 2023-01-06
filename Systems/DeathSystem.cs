@@ -52,9 +52,9 @@ namespace MagnumOpus.Simulation.Systems
             ref readonly var pos = ref ntt.Get<PositionComponent>();
             Game.Grids[pos.Map].Remove(in ntt);
             
-            if(ntt.Type != EntityType.Player)
-                PixelWorld.Destroy(in ntt);
-            else
+            // if(ntt.Type != EntityType.Player)
+            //     PixelWorld.Destroy(in ntt);
+            // else
                 ntt.Remove<DeathTagComponent>();
         }
     }

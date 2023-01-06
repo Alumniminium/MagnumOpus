@@ -50,8 +50,9 @@ namespace MagnumOpus.Networking.Packets
                     break;
                 case MsgItemType.RemoveInventory:
                 {
-                    var drc = new DropRequestComponent(ntt.Id, msg.Value);
+                    var drc = new DropRequestComponent(ntt.Id, msg.UnqiueId);
                     ntt.Add(ref drc);
+                    ntt.NetSync(memory[..sizeof(MsgItem)]);
                     break;
                 }
                 default:

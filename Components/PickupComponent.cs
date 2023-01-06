@@ -6,12 +6,12 @@ namespace MagnumOpus.Components
     public struct DropRequestComponent
     {
         public readonly int EntityId;
-        public byte ItemNetId;
+        public int ItemNetId;
 
         public DropRequestComponent(int entityId, int itemNetId)
         {
             EntityId = entityId;
-            ItemNetId = (byte)itemNetId;
+            ItemNetId = itemNetId;
         }
         
         public override int GetHashCode() => EntityId;

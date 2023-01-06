@@ -10,8 +10,10 @@ namespace MagnumOpus.Simulation.Systems
 
         public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref DropRequestComponent drc)
         {
-            ref var itemNtt = ref PixelWorld.GetEntity(drc.ItemNetId);
+            ref var itemNtt = ref PixelWorld.GetEntityByNetId(drc.ItemNetId);
             ref var item = ref itemNtt.Get<ItemComponent>();
+
+            Game.Grids[pos.Map].Add(in itemNtt, ref pos);
             
             var dropPos = new PositionComponent(itemNtt.Id, pos.Position, pos.Map);
             itemNtt.Add(ref dropPos);
@@ -19,8 +21,8 @@ namespace MagnumOpus.Simulation.Systems
             var dropMsg = MsgFloorItem.Create(in itemNtt, Enums.MsgFloorItemType.Create);
             ntt.NetSync(ref dropMsg, true);
 
-            var removeInv = MsgItem.Create(ntt.NetId, itemNtt.NetId, itemNtt.NetId, PixelWorld.Tick, Enums.MsgItemType.RemoveInventory);
-            ntt.NetSync(ref removeInv);
+            // var removeInv = MsgItem.Create(ntt.NetId, itemNtt.NetId, itemNtt.NetId, PixelWorld.Tick, Enums.MsgItemType.RemoveInventory);
+            // ntt.NetSync(ref removeInv);
 
             ntt.Remove<DropRequestComponent>();
         }

@@ -12,9 +12,14 @@ namespace MagnumOpus.Networking
                 var spawnPacket = MsgNpcSpawn.Create(ntt);
                 to.NetSync(ref spawnPacket);
             }
-            else
+            else if (ntt.Type == EntityType.Player || ntt.Type == EntityType.Monster)
             {
                 var spawnPacket = MsgSpawn.Create(ntt);
+                to.NetSync(ref spawnPacket);
+            }
+            else if (ntt.Type == EntityType.Item)
+            {
+                var spawnPacket = MsgFloorItem.Create(in ntt, Enums.MsgFloorItemType.Create);
                 to.NetSync(ref spawnPacket);
             }
         }
