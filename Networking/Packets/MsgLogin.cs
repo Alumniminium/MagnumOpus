@@ -48,6 +48,8 @@ namespace MagnumOpus.Networking.Packets
             var eff = new StatusEffectComponent(ntt.Id);
             var inv = new InventoryComponent(ntt.Id, 1000, 0);
             var lvl = new LevelComponent(ntt.Id, 1);
+            var hlt = new HealthComponent(ntt.Id, 330, 330);
+            var mana = new ManaComponent(ntt.Id, 100, 100);
             var pro = new ProfessionComponent(ntt.Id, ClasseName.InternTaoist);
             var sbc = new SpellBookComponent(ntt.Id);
             sbc.Spells.Add(1000, (0, 0, 0));
@@ -64,12 +66,18 @@ namespace MagnumOpus.Networking.Packets
             ntt.Add(ref inv);
             ntt.Add(ref lvl);
             ntt.Add(ref pro);
-
-            var testItem = PixelWorld.CreateEntity(EntityType.Item);
-            var itemComp = new ItemComponent(testItem.Id, 1001020,0,0,0,0,0,0,0,0,0,0);
-            testItem.Add(ref itemComp);
+            ntt.Add(ref hlt);
+            ntt.Add(ref mana);
             
+            var testItem = PixelWorld.CreateEntity(EntityType.Item);
+            var itemComp = new ItemComponent(testItem.Id, 1001020, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+            testItem.Add(ref itemComp);
             inv.Items[0] = testItem;
+
+            var testItem2 = PixelWorld.CreateEntity(EntityType.Item);
+            var itemComp2 = new ItemComponent(testItem2.Id, 1000000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+            testItem2.Add(ref itemComp2);
+            inv.Items[1] = testItem2;
 
             var ok = MsgText.Create("SYSTEM", "ALLUSERS", "ANSWER_OK", MsgTextType.LoginInformation);
             var okserialized = Co2Packet.Serialize(ref ok, ok.Size);

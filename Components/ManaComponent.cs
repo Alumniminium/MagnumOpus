@@ -1,4 +1,5 @@
 using MagnumOpus.ECS;
+using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 
 namespace MagnumOpus.Components
 {
@@ -10,16 +11,13 @@ namespace MagnumOpus.Components
         public ushort Mana;
         public ushort MaxMana;
 
-        public ManaComponent(int entityId)
+        public ManaComponent(int entityId, ushort mana, ushort maxMana)
         {
             EntityId = entityId;
-            ChangedTick = 0;
-            Mana = 0;
-            MaxMana = 0;
+            ChangedTick = PixelWorld.Tick;
+            Mana = mana;
+            MaxMana = maxMana;
         }
-        public override int GetHashCode()
-        {
-            return EntityId;
-        }
+        public override int GetHashCode() => EntityId;
     }
 }

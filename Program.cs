@@ -1,5 +1,6 @@
 ﻿using System.Net.Sockets;
 using System.Text;
+using CO2_CORE_DLL.Security.Cryptography;
 using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
@@ -19,7 +20,7 @@ namespace MagnumOpus
         private static readonly TcpListener GameListener = new(System.Net.IPAddress.Any, 5816);
         private static readonly TcpListener LoginListener = new(System.Net.IPAddress.Any, 9958);
 
-        private static void Main()
+        private static unsafe void Main()
         {
             var systems = new List<PixelSystem>
             {
@@ -31,16 +32,45 @@ namespace MagnumOpus
                 new EmoteSystem(),
                 new PortalSystem(),
                 new TeleportSystem(),
-                new DropSystem(),
                 new ViewportSystem(),
                 new AttackSystem(),
                 new DamageSystem(),
                 new HealthSystem(),
                 new ExpRewardSystem(),
                 new DeathSystem(),
+                new DropSystem(),
+                new PickupSystem(),
+                new ItemUseSystem(),
                 new ReviveSystem(),
                 new NetSyncSystem(),
+                new DestroySystem(),
             };
+            FConsole.WriteLine("[DATABASE] Loading...");
+            var Cipher = new COFAC();
+            String TmpFile = Path.GetTempFileName();
+            Cipher.GenerateKey(0x2537); // must be changed to 2537
+
+            using (FileStream Reader = new FileStream("itemtype.dat", FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (FileStream Writer = new FileStream(TmpFile, FileMode.Open, FileAccess.Write, FileShare.Read))
+            {
+                Byte[] Buffer = new Byte[10240];
+
+                Int32 Length = Reader.Read(Buffer, 0, Buffer.Length);
+                while (Length > 0)
+                {
+                    fixed (Byte* pBuffer = Buffer)
+                        Cipher.Decrypt(pBuffer, Length);
+                    Writer.Write(Buffer, 0, Length);
+
+                    Length = Reader.Read(Buffer, 0, Buffer.Length);
+                }
+            }
+
+            Collections.ItemType.LoadFromTxt(TmpFile);
+            File.Delete(TmpFile);
+
+            Console.WriteLine("Ok!");
+            FConsole.WriteLine($"{Collections.ItemType.Count} item types loaded.");
             SquigglyDb.LoadMaps();
             SquigglyDb.LoadPortals();
             SquigglyDb.LoadLevelExp();
@@ -115,7 +145,7 @@ namespace MagnumOpus
             }
             catch
             {
-                FConsole.WriteLine($"[LOGIN] Client disconnected: {net.Socket.RemoteEndPoint}");
+                FConsole.WriteLine($"[LOGIN] Client disconnected");
                 net.Socket.Close();
                 net.Socket.Dispose();
             }
@@ -144,7 +174,7 @@ namespace MagnumOpus
                 net.Socket = client.Client;
 
                 net.DiffieHellman.ComputePublicKeyAsync();
-                var dhx = MsgDHX.Create(net.ClientIV, net.ServerIV, DiffieHellman.P, DiffieHellman.G, net.DiffieHellman.GetPublicKey());
+                var dhx = MsgDHX.Create(net.ClientIV, net.ServerIV, Networking.Cryptography.DiffieHellman.P, Networking.Cryptography.DiffieHellman.G, net.DiffieHellman.GetPublicKey());
                 ntt.NetSync(ref dhx);
 
                 var count = net.Socket.Receive(net.RecvBuffer.Span);
@@ -213,12 +243,12 @@ namespace MagnumOpus
                 catch
                 {
                     FConsole.WriteLine($"[GAME] Client disconnected: {net.Username}");
+                    net.Socket?.Close();
+                    net.Socket?.Dispose();
                     break;
                 }
             }
             
-            net.Socket.Close();
-            net.Socket.Dispose();
             PixelWorld.Destroy(in ntt);
         }
     }

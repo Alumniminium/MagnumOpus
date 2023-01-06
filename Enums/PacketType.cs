@@ -6,7 +6,7 @@
 
 namespace MagnumOpus.Enums
 {
-    public enum PacketId : short
+    public enum PacketId : ushort
     {
         MsgRemoteLogin = 1,
         MsgRemoteText = 2,
@@ -32,7 +32,7 @@ namespace MagnumOpus.Enums
         MsgLogin = 1052,
         MsgTransfer = 1055,
         MsgTrade = 1056,
-        MsgFloor = 1101,
+        MsgFloorItem = 1101,
         MsgStorage = 1102,
         MsgSyndicate = 1107,
         MsgNpc = 1109,

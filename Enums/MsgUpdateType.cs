@@ -10,7 +10,7 @@ namespace MagnumOpus.Enums
     {
         Health = 0,
         MaxHealth = 1,
-        CurrentMana = 2,
+        Mana = 2,
         MaxMana = 3,
         InvMoney = 4,
         Experience = 5,

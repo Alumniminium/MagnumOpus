@@ -14,15 +14,12 @@ namespace MagnumOpus.Simulation.Systems
             ref var item = ref itemNtt.Get<ItemComponent>();
 
             Game.Grids[pos.Map].Add(in itemNtt, ref pos);
-            
+
             var dropPos = new PositionComponent(itemNtt.Id, pos.Position, pos.Map);
             itemNtt.Add(ref dropPos);
 
             var dropMsg = MsgFloorItem.Create(in itemNtt, Enums.MsgFloorItemType.Create);
             ntt.NetSync(ref dropMsg, true);
-
-            // var removeInv = MsgItem.Create(ntt.NetId, itemNtt.NetId, itemNtt.NetId, PixelWorld.Tick, Enums.MsgItemType.RemoveInventory);
-            // ntt.NetSync(ref removeInv);
 
             ntt.Remove<DropRequestComponent>();
         }

@@ -12,7 +12,7 @@ namespace MagnumOpus.Networking.Packets
     {
         public ushort Size;
         public ushort Id;
-        public uint UniqueId;
+        public int UniqueId;
         public int ItemId;
         public ushort X, Y;
         public MsgFloorItemType MsgFloorItemType;
@@ -25,8 +25,8 @@ namespace MagnumOpus.Networking.Packets
             var packet = new MsgFloorItem
             {
                 Size = (ushort)sizeof(MsgFloorItem),
-                Id = 1101,
-                UniqueId = (uint)item.NetId,
+                Id = (ushort)PacketId.MsgFloorItem,
+                UniqueId = item.NetId,
                 X = (ushort)pos.Position.X,
                 Y = (ushort)pos.Position.Y,
                 ItemId = itemComponent.Id,
@@ -34,12 +34,12 @@ namespace MagnumOpus.Networking.Packets
             };
             return packet;
         }
-        public static MsgFloorItem Create(uint uid, ushort x, ushort y, int look, MsgFloorItemType type)
+        public static MsgFloorItem Create(int uid, ushort x, ushort y, int look, MsgFloorItemType type)
         {
             var packet = new MsgFloorItem
             {
                 Size = (ushort)sizeof(MsgFloorItem),
-                Id = 1101,
+                Id = (ushort)PacketId.MsgFloorItem,
                 UniqueId = uid,
                 X = x,
                 Y = y,
@@ -47,6 +47,23 @@ namespace MagnumOpus.Networking.Packets
                 MsgFloorItemType = type,
             };
             return packet;
+        }
+
+        [PacketHandler(PacketId.MsgFloorItem)]
+        public static void Process(PixelEntity ntt, Memory<byte> memory)
+        {
+            var msg = Co2Packet.Deserialze<MsgFloorItem>(in memory);
+
+            switch (msg.MsgFloorItemType)
+            {
+                case MsgFloorItemType.Pick:
+                {
+                    ref readonly var item = ref PixelWorld.GetEntityByNetId(msg.UniqueId);
+                    var pic = new PickupRequestComponent(ntt.Id, in item);
+                    ntt.Add(ref pic);
+                    break;
+                }
+            }
         }
     }
 }

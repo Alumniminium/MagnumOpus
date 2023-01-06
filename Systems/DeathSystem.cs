@@ -14,8 +14,8 @@ namespace MagnumOpus.Simulation.Systems
         public override void Update(in PixelEntity ntt, ref DeathTagComponent dtc)
         {
             var death = MsgInteract.Create(in dtc.Killer, in ntt, MsgInteractType.Death, 0);
-            // var despwan = MsgAction.RemoveEntity(ntt.NetId);
-            // ntt.NetSync(ref despwan, true);
+            var despwan = MsgAction.RemoveEntity(ntt.NetId);
+            ntt.NetSync(ref despwan, true);
             ntt.NetSync(ref death, true);
 
             ref var eff = ref ntt.Get<StatusEffectComponent>();
@@ -36,7 +36,7 @@ namespace MagnumOpus.Simulation.Systems
 
             if(ntt.Type == EntityType.Monster)
             {
-                eff.Effects |= StatusEffect.Fade;
+                eff.Effects |= StatusEffect.Dead;
                 ref readonly var cqc = ref ntt.Get<CqActionComponent>();
                 
                 long action = cqc.cq_Action;
@@ -52,10 +52,10 @@ namespace MagnumOpus.Simulation.Systems
             ref readonly var pos = ref ntt.Get<PositionComponent>();
             Game.Grids[pos.Map].Remove(in ntt);
             
-            // if(ntt.Type != EntityType.Player)
-            //     PixelWorld.Destroy(in ntt);
-            // else
-                ntt.Remove<DeathTagComponent>();
+            var ded = new DestroyEndOfFrameComponent(ntt.Id);
+            ntt.Add(ref ded);
+
+            ntt.Remove<DeathTagComponent>();
         }
     }
 }

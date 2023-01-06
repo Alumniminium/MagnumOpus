@@ -1,3 +1,4 @@
+using CO2_CORE_DLL.IO;
 using MagnumOpus.Squiggly.Models;
 
 namespace MagnumOpus.Squiggly
@@ -13,5 +14,6 @@ namespace MagnumOpus.Squiggly
         public static Dictionary<int, CqSpawnGenerator> Spawns { get; set; } = new();
         public static Dictionary<int, CqLevelExp> LevelExps { get; set; } = new();
         public static Dictionary<int, CqItemBonus> ItemBonus { get; set; } = new();
+        public static ItemType ItemType { get; set; } = new ItemType();
     }
 }

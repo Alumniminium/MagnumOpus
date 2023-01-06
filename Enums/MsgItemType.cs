@@ -11,7 +11,7 @@ namespace MagnumOpus.Enums
         BuyItemAddItem = 1,
         SellItem = 2,
         RemoveInventory = 3,
-        EquipItem = 4,
+        UseItem = 4,
         SetEquipPosition = 5,
         UnEquipItem = 6,
         ShowWarehouseMoney = 9,

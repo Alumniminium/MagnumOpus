@@ -55,6 +55,13 @@ namespace MagnumOpus.Networking.Packets
                     ntt.NetSync(memory[..sizeof(MsgItem)]);
                     break;
                 }
+                case MsgItemType.UseItem:
+                {
+                    var uic = new UseItemRequestComponent(ntt.Id, msg.UnqiueId, msg.Param);
+                    ntt.Add(ref uic);
+                    ntt.NetSync(memory[..sizeof(MsgItem)]);
+                    break;
+                }
                 default:
                     FConsole.WriteLine($"Unhandled MsgItem type: {msg.Type}");
                     FConsole.WriteLine(memory.Dump());

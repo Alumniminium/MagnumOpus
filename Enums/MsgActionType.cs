@@ -84,7 +84,7 @@ namespace MagnumOpus.Enums
         /// [135] 
         /// Data1 = EntityId
         /// </summary>
-        RemoveEntity = 135,
+        RemoveEntity = 132,
         TeleportReply = 138,
         ChangeFace = 142,
         DeathConfirmation = 145,

@@ -31,6 +31,11 @@ namespace MagnumOpus.Simulation.Systems
                     // TODO: calculate damage
 
                     var damage = Random.Shared.Next(1,10);
+                    if(ntt.Type == EntityType.Player)
+                        damage *= 2;
+                    if(ntt.Has<GuardComponent>())
+                        damage *= 10;
+
                     var dmg = new DamageComponent(in atk.Target, in ntt, damage);
                     atk.Target.Add(ref dmg);
 

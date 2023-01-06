@@ -90,27 +90,6 @@ namespace MagnumOpus.Networking.Packets
                 ntt.Add(ref atr);
             }
 
-            if (hlt.Health == 0)
-            {
-                hlt = new HealthComponent(ntt.Id, 100, 100);
-                ntt.Add(ref hlt);
-            }
-
-            if (lvl.Level == 0)
-            {
-                lvl = new LevelComponent(ntt.Id, 1);
-                ntt.Add(ref lvl);
-            }
-
-            if (mna.Mana == 0)
-            {
-                mna = new ManaComponent(ntt.Id)
-                {
-                    Mana = 100,
-                    MaxMana = 100
-                };
-                ntt.Add(ref mna);
-            }
             var packet = new MsgCharacter
             {
                 Size = (ushort)(sizeof(MsgCharacter) - 30 + ntc.Name.Length + spouseName.Length),

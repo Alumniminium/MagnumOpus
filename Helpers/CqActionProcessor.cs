@@ -187,6 +187,9 @@ namespace MagnumOpus.Helpers
 
         public static long Process(in PixelEntity ntt, cq_action action)
         {
+            if(action == null)
+                return 0;
+                
             var taskType = (TaskActionType)action.type;
 
             switch (taskType)
@@ -203,6 +206,11 @@ namespace MagnumOpus.Helpers
                     }
                 case TaskActionType.ACTION_MENULINK:
                     {
+                        if(!ntt.Has<TaskComponent>())
+                        {
+                            var tacComp = new TaskComponent(ntt.Id, 0);
+                            ntt.Add(ref tacComp);
+                        }
                         ref var tac = ref ntt.Get<TaskComponent>();
                         tac.OptionCount++;
                         var text = action.param.Trim().Split(' ')[0];

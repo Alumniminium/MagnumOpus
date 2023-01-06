@@ -11,7 +11,7 @@ namespace MagnumOpus.Components
         public uint Money;
         public uint CPs;
 
-        public readonly PixelEntity[] Items;
+        public PixelEntity[] Items;
 
         public InventoryComponent(int entityId, uint money, uint cps)
         {
