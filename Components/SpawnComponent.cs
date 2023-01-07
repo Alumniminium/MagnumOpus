@@ -10,7 +10,7 @@ namespace MagnumOpus.Components
             EntityId = entityId;
             SpawnId = spawnId;
         }
-        
-        public override int GetHashCode() => EntityId;        
+
+        public override int GetHashCode() => EntityId;
     }
 }

@@ -33,7 +33,7 @@ namespace MagnumOpus.Simulation.Systems
                     var damage = Random.Shared.Next(1,10);
                     if(ntt.Type == EntityType.Player)
                         damage *= 2;
-                    if(ntt.Has<GuardComponent>())
+                    if(ntt.Has<GuardPositionComponent>())
                         damage *= 10;
 
                     var dmg = new DamageComponent(in atk.Target, in ntt, damage);

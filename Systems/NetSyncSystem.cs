@@ -5,16 +5,15 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class NetSyncSystem : PixelSystem<NetSyncComponent>
+    public sealed class NetSyncSystem : PixelSystem<PositionComponent>
     {
         public NetSyncSystem() : base("NetSync System", threads: 1) { }
 
         protected override bool MatchesFilter(in PixelEntity ntt) => base.MatchesFilter(ntt);
 
-        public override void Update(in PixelEntity ntt, ref NetSyncComponent c1)
+        public override void Update(in PixelEntity ntt, ref PositionComponent pos)
         {
-            ref readonly var syn = ref ntt.Get<NetSyncComponent>();
-            if (syn.Fields.HasFlag(SyncThings.Walk) && ntt.Has<WalkComponent>())
+            if (ntt.Has<WalkComponent>())
             {
                 ref readonly var x = ref ntt.Get<WalkComponent>();
                 var pkt = MsgWalk.Create(ntt.NetId, x.Direction, x.IsRunning);

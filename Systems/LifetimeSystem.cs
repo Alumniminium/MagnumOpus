@@ -1,5 +1,5 @@
-using MagnumOpus.ECS;
 using MagnumOpus.Components;
+using MagnumOpus.ECS;
 
 namespace MagnumOpus.Simulation.Systems
 {
@@ -9,13 +9,12 @@ namespace MagnumOpus.Simulation.Systems
 
         public override void Update(in PixelEntity ntt, ref LifeTimeComponent ltc)
         {
-            ltc.LifeTimeSeconds -= deltaTime;
-
-            if (ltc.LifeTimeSeconds > 0)
+            if (ltc.ExpireTick > PixelWorld.Tick)
                 return;
-
+            
             var dtc = new DeathTagComponent();
             ntt.Add(ref dtc);
+            ntt.Remove<LifeTimeComponent>();
         }
     }
 }

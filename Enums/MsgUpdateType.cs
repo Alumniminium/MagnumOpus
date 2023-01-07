@@ -12,7 +12,7 @@ namespace MagnumOpus.Enums
         MaxHealth = 1,
         Mana = 2,
         MaxMana = 3,
-        InvMoney = 4,
+        MoneyInventory = 4,
         Experience = 5,
         PkPoints = 6,
         Class = 7,

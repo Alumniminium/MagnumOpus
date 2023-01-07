@@ -56,9 +56,9 @@ namespace MagnumOpus.Networking.Packets
 
         public static MsgCharacter Create(in PixelEntity ntt)
         {
+            ref var hed = ref ntt.Get<HeadComponent>();
             ref var bdy = ref ntt.Get<BodyComponent>();
             ref var lvl = ref ntt.Get<LevelComponent>();
-            ref var exp = ref ntt.Get<ExperienceComponent>();
             ref var pkp = ref ntt.Get<PkPointComponent>();
             ref var hlt = ref ntt.Get<HealthComponent>();
             ref var mna = ref ntt.Get<ManaComponent>();
@@ -75,7 +75,7 @@ namespace MagnumOpus.Networking.Packets
             // sNtc.Name ??= "None";
 
             var look = bdy.Look;
-            look = (uint)(bdy.FaceId * 10_000 + bdy.Look);
+            look = (uint)(hed.FaceId * 10_000 + bdy.Look);
 
             if (atr.Statpoints == 0)
             {
@@ -96,10 +96,10 @@ namespace MagnumOpus.Networking.Packets
                 Id = 1006,
                 EntityId = ntt.NetId,
                 Look = look,
-                Hair = bdy.Hair,
+                Hair = hed.Hair,
                 Money = inv.Money,
                 CPs = inv.CPs,
-                Experience = exp.Experience,
+                Experience = lvl.Experience,
                 Strength = atr.Strength,
                 Agility = atr.Agility,
                 Vitality = atr.Vitality,

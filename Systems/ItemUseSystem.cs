@@ -5,23 +5,23 @@ using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class ItemUseSystem : PixelSystem<InventoryComponent, UseItemRequestComponent>
+    public sealed class ItemUseSystem : PixelSystem<InventoryComponent, RequestItemUseComponent>
     {
         public ItemUseSystem() : base("ItemUse System", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref InventoryComponent inv, ref UseItemRequestComponent use)
+        public override void Update(in PixelEntity ntt, ref InventoryComponent inv, ref RequestItemUseComponent use)
         {
             ref var item = ref PixelWorld.GetEntityByNetId(use.ItemNetId);
             ref var itemComp = ref item.Get<ItemComponent>();
 
             if (Collections.ItemType.TryGetValue(itemComp.Id, out var entry))
             {
-                if (entry.Action != 0)
+                if (entry.Action > 0)
                 {
                     long next = entry.Action;
-                    while((next = CqActionProcessor.Process(in ntt, CqProcessor.GetAction(next))) != 0);
+                    while ((next = CqActionProcessor.Process(in ntt, CqProcessor.GetAction(next))) != 0) ;
                 }
-                else if(entry.Life > 0)
+                else if (entry.Life > 0)
                 {
                     ref var hlt = ref ntt.Get<HealthComponent>();
                     hlt.Health = Math.Clamp(hlt.Health + entry.Life, 0, hlt.MaxHealth);
@@ -35,7 +35,7 @@ namespace MagnumOpus.Simulation.Systems
                 }
             }
 
-            ntt.Remove<UseItemRequestComponent>();
+            ntt.Remove<RequestItemUseComponent>();
         }
     }
 }

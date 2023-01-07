@@ -38,12 +38,11 @@ namespace MagnumOpus.Networking.Packets
             var language = msg.GetLanguage();
             FConsole.WriteLine($"[GAME] Client Version: {msg.ClientVersion}, Language: {language}");
             ref readonly var net = ref ntt.Get<NetworkComponent>();
-            var bdy = new BodyComponent(ntt.Id);
+            var bdy = new BodyComponent(ntt.Id, (uint)(net.Username == "trbl" ? 2003 : 2002));
             var ntc = new NameTagComponent(ntt.Id, net.Username);
             var dir = new DirectionComponent(ntt.Id, Direction.South);
             var emo = new EmoteComponent(ntt.Id, Emote.Dance);
             var vwp = new ViewportComponent(ntt.Id, 40);
-            var syn = new NetSyncComponent(ntt.Id, SyncThings.All);
             var pos = new PositionComponent(ntt.Id, new System.Numerics.Vector2(438,377), 1002);
             var eff = new StatusEffectComponent(ntt.Id);
             var inv = new InventoryComponent(ntt.Id, 1000, 0);
@@ -52,13 +51,14 @@ namespace MagnumOpus.Networking.Packets
             var mana = new ManaComponent(ntt.Id, 100, 100);
             var pro = new ProfessionComponent(ntt.Id, ClasseName.InternTaoist);
             var sbc = new SpellBookComponent(ntt.Id);
+            var eqc = new EquipmentComponent(ntt.Id);
+
             sbc.Spells.Add(1000, (0, 0, 0));
             sbc.Spells.Add(1005, (0, 0, 0));
             ntt.Add(ref bdy);
             ntt.Add(ref ntc);
             ntt.Add(ref dir);
             ntt.Add(ref vwp);
-            ntt.Add(ref syn);
             ntt.Add(ref emo);
             ntt.Add(ref pos);
             ntt.Add(ref eff);
@@ -68,6 +68,7 @@ namespace MagnumOpus.Networking.Packets
             ntt.Add(ref pro);
             ntt.Add(ref hlt);
             ntt.Add(ref mana);
+            ntt.Add(ref eqc);
             
             var testItem = PixelWorld.CreateEntity(EntityType.Item);
             var itemComp = new ItemComponent(testItem.Id, 1001020, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);

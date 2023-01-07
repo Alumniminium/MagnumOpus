@@ -8,28 +8,21 @@ namespace MagnumOpus.Components
         public readonly int EntityId;
         public uint ChangedTick;
 
-        public int Head;
-        public int Armor;
-        public int MainHand;
-        public int OffHand;
-        public int Boots;
-        public int Garment;
+        public PixelEntity Head;
+        public PixelEntity Necklace;
+        public PixelEntity Garment;
+        public PixelEntity Armor;
+        public PixelEntity Ring;
+        public PixelEntity MainHand;
+        public PixelEntity OffHand;
+        public PixelEntity Boots;
 
         public EquipmentComponent(int entityId)
         {
             EntityId = entityId;
             ChangedTick = PixelWorld.Tick;
-            Head = 0;
-            Armor = 0;
-            MainHand = 0;
-            OffHand = 0;
-            Boots = 0;
-            Garment = 0;
         }
 
-        public override int GetHashCode()
-        {
-            return EntityId;
-        }
+        public override int GetHashCode() => EntityId;
     }
 }

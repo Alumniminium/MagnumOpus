@@ -1,5 +1,4 @@
 using MagnumOpus.ECS;
-using MagnumOpus.Enums;
 
 namespace MagnumOpus.Components
 {
@@ -9,21 +8,14 @@ namespace MagnumOpus.Components
         public readonly int EntityId;
         public uint ChangedTick;
         
-        internal ushort Hair;
         public uint Look;
-        internal Emote Emote;
-        public ushort FaceId;
 
-        public BodyComponent(int entityId, uint look = 1003, Emote emote = Emote.Stand, ushort hair = 310)
+        public BodyComponent(int entityId, uint look = 1003)
         {
             EntityId = entityId;
             ChangedTick = PixelWorld.Tick;
             Look = look;
-            Emote = emote;
-            Hair = hair;
-            FaceId = 6;
         }
-
 
         public override int GetHashCode() => EntityId;
     }

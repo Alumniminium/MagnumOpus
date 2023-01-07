@@ -25,9 +25,8 @@ namespace MagnumOpus.Networking.Packets
             ref readonly var ntc = ref owner.Get<NameTagComponent>();
             ref readonly var bdy = ref owner.Get<BodyComponent>();
             ref readonly var hlt = ref owner.Get<HealthComponent>();
-            ref readonly var trs = ref owner.Get<TransformationComponent>();
 
-            var look = trs.EntityId == owner.NetId ? trs.Look : bdy.Look;
+            var look = bdy.Look;
 
             var packet = new MsgTeamUpdate
             {

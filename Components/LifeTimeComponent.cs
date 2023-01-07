@@ -6,16 +6,13 @@ namespace MagnumOpus.Components
     public struct LifeTimeComponent
     {
         public readonly int EntityId;
-        public float LifeTimeSeconds;
+        public uint ExpireTick;
 
         public LifeTimeComponent(int entityId, TimeSpan timespan)
         {
             EntityId = entityId;
-            LifeTimeSeconds = (float)timespan.TotalSeconds;
+            ExpireTick = (uint)(PixelWorld.TargetTps * timespan.TotalSeconds);
         }
-        public override int GetHashCode()
-        {
-            return EntityId;
-        }
+        public override int GetHashCode() => EntityId;
     }
 }

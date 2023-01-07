@@ -57,19 +57,15 @@ namespace MagnumOpus.Networking.Packets
 
         public static MsgSpawn CreatePlayer(in PixelEntity ntt)
         {
+            ref readonly var hed = ref ntt.Get<HeadComponent>();
             ref readonly var bdy = ref ntt.Get<BodyComponent>();
             ref readonly var ntc = ref ntt.Get<NameTagComponent>();
-            ref readonly var lvl = ref ntt.Get<LevelComponent>();
             ref readonly var gld = ref ntt.Get<GuildComponent>();
-            ref readonly var hlt = ref ntt.Get<HealthComponent>();
             ref readonly var eqc = ref ntt.Get<EquipmentComponent>();
             ref readonly var pos = ref ntt.Get<PositionComponent>();
-            ref readonly var rbn = ref ntt.Get<RebornComponent>();
-            ref readonly var eff = ref ntt.Get<StatusEffectComponent>();
-            ref readonly var dir = ref ntt.Get<DirectionComponent>();
 
             var look = bdy.Look;
-            look = (uint)(bdy.FaceId * 10_000 + bdy.Look);
+            look = (uint)(hed.FaceId * 10_000 + bdy.Look);
             if (ntt.Has<DeathTagComponent>())
             {
                 if (bdy.Look % 10000 == 2001 || bdy.Look % 10000 == 2002)
@@ -84,20 +80,20 @@ namespace MagnumOpus.Networking.Packets
                 Id = 1014,
                 UniqueId = ntt.NetId,
                 Look = look,
-                StatusEffects = eff.Effects,
+                StatusEffects = ntt.Get<StatusEffectComponent>().Effects,
                 GuildRank = gld.Rank,
-                Head = eqc.Head,
-                Armor = eqc.Armor,
-                MainHand = eqc.MainHand,
-                OffHand = eqc.OffHand,
-                CurrentHp = (ushort)hlt.Health,
-                Level = lvl.Level,
+                Head = eqc.Head.Get<ItemComponent>().Id,
+                Armor = eqc.Armor.Get<ItemComponent>().Id,
+                MainHand = eqc.MainHand.Get<ItemComponent>().Id,
+                OffHand = eqc.OffHand.Get<ItemComponent>().Id,
+                CurrentHp = (ushort)ntt.Get<HealthComponent>().Health,
+                Level = ntt.Get<LevelComponent>().Level,
                 X = (ushort)pos.Position.X,
                 Y = (ushort)pos.Position.Y,
-                Hair = bdy.Hair,
-                Direction = dir.Direction,
-                Emote = bdy.Emote,
-                Reborn = rbn.Count,
+                Hair = hed.Hair,
+                Direction = ntt.Get<DirectionComponent>().Direction,
+                Emote = ntt.Get<EmoteComponent>().Emote,
+                Reborn = ntt.Get<RebornComponent>().Count,
                 GuildId = (ushort)gld.GuildId,
                 StringCount = 1,
                 NameLen = (byte)ntc.Name.Length,

@@ -28,6 +28,8 @@ namespace MagnumOpus.ECS
         private static Action? OnSecond;
         private static Action? OnTick;
 
+        public static readonly AutoResetEvent Sync = new(false);
+
         static PixelWorld()
         {
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
@@ -140,6 +142,7 @@ namespace MagnumOpus.ECS
                             Systems[x].EntityChanged(in ntt);
                     }
                     ChangedThisTick.Clear();
+                    Sync.Set();
                     PerformanceMetrics.AddSample(system.Name, Stopwatch.Elapsed.TotalMilliseconds - last);
                     last = Stopwatch.Elapsed.TotalMilliseconds;
                 }

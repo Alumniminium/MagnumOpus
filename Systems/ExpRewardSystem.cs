@@ -1,23 +1,24 @@
-using MagnumOpus.ECS;
 using MagnumOpus.Components;
+using MagnumOpus.ECS;
 using MagnumOpus.Networking.Packets;
+using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class ExpRewardSystem : PixelSystem<ExperienceComponent, ExpRewardComponent>
+    public sealed class ExpRewardSystem : PixelSystem<LevelComponent, ExpRewardComponent>
     {
         public ExpRewardSystem() : base("Exp Reward System", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref ExperienceComponent exp, ref ExpRewardComponent rew)
+        public override void Update(in PixelEntity ntt, ref LevelComponent lvl, ref ExpRewardComponent rew)
         {
-            exp.Experience += rew.Experience;
-            ntt.Remove<ExpRewardComponent>();
+            lvl.Experience += (uint)rew.Experience;
 
-            if(exp.Experience >= exp.ExperienceToNextLevel)
+            if(lvl.Experience >= lvl.ExperienceToNextLevel)
             {
-                ref var lvl = ref ntt.Get<LevelComponent>();
                 ref var hlt = ref ntt.Get<HealthComponent>();
                 lvl.Level++;
+                lvl.Experience = 0;
+                lvl.ExperienceToNextLevel = (uint)Collections.LevelExps[lvl.Level].ExpReq;
                 lvl.ChangedTick = PixelWorld.Tick;
                 hlt.Health = hlt.MaxHealth;
 
@@ -25,8 +26,9 @@ namespace MagnumOpus.Simulation.Systems
                 ntt.NetSync(ref lvlUp, false);
             }
 
-            var expUp = MsgUserAttrib.Create(ntt.NetId, exp.Experience, Enums.MsgUserAttribType.Experience);
+            var expUp = MsgUserAttrib.Create(ntt.NetId, lvl.Experience, Enums.MsgUserAttribType.Experience);
             ntt.NetSync(ref expUp, false);
+            ntt.Remove<ExpRewardComponent>();
         }
     }
 }

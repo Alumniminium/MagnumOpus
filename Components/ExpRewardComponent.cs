@@ -6,9 +6,9 @@ namespace MagnumOpus.Components
     public readonly struct ExpRewardComponent
     {
         public readonly int EntityId;
-        public readonly uint Experience;
+        public readonly int Experience;
 
-        public ExpRewardComponent(in PixelEntity ntt, uint experience)
+        public ExpRewardComponent(in PixelEntity ntt, int experience)
         {
             EntityId = ntt.Id;
             Experience = experience;

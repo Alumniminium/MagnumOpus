@@ -1,5 +1,5 @@
-using MagnumOpus.ECS;
 using MagnumOpus.Components;
+using MagnumOpus.ECS;
 using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
@@ -10,7 +10,8 @@ namespace MagnumOpus.Simulation.Systems
 
         public override void Update(in PixelEntity ntt, ref HealthComponent hlt, ref DamageComponent dmg)
         {
-            hlt.Health -= (ushort)dmg.Damage;
+            var actualDamage = Math.Clamp(dmg.Damage, 0,hlt.Health);
+            hlt.Health -= (ushort)actualDamage;
 
             if(hlt.Health <= 0)
             {
@@ -19,12 +20,12 @@ namespace MagnumOpus.Simulation.Systems
                 ntt.Add(ref dtc);
             }
 
-            ntt.Remove<DamageComponent>();
-            var expReward = new ExpRewardComponent(in dmg.Attacker, (ushort)dmg.Damage);
+            var expReward = new ExpRewardComponent(in dmg.Attacker, (ushort)actualDamage);
             dmg.Attacker.Add(ref expReward);
 
             var healthUpdate = MsgUserAttrib.Create(ntt.NetId, (ushort)hlt.Health, Enums.MsgUserAttribType.Health);
             ntt.NetSync(ref healthUpdate, true);
+            ntt.Remove<DamageComponent>();
         }
     }
 }

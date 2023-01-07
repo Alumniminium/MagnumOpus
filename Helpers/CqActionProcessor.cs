@@ -75,7 +75,7 @@ namespace MagnumOpus.Helpers
                         if(result >= 0)
                         {
                             x.Money = (uint)result;
-                            var pak = MsgUserAttrib.Create(ntt.NetId, x.Money, MsgUserAttribType.InvMoney);
+                            var pak = MsgUserAttrib.Create(ntt.NetId, x.Money, MsgUserAttribType.MoneyInventory);
                             ntt.NetSync(ref pak);
                             return true;
                         }
@@ -196,7 +196,7 @@ namespace MagnumOpus.Helpers
             {
                 case TaskActionType.ACTION_MENUTEXT:
                     {
-                        ref readonly var tac = ref ntt.Get<TaskComponent>();
+                        ref readonly var tac = ref ntt.Get<CqTaskComponent>();
                         var text = action.param.Replace("~", " ").Trim();
                         var textPacket = MsgTaskDialog.Create(in tac.Npc, 0, MsgTaskDialogAction.Text, text);
                         var textMem = Co2Packet.Serialize(ref textPacket, textPacket.Size);
@@ -206,12 +206,12 @@ namespace MagnumOpus.Helpers
                     }
                 case TaskActionType.ACTION_MENULINK:
                     {
-                        if(!ntt.Has<TaskComponent>())
+                        if(!ntt.Has<CqTaskComponent>())
                         {
-                            var tacComp = new TaskComponent(ntt.Id, 0);
+                            var tacComp = new CqTaskComponent(ntt.Id, 0);
                             ntt.Add(ref tacComp);
                         }
-                        ref var tac = ref ntt.Get<TaskComponent>();
+                        ref var tac = ref ntt.Get<CqTaskComponent>();
                         tac.OptionCount++;
                         var text = action.param.Trim().Split(' ')[0];
                         var optionId = int.Parse(action.param.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries)[1]);
@@ -224,7 +224,7 @@ namespace MagnumOpus.Helpers
                     }
                 case TaskActionType.ACTION_MENUEDIT:
                     {
-                        ref var tac = ref ntt.Get<TaskComponent>();
+                        ref var tac = ref ntt.Get<CqTaskComponent>();
                         tac.OptionCount++;
                         var text = action.param.Trim().Split(' ')[2];
                         var optionId = int.Parse(action.param.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries)[1]);
@@ -237,7 +237,7 @@ namespace MagnumOpus.Helpers
                     }
                 case TaskActionType.ACTION_MENUPIC:
                     {
-                        ref readonly var tac = ref ntt.Get<TaskComponent>();
+                        ref readonly var tac = ref ntt.Get<CqTaskComponent>();
                         var facePacket = MsgTaskDialog.Create(in tac.Npc, 0, MsgTaskDialogAction.Picture);
                         var faceId = byte.Parse(action.param.Trim().Split(' ')[2]);
                         facePacket.Avatar = faceId;
@@ -247,7 +247,7 @@ namespace MagnumOpus.Helpers
                     }
                 case TaskActionType.ACTION_MENUCREATE:
                     {
-                        ref var tac = ref ntt.Get<TaskComponent>();
+                        ref var tac = ref ntt.Get<CqTaskComponent>();
                         tac.OptionCount = 0;
                         var showPacket = MsgTaskDialog.Create(in tac.Npc, 0, MsgTaskDialogAction.Create);
                         var showMem = Co2Packet.Serialize(ref showPacket, showPacket.Size);
@@ -336,11 +336,11 @@ namespace MagnumOpus.Helpers
                     {
                         var parameters = action.param.Trim().Split(' ');
                         var style = parameters[1];
-                        ref var hair = ref ntt.Get<BodyComponent>();
-                        var color = (hair.Hair / 100) * 100;
-                        hair.Hair = (ushort)(color + int.Parse(style));
+                        ref var head = ref ntt.Get<HeadComponent>();
+                        var color = (head.Hair / 100) * 100;
+                        head.Hair = (ushort)(color + int.Parse(style));
 
-                        var msg = MsgUserAttrib.Create(ntt.NetId, hair.Hair, MsgUserAttribType.HairStyle);
+                        var msg = MsgUserAttrib.Create(ntt.NetId, head.Hair, MsgUserAttribType.HairStyle);
                         ntt.NetSync(ref msg, true);
                         return action.id_next;
                     }
@@ -388,9 +388,14 @@ namespace MagnumOpus.Helpers
                     {
                         var parameters = action.param.Trim().Split(' ');
                         var itemId = int.Parse(parameters[1]);
+
+                        if(!Collections.ItemType.TryGetValue(itemId, out var entry))
+                            return action.id_nextfail;
                         
                         ref var itemNtt = ref PixelWorld.CreateEntity(EntityType.Item);
-                        var itemComp = new ItemComponent(itemNtt.Id, itemId,0,0,0,0,0,0,0,0,0,0);
+
+                        var dura = (ushort)Random.Shared.Next(entry.Amount, entry.AmountLimit);
+                        var itemComp = new ItemComponent(itemNtt.Id, itemId, dura, entry.AmountLimit, 0,0,0,0,0,0,0,0);
                         itemNtt.Add(ref itemComp);
 
                         var drc = new DropRequestComponent(ntt.Id, itemNtt.NetId);

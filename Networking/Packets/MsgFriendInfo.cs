@@ -22,7 +22,6 @@ namespace MagnumOpus.Networking.Packets
 
         public static MsgFriendInfo Create(in PixelEntity target)
         {
-            ref readonly var trs = ref target.Get<TransformationComponent>();
             ref readonly var bdy = ref target.Get<BodyComponent>();
             ref readonly var gld = ref target.Get<GuildComponent>();
             ref readonly var mar = ref target.Get<MarriageComponent>();

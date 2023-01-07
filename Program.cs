@@ -42,23 +42,25 @@ namespace MagnumOpus
                 new PickupSystem(),
                 new ItemUseSystem(),
                 new ReviveSystem(),
+                new ShopSystem(),
+                new EquipSystem(),
                 new NetSyncSystem(),
                 new DestroySystem(),
             };
             FConsole.WriteLine("[DATABASE] Loading...");
             var Cipher = new COFAC();
-            String TmpFile = Path.GetTempFileName();
+            string TmpFile = Path.GetTempFileName();
             Cipher.GenerateKey(0x2537); // must be changed to 2537
 
-            using (FileStream Reader = new FileStream("itemtype.dat", FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (FileStream Writer = new FileStream(TmpFile, FileMode.Open, FileAccess.Write, FileShare.Read))
+            using (FileStream Reader = new ("CLIENT_FILES/itemtype.dat", FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (FileStream Writer = new (TmpFile, FileMode.Open, FileAccess.Write, FileShare.Read))
             {
-                Byte[] Buffer = new Byte[10240];
+                var Buffer = new byte[10240];
 
-                Int32 Length = Reader.Read(Buffer, 0, Buffer.Length);
+                var Length = Reader.Read(Buffer, 0, Buffer.Length);
                 while (Length > 0)
                 {
-                    fixed (Byte* pBuffer = Buffer)
+                    fixed (byte* pBuffer = Buffer)
                         Cipher.Decrypt(pBuffer, Length);
                     Writer.Write(Buffer, 0, Length);
 
@@ -68,9 +70,11 @@ namespace MagnumOpus
 
             Collections.ItemType.LoadFromTxt(TmpFile);
             File.Delete(TmpFile);
+            Collections.MagicType.LoadFromDat("CLIENT_FILES/MagicType.dat");
 
-            Console.WriteLine("Ok!");
+            FConsole.WriteLine($"{Collections.MagicType.Count} magic types loaded.");
             FConsole.WriteLine($"{Collections.ItemType.Count} item types loaded.");
+            SquigglyDb.LoadShopDat("CLIENT_FILES/Shop.dat");
             SquigglyDb.LoadMaps();
             SquigglyDb.LoadPortals();
             SquigglyDb.LoadLevelExp();
@@ -108,6 +112,7 @@ namespace MagnumOpus
             while (true)
             {
                 var client = LoginListener.AcceptTcpClient();
+                PixelWorld.Sync.WaitOne();
                 var player = PixelWorld.CreateEntity(EntityType.Player);
                 var net = new NetworkComponent(in player, client.Client);
                 player.Add(ref net);
@@ -214,12 +219,10 @@ namespace MagnumOpus
             {
                 try
                 {
-                    var count = net.Socket.Receive(net.RecvBuffer.Span[..1]);
+                    var count = net.Socket.Receive(net.RecvBuffer.Span[..2]);
 
-                    if (count == 0)
-                        break;
-                        
-                    count += net.Socket.Receive(net.RecvBuffer.Span[1..2]);
+                    if (count != 2)
+                        throw new Exception("NO DIE");
 
                     net.GameCrypto.Decrypt(net.RecvBuffer.Span[..count]);
                     var size = BitConverter.ToUInt16(net.RecvBuffer.Span[..count]) + 8;
@@ -230,7 +233,7 @@ namespace MagnumOpus
                         count += received;
 
                         if (received == 0)
-                            break;
+                            throw new Exception("NO DIE");
                     }
 
                     var packet = net.RecvBuffer[..size];

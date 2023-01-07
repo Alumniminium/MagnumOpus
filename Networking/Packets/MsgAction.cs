@@ -148,8 +148,8 @@ namespace MagnumOpus.Networking.Packets
                 case MsgActionType.ChangeFace:
                     {
                         FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId}");
-                        ref var bdy = ref ntt.Get<BodyComponent>();
-                        bdy.FaceId = (ushort)msg.Param;
+                        ref var head = ref ntt.Get<HeadComponent>();
+                        head.FaceId = (ushort)msg.Param;
                         ntt.NetSync(memory[..msg.Size], true);
                         break;
                     }

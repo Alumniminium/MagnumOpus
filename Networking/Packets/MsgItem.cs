@@ -49,19 +49,44 @@ namespace MagnumOpus.Networking.Packets
                     // ntt.NetSync(ref tick);
                     break;
                 case MsgItemType.RemoveInventory:
-                {
-                    var drc = new DropRequestComponent(ntt.Id, msg.UnqiueId);
-                    ntt.Add(ref drc);
-                    ntt.NetSync(memory[..sizeof(MsgItem)]);
-                    break;
-                }
+                    {
+                        var drc = new DropRequestComponent(ntt.Id, msg.UnqiueId);
+                        ntt.Add(ref drc);
+
+                        ntt.NetSync(memory[..sizeof(MsgItem)]);
+                        break;
+                    }
                 case MsgItemType.UseItem:
-                {
-                    var uic = new UseItemRequestComponent(ntt.Id, msg.UnqiueId, msg.Param);
-                    ntt.Add(ref uic);
-                    ntt.NetSync(memory[..sizeof(MsgItem)]);
-                    break;
-                }
+                case MsgItemType.UnEquipItem:
+                    {
+                        var itemNttId = msg.UnqiueId;
+                        var slot = msg.Param;
+
+                        if (slot == 0)
+                        {
+                            var uic = new RequestItemUseComponent(ntt.Id, itemNttId, slot);
+                            ntt.Add(ref uic);
+                        }
+                        else
+                        {
+                            var rue = new RequestChangeEquipComponent(ntt.Id, itemNttId, slot, msg.Type == MsgItemType.UseItem);
+                            ntt.Add(ref rue);
+                        }
+                        ntt.NetSync(memory[..sizeof(MsgItem)]);
+                        break;
+                    }
+                case MsgItemType.SellItem:
+                case MsgItemType.BuyItemAddItem:
+                    {
+                        var shopId = msg.UnqiueId;
+                        var itemId = msg.Param;
+
+                        var rbi = new RequestShopItemTransactionComponent(ntt.Id, shopId, itemId, msg.Type == MsgItemType.BuyItemAddItem);
+                        ntt.Add(ref rbi);
+
+                        ntt.NetSync(memory[..sizeof(MsgItem)]);
+                        break;
+                    }
                 default:
                     FConsole.WriteLine($"Unhandled MsgItem type: {msg.Type}");
                     FConsole.WriteLine(memory.Dump());

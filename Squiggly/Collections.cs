@@ -15,5 +15,7 @@ namespace MagnumOpus.Squiggly
         public static Dictionary<int, CqLevelExp> LevelExps { get; set; } = new();
         public static Dictionary<int, CqItemBonus> ItemBonus { get; set; } = new();
         public static ItemType ItemType { get; set; } = new ItemType();
+        public static MagicType MagicType { get; set; } = new MagicType();
+        public static Dictionary<int, ShopDatEntry> Shops { get; set; } = new();
     }
 }

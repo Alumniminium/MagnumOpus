@@ -6,12 +6,12 @@ using MagnumOpus.Helpers;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class GuardAISystem : PixelSystem<PositionComponent, ViewportComponent, GuardComponent, BrainComponent>
+    public sealed class GuardAISystem : PixelSystem<PositionComponent, ViewportComponent, GuardPositionComponent, BrainComponent>
     {
         public GuardAISystem() : base("Guard AI System", threads: 1) { }
         protected override bool MatchesFilter(in PixelEntity ntt) => ntt.Type == EntityType.Monster && base.MatchesFilter(in ntt);
 
-        public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref ViewportComponent vwp, ref GuardComponent grd, ref BrainComponent brn)
+        public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref ViewportComponent vwp, ref GuardPositionComponent grd, ref BrainComponent brn)
         {
             if (brn.State == BrainState.Sleeping)
             {
@@ -37,7 +37,7 @@ namespace MagnumOpus.Simulation.Systems
                     if (b.Type != EntityType.Monster)
                         continue;
 
-                    if (b.Has<GuardComponent>())
+                    if (b.Has<GuardPositionComponent>())
                         continue;
 
                     ref readonly var targetPos = ref b.Get<PositionComponent>();

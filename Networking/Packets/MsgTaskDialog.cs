@@ -22,13 +22,13 @@ namespace MagnumOpus.Networking.Packets
 
         public static MsgTaskDialog Create(in PixelEntity target, byte optionId, MsgTaskDialogAction action, string text = "")
         {
-            ref readonly var bdy = ref target.Get<BodyComponent>();
+            ref readonly var hed = ref target.Get<HeadComponent>();
             var packet = new MsgTaskDialog
             {
                 Size = (ushort)(14 + text.Length),
                 Id = 2032,
                 UniqeId = target.NetId,
-                Avatar = bdy.FaceId,
+                Avatar = hed.FaceId,
                 OptionId = optionId,
                 Action = action
             };
@@ -63,7 +63,7 @@ namespace MagnumOpus.Networking.Packets
 
             cq_action action;
             var nextId = cq_task.id_next;
-            var taskComponent = new TaskComponent(ntt.Id, npc.Id);
+            var taskComponent = new CqTaskComponent(ntt.Id, npc.Id);
             ntt.Add(ref taskComponent);
             do
             {
@@ -81,33 +81,33 @@ namespace MagnumOpus.Networking.Packets
         [PacketHandler(PacketId.MsgDialog2)]
         public static void Process2(PixelEntity ntt, Memory<byte> memory)
         {
-            if (!ntt.Has<TaskComponent>())
+            if (!ntt.Has<CqTaskComponent>())
                 return;
 
             var msgTaskDialog = Co2Packet.Deserialze<MsgTaskDialog>(in memory);
 
             if (msgTaskDialog.OptionId == 255 || msgTaskDialog.OptionId == 0)
             {
-                ntt.Remove<TaskComponent>();
+                ntt.Remove<CqTaskComponent>();
                 return;
             }
 
             var npc = PixelWorld.GetEntityByNetId(msgTaskDialog.UniqeId);
             using var ctx = new SquigglyContext();
 
-            ref readonly var taskComponent = ref ntt.Get<TaskComponent>();
+            ref readonly var taskComponent = ref ntt.Get<CqTaskComponent>();
             var option = taskComponent.Options[msgTaskDialog.OptionId];
 
             if (option == -1)
             {
-                ntt.Remove<TaskComponent>();
+                ntt.Remove<CqTaskComponent>();
                 return;
             }
             var task = CqProcessor.GetTask(option);
 
             if (task == null)
             {
-                ntt.Remove<TaskComponent>();
+                ntt.Remove<CqTaskComponent>();
                 return;
             }
 
