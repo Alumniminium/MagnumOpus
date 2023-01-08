@@ -1,3 +1,4 @@
+using System.Net.Security;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Networking.Packets;
@@ -10,6 +11,23 @@ namespace MagnumOpus.Simulation.Systems
 
         public override void Update(in PixelEntity ntt,ref PositionComponent pos, ref InventoryComponent inv, ref PickupRequestComponent pic)
         {
+            var emptyIdx = Array.IndexOf(inv.Items, default);
+
+            if (emptyIdx == -1)
+            {
+                ntt.Remove<PickupRequestComponent>();
+                return;
+            }
+
+            Game.Grids[pos.Map].Remove(in pic.Item);
+            pic.Item.Remove<PositionComponent>();
+            inv.Items[emptyIdx] = pic.Item;
+
+            var dropMsg = MsgFloorItem.Create(in pic.Item, Enums.MsgFloorItemType.Delete);
+            ntt.NetSync(ref dropMsg, true);
+            
+            inv.Items = inv.Items.OrderByDescending(x => x.Get<ItemComponent>().Id).ToArray();
+            
             for (var i = 0; i < inv.Items.Length; i++)
             {
                 if (inv.Items[i].Id != 0)
@@ -18,23 +36,6 @@ namespace MagnumOpus.Simulation.Systems
                     ntt.NetSync(ref dropMsg);
                 }
             }
-
-            for(int i = 0; i < inv.Items.Length; i++)
-            {
-                if(inv.Items[i].Id == 0)
-                {
-                    Game.Grids[pos.Map].Remove(in pic.Item);
-                    pic.Item.Remove<PositionComponent>();
-                    inv.Items[i] = pic.Item;
-
-                    var dropMsg = MsgFloorItem.Create(in pic.Item, Enums.MsgFloorItemType.Delete);
-                    ntt.NetSync(ref dropMsg, true);
-                    break;
-                }
-            }
-
-            inv.Items = inv.Items.OrderByDescending(x => x.Get<ItemComponent>().Id).ToArray();
-
             for (var i = 0; i < inv.Items.Length; i++)
             {
                 if (inv.Items[i].Id != 0)

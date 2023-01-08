@@ -25,7 +25,7 @@ namespace MagnumOpus.Simulation.Systems
             Game.Grids[pos.Map].Move(in ntt, ref pos);
             Game.Grids[pos.Map].GetVisibleEntities(ref vwp);
             
-            // FConsole.WriteLine($"[{nameof(ViewportSystem)}] {ntt.Id} -> {vwp.EntitiesVisible.Count} entities visible");
+            FConsole.WriteLine($"[{nameof(ViewportSystem)}] {ntt.Id} -> {vwp.EntitiesVisible.Count} entities visible");
 
             if (ntt.Type != EntityType.Player)
                 return;
@@ -33,6 +33,12 @@ namespace MagnumOpus.Simulation.Systems
             for (var i = 0; i < vwp.EntitiesVisible.Count; i++)
             {
                 var b = vwp.EntitiesVisible[i];
+                if(b.Has<ViewportComponent>())
+                {
+                    ref readonly var bvwp = ref b.Get<ViewportComponent>();
+                    if (!bvwp.EntitiesVisible.Contains(ntt))
+                        bvwp.EntitiesVisible.Add(ntt);
+                }
 
                 if(b.Has<BrainComponent>())
                 {

@@ -61,6 +61,7 @@ namespace MagnumOpus.Networking.Packets
                     ref readonly var item = ref PixelWorld.GetEntityByNetId(msg.UniqueId);
                     var pic = new PickupRequestComponent(ntt.Id, in item);
                     ntt.Add(ref pic);
+                    ntt.NetSync(memory[0..msg.Size], true);
                     break;
                 }
             }

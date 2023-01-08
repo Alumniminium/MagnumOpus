@@ -36,7 +36,7 @@ namespace MagnumOpus.Squiggly
                     var dir = new DirectionComponent(obj.Id, (Direction)Random.Shared.Next(0, 9));
                     var hp = new HealthComponent(obj.Id, prefab.Health, prefab.MaxHealth);
                     var ntc = new NameTagComponent(obj.Id, prefab.Name);
-                    var vwp = new ViewportComponent(obj.Id, 18f);
+                    var vwp = new ViewportComponent(obj.Id, 40f);
 
                     if(prefab.CQAction != 0)
                     {
@@ -131,10 +131,12 @@ namespace MagnumOpus.Squiggly
                     var pos = new PositionComponent(ntt.Id, new Vector2(cqNpc.cellx, cqNpc.celly), cqNpc.mapid);
                     var bdy = new BodyComponent(ntt.Id, cqNpc.lookface);
                     var npcc = new NpcComponent(ntt.Id, npc.Base, npc.Type, npc.Sort);
+                    var vwp = new ViewportComponent(ntt.Id, 40);
                     ntt.Add(ref pos);
                     ntt.Add(ref bdy);
                     ntt.Add(ref npcc);
-                    
+                    ntt.Add(ref vwp);
+
                     if (!Game.Grids.ContainsKey(pos.Map))
                     {
                         if (!Collections.Maps.TryGetValue(pos.Map, out var map))

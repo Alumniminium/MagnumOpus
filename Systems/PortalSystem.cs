@@ -19,7 +19,7 @@ namespace MagnumOpus.Simulation.Systems
             var entry = Collections.DmapPortals.FirstOrDefault(p => p.MapId == mapId && Math.Abs(p.X - x) < 5 && Math.Abs(p.Y - y) < 5);
             if (entry == null)
             {
-                FConsole.WriteLine($"PortalSystem: No Dmap Portal found at {ptc.X}, {ptc.Y} on map {mapId}");
+                FConsole.WriteLine($"[{nameof(PortalSystem)}] {ntt.NetId} -> No Dmap Portal found at {ptc.X}, {ptc.Y} on map {mapId}");
                 ntt.Remove<PortalComponent>();
                 return;
             }
@@ -27,7 +27,7 @@ namespace MagnumOpus.Simulation.Systems
             var passway = Collections.CqPassway.FirstOrDefault(x => x.mapid == mapId && x.passway_idx == entry.PortalId);
             if (passway == null)
             {
-                FConsole.WriteLine($"PortalSystem: No Passway for {entry.PortalId} on map {mapId}");
+                FConsole.WriteLine($"[{nameof(PortalSystem)}] {ntt.NetId} -> No Passway for {entry.PortalId} on map {mapId}");
                 ntt.Remove<PortalComponent>();
                 return;
             }
@@ -35,7 +35,7 @@ namespace MagnumOpus.Simulation.Systems
             var exit = Collections.CqPortal.FirstOrDefault(x => x.MapId == passway.passway_mapid && x.IdX == passway.passway_mapportal);
             if (exit == null)
             {
-                FConsole.WriteLine($"PortalSystem: No Exit Portal for {passway.passway_mapid} on map {passway.passway_mapportal}");
+                FConsole.WriteLine($"[{nameof(PortalSystem)}] {ntt.NetId} -> No Exit Portal for {passway.passway_mapid} on map {passway.passway_mapportal}");
                 ntt.Remove<PortalComponent>();
                 return;
             }

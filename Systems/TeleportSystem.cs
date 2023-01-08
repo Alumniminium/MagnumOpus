@@ -16,14 +16,13 @@ namespace MagnumOpus.Simulation.Systems
             pos.Map = tpc.Map;
             pos.ChangedTick = PixelWorld.Tick;
 
-            FConsole.WriteLine($"[{nameof(TeleportSystem)}]: Teleported {ntt.NetId} to {tpc.Map} at {tpc.X}, {tpc.Y}");
-
             var tpP = MsgAction.Create(ntt.NetId, tpc.Map, tpc.X, tpc.Y, Enums.Direction.South, Enums.MsgActionType.SendLocation);
             ntt.NetSync(ref tpP);
             var mapStatus = MsgStatus.Create(tpc.Map, (uint)Enums.MapFlags.None);
             ntt.NetSync(in mapStatus);
 
             ntt.Remove<TeleportComponent>();
+            FConsole.WriteLine($"[{nameof(TeleportSystem)}]: Teleported {ntt.NetId} to {tpc.Map} at {tpc.X}, {tpc.Y}");
         }
     }
 }

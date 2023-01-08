@@ -48,6 +48,8 @@ namespace MagnumOpus.Simulation.Systems
 
             ntt.Add(ref pos);
             ntt.Remove<ReviveComponent>();
+
+            FConsole.WriteLine($"[{nameof(ReviveSystem)}]: Revived {ntt.NetId} at {pos.Map} at {pos.Position.X}, {pos.Position.Y}");
         }
     }
 }

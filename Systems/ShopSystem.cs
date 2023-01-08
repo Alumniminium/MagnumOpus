@@ -1,3 +1,4 @@
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -10,38 +11,42 @@ namespace MagnumOpus.Simulation.Systems
     {
         public ShopSystem() : base("Shop System", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref InventoryComponent inv, ref RequestShopItemTransactionComponent tranaction)
+        public override void Update(in PixelEntity ntt, ref InventoryComponent inv, ref RequestShopItemTransactionComponent txc)
         {
-            var itemId = tranaction.ItemId;
+            var itemId = txc.ItemId;
 
-            if(!tranaction.Buy)
+            if(!txc.Buy)
             {
                 ref readonly var itemNtt = ref PixelWorld.GetEntityByNetId(itemId);
                 ref readonly var itemComp = ref itemNtt.Get<ItemComponent>();
                 itemId = itemComp.Id;
             }
 
-            if (!Collections.Shops.TryGetValue(tranaction.ShopId, out var entry))
+            if (!Collections.Shops.TryGetValue(txc.ShopId, out var shopEntry))
             {
+                FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.NetId} tried to {(txc.Buy ? "buy" : "sell")} from shop {txc.ShopId} but it doesn't exist in Shops.dat");
                 ntt.Remove<RequestShopItemTransactionComponent>();
                 return;
             }
 
-            if (!entry.Items.Contains(itemId) && tranaction.Buy)
+            if (!shopEntry.Items.Contains(itemId) && txc.Buy)
             {
                 ntt.Remove<RequestShopItemTransactionComponent>();
+                FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.NetId} tried to {(txc.Buy ? "buy" : "sell")} {itemId} but it doesn't exist in the shop {txc.ShopId}");
                 return;
             }
 
             if (!Collections.ItemType.TryGetValue(itemId, out var itemEntry))
             {
                 ntt.Remove<RequestShopItemTransactionComponent>();
+                FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.NetId} tried to {(txc.Buy ? "buy" : "sell")} {itemId} but it doesn't exist in ItemType.dat");
                 return;
             }
 
-            if (inv.Money < itemEntry.Price && tranaction.Buy)
+            if (inv.Money < itemEntry.Price && txc.Buy)
             {
-                ntt.Remove<RequestShopItemTransactionComponent>();
+                ntt.Remove<RequestShopItemTransactionComponent>(); 
+                FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.NetId} tried to buy {itemId} with {inv.Money} but it costs {itemEntry.Price}");
                 return;
             }
 
@@ -49,33 +54,36 @@ namespace MagnumOpus.Simulation.Systems
             for (int i = 0; i < inv.Items.Length; i++)
             {
                 ref readonly var itemComp = ref inv.Items[i].Get<ItemComponent>();
-                if (itemComp.Id == 0 && tranaction.Buy || itemComp.Id == itemId && !tranaction.Buy)
+                if (itemComp.Id == 0 && txc.Buy || itemComp.Id == itemId && !txc.Buy)
                 {
-                    if(tranaction.Buy)
+                    if(txc.Buy)
                     {
                         inv.Money -= itemEntry.Price;
                         ref var itemNtt = ref PixelWorld.CreateEntity(EntityType.Item);
-                        var newItemComp = new ItemComponent(itemNtt.Id, tranaction.ItemId, itemEntry.Amount, itemEntry.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
+                        var newItemComp = new ItemComponent(itemNtt.Id, txc.ItemId, itemEntry.Amount, itemEntry.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
                         itemNtt.Add(ref newItemComp);
                         inv.Items[i] = itemNtt;
 
                         var msg = MsgItemInformation.Create(in itemNtt);
                         ntt.NetSync(ref msg);
+
+                        FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.NetId} bought {txc.ItemId} for {itemEntry.Price} and now has {inv.Money} left");
                     }
                     else
                     {
-                        Collections.ItemType.TryGetValue(tranaction.ItemId, out var Info);
+                        Collections.ItemType.TryGetValue(itemComp.Id, out var Info);
                         
                         var money = Info.Price / 3;
                         money = (uint)((double)money * ((float)itemComp.CurrentDurability / itemComp.MaximumDurability));
-
                         inv.Money += money;
-                        ref var itemNtt = ref PixelWorld.GetEntityByNetId(tranaction.ItemId);
+
+                        ref var itemNtt = ref PixelWorld.GetEntityByNetId(txc.ItemId);
                         var def = new DestroyEndOfFrameComponent();
                         itemNtt.Add(ref def);
 
                         var msg = MsgItem.Create(itemNtt.NetId, 0, 0, PixelWorld.Tick, MsgItemType.RemoveInventory);
                         ntt.NetSync(ref msg);
+                        FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.NetId} sold {txc.ItemId} for {money} and now has {inv.Money}");
                     }
                     var moneyMsg = MsgUserAttrib.Create(ntt.NetId, inv.Money, MsgUserAttribType.MoneyInventory);
                     ntt.NetSync(ref moneyMsg);

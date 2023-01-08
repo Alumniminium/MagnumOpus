@@ -1,10 +1,10 @@
 using HerstLib.IO;
-using MagnumOpus.ECS;
-using MagnumOpus.Helpers;
 using MagnumOpus.Components;
-using MagnumOpus.Networking.Packets;
+using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using MagnumOpus.Helpers;
 using MagnumOpus.Networking;
+using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
@@ -28,6 +28,7 @@ namespace MagnumOpus.Simulation.Systems
             var msgText = MsgText.Create(in ntt, text, MsgTextType.Talk);
             var serialized = Co2Packet.Serialize(ref msgText, msgText.Size);
             ntt.NetSync(serialized);
+            FConsole.WriteLine($"[{nameof(WalkSystem)}] {ntt.Id} -> {text}");
         }
     }
 }
