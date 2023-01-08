@@ -3,15 +3,15 @@ using MagnumOpus.ECS;
 namespace MagnumOpus.Components
 {
     [Component]
-    public readonly struct RequestDropItemComponent
+    public readonly struct MoneyRewardComponent
     {
         public readonly int EntityId;
-        public readonly int ItemNetId;
+        public readonly int Amount;
 
-        public RequestDropItemComponent(int entityId, int itemNetId)
+        public MoneyRewardComponent(int entityId, int amount)
         {
             EntityId = entityId;
-            ItemNetId = itemNetId;
+            Amount = amount;
         }
 
         public override int GetHashCode() => EntityId;

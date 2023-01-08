@@ -1,24 +1,18 @@
-﻿// -------- Yi --------
-// Project: Library File: MsgItemType.cs 
-// Created: 27/10/2015/2015 at 3:09 PM
-// Last Edit: 08/12/2015 at 12:31 PM
-// By: Buddha
-
-namespace MagnumOpus.Enums
+﻿namespace MagnumOpus.Enums
 {
     public enum MsgItemType
     {
-        BuyItemAddItem = 1,
-        SellItem = 2,
+        Buy = 1,
+        Sell = 2,
         RemoveInventory = 3,
-        UseItem = 4,
+        Use = 4,
         SetEquipPosition = 5,
-        UnEquipItem = 6,
+        UnEquip = 6,
         ShowWarehouseMoney = 9,
         DepositWarehouseMoney = 10,
         WithdrawWarehouseMoney = 11,
-        DropGold = 12,
-        RepairItem = 14,
+        DropMoney = 12,
+        Repair = 14,
         UpdateDurability = 17,
         RemoveEquipment = 18,
         UpgradeDragonball = 19,

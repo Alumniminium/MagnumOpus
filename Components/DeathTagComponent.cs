@@ -7,11 +7,13 @@ namespace MagnumOpus.Components
     {
         public readonly int EntityId;
         public readonly PixelEntity Killer;
+        public readonly uint Tick;
         
         public DeathTagComponent(int entityId, in PixelEntity killer)
         {
             EntityId = entityId;
             Killer = killer;
+            Tick = PixelWorld.Tick;
         }
         public override int GetHashCode() => EntityId;
     }

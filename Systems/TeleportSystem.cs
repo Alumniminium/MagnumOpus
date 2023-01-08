@@ -18,8 +18,8 @@ namespace MagnumOpus.Simulation.Systems
 
             var tpP = MsgAction.Create(ntt.NetId, tpc.Map, tpc.X, tpc.Y, Enums.Direction.South, Enums.MsgActionType.SendLocation);
             ntt.NetSync(ref tpP);
-            var mapStatus = MsgStatus.Create(tpc.Map, (uint)Enums.MapFlags.None);
-            ntt.NetSync(in mapStatus);
+            var mapStatus = MsgMapStatus.Create(tpc.Map, (uint)Enums.MapFlags.None);
+            ntt.NetSync(ref mapStatus);
 
             ntt.Remove<TeleportComponent>();
             FConsole.WriteLine($"[{nameof(TeleportSystem)}]: Teleported {ntt.NetId} to {tpc.Map} at {tpc.X}, {tpc.Y}");

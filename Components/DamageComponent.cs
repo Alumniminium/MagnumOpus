@@ -15,9 +15,6 @@ namespace MagnumOpus.Components
             Attacker = attacker;
             Damage = damage;
         }
-        public override int GetHashCode()
-        {
-            return EntityId;
-        }
+        public override int GetHashCode() => EntityId;
     }
 }

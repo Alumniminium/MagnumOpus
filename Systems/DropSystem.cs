@@ -4,11 +4,11 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class DropSystem : PixelSystem<PositionComponent, DropRequestComponent>
+    public sealed class DropSystem : PixelSystem<PositionComponent, RequestDropItemComponent>
     {
         public DropSystem() : base("Drop System", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref DropRequestComponent drc)
+        public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref RequestDropItemComponent drc)
         {
             ref var itemNtt = ref PixelWorld.GetEntityByNetId(drc.ItemNetId);
             ref var item = ref itemNtt.Get<ItemComponent>();
@@ -21,7 +21,7 @@ namespace MagnumOpus.Simulation.Systems
             var dropMsg = MsgFloorItem.Create(in itemNtt, Enums.MsgFloorItemType.Create);
             ntt.NetSync(ref dropMsg, true);
 
-            ntt.Remove<DropRequestComponent>();
+            ntt.Remove<RequestDropItemComponent>();
         }
     }
 }

@@ -1,8 +1,5 @@
 using System.Globalization;
-using System.Runtime.InteropServices;
-using System.Timers;
 using HerstLib.IO;
-using Humanizer;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -10,7 +7,6 @@ using MagnumOpus.Networking;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Squiggly;
 using MagnumOpus.Squiggly.Models;
-using Org.BouncyCastle.Ocsp;
 
 namespace MagnumOpus.Helpers
 {
@@ -404,11 +400,11 @@ namespace MagnumOpus.Helpers
 
                         ref var itemNtt = ref PixelWorld.CreateEntity(EntityType.Item);
 
-                        var dura = (ushort)Random.Shared.Next(1, entry.AmountLimit);
+                        var dura = (ushort)Random.Shared.Next(0, entry.AmountLimit);
                         var itemComp = new ItemComponent(itemNtt.Id, itemId, dura, entry.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
                         itemNtt.Add(ref itemComp);
 
-                        var drc = new DropRequestComponent(ntt.Id, itemNtt.NetId);
+                        var drc = new RequestDropItemComponent(ntt.Id, itemNtt.NetId);
                         ntt.Add(ref drc);
 
 

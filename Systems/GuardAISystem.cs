@@ -37,7 +37,7 @@ namespace MagnumOpus.Simulation.Systems
                     if (b.Type != EntityType.Monster)
                         continue;
 
-                    if (b.Has<GuardPositionComponent>())
+                    if (b.Has<GuardPositionComponent>() || b.Has<DeathTagComponent>())
                         continue;
 
                     ref readonly var targetPos = ref b.Get<PositionComponent>();
@@ -70,6 +70,13 @@ namespace MagnumOpus.Simulation.Systems
             else
             {
                 if (!PixelWorld.EntityExists(brn.TargetId))
+                {
+                    brn.TargetId = 0;
+                    return;
+                }
+
+                ref readonly var _target = ref PixelWorld.GetEntity(brn.TargetId);
+                if(_target.Has<DeathTagComponent>())
                 {
                     brn.TargetId = 0;
                     return;

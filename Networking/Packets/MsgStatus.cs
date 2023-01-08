@@ -4,27 +4,25 @@ using System.Runtime.InteropServices;
 namespace MagnumOpus.Networking.Packets
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public unsafe struct MsgStatus
+    public unsafe struct MsgMapStatus
     {
         public ushort Size;
         public ushort Id;
         public uint MapId;
-        public uint DynMapId;
+        public uint MinimapId;
         public uint Flags;
 
-        public static Memory<byte> Create(uint mapId, uint flags)
+        public static MsgMapStatus Create(uint mapId, uint flags)
         {
-            var packet = stackalloc MsgStatus[1];
-            packet->Size = (ushort)sizeof(MsgStatus);
-            packet->Id = 1110;
-            packet->MapId = mapId;
-            packet->DynMapId = mapId;
-            packet->Flags = flags;
-
-            var buffer = new byte[sizeof(MsgStatus)];
-            fixed (byte* p = buffer)
-                *(MsgStatus*)p = *packet;
-            return buffer;
+            var msg = new MsgMapStatus
+            {
+                Size = (ushort)sizeof(MsgMapStatus),
+                Id = 1110,
+                MapId = mapId,
+                MinimapId = mapId,
+                Flags = flags,
+            };
+            return msg;
         }
     }
 }

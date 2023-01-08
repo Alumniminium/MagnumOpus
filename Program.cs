@@ -1,16 +1,15 @@
 ﻿using System.Net.Sockets;
 using System.Text;
-using CO2_CORE_DLL.Security.Cryptography;
 using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking;
-using MagnumOpus.Networking.Cryptography;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Simulation.Systems;
 using MagnumOpus.Squiggly;
 using SpacePartitioning;
+using CO2_CORE_DLL.Security.Cryptography;
 
 namespace MagnumOpus
 {
@@ -39,6 +38,7 @@ namespace MagnumOpus
                 new ExpRewardSystem(),
                 new DeathSystem(),
                 new DropSystem(),
+                new DropMoneySystem(),
                 new PickupSystem(),
                 new ItemUseSystem(),
                 new ReviveSystem(),

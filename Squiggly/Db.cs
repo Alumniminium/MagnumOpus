@@ -37,6 +37,7 @@ namespace MagnumOpus.Squiggly
                     var hp = new HealthComponent(obj.Id, prefab.Health, prefab.MaxHealth);
                     var ntc = new NameTagComponent(obj.Id, prefab.Name);
                     var vwp = new ViewportComponent(obj.Id, 40f);
+                    var drp = new DropComponent(obj.Id, prefab.Drops);
 
                     if(prefab.CQAction != 0)
                     {
@@ -61,6 +62,7 @@ namespace MagnumOpus.Squiggly
                     obj.Add(ref hp);
                     obj.Add(ref ntc);
                     obj.Add(ref vwp);
+                    obj.Add(ref drp);
 
                         var brn = new BrainComponent(obj.Id);
                         obj.Add(ref brn);

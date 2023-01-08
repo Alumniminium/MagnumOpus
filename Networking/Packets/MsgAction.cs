@@ -124,7 +124,7 @@ namespace MagnumOpus.Networking.Packets
                         foreach (var item in inv.Items)
                         {
                             ref readonly var itemComp = ref item.Get<ItemComponent>();
-                            var reply = MsgItem.Create(item.NetId, itemComp.Id, itemComp.Id, 0, MsgItemType.BuyItemAddItem);
+                            var reply = MsgItem.Create(item.NetId, itemComp.Id, itemComp.Id, 0, MsgItemType.Buy);
                             var reply2 = MsgItemInformation.Create(in item);
                             ntt.NetSync(ref reply);
                             ntt.NetSync(ref reply2);

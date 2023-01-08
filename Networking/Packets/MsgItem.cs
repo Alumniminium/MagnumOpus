@@ -43,22 +43,27 @@ namespace MagnumOpus.Networking.Packets
             switch (msg.Type)
             {
                 case MsgItemType.Ping:
-                    var reply = MsgItem.Create(ntt.NetId, msg.Value, msg.Param, msg.Timestamp, MsgItemType.Ping);
-                    // var tick = MsgTick.Create(in ntt);
-                    ntt.NetSync(ref reply);
-                    // ntt.NetSync(ref tick);
+                    var tick = MsgTick.Create(in ntt);
+                    ntt.NetSync(ref tick);
+                    ntt.NetSync(memory[..sizeof(MsgItem)]);
                     break;
+
+                case MsgItemType.DropMoney:
+                    var rdmc = new RequestDropMoneyComponent(ntt.Id, msg.Value);
+                    ntt.Add(ref rdmc);
+
+                    ntt.NetSync(memory[..sizeof(MsgItem)]);
+                    break;
+                
                 case MsgItemType.RemoveInventory:
-                    {
-                        var drc = new DropRequestComponent(ntt.Id, msg.UnqiueId);
+                        var drc = new RequestDropItemComponent(ntt.Id, msg.UnqiueId);
                         ntt.Add(ref drc);
 
                         ntt.NetSync(memory[..sizeof(MsgItem)]);
                         break;
-                    }
-                case MsgItemType.UseItem:
-                case MsgItemType.UnEquipItem:
-                    {
+                
+                case MsgItemType.Use:
+                case MsgItemType.UnEquip:
                         var itemNttId = msg.UnqiueId;
                         var slot = msg.Param;
 
@@ -69,24 +74,23 @@ namespace MagnumOpus.Networking.Packets
                         }
                         else
                         {
-                            var rue = new RequestChangeEquipComponent(ntt.Id, itemNttId, slot, msg.Type == MsgItemType.UseItem);
+                            var rue = new RequestChangeEquipComponent(ntt.Id, itemNttId, slot, msg.Type == MsgItemType.Use);
                             ntt.Add(ref rue);
                         }
                         ntt.NetSync(memory[..sizeof(MsgItem)]);
                         break;
-                    }
-                case MsgItemType.SellItem:
-                case MsgItemType.BuyItemAddItem:
-                    {
+                    
+                case MsgItemType.Sell:
+                case MsgItemType.Buy:
                         var shopId = msg.UnqiueId;
                         var itemId = msg.Param;
 
-                        var rbi = new RequestShopItemTransactionComponent(ntt.Id, shopId, itemId, msg.Type == MsgItemType.BuyItemAddItem);
+                        var rbi = new RequestShopItemTransactionComponent(ntt.Id, shopId, itemId, msg.Type == MsgItemType.Buy);
                         ntt.Add(ref rbi);
 
                         ntt.NetSync(memory[..sizeof(MsgItem)]);
                         break;
-                    }
+                    
                 default:
                     FConsole.WriteLine($"Unhandled MsgItem type: {msg.Type}");
                     FConsole.WriteLine(memory.Dump());
