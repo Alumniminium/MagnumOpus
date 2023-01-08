@@ -12,7 +12,7 @@ namespace MagnumOpus.Simulation.Systems
             if (rtc.RespawnTimeTick > PixelWorld.Tick)
                 return;
 
-
+            
         }
     }
 }

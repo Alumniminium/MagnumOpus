@@ -1,4 +1,5 @@
 using System.Net.Security;
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Networking.Packets;
@@ -16,6 +17,7 @@ namespace MagnumOpus.Simulation.Systems
             if (emptyIdx == -1)
             {
                 ntt.Remove<PickupRequestComponent>();
+                FConsole.WriteLine($"[{nameof(PickupSystem)}]: {ntt.NetId} tried to pick up {pic.Item.NetId} but their inventory is full");
                 return;
             }
 
@@ -25,7 +27,7 @@ namespace MagnumOpus.Simulation.Systems
 
             var dropMsg = MsgFloorItem.Create(in pic.Item, Enums.MsgFloorItemType.Delete);
             ntt.NetSync(ref dropMsg, true);
-            
+
             inv.Items = inv.Items.OrderByDescending(x => x.Get<ItemComponent>().Id).ToArray();
             
             for (var i = 0; i < inv.Items.Length; i++)
@@ -44,7 +46,8 @@ namespace MagnumOpus.Simulation.Systems
                     ntt.NetSync(ref addMsg);
                 }
             }
-           
+
+            FConsole.WriteLine($"[{nameof(PickupSystem)}]: {ntt.NetId} picked up {pic.Item.NetId}");
             ntt.Remove<PickupRequestComponent>();
         }
     }

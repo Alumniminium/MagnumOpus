@@ -46,7 +46,7 @@ namespace MagnumOpus.Simulation.Systems
             if (inv.Money < itemEntry.Price && txc.Buy)
             {
                 ntt.Remove<RequestShopItemTransactionComponent>(); 
-                FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.NetId} tried to buy {itemId} with {inv.Money} but it costs {itemEntry.Price}");
+                FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.NetId} tried to buy {itemId} with {inv.Money:C} but it costs {itemEntry.Price:C}");
                 return;
             }
 
@@ -67,7 +67,7 @@ namespace MagnumOpus.Simulation.Systems
                         var msg = MsgItemInformation.Create(in itemNtt);
                         ntt.NetSync(ref msg);
 
-                        FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.NetId} bought {txc.ItemId} for {itemEntry.Price} and now has {inv.Money} left");
+                        FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.NetId} bought {txc.ItemId} for {itemEntry.Price:C} and now has {inv.Money:C} left");
                     }
                     else
                     {
@@ -83,7 +83,7 @@ namespace MagnumOpus.Simulation.Systems
 
                         var msg = MsgItem.Create(itemNtt.NetId, 0, 0, PixelWorld.Tick, MsgItemType.RemoveInventory);
                         ntt.NetSync(ref msg);
-                        FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.NetId} sold {txc.ItemId} for {money} and now has {inv.Money}");
+                        FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.NetId} sold {txc.ItemId} for {money} and now has {inv.Money:C}");
                     }
                     var moneyMsg = MsgUserAttrib.Create(ntt.NetId, inv.Money, MsgUserAttribType.MoneyInventory);
                     ntt.NetSync(ref moneyMsg);
