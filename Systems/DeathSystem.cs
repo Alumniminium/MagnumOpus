@@ -40,7 +40,7 @@ namespace MagnumOpus.Simulation.Systems
                 ref readonly var cqc = ref ntt.Get<CqActionComponent>();
                 
                 long action = cqc.cq_Action;
-                while((action = CqActionProcessor.Process(in ntt, CqProcessor.GetAction(action))) != 0);
+                while((action = CqActionProcessor.Process(in ntt, in ntt, CqProcessor.GetAction(action))) != 0);
             }
 
             var update = MsgUserAttrib.Create(ntt.NetId, (ulong)eff.Effects, MsgUserAttribType.StatusEffect);

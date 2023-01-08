@@ -72,7 +72,7 @@ namespace MagnumOpus.Networking.Packets
                 if (action == null)
                     break;
 
-                nextId = CqActionProcessor.Process(in ntt, action);
+                nextId = CqActionProcessor.Process(in ntt, in npc, action);
                 FConsole.WriteLine($"Type: {action.type}, Data: {action.param.Trim()}, Next: {action.id_next}, Fail: {action.id_nextfail}");
             }
             while (nextId != 0); // copilot is a bit 
@@ -121,7 +121,7 @@ namespace MagnumOpus.Networking.Packets
 
                 // FConsole.WriteLine($"Type: {task.type}, Data: {task.param.Trim()}, Next: {task.id_next}, Fail: {task.id_nextfail}");
                 
-                nextId = CqActionProcessor.Process(in ntt, action);
+                nextId = CqActionProcessor.Process(in ntt, in npc, action);
                 task = CqProcessor.GetTask(nextId);
             }
             while (nextId != 0); // copilot is a bit 

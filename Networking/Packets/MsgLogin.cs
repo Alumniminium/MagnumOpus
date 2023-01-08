@@ -39,6 +39,7 @@ namespace MagnumOpus.Networking.Packets
             FConsole.WriteLine($"[GAME] Client Version: {msg.ClientVersion}, Language: {language}");
             ref readonly var net = ref ntt.Get<NetworkComponent>();
             var bdy = new BodyComponent(ntt.Id, (uint)(net.Username == "trbl" ? 2003 : 2002));
+            var hed = new HeadComponent(ntt.Id, 6);
             var ntc = new NameTagComponent(ntt.Id, net.Username);
             var dir = new DirectionComponent(ntt.Id, Direction.South);
             var emo = new EmoteComponent(ntt.Id, Emote.Dance);
@@ -69,6 +70,7 @@ namespace MagnumOpus.Networking.Packets
             ntt.Add(ref hlt);
             ntt.Add(ref mana);
             ntt.Add(ref eqc);
+            ntt.Add(ref hed);
             
             var testItem = PixelWorld.CreateEntity(EntityType.Item);
             var itemComp = new ItemComponent(testItem.Id, 1001020, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);

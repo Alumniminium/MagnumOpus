@@ -15,75 +15,25 @@ namespace MagnumOpus.Simulation.Systems
 
             if (change.Equip)
             {
-                switch (change.Slot)
-                {
-                    case MsgItemPosition.Armor:
-                            eq.Armor = item;
-                            break;
-                    case MsgItemPosition.RightWeapon:
-                            eq.MainHand = item;
-                            break;
-                    case MsgItemPosition.LeftWeapon:
-                            eq.OffHand = item;
-                            break;
-                    case MsgItemPosition.Ring:
-                            eq.Ring = item;
-                            break;
-                    case MsgItemPosition.Necklace:
-                            eq.Necklace = item;
-                            break;
-                    case MsgItemPosition.Head:
-                            eq.Head = item;
-                            break;
-                    case MsgItemPosition.Boots:
-                            eq.Boots = item;
-                            break;
-                }
+                var newEqInvIdx = Array.IndexOf(inv.Items, item);
+                var oldEq = eq.Items[change.Slot];
+                inv.Items[newEqInvIdx] = oldEq;
+                eq.Items[change.Slot] = item;
 
                 var msg = MsgItem.Create(item.NetId, 0, (int)change.Slot, PixelWorld.Tick, MsgItemType.SetEquipPosition);
                 ntt.NetSync(ref msg);
             }
             else
             {
-                for(int i = 0; i<inv.Items.Length; i++)
-                {
-                    if (inv.Items[i] == default)
-                    {
-                        switch (change.Slot)
-                        {
-                            case MsgItemPosition.Armor:
-                                eq.Armor = default;
-                                break;
-                            case MsgItemPosition.RightWeapon:
-                                eq.MainHand = default;
-                                break;
-                            case MsgItemPosition.LeftWeapon:
-                                eq.OffHand = default;
-                                break;
-                            case MsgItemPosition.Ring:
-                                eq.Ring = default;
-                                break;
-                            case MsgItemPosition.Necklace:
-                                eq.Necklace = default;
-                                break;
-                            case MsgItemPosition.Head:
-                                eq.Head = default;
-                                break;
-                            case MsgItemPosition.Boots:
-                                eq.Boots = default;
-                                break;
-                        }
-                        
-                        inv.Items[i] = item;
-                        
-                        var msgAddInv = MsgItemInformation.Create(in item);
-                        ntt.NetSync(ref msgAddInv);
+                eq.Items[change.Slot] = default;
+                var emptInvSlotIdx = Array.IndexOf(inv.Items, default);
+                inv.Items[emptInvSlotIdx] = item;
 
-                        var msg = MsgItem.Create(item.NetId, 0, 0, PixelWorld.Tick, MsgItemType.BuyItemAddItem);
-                        ntt.NetSync(ref msg);
-                        break;
-                    }
-                }
+                var msgAddInv = MsgItemInformation.Create(in item);
+                ntt.NetSync(ref msgAddInv);
+
+                // var msg = MsgItem.Create(item.NetId, 0, 0, PixelWorld.Tick, MsgItemType.BuyItemAddItem);
+                // ntt.NetSync(ref msg);
             }
             ntt.Remove<RequestChangeEquipComponent>();
         }

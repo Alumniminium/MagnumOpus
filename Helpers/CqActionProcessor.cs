@@ -1,6 +1,8 @@
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Timers;
 using HerstLib.IO;
+using Humanizer;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -31,21 +33,6 @@ namespace MagnumOpus.Helpers
 
             using var ctx = new SquigglyContext();
             return ctx.cq_action.Find(actionId);
-        }
-
-        public static void Process(in PixelEntity ntt, cq_task task)
-        {
-            var action = GetAction(task.id_next);
-            if (action != null)
-                CqActionProcessor.Process(ntt, action);
-        }
-
-        public static void Process(in PixelEntity ntt, cq_action? action)
-        {
-            if (action == null)
-                return;
-
-            CqActionProcessor.Process(ntt, action);
         }
     }
     public static class CqActionProcessor
@@ -185,11 +172,11 @@ namespace MagnumOpus.Helpers
             }
         };
 
-        public static long Process(in PixelEntity ntt, cq_action action)
+        public static long Process(in PixelEntity ntt, in PixelEntity trigger, cq_action action)
         {
-            if(action == null)
+            if (action == null)
                 return 0;
-                
+
             var taskType = (TaskActionType)action.type;
 
             switch (taskType)
@@ -206,7 +193,7 @@ namespace MagnumOpus.Helpers
                     }
                 case TaskActionType.ACTION_MENULINK:
                     {
-                        if(!ntt.Has<CqTaskComponent>())
+                        if (!ntt.Has<CqTaskComponent>())
                         {
                             var tacComp = new CqTaskComponent(ntt.Id, 0);
                             ntt.Add(ref tacComp);
@@ -263,11 +250,11 @@ namespace MagnumOpus.Helpers
 
                         if (!AttrVals.TryGetValue(attribute, out var func))
                         {
-                            FConsole.WriteLine($"Unknown attribute {attribute}");
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> Unknown attribute {attribute}");
                             return action.id_nextfail;
                         }
                         var result = func(ntt, targetVal, operation);
-                        FConsole.WriteLine($"if ({attribute} {operation} {targetVal}) -> {result}");
+                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> if ({attribute} {operation} {targetVal}) -> {result}");
                         return result ? action.id_next : action.id_nextfail;
                     }
                 case TaskActionType.ACTION_USER_CHGMAP:
@@ -277,15 +264,19 @@ namespace MagnumOpus.Helpers
                         var x = int.Parse(parameters[1]);
                         var y = int.Parse(parameters[2]);
 
+                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {x},{y},{mapId}");
+
                         var tpc = new TeleportComponent(ntt.Id, (ushort)x, (ushort)y, (ushort)mapId);
                         ntt.Add(ref tpc);
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_USER_CHGMAPRECORD:
                     {
-                        if (!ntt.Has<RecordPointComponent>())
+                        ref readonly var rpc = ref ntt.Get<RecordPointComponent>();
+                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {rpc.X},{rpc.Y},{rpc.Map}");
+
+                        if (rpc.EntityId != 0)
                         {
-                            ref readonly var rpc = ref ntt.Get<RecordPointComponent>();
                             var tpc = new TeleportComponent(ntt.Id, rpc.X, rpc.Y, rpc.Map);
                             ntt.Add(ref tpc);
                             return action.id_next;
@@ -295,8 +286,9 @@ namespace MagnumOpus.Helpers
                 case TaskActionType.ACTION_POLICEWANTED_CHECK:
                     {
                         ref readonly var pkc = ref ntt.Get<PkPointComponent>();
-                        // idnext if wanted, idnextfail if not
-                        return pkc.Points >= 100 ? action.id_next : action.id_nextfail;
+                        var wanted = pkc.Points >= 100;
+                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {wanted}");
+                        return wanted ? action.id_next : action.id_nextfail;
                     }
                 case TaskActionType.ACTION_USER_RECORDPOINT:
                     {
@@ -307,6 +299,9 @@ namespace MagnumOpus.Helpers
 
                         var rpc = new RecordPointComponent(ntt.Id, x, y, map);
                         ntt.Add(ref rpc);
+
+                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {x},{y},{map}");
+
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_USER_MAGIC:
@@ -316,32 +311,36 @@ namespace MagnumOpus.Helpers
                         var skillId = ushort.Parse(parameters[1]);
 
                         ref var sbc = ref ntt.Get<SpellBookComponent>();
+                        var checkResult = sbc.Spells.ContainsKey(skillId);
+
+                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {op} {skillId} -> {(op == "check" ? checkResult : !checkResult)}");
 
                         if (op == "check")
                         {
-                            if (sbc.Spells.ContainsKey(skillId))
+                            if (checkResult)
                                 return action.id_next;
                             return action.id_nextfail;
                         }
-                        if (op == "learn")
+                        else if (op == "learn" && !checkResult)
                         {
                             sbc.Spells.Add(skillId, (0, 0, 0));
                             var msg = MsgSkill.Create(skillId, 0, 0);
                             ntt.NetSync(ref msg);
+                            return action.id_next;
                         }
 
-                        return action.id_next;
+                        return action.id_nextfail;
                     }
                 case TaskActionType.ACTION_USER_HAIR:
                     {
                         var parameters = action.param.Trim().Split(' ');
                         var style = parameters[1];
                         ref var head = ref ntt.Get<HeadComponent>();
-                        var color = (head.Hair / 100) * 100;
+                        var color = head.Hair / 100 * 100;
                         head.Hair = (ushort)(color + int.Parse(style));
-
                         var msg = MsgUserAttrib.Create(ntt.NetId, head.Hair, MsgUserAttribType.HairStyle);
                         ntt.NetSync(ref msg, true);
+                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> Color: {color}, Style: {style}) -> {head.Hair}");
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_USER_MEDIAPLAY:
@@ -350,6 +349,7 @@ namespace MagnumOpus.Helpers
                         var media = parameters[1];
                         var msg = MsgName.Create(ntt.NetId, media, (byte)MsgNameType.Sound);
                         ntt.NetSync(in msg);
+                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {media}");
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_USER_EFFECT:
@@ -358,6 +358,7 @@ namespace MagnumOpus.Helpers
                         var effect = parameters[1];
                         var msg = MsgName.Create(ntt.NetId, effect, (byte)MsgNameType.RoleEffect);
                         ntt.NetSync(in msg, true);
+                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {effect}");
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_RAND:
@@ -368,6 +369,9 @@ namespace MagnumOpus.Helpers
 
                         var chance = a / (float)b;
                         var result = Random.Shared.NextSingle();
+
+                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {a}/{b} -> {chance*100}% -> {result*100}% -> {(result < chance ? "Success" : "Fail")}");
+
                         if (result < chance)
                             return action.id_next;
 
@@ -378,30 +382,35 @@ namespace MagnumOpus.Helpers
                         var parameters = action.param.Trim().Split(' ');
                         var idx = Random.Shared.Next(0, 8);
                         var next = long.Parse(parameters[idx]);
+
+                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {action.param.Trim()} -> Random Dice: {idx} -> {next}");
                         return next;
                     }
                 case TaskActionType.ACTION_MAP_MOVENPC:
                     {
+                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> NOT CODED YET");
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_MST_DROPITEM:
                     {
                         var parameters = action.param.Trim().Split(' ');
                         var itemId = int.Parse(parameters[1]);
+                        var itemExists = Collections.ItemType.TryGetValue(itemId, out var entry);
 
-                        if(!Collections.ItemType.TryGetValue(itemId, out var entry))
+                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {itemId} -> {(itemExists ? "Exists" : "Fail")}");
+
+                        if (!itemExists)
                             return action.id_nextfail;
-                        
+
                         ref var itemNtt = ref PixelWorld.CreateEntity(EntityType.Item);
 
-                        var dura = (ushort)Random.Shared.Next(entry.Amount, entry.AmountLimit);
-                        var itemComp = new ItemComponent(itemNtt.Id, itemId, dura, entry.AmountLimit, 0,0,0,0,0,0,0,0);
+                        var dura = (ushort)Random.Shared.Next(1, entry.AmountLimit);
+                        var itemComp = new ItemComponent(itemNtt.Id, itemId, dura, entry.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
                         itemNtt.Add(ref itemComp);
 
                         var drc = new DropRequestComponent(ntt.Id, itemNtt.NetId);
                         ntt.Add(ref drc);
 
-                        FConsole.WriteLine($"DropRequestComponent added to {ntt.Id} for item {itemId}");
 
                         return action.id_next;
                     }
@@ -410,18 +419,26 @@ namespace MagnumOpus.Helpers
                         var msg = MsgText.Create("SYSTEM", "ALLUSERS", action.param.Trim(), (MsgTextType)action.data);
                         var srz = Co2Packet.Serialize(ref msg, msg.Size);
                         ntt.NetSync(in srz, true);
+                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {action.param.Trim()} | {(MsgTextType)action.data}");
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_ITEM_CHECK:
                     {
                         ref readonly var inv = ref ntt.Get<InventoryComponent>();
+                        bool found = false;
                         for (int i = 0; i < inv.Items.Length; i++)
                         {
                             ref readonly var item = ref inv.Items[i].Get<ItemComponent>();
-                            if (item.Id == action.data)
-                                return action.id_next;
+                            if (item.Id != action.data)
+                                continue;
+
+                            found = true;
+                            break;
                         }
-                        return action.id_next; // ERROR: should be id_nextfail, just for testing its not
+
+                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {action.data} -> {(found ? "Found/Success" : "NotFound/Fail")}");
+
+                        return action.id_nextfail;
                     }
                 case TaskActionType.ACTION_ITEM_MULTICHK:
                     {
@@ -441,10 +458,8 @@ namespace MagnumOpus.Helpers
                                 count++;
                         }
 
-                        if (count >= chkCount)
-                            return action.id_next;
-
-                        return action.id_next; // ERROR: should be id_nextfail, just for testing its not
+                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {action.param.Trim()} -> {(count >= chkCount ? "Found/Success" : "NotFound/Fail")}");
+                        return count >= chkCount ? action.id_next : action.id_nextfail;
                     }
                 case TaskActionType.ACTION_ITEM_MULTIDEL:
                     {
@@ -460,74 +475,117 @@ namespace MagnumOpus.Helpers
                         for (int i = 0; i < inv.Items.Length; i++)
                         {
                             ref readonly var item = ref inv.Items[i].Get<ItemComponent>();
-                            
+
                             if (chkRange.Contains(item.Id))
                             {
-                                var msg = MsgItem.Create(ntt.NetId, inv.Items[i].NetId,inv.Items[i].NetId,PixelWorld.Tick, MsgItemType.RemoveInventory);
+                                var msg = MsgItem.Create(ntt.NetId, inv.Items[i].NetId, inv.Items[i].NetId, PixelWorld.Tick, MsgItemType.RemoveInventory);
                                 ntt.NetSync(ref msg);
                                 count++;
                                 inv.Items[i] = default;
                             }
                             if (count >= chkCount)
-                                return action.id_next;
+                                break;
                         }
-                        return action.id_next; // ERROR: should be id_nextfail, just for testing its not
+
+                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {action.param.Trim()} -> {(count >= chkCount ? "Found/Success" : "NotFound/Fail")}");
+                        return count >= chkCount ? action.id_next : action.id_nextfail;
                     }
-                    case TaskActionType.ACTION_ITEM_LEAVESPACE:
+                case TaskActionType.ACTION_ITEM_LEAVESPACE:
                     {
                         ref readonly var inv = ref ntt.Get<InventoryComponent>();
                         var chkCount = action.data;
+                        var count = 0;
 
                         for (int i = 0; i < inv.Items.Length; i++)
                         {
                             if (inv.Items[i].NetId == 0)
-                                chkCount--;
+                                count++;
                         }
 
-                        if (chkCount <= 0)
-                            return action.id_next;
-                        
-                        return action.id_next;
+                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {chkCount} -> {(count >= chkCount ? "Success" : "Fail")}");
+                        return count >= chkCount ? action.id_next : action.id_nextfail;
                     }
-                    case TaskActionType.ACTION_ITEM_ADD:
+                case TaskActionType.ACTION_ITEM_ADD:
                     {
                         ref readonly var inv = ref ntt.Get<InventoryComponent>();
                         var itemId = action.data;
+                        var itemFound = Collections.ItemType.TryGetValue(itemId, out var itemType);
 
-                        ref var itemNtt = ref PixelWorld.CreateEntity(EntityType.Item);
-                        var item = new ItemComponent(itemNtt.Id, itemId, 1,1,0,0,0,0,0,0,RebornItemEffect.None, 0);
-                        itemNtt.Add(ref item);
-                        
-                        for(int i = 0; i < inv.Items.Length; i++)
+                        var idx = Array.IndexOf(inv.Items, default);
+                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {itemId} -> {(idx != -1 && itemFound ? "Success" : "Fail")}");
+
+                        if (idx != -1)
                         {
-                            if (inv.Items[i].NetId != 0)
-                                continue;
-                            
-                            inv.Items[i] = itemNtt;
+                            ref var itemNtt = ref PixelWorld.CreateEntity(EntityType.Item);
+                            var item = new ItemComponent(itemNtt.Id, itemId, itemType.Amount, itemType.AmountLimit, 0, 0, 0, 0, 0, 0, RebornItemEffect.None, 0);
+                            itemNtt.Add(ref item);
+                            inv.Items[idx] = itemNtt;
                             var msg = MsgItemInformation.Create(in itemNtt, MsgItemInfoAction.AddItem, MsgItemPosition.Inventory);
                             ntt.NetSync(ref msg);
-                            return action.id_next;
                         }
 
-                        return action.id_nextfail;
+                        return idx != -1 ? action.id_next : action.id_nextfail;
                     }
-                    case TaskActionType.ACTION_ITEM_DEL:
+                case TaskActionType.ACTION_ITEM_DEL:
                     {
                         ref readonly var inv = ref ntt.Get<InventoryComponent>();
-                        var itemId = action.data;
+                        var itemId = trigger.Id;
+                        var foundIdx = -1;
 
                         for (int i = 0; i < inv.Items.Length; i++)
                         {
-                            if (inv.Items[i].NetId != itemId)
+                            if (inv.Items[i].Id != itemId)
                                 continue;
 
-                            var removeInv = MsgItem.Create(inv.Items[i].NetId, inv.Items[i].NetId, inv.Items[i].NetId, PixelWorld.Tick, Enums.MsgItemType.RemoveInventory);
-                            ntt.NetSync(ref removeInv);
-                            inv.Items[i] = default;
-                            return action.id_nextfail;
+                            foundIdx = i;
+                            break;
                         }
 
-                        return action.id_next; // ERROR: should be id_nextfail, just for testing its not
+                        if (foundIdx != -1)
+                        {
+                            var removeInv = MsgItem.Create(inv.Items[foundIdx].NetId, inv.Items[foundIdx].NetId, inv.Items[foundIdx].NetId, PixelWorld.Tick, Enums.MsgItemType.RemoveInventory);
+                            ntt.NetSync(ref removeInv);
+                            inv.Items[foundIdx] = default;
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {itemId} -> {(foundIdx != -1 ? "Success" : "Fail")}");
+                        }
+
+                        return foundIdx != -1 ? action.id_next : action.id_nextfail;
+                    }
+                    case TaskActionType.ACTION_ITEM_DELTHIS:
+                    {
+                        ref readonly var inv = ref ntt.Get<InventoryComponent>();
+                        var itemId = trigger.Id;
+                        var foundIdx = -1;
+
+                        for (int i = 0; i < inv.Items.Length; i++)
+                        {
+                            if (inv.Items[i].Id != itemId)
+                                continue;
+
+                            foundIdx = i;
+                            break;
+                        }
+
+                        if (foundIdx != -1)
+                        {
+                            var removeInv = MsgItem.Create(inv.Items[foundIdx].NetId, inv.Items[foundIdx].NetId, inv.Items[foundIdx].NetId, PixelWorld.Tick, Enums.MsgItemType.RemoveInventory);
+                            ntt.NetSync(ref removeInv);
+                            inv.Items[foundIdx] = default;
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {itemId} -> {(foundIdx != -1 ? "Success" : "Fail")}");
+                        }
+
+                        return foundIdx != -1 ? action.id_next : action.id_nextfail;
+                    }
+                    case TaskActionType.ACTION_CHKTIME:
+                    {
+                        var timestamps = action.param.Trim().Split(' ');
+                        var start = string.Join(' ',timestamps[0..2]);
+                        var end = string.Join(' ', timestamps[2..4]);
+
+                        var startTime = DateTime.ParseExact(start, "yyyy-M-d HH:mm", CultureInfo.InvariantCulture);
+                        var endTime = DateTime.ParseExact(end, "yyyy-M-d HH:mm", CultureInfo.InvariantCulture);
+
+                        return action.id_next;
                     }
                 default:
                     FConsole.WriteLine($"[FAIL] Unknown task type: {taskType}");

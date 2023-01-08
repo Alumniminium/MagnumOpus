@@ -248,6 +248,7 @@ namespace MagnumOpus
                     FConsole.WriteLine($"[GAME] Client disconnected: {net.Username}");
                     net.Socket?.Close();
                     net.Socket?.Dispose();
+                    PixelWorld.Destroy(in ntt);
                     break;
                 }
             }

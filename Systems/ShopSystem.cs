@@ -64,7 +64,12 @@ namespace MagnumOpus.Simulation.Systems
                     }
                     else
                     {
-                        inv.Money += itemEntry.Price;
+                        Collections.ItemType.TryGetValue(tranaction.ItemId, out var Info);
+                        
+                        var money = Info.Price / 3;
+                        money = (uint)((double)money * ((float)itemComp.CurrentDurability / itemComp.MaximumDurability));
+
+                        inv.Money += money;
                         ref var itemNtt = ref PixelWorld.GetEntityByNetId(tranaction.ItemId);
                         var def = new DestroyEndOfFrameComponent();
                         itemNtt.Add(ref def);

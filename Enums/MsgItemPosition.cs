@@ -16,6 +16,7 @@ namespace MagnumOpus.Enums
         LeftWeapon = 5,
         Ring = 6,
         Bottle = 7,
-        Boots = 8
+        Boots = 8,
+        Garment = 9,
     }
 }

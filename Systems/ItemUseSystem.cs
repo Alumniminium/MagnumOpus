@@ -19,7 +19,7 @@ namespace MagnumOpus.Simulation.Systems
                 if (entry.Action > 0)
                 {
                     long next = entry.Action;
-                    while ((next = CqActionProcessor.Process(in ntt, CqProcessor.GetAction(next))) != 0) ;
+                    while ((next = CqActionProcessor.Process(in ntt, in item, CqProcessor.GetAction(next))) != 0) ;
                 }
                 else if (entry.Life > 0)
                 {
