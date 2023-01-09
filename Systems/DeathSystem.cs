@@ -17,7 +17,8 @@ namespace MagnumOpus.Simulation.Systems
             if (dtc.Tick == PixelWorld.Tick)
             {
                 ref var eff = ref ntt.Get<StatusEffectComponent>();
-                eff.Effects |= StatusEffect.Dead;
+                eff.Effects |= StatusEffect.Dead; 
+                eff.Effects |= StatusEffect.FrozenRemoveName;
 
                 if (ntt.Type == EntityType.Player)
                 {
@@ -57,7 +58,7 @@ namespace MagnumOpus.Simulation.Systems
                 ntt.Remove<AttackComponent>();
                 ntt.Remove<BrainComponent>();
             }
-            else if (dtc.Tick + PixelWorld.TargetTps * 2 == PixelWorld.Tick && ntt.Type == EntityType.Monster)
+            else if (dtc.Tick + PixelWorld.TargetTps * 7 == PixelWorld.Tick && ntt.Type == EntityType.Monster)
             {
                 ref var eff = ref ntt.Get<StatusEffectComponent>();
                 eff.Effects |= StatusEffect.Fade;
@@ -65,7 +66,7 @@ namespace MagnumOpus.Simulation.Systems
                 var update = MsgUserAttrib.Create(ntt.NetId, (ulong)eff.Effects, MsgUserAttribType.StatusEffect);
                 ntt.NetSync(ref update, true);
             }
-            else if (dtc.Tick + PixelWorld.TargetTps * 5 == PixelWorld.Tick && ntt.Type == EntityType.Monster)
+            else if (dtc.Tick + PixelWorld.TargetTps * 10 == PixelWorld.Tick && ntt.Type == EntityType.Monster)
             {
                 var despwan = MsgAction.RemoveEntity(ntt.NetId);
                 ntt.NetSync(ref despwan, true);

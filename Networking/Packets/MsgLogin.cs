@@ -38,9 +38,9 @@ namespace MagnumOpus.Networking.Packets
             var language = msg.GetLanguage();
             FConsole.WriteLine($"[GAME] Client Version: {msg.ClientVersion}, Language: {language}");
             ref readonly var net = ref ntt.Get<NetworkComponent>();
-            var bdy = new BodyComponent(ntt.Id, (uint)(net.Username == "trbl" ? 2003 : 2002));
+            var ntc = new NameTagComponent(ntt.Id, net.Username+"[PM]");
+            var bdy = new BodyComponent(ntt.Id, (uint)(net.Username == "trbl[PM]" ? 2003 : 2002));
             var hed = new HeadComponent(ntt.Id, 6);
-            var ntc = new NameTagComponent(ntt.Id, net.Username);
             var dir = new DirectionComponent(ntt.Id, Direction.South);
             var emo = new EmoteComponent(ntt.Id, Emote.Dance);
             var vwp = new ViewportComponent(ntt.Id, 40);

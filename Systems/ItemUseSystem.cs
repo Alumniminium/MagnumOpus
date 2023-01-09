@@ -1,3 +1,4 @@
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
@@ -34,7 +35,7 @@ namespace MagnumOpus.Simulation.Systems
                     mna.ChangedTick = PixelWorld.Tick;
                 }
             }
-
+            FConsole.WriteLine($"[{nameof(ItemUseSystem)}]: {ntt.NetId} used {item.NetId} ({itemComp.Id})");
             ntt.Remove<RequestItemUseComponent>();
         }
     }

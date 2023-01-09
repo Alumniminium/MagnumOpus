@@ -13,7 +13,7 @@ namespace MagnumOpus.Enums
         Action = 2002,
         Team = 2003,
         Guild = 2004,
-        Top = 2005,
+        TopLeft = 2005,
         Spouse = 2006,
         Friend = 2009,
         Broadcast = 2010,

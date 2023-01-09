@@ -2,6 +2,7 @@ using System.Net.Security;
 using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
+using MagnumOpus.Networking;
 using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
@@ -21,6 +22,16 @@ namespace MagnumOpus.Simulation.Systems
 
                 var moneyMsg = MsgUserAttrib.Create(ntt.NetId, inv.Money, Enums.MsgUserAttribType.MoneyInventory);
                 ntt.NetSync(ref moneyMsg);
+
+                var moneyTxtMsg = MsgText.Create(in ntt, $"You picked up {rew.Amount} gold", Enums.MsgTextType.Action);
+                var moneyTxtSerialized = Co2Packet.Serialize(ref moneyTxtMsg, moneyTxtMsg.Size);
+                ntt.NetSync(in moneyTxtSerialized);
+
+                if(rew.Amount > 1000)
+                {
+                    var moneyActionMsg = MsgAction.Create(ntt.NetId, 0, 0, 0, 0, Enums.MsgActionType.GetMoney);
+                    ntt.NetSync(ref moneyActionMsg, true);
+                }
             }
             else
             {

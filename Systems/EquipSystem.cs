@@ -22,6 +22,8 @@ namespace MagnumOpus.Simulation.Systems
 
                 var msg = MsgItem.Create(item.NetId, 0, (int)change.Slot, PixelWorld.Tick, MsgItemType.SetEquipPosition);
                 ntt.NetSync(ref msg);
+                var remInv = MsgItem.Create(item.NetId, item.NetId, item.NetId, PixelWorld.Tick, MsgItemType.RemoveInventory);
+                ntt.NetSync(ref remInv);
             }
             else
             {
@@ -31,9 +33,6 @@ namespace MagnumOpus.Simulation.Systems
 
                 var msgAddInv = MsgItemInformation.Create(in item);
                 ntt.NetSync(ref msgAddInv);
-
-                // var msg = MsgItem.Create(item.NetId, 0, 0, PixelWorld.Tick, MsgItemType.BuyItemAddItem);
-                // ntt.NetSync(ref msg);
             }
             ntt.Remove<RequestChangeEquipComponent>();
         }

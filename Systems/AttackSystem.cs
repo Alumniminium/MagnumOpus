@@ -18,6 +18,12 @@ namespace MagnumOpus.Simulation.Systems
                 return;
             }
 
+            if(atk.Target.Has<DeathTagComponent>())
+            {
+                ntt.Remove<AttackComponent>();
+                return;
+            }
+
             // TODO: Implement
             ref readonly var targetPos = ref atk.Target.Get<PositionComponent>();
 

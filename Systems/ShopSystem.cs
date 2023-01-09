@@ -15,7 +15,7 @@ namespace MagnumOpus.Simulation.Systems
         {
             var itemId = txc.ItemId;
 
-            if(!txc.Buy)
+            if (!txc.Buy)
             {
                 ref readonly var itemNtt = ref PixelWorld.GetEntityByNetId(itemId);
                 ref readonly var itemComp = ref itemNtt.Get<ItemComponent>();
@@ -45,7 +45,7 @@ namespace MagnumOpus.Simulation.Systems
 
             if (inv.Money < itemEntry.Price && txc.Buy)
             {
-                ntt.Remove<RequestShopItemTransactionComponent>(); 
+                ntt.Remove<RequestShopItemTransactionComponent>();
                 FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.NetId} tried to buy {itemId} with {inv.Money:C} but it costs {itemEntry.Price:C}");
                 return;
             }
@@ -56,7 +56,7 @@ namespace MagnumOpus.Simulation.Systems
                 ref readonly var itemComp = ref inv.Items[i].Get<ItemComponent>();
                 if (itemComp.Id == 0 && txc.Buy || itemComp.Id == itemId && !txc.Buy)
                 {
-                    if(txc.Buy)
+                    if (txc.Buy)
                     {
                         inv.Money -= itemEntry.Price;
                         ref var itemNtt = ref PixelWorld.CreateEntity(EntityType.Item);
@@ -72,7 +72,7 @@ namespace MagnumOpus.Simulation.Systems
                     else
                     {
                         Collections.ItemType.TryGetValue(itemComp.Id, out var Info);
-                        
+
                         var money = Info.Price / 3;
                         money = (uint)((double)money * ((float)itemComp.CurrentDurability / itemComp.MaximumDurability));
                         inv.Money += money;
@@ -81,8 +81,10 @@ namespace MagnumOpus.Simulation.Systems
                         var def = new DestroyEndOfFrameComponent();
                         itemNtt.Add(ref def);
 
-                        var msg = MsgItem.Create(itemNtt.NetId, 0, 0, PixelWorld.Tick, MsgItemType.RemoveInventory);
-                        ntt.NetSync(ref msg);
+                        inv.Items[i] = default;
+
+                        var remInv = MsgItem.Create(itemNtt.NetId, itemNtt.NetId, itemNtt.NetId, PixelWorld.Tick, MsgItemType.RemoveInventory);
+                        ntt.NetSync(ref remInv);
                         FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.NetId} sold {txc.ItemId} for {money} and now has {inv.Money:C}");
                     }
                     var moneyMsg = MsgUserAttrib.Create(ntt.NetId, inv.Money, MsgUserAttribType.MoneyInventory);

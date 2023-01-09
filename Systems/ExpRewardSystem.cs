@@ -24,6 +24,9 @@ namespace MagnumOpus.Simulation.Systems
 
                 var lvlUp = MsgUserAttrib.Create(ntt.NetId, lvl.Level, Enums.MsgUserAttribType.Level);
                 ntt.NetSync(ref lvlUp, false);
+
+                var lvlActionMsg = MsgAction.Create(ntt.NetId,0,0,0,0, Enums.MsgActionType.LevelUp);
+                ntt.NetSync(ref lvlActionMsg, true);
             }
 
             var expUp = MsgUserAttrib.Create(ntt.NetId, lvl.Experience, Enums.MsgUserAttribType.Experience);
