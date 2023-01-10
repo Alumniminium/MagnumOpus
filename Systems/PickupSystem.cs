@@ -24,8 +24,7 @@ namespace MagnumOpus.Simulation.Systems
                 ntt.NetSync(ref moneyMsg);
 
                 var moneyTxtMsg = MsgText.Create(in ntt, $"You picked up {rew.Amount} gold", Enums.MsgTextType.Action);
-                var moneyTxtSerialized = Co2Packet.Serialize(ref moneyTxtMsg, moneyTxtMsg.Size);
-                ntt.NetSync(in moneyTxtSerialized);
+                ntt.NetSync(ref moneyMsg);
 
                 if(rew.Amount > 1000)
                 {

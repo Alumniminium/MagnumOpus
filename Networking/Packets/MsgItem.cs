@@ -45,21 +45,21 @@ namespace MagnumOpus.Networking.Packets
                 case MsgItemType.Ping:
                     var tick = MsgTick.Create(in ntt);
                     ntt.NetSync(ref tick);
-                    ntt.NetSync(memory[..sizeof(MsgItem)]);
+                    ntt.NetSync(ref msg);
                     break;
 
                 case MsgItemType.DropMoney:
                     var rdmc = new RequestDropMoneyComponent(ntt.Id, msg.Value);
                     ntt.Set(ref rdmc);
 
-                    ntt.NetSync(memory[..sizeof(MsgItem)]);
+                    ntt.NetSync(ref msg);
                     break;
                 
                 case MsgItemType.RemoveInventory:
                         var drc = new RequestDropItemComponent(ntt.Id, msg.UnqiueId);
                         ntt.Set(ref drc);
 
-                        ntt.NetSync(memory[..sizeof(MsgItem)]);
+                        ntt.NetSync(ref msg);
                         break;
                 
                 case MsgItemType.Use:
@@ -77,7 +77,7 @@ namespace MagnumOpus.Networking.Packets
                             var rue = new RequestChangeEquipComponent(ntt.Id, itemNttId, slot, msg.Type == MsgItemType.Use);
                             ntt.Set(ref rue);
                         }
-                        ntt.NetSync(memory[..sizeof(MsgItem)]);
+                        ntt.NetSync(ref msg);
                         break;
                     
                 case MsgItemType.Sell:
@@ -88,7 +88,7 @@ namespace MagnumOpus.Networking.Packets
                         var rbi = new RequestShopItemTransactionComponent(ntt.Id, shopId, itemId, msg.Type == MsgItemType.Buy);
                         ntt.Set(ref rbi);
 
-                        ntt.NetSync(memory[..sizeof(MsgItem)]);
+                        ntt.NetSync(ref msg);
                         break;
                     
                 default:

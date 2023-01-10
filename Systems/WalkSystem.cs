@@ -29,8 +29,8 @@ namespace MagnumOpus.Simulation.Systems
             
             var text = $"{wlk.Direction} -> {pos.Position}";
             var msgText = MsgText.Create(in ntt, text, MsgTextType.TopLeft);
-            var serialized = Co2Packet.Serialize(ref msgText, msgText.Size);
-            ntt.NetSync(serialized);
+            ntt.NetSync(ref msgText);
+            
             FConsole.WriteLine($"[{nameof(WalkSystem)}] {ntt.Id} -> {text}");
 
             ntt.Remove<WalkComponent>();

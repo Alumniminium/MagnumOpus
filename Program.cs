@@ -110,7 +110,6 @@ namespace MagnumOpus
             while (true)
             {
                 var client = LoginListener.AcceptTcpClient();
-                PixelWorld.Sync.WaitOne();
                 var player = PixelWorld.CreateEntity(EntityType.Player);
                 var net = new NetworkComponent(in player, client.Client);
                 player.Set(ref net);

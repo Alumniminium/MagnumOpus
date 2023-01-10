@@ -83,14 +83,11 @@ namespace MagnumOpus.Networking.Packets
             inv.Items[1] = testItem2;
 
             var ok = MsgText.Create("SYSTEM", "ALLUSERS", "ANSWER_OK", MsgTextType.LoginInformation);
-            var okserialized = Co2Packet.Serialize(ref ok, ok.Size);
-            ntt.NetSync(okserialized);
-
             var info = MsgCharacter.Create(ntt);
-            var serialized = Co2Packet.Serialize(ref info, info.Size);
-            ntt.NetSync(serialized);
-
             var msgStatus = MsgMapStatus.Create(1002,3282567244);
+
+            ntt.NetSync(ref ok);
+            ntt.NetSync(ref info);
             ntt.NetSync(ref msgStatus);
         }
     }

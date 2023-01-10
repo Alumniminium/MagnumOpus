@@ -8,24 +8,14 @@ namespace MagnumOpus.ECS
         public readonly int Id;
         public readonly int NetId;
         public readonly EntityType Type;
-        public readonly int ParentId;
-        public readonly PixelEntity[] Children;
 
-        public PixelEntity(int id, int netId, EntityType type, int parentId = -1)
+        public PixelEntity(int id, int netId, EntityType type)
         {
             Id = id;
             NetId = netId;
             Type = type;
-            ParentId = parentId;
-            Children = Array.Empty<PixelEntity>();
         }
 
-        public readonly void AttachChild(in PixelEntity child)
-        {
-            var children = Children;
-            Array.Resize(ref children, children.Length + 1);
-            children[^1] = child;
-        }
         public readonly void Set<T>(ref T component) where T : struct => ComponentList<T>.AddFor(in this, ref component);
         public readonly ref T Get<T>() where T : struct => ref ComponentList<T>.Get(this);
         public readonly bool Has<T>() where T : struct => ComponentList<T>.HasFor(in this);
@@ -35,33 +25,35 @@ namespace MagnumOpus.ECS
         public readonly bool Has<T, T2, T3, T4, T5>() where T : struct where T2 : struct where T3 : struct where T4 : struct where T5 : struct => Has<T, T2, T3, T4>() && Has<T5>();
         public readonly void Remove<T>() => ReflectionHelper.Remove<T>(in this);
         public readonly void Recycle() => ReflectionHelper.RecycleComponents(in this);
-        public readonly void NetSync<T>(ref T packet, bool broadcast = false) where T : unmanaged
+
+        public readonly void NetSync<T>(ref T msg, bool broadcast = false) where T : unmanaged
         {
-            var serialized = Co2Packet.Serialize(ref packet);
-            NetSync(in serialized, broadcast);
-        }
-        public readonly void NetSync(in Memory<byte> packet, bool broadcast = false)
-        {
-            if(Type == EntityType.Player)
+            if (Type == EntityType.Player)
+            {
+                var packet = Co2Packet.Serialize(ref msg);
                 OutgoingPacketQueue.Add(in this, in packet);
-    
+            }
+
             if (broadcast)
             {
                 ref readonly var vwp = ref Get<ViewportComponent>();
+
                 for (var i = 0; i < vwp.EntitiesVisible.Count; i++)
                 {
                     var b = vwp.EntitiesVisible[i];
                     if (b.Type != EntityType.Player || b.Id == Id)
                         continue;
 
+                    var packet = Co2Packet.Serialize(ref msg);
                     OutgoingPacketQueue.Add(in b, in packet);
                 }
-                 for (var i = 0; i < vwp.EntitiesVisibleLast.Count; i++)
+                for (var i = 0; i < vwp.EntitiesVisibleLast.Count; i++)
                 {
                     var b = vwp.EntitiesVisibleLast[i];
                     if (b.Type != EntityType.Player || b.Id == Id || vwp.EntitiesVisible.Contains(b))
                         continue;
 
+                    var packet = Co2Packet.Serialize(ref msg);
                     OutgoingPacketQueue.Add(in b, in packet);
                 }
             }

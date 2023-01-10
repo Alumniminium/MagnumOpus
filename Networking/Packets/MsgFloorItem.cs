@@ -62,7 +62,7 @@ namespace MagnumOpus.Networking.Packets
                     var pic = new PickupRequestComponent(ntt.Id, in item);
                     ntt.Set(ref pic);
 
-                    ntt.NetSync(memory[..sizeof(MsgFloorItem)], true);
+                    ntt.NetSync(ref msg, true);
                     break;
                 }
             }

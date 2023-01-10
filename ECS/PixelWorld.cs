@@ -28,8 +28,6 @@ namespace MagnumOpus.ECS
         private static Action? OnSecond;
         private static Action? OnTick;
 
-        public static readonly AutoResetEvent Sync = new(false);
-
         static PixelWorld()
         {
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
@@ -52,12 +50,12 @@ namespace MagnumOpus.ECS
         public static void RegisterOnSecond(Action action) => OnSecond += action;
         public static void RegisterOnTick(Action action) => OnTick += action;
 
-        public static ref PixelEntity CreateEntity(EntityType type, int parentId = -1)
+        public static ref PixelEntity CreateEntity(EntityType type)
         {
             if (AvailableArrayIndicies.TryPop(out var arrayIndex))
             {
                 var netId = IdGenerator.Get(type);
-                Entities[arrayIndex] = new PixelEntity(arrayIndex, netId, type, parentId);
+                Entities[arrayIndex] = new PixelEntity(arrayIndex, netId, type);
                 NetIdToEntityIndex.Add(netId, arrayIndex);
                 return ref Entities[arrayIndex];
             }
@@ -67,7 +65,7 @@ namespace MagnumOpus.ECS
         {
             if (AvailableArrayIndicies.TryPop(out var arrayIndex))
             {
-                Entities[arrayIndex] = new PixelEntity(arrayIndex, netId, type, -1);
+                Entities[arrayIndex] = new PixelEntity(arrayIndex, netId, type);
                 NetIdToEntityIndex.Add(netId, arrayIndex);
                 return ref Entities[arrayIndex];
             }
@@ -85,17 +83,21 @@ namespace MagnumOpus.ECS
 
         public static bool EntityExists(int nttId) => Entities[nttId].Id == nttId;
 
-        public static void InformChangesFor(in PixelEntity ntt) => ChangedThisTick.Add(ntt);
+        public static void InformChangesFor(in PixelEntity ntt)
+        {
+            lock (ChangedThisTick)
+                ChangedThisTick.Add(ntt);
+        }
 
         public static void Destroy(in PixelEntity ntt) => ToBeRemoved.Push(ntt);
 
         private static void DestroyInternal(in PixelEntity ntt)
         {
-            if (ChangedThisTick.Contains(ntt))
-                ChangedThisTick.Remove(ntt);
-
-            foreach (var child in ntt.Children)
-                DestroyInternal(child);
+            lock (ChangedThisTick)
+            {
+                if (ChangedThisTick.Contains(ntt))
+                    ChangedThisTick.Remove(ntt);
+            }
 
             AvailableArrayIndicies.Push(ntt.Id);
             Players.Remove(ntt);
@@ -122,10 +124,13 @@ namespace MagnumOpus.ECS
             {
                 IncomingPacketQueue.ProcessAll();
 
-                foreach (var ntt in ChangedThisTick)
+                lock (ChangedThisTick)
                 {
-                    for (int x = 0; x < Systems.Length; x++)
-                        Systems[x].EntityChanged(in ntt);
+                    foreach (var ntt in ChangedThisTick)
+                    {
+                        for (int x = 0; x < Systems.Length; x++)
+                            Systems[x].EntityChanged(in ntt);
+                    }
                 }
 
                 UpdateTimeAcc -= UpdateTime;
@@ -136,13 +141,16 @@ namespace MagnumOpus.ECS
                     system.Update(dt);
                     while (ToBeRemoved.Count != 0)
                         DestroyInternal(ToBeRemoved.Pop());
-                    foreach (var ntt in ChangedThisTick)
+
+                    lock (ChangedThisTick)
                     {
-                        for (int x = 0; x < Systems.Length; x++)
-                            Systems[x].EntityChanged(in ntt);
+                        foreach (var ntt in ChangedThisTick)
+                        {
+                            for (int x = 0; x < Systems.Length; x++)
+                                Systems[x].EntityChanged(in ntt);
+                        }
+                        ChangedThisTick.Clear();
                     }
-                    ChangedThisTick.Clear();
-                    Sync.Set();
                     PerformanceMetrics.AddSample(system.Name, Stopwatch.Elapsed.TotalMilliseconds - last);
                     last = Stopwatch.Elapsed.TotalMilliseconds;
                 }

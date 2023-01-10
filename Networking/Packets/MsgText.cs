@@ -73,8 +73,8 @@ namespace MagnumOpus.Networking.Packets
         }
         public static MsgText Create(in PixelEntity to, string message, MsgTextType type = MsgTextType.Talk)
         {
-            ref readonly var ntc = ref to.Get<NameTagComponent>(); 
-            return Create(ntc.Name,ntc.Name, message, type);
+            ref readonly var ntc = ref to.Get<NameTagComponent>();
+            return Create(ntc.Name, ntc.Name, message, type);
         }
         public static MsgText Create(string from, string to, string message, MsgTextType type)
         {
@@ -120,10 +120,10 @@ namespace MagnumOpus.Networking.Packets
             switch (msg.Channel)
             {
                 case MsgTextType.Ghost:
-                    GhostChat(in ntt, in memory);
+                    GhostChat(in ntt, ref msg);
                     break;
                 case MsgTextType.Talk:
-                    TalkChat(in ntt, in memory);
+                    TalkChat(in ntt, ref msg);
                     break;
                 default:
                     FConsole.WriteLine("Unknown ChatType: " + msg.Channel);
@@ -132,7 +132,7 @@ namespace MagnumOpus.Networking.Packets
             }
         }
 
-        private static void GhostChat(in PixelEntity ntt, in Memory<byte> mem)
+        private static void GhostChat(in PixelEntity ntt, ref MsgText mem)
         {
             ref readonly var vwp = ref ntt.Get<ViewportComponent>();
             foreach (var entity in vwp.EntitiesVisible)
@@ -146,19 +146,19 @@ namespace MagnumOpus.Networking.Packets
                     case ClasseName.WaterTaoist:
                     case ClasseName.WaterWizard:
                         {
-                            entity.NetSync(mem[0..(mem.Length - 8)]);
+                            entity.NetSync(ref mem);
                             break;
                         }
                 }
             }
         }
 
-        private static void TalkChat(in PixelEntity ntt, in Memory<byte> mem)
+        private static void TalkChat(in PixelEntity ntt, ref MsgText mem)
         {
             ref readonly var vwp = ref ntt.Get<ViewportComponent>();
             foreach (var entity in vwp.EntitiesVisible)
                 if (entity != ntt)
-                    entity.NetSync(mem[0..(mem.Length - 8)]);
+                    entity.NetSync(ref mem);
         }
     }
 }

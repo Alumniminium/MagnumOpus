@@ -111,7 +111,7 @@ namespace MagnumOpus.Networking.Packets
                         var target = PixelWorld.GetEntityByNetId((int)targetId);
 
                         var atkMsg = MsgMagicEffect.Create(in ntt, in target, 10, id, 0);
-                        ntt.NetSync(atkMsg, true);
+                        ntt.NetSync(ref atkMsg, true);
                         break;
                     }
             }

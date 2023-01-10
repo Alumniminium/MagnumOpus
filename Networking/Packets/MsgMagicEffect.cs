@@ -57,10 +57,9 @@ namespace MagnumOpus.Networking.Packets
         //     return packets;
         // }
 
-        public static Memory<byte> Create(in PixelEntity attacker, in PixelEntity target, int damage, ushort skillId, byte skillLevel)
+        public static MsgMagicEffect Create(in PixelEntity attacker, in PixelEntity target, int damage, ushort skillId, byte skillLevel)
         {
-            var buffer = new byte[sizeof(MsgMagicEffect)];
-            var packet = new MsgMagicEffect()
+            var msg = new MsgMagicEffect()
             {
                 Size = 28,
                 Id = 1105,
@@ -74,15 +73,13 @@ namespace MagnumOpus.Networking.Packets
             };
             unsafe
             {
-                packet.Targets[0] = target.NetId;
-                packet.Targets[1] = damage;
-                packet.Targets[2] = 0;
-                fixed (byte* p = buffer)
-                    *(MsgMagicEffect*)p = packet;
+                msg.Targets[0] = target.NetId;
+                msg.Targets[1] = damage;
+                msg.Targets[2] = 0;
             }
 
 
-            return buffer.AsMemory()[..packet.Size];
+            return msg;
         }
     }
 }

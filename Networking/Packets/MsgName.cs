@@ -12,21 +12,19 @@ namespace MagnumOpus.Networking.Packets
         public byte Count;
         public fixed byte Params[255];
 
-        public static Memory<byte> Create(int data, string param, byte action)
+        public static MsgName Create(int data, string param, byte action)
         {
-            var Out = new byte[13 + param.Length];
-            fixed (byte* p = Out)
+            var msg = new MsgName
             {
-                *(short*)(p + 0) = (short)Out.Length;
-                *(short*)(p + 2) = 1015;
-                *(int*)(p + 4) = data;
-                *(p + 8) = action;
-                *(p + 9) = 0x01;
-                *(p + 10) = (byte)param.Length;
+                Size = (ushort)(13 + param.Length),
+                Id = 1015,
+                Data = data,
+                Type = (MsgNameType)action,
+                Count = (byte)param.Length
+            };
                 for (byte i = 0; i < (byte)param.Length; i++)
-                    *(p + 11 + i) = (byte)param[i];
-            }
-            return Out;
+                msg.Params[i] = (byte)param[i];
+            return msg;
         }
 
         public static Memory<byte> Create(ushort x, ushort y, string param, MsgNameType action)

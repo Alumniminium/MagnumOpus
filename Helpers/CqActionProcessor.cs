@@ -182,8 +182,7 @@ namespace MagnumOpus.Helpers
                         ref readonly var tac = ref ntt.Get<CqTaskComponent>();
                         var text = action.param.Replace("~", " ").Trim();
                         var textPacket = MsgTaskDialog.Create(in tac.Npc, 0, MsgTaskDialogAction.Text, text);
-                        var textMem = Co2Packet.Serialize(ref textPacket, textPacket.Size);
-                        ntt.NetSync(textMem);
+                        ntt.NetSync(ref textPacket);
                         FConsole.WriteLine(text);
                         return action.id_next;
                     }
@@ -199,9 +198,8 @@ namespace MagnumOpus.Helpers
                         var text = action.param.Trim().Split(' ')[0];
                         var optionId = int.Parse(action.param.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries)[1]);
                         var optionPacket = MsgTaskDialog.Create(in tac.Npc, tac.OptionCount, MsgTaskDialogAction.Link, text);
-                        var optionMem = Co2Packet.Serialize(ref optionPacket, optionPacket.Size);
                         tac.Options[tac.OptionCount] = (int)optionId;
-                        ntt.NetSync(optionMem);
+                        ntt.NetSync(ref optionPacket);
                         FConsole.WriteLine(text);
                         return action.id_next;
                     }
@@ -212,9 +210,8 @@ namespace MagnumOpus.Helpers
                         var text = action.param.Trim().Split(' ')[2];
                         var optionId = int.Parse(action.param.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries)[1]);
                         var optionPacket = MsgTaskDialog.Create(in tac.Npc, tac.OptionCount, MsgTaskDialogAction.Edit, text);
-                        var optionMem = Co2Packet.Serialize(ref optionPacket, optionPacket.Size);
                         tac.Options[tac.OptionCount] = (int)optionId;
-                        ntt.NetSync(optionMem);
+                        ntt.NetSync(ref optionPacket);
                         FConsole.WriteLine(text);
                         return action.id_next;
                     }
@@ -224,8 +221,7 @@ namespace MagnumOpus.Helpers
                         var facePacket = MsgTaskDialog.Create(in tac.Npc, 0, MsgTaskDialogAction.Picture);
                         var faceId = byte.Parse(action.param.Trim().Split(' ')[2]);
                         facePacket.Avatar = faceId;
-                        var faceMem = Co2Packet.Serialize(ref facePacket, facePacket.Size);
-                        ntt.NetSync(faceMem);
+                        ntt.NetSync(ref facePacket);
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_MENUCREATE:
@@ -233,8 +229,7 @@ namespace MagnumOpus.Helpers
                         ref var tac = ref ntt.Get<CqTaskComponent>();
                         tac.OptionCount = 0;
                         var showPacket = MsgTaskDialog.Create(in tac.Npc, 0, MsgTaskDialogAction.Create);
-                        var showMem = Co2Packet.Serialize(ref showPacket, showPacket.Size);
-                        ntt.NetSync(showMem);
+                        ntt.NetSync(ref showPacket);
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_USER_ATTR:
@@ -344,7 +339,7 @@ namespace MagnumOpus.Helpers
                         var parameters = action.param.Trim().Split(' ');
                         var media = parameters[1];
                         var msg = MsgName.Create(ntt.NetId, media, (byte)MsgNameType.Sound);
-                        ntt.NetSync(in msg);
+                        ntt.NetSync(ref msg);
                         FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {media} -> {action.id_next}");
                         return action.id_next;
                     }
@@ -353,7 +348,7 @@ namespace MagnumOpus.Helpers
                         var parameters = action.param.Trim().Split(' ');
                         var effect = parameters[1];
                         var msg = MsgName.Create(ntt.NetId, effect, (byte)MsgNameType.RoleEffect);
-                        ntt.NetSync(in msg, true);
+                        ntt.NetSync(ref msg, true);
                         FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {effect} -> {action.id_next}");
                         return action.id_next;
                     }
@@ -413,8 +408,7 @@ namespace MagnumOpus.Helpers
                 case TaskActionType.ACTION_USER_TALK:
                     {
                         var msg = MsgText.Create("SYSTEM", "ALLUSERS", action.param.Trim(), (MsgTextType)action.data);
-                        var srz = Co2Packet.Serialize(ref msg, msg.Size);
-                        ntt.NetSync(in srz, true);
+                        ntt.NetSync(ref msg, true);
                         FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {action.param.Trim()} | {(MsgTextType)action.data} -> {action.id_next}");
                         return action.id_next;
                     }

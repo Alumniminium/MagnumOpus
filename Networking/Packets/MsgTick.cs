@@ -60,8 +60,7 @@ namespace MagnumOpus.Networking.Packets
             pin.LastPing = msg.Timestamp;
             
             var pingMsg = MsgText.Create("SYSTEM", "PING", $"10s Avg Ping: {pin.Ping}ms", MsgTextType.MiniMap);
-            var serialized = Co2Packet.Serialize(ref pingMsg, pingMsg.Size);
-            ntt.NetSync(serialized);
+            ntt.NetSync(ref pingMsg);
         }
 
         public static uint HashName(string name)

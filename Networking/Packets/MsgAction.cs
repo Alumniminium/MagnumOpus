@@ -113,7 +113,7 @@ namespace MagnumOpus.Networking.Packets
                 case MsgActionType.SendProficiencies:
                     {
                         FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId}");
-                        ntt.NetSync(memory[..msg.Size]);
+                        ntt.NetSync(ref msg);
                         break;
                     }
                 case MsgActionType.SendItems:
@@ -129,7 +129,7 @@ namespace MagnumOpus.Networking.Packets
                             ntt.NetSync(ref reply);
                             ntt.NetSync(ref reply2);
                         }
-                        ntt.NetSync(memory[..msg.Size]);
+                        ntt.NetSync(ref msg);
 
                         break;
                     }
@@ -142,7 +142,7 @@ namespace MagnumOpus.Networking.Packets
                             var reply = MsgSkill.Create(spell.Key, spell.Value.exp, spell.Value.lvl);
                             ntt.NetSync(ref reply);
                         }
-                        ntt.NetSync(memory[..msg.Size]);
+                        ntt.NetSync(ref msg);
                         break;
                     }
                 case MsgActionType.ChangeFace:
@@ -150,7 +150,7 @@ namespace MagnumOpus.Networking.Packets
                         FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId}");
                         ref var head = ref ntt.Get<HeadComponent>();
                         head.FaceId = (ushort)msg.Param;
-                        ntt.NetSync(memory[..msg.Size], true);
+                        ntt.NetSync(ref msg, true);
                         break;
                     }
                 case MsgActionType.ChangeFacing:
@@ -192,7 +192,7 @@ namespace MagnumOpus.Networking.Packets
                         if (ent.Id != 0)
                             NetworkHelper.FullSync(in ntt, in ent);
                         else
-                            ntt.NetSync(memory[..msg.Size]);
+                            ntt.NetSync(ref msg);
                         break;
                     }
                 case MsgActionType.TeleportReply:
@@ -201,13 +201,13 @@ namespace MagnumOpus.Networking.Packets
                         ref var pos = ref ntt.Get<PositionComponent>();
                         pos.Position = new Vector2(msg.JumpX, msg.JumpY);
                         pos.ChangedTick = PixelWorld.Tick;
-                        ntt.NetSync(memory[..msg.Size]);
+                        ntt.NetSync(ref msg);
                         break;
                     }
                 case MsgActionType.GuardJump:
                     {
                         FConsole.WriteLine($"[GAME] {msg.Type} : {ntt.NetId} -> {msg.JumpX}, {msg.JumpY}");
-                        ntt.NetSync(memory[..msg.Size]);
+                        ntt.NetSync(ref msg);
                         break;
                     }
                 default:
