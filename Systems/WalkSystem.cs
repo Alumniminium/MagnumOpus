@@ -23,12 +23,17 @@ namespace MagnumOpus.Simulation.Systems
             var deltaY = Constants.DeltaY[(int)wlk.Direction];
             pos.Position.X += deltaX;
             pos.Position.Y += deltaY;
+
+            var pkt = MsgWalk.Create(ntt.NetId, (byte)wlk.Direction, wlk.IsRunning);
+            ntt.NetSync(ref pkt, true);
             
             var text = $"{wlk.Direction} -> {pos.Position}";
             var msgText = MsgText.Create(in ntt, text, MsgTextType.TopLeft);
             var serialized = Co2Packet.Serialize(ref msgText, msgText.Size);
             ntt.NetSync(serialized);
             FConsole.WriteLine($"[{nameof(WalkSystem)}] {ntt.Id} -> {text}");
+
+            ntt.Remove<WalkComponent>();
         }
     }
 }

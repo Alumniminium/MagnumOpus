@@ -27,7 +27,7 @@ namespace MagnumOpus.Simulation.Systems
             Game.Grids[pos.Map].Add(in itemNtt, ref pos);
 
             var dropPos = new PositionComponent(itemNtt.Id, pos.Position, pos.Map);
-            itemNtt.Add(ref dropPos);
+            itemNtt.Set(ref dropPos);
 
             var dropMsg = MsgFloorItem.Create(in itemNtt, Enums.MsgFloorItemType.Create);
             ntt.NetSync(ref dropMsg, true);

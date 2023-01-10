@@ -41,7 +41,7 @@ namespace MagnumOpus.Simulation.Systems
             }
 
             var tpc = new TeleportComponent(ntt.Id, (ushort)exit.X, (ushort)exit.Y, (ushort)exit.MapId);
-            ntt.Add(ref tpc);
+            ntt.Set(ref tpc);
 
             ntt.Remove<PortalComponent>();
         }

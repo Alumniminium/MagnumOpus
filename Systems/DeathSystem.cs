@@ -45,7 +45,7 @@ namespace MagnumOpus.Simulation.Systems
                     if(drp.Drops.Money > 0 && Random.Shared.NextSingle() < 0.25f)
                     {
                         var drop = new RequestDropMoneyComponent(ntt.Id, Random.Shared.Next(drp.Drops.Money));
-                        ntt.Add(ref drop);
+                        ntt.Set(ref drop);
                     }
                 }
 
@@ -71,7 +71,7 @@ namespace MagnumOpus.Simulation.Systems
                 var despwan = MsgAction.RemoveEntity(ntt.NetId);
                 ntt.NetSync(ref despwan, true);
                 var ded = new DestroyEndOfFrameComponent(ntt.Id);
-                ntt.Add(ref ded);
+                ntt.Set(ref ded);
 
                 ref readonly var pos = ref ntt.Get<PositionComponent>();
                 Game.Grids[pos.Map].Remove(in ntt);

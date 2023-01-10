@@ -18,7 +18,7 @@ namespace MagnumOpus.Simulation.Systems
                 ref readonly var rew = ref pic.Item.Get<MoneyRewardComponent>();
                 inv.Money += (uint)rew.Amount;
                 var ded = new DestroyEndOfFrameComponent(pic.Item.Id);
-                pic.Item.Add(ref ded);
+                pic.Item.Set(ref ded);
 
                 var moneyMsg = MsgUserAttrib.Create(ntt.NetId, inv.Money, Enums.MsgUserAttribType.MoneyInventory);
                 ntt.NetSync(ref moneyMsg);

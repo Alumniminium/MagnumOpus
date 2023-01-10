@@ -13,7 +13,7 @@ namespace MagnumOpus.Simulation.Systems
                 return;
             
             var dtc = new DeathTagComponent();
-            ntt.Add(ref dtc);
+            ntt.Set(ref dtc);
             ntt.Remove<LifeTimeComponent>();
         }
     }

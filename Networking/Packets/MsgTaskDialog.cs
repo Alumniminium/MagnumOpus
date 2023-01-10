@@ -64,7 +64,7 @@ namespace MagnumOpus.Networking.Packets
             cq_action action;
             var nextId = cq_task.id_next;
             var taskComponent = new CqTaskComponent(ntt.Id, npc.Id);
-            ntt.Add(ref taskComponent);
+            ntt.Set(ref taskComponent);
             do
             {
                 action = CqProcessor.GetAction(nextId);

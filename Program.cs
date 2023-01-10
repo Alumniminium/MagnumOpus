@@ -34,7 +34,6 @@ namespace MagnumOpus
                 new ViewportSystem(),
                 new AttackSystem(),
                 new DamageSystem(),
-                new HealthSystem(),
                 new ExpRewardSystem(),
                 new DeathSystem(),
                 new DropSystem(),
@@ -44,7 +43,6 @@ namespace MagnumOpus
                 new ReviveSystem(),
                 new ShopSystem(),
                 new EquipSystem(),
-                new NetSyncSystem(),
                 new DestroySystem(),
             };
             FConsole.WriteLine("[DATABASE] Loading...");
@@ -89,7 +87,7 @@ namespace MagnumOpus
             PixelWorld.RegisterOnSecond(() =>
             {
                 var lines = PerformanceMetrics.Draw();
-                // Console.WriteLine(lines);2
+                Console.WriteLine(lines);
                 PerformanceMetrics.Restart();
             });
 
@@ -115,7 +113,7 @@ namespace MagnumOpus
                 PixelWorld.Sync.WaitOne();
                 var player = PixelWorld.CreateEntity(EntityType.Player);
                 var net = new NetworkComponent(in player, client.Client);
-                player.Add(ref net);
+                player.Set(ref net);
 
                 var ipendpoint = client.Client.RemoteEndPoint?.ToString();
                 if (ipendpoint == null)

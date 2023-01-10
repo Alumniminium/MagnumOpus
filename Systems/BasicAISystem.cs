@@ -90,12 +90,12 @@ namespace MagnumOpus.Simulation.Systems
                 var dir = CoMath.GetRawDirection(targetPos.Position, pos.Position);
 
                 var wlk = new WalkComponent(ntt.Id, dir, false);
-                ntt.Add(ref wlk);
+                ntt.Set(ref wlk);
             }
             if(brn.State == BrainState.Attacking)
             {
                 var atk = new AttackComponent(ntt.Id, in target, MsgInteractType.Physical);
-                ntt.Add(ref atk);
+                ntt.Set(ref atk);
             }
 
             brn.State = BrainState.Sleeping;

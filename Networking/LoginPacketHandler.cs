@@ -42,7 +42,7 @@ namespace MagnumOpus.Networking
 
                         ref readonly var net = ref player.Get<NetworkComponent>();
                         var ntc = new NameTagComponent(player.Id, "test");
-                        player.Add(ref ntc);
+                        player.Set(ref ntc);
                         break;
                     }
                 default:

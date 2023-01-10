@@ -36,6 +36,7 @@ namespace MagnumOpus.Simulation.Systems
 
             hlt.Health = hlt.MaxHealth;
             eff.Effects &= ~StatusEffect.Dead;
+            eff.Effects &= ~StatusEffect.FrozenRemoveName;
 
             var update = MsgUserAttrib.Create(ntt.NetId, (ulong)eff.Effects, MsgUserAttribType.StatusEffect);
             var hltUp = MsgUserAttrib.Create(ntt.NetId, (ulong)hlt.Health, MsgUserAttribType.Health);
@@ -47,7 +48,7 @@ namespace MagnumOpus.Simulation.Systems
             ntt.NetSync(ref update);
             ntt.NetSync(ref reply);
 
-            ntt.Add(ref pos);
+            ntt.Set(ref pos);
             ntt.Remove<ReviveComponent>();
 
             FConsole.WriteLine($"[{nameof(ReviveSystem)}]: Revived {ntt.NetId} at {pos.Map} at {pos.Position.X}, {pos.Position.Y}");

@@ -7,8 +7,8 @@ namespace MagnumOpus.Components
     public struct EmoteComponent
     {
         public readonly int EntityId;
-        public uint ChangedTick;
-        public Emote Emote;
+        public readonly uint ChangedTick;
+        public readonly Emote Emote;
 
         public EmoteComponent(int entityId, Emote emote = Emote.Stand)
         {

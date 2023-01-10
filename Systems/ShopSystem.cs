@@ -61,7 +61,7 @@ namespace MagnumOpus.Simulation.Systems
                         inv.Money -= itemEntry.Price;
                         ref var itemNtt = ref PixelWorld.CreateEntity(EntityType.Item);
                         var newItemComp = new ItemComponent(itemNtt.Id, txc.ItemId, itemEntry.Amount, itemEntry.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
-                        itemNtt.Add(ref newItemComp);
+                        itemNtt.Set(ref newItemComp);
                         inv.Items[i] = itemNtt;
 
                         var msg = MsgItemInformation.Create(in itemNtt);
@@ -79,7 +79,7 @@ namespace MagnumOpus.Simulation.Systems
 
                         ref var itemNtt = ref PixelWorld.GetEntityByNetId(txc.ItemId);
                         var def = new DestroyEndOfFrameComponent();
-                        itemNtt.Add(ref def);
+                        itemNtt.Set(ref def);
 
                         inv.Items[i] = default;
 

@@ -92,7 +92,7 @@ namespace MagnumOpus.Networking.Packets
                     {
                         FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId}");
                         var rev = new ReviveComponent(ntt.Id, 1);
-                        ntt.Add(ref rev);
+                        ntt.Set(ref rev);
                         break;
                     }
                 case MsgActionType.SendLocation:
@@ -157,14 +157,14 @@ namespace MagnumOpus.Networking.Packets
                     {
                         FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.Direction}");
                         var dir = new DirectionComponent(ntt.Id, msg.Direction);
-                        ntt.Add(ref dir);
+                        ntt.Set(ref dir);
                         break;
                     }
                 case MsgActionType.ChangeAction:
                     {
                         FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.Param}");
                         var emo = new EmoteComponent(ntt.Id, (Emote)msg.Param);
-                        ntt.Add(ref emo);
+                        ntt.Set(ref emo);
                         break;
                     }
                 case MsgActionType.Jump:
@@ -172,15 +172,17 @@ namespace MagnumOpus.Networking.Packets
                         FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.JumpX}, {msg.JumpY}");
                         var jmp = new JumpComponent(ntt.Id, msg.JumpX, msg.JumpY);
                         var dir = new DirectionComponent(ntt.Id, msg.Direction);
-                        ntt.Add(ref jmp);
-                        ntt.Add(ref dir);
+                        var emo = new EmoteComponent(ntt.Id, Emote.Stand);
+                        ntt.Set(ref jmp);
+                        ntt.Set(ref dir);
+                        ntt.Set(ref emo);
                         break;
                     }
                 case MsgActionType.EnterPortalChangeMap:
                     {
                         FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.Param}");
                         var tpc = new PortalComponent(ntt.Id, msg.X, msg.Y);
-                        ntt.Add(ref tpc);
+                        ntt.Set(ref tpc);
                         break;
                     }
                 case MsgActionType.QueryEntity:

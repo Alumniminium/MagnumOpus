@@ -35,11 +35,11 @@ namespace MagnumOpus.Simulation.Systems
             var dropInfo = new ItemComponent(itemNtt.Id, id, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
             var moneyInfo = new MoneyRewardComponent(itemNtt.Id, drc.Amount);
 
-            itemNtt.Add(ref dropInfo);
-            itemNtt.Add(ref moneyInfo);
+            itemNtt.Set(ref dropInfo);
+            itemNtt.Set(ref moneyInfo);
 
             var dropPos = new PositionComponent(itemNtt.Id, pos.Position, pos.Map);
-            itemNtt.Add(ref dropPos);
+            itemNtt.Set(ref dropPos);
 
             var dropMsg = MsgFloorItem.Create(in itemNtt, Enums.MsgFloorItemType.Create);
             ntt.NetSync(ref dropMsg, true);

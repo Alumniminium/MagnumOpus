@@ -71,7 +71,9 @@ namespace MagnumOpus.Networking.Packets
                 return;
             }
             var wlk = new WalkComponent(ntt.Id, msg.RawDirection, msg.Type == 1);
-            ntt.Add(ref wlk);
+            var emo = new EmoteComponent(ntt.Id, Emote.Stand);
+            ntt.Set(ref wlk);
+            ntt.Set(ref emo);
         }
     }
 }

@@ -87,7 +87,7 @@ namespace MagnumOpus.Networking.Packets
                     Spirit = 10,
                     Statpoints = 10
                 };
-                ntt.Add(ref atr);
+                ntt.Set(ref atr);
             }
 
             var packet = new MsgCharacter

@@ -50,14 +50,14 @@ namespace MagnumOpus.Networking.Packets
 
                 case MsgItemType.DropMoney:
                     var rdmc = new RequestDropMoneyComponent(ntt.Id, msg.Value);
-                    ntt.Add(ref rdmc);
+                    ntt.Set(ref rdmc);
 
                     ntt.NetSync(memory[..sizeof(MsgItem)]);
                     break;
                 
                 case MsgItemType.RemoveInventory:
                         var drc = new RequestDropItemComponent(ntt.Id, msg.UnqiueId);
-                        ntt.Add(ref drc);
+                        ntt.Set(ref drc);
 
                         ntt.NetSync(memory[..sizeof(MsgItem)]);
                         break;
@@ -70,12 +70,12 @@ namespace MagnumOpus.Networking.Packets
                         if (slot == 0)
                         {
                             var uic = new RequestItemUseComponent(ntt.Id, itemNttId, slot);
-                            ntt.Add(ref uic);
+                            ntt.Set(ref uic);
                         }
                         else
                         {
                             var rue = new RequestChangeEquipComponent(ntt.Id, itemNttId, slot, msg.Type == MsgItemType.Use);
-                            ntt.Add(ref rue);
+                            ntt.Set(ref rue);
                         }
                         ntt.NetSync(memory[..sizeof(MsgItem)]);
                         break;
@@ -86,7 +86,7 @@ namespace MagnumOpus.Networking.Packets
                         var itemId = msg.Param;
 
                         var rbi = new RequestShopItemTransactionComponent(ntt.Id, shopId, itemId, msg.Type == MsgItemType.Buy);
-                        ntt.Add(ref rbi);
+                        ntt.Set(ref rbi);
 
                         ntt.NetSync(memory[..sizeof(MsgItem)]);
                         break;

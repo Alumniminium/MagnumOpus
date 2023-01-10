@@ -42,7 +42,7 @@ namespace MagnumOpus.Squiggly
                     if(prefab.CQAction != 0)
                     {
                         var cq = new CqActionComponent(obj.Id, prefab.CQAction);
-                        obj.Add(ref cq);
+                        obj.Set(ref cq);
                     }
 
                     pos.Position.X = (ushort)Random.Shared.Next(spawn.Value.Xstart - 10, spawn.Value.Xstart + spawn.Value.Xend + 10);
@@ -52,20 +52,20 @@ namespace MagnumOpus.Squiggly
                     {
                         pos.Position = new Vector2(spawn.Value.Xstart, spawn.Value.Ystart);
                         var grd = new GuardPositionComponent(obj.Id, pos.Position);
-                        obj.Add(ref grd);
+                        obj.Set(ref grd);
                     }
 
-                    obj.Add(ref spw);
-                    obj.Add(ref pos);
-                    obj.Add(ref bdy);
-                    obj.Add(ref dir);
-                    obj.Add(ref hp);
-                    obj.Add(ref ntc);
-                    obj.Add(ref vwp);
-                    obj.Add(ref drp);
+                    obj.Set(ref spw);
+                    obj.Set(ref pos);
+                    obj.Set(ref bdy);
+                    obj.Set(ref dir);
+                    obj.Set(ref hp);
+                    obj.Set(ref ntc);
+                    obj.Set(ref vwp);
+                    obj.Set(ref drp);
 
                         var brn = new BrainComponent(obj.Id);
-                        obj.Add(ref brn);
+                        obj.Set(ref brn);
 
                     if (!Game.Grids.ContainsKey(pos.Map))
                     {
@@ -134,10 +134,10 @@ namespace MagnumOpus.Squiggly
                     var bdy = new BodyComponent(ntt.Id, cqNpc.lookface);
                     var npcc = new NpcComponent(ntt.Id, npc.Base, npc.Type, npc.Sort);
                     var vwp = new ViewportComponent(ntt.Id, 40);
-                    ntt.Add(ref pos);
-                    ntt.Add(ref bdy);
-                    ntt.Add(ref npcc);
-                    ntt.Add(ref vwp);
+                    ntt.Set(ref pos);
+                    ntt.Set(ref bdy);
+                    ntt.Set(ref npcc);
+                    ntt.Set(ref vwp);
 
                     if (!Game.Grids.ContainsKey(pos.Map))
                     {

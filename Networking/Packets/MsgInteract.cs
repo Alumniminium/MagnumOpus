@@ -96,7 +96,7 @@ namespace MagnumOpus.Networking.Packets
                         // TODO: check if target not invalid
 
                         var atk = new AttackComponent(ntt.Id, in target, msg.Type);
-                        ntt.Add(ref atk);
+                        ntt.Set(ref atk);
                         break;
                     }
                 case MsgInteractType.Magic:

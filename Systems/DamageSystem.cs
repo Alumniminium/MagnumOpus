@@ -17,11 +17,11 @@ namespace MagnumOpus.Simulation.Systems
             {
                 hlt.Health = 0;
                 var dtc = new DeathTagComponent(ntt.Id, dmg.Attacker);
-                ntt.Add(ref dtc);
+                ntt.Set(ref dtc);
             }
 
             var expReward = new ExpRewardComponent(in dmg.Attacker, (ushort)actualDamage);
-            dmg.Attacker.Add(ref expReward);
+            dmg.Attacker.Set(ref expReward);
 
             var healthUpdate = MsgUserAttrib.Create(ntt.NetId, (ushort)hlt.Health, Enums.MsgUserAttribType.Health);
             ntt.NetSync(ref healthUpdate, true);

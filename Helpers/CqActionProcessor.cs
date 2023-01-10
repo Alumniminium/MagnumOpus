@@ -192,7 +192,7 @@ namespace MagnumOpus.Helpers
                         if (!ntt.Has<CqTaskComponent>())
                         {
                             var tacComp = new CqTaskComponent(ntt.Id, 0);
-                            ntt.Add(ref tacComp);
+                            ntt.Set(ref tacComp);
                         }
                         ref var tac = ref ntt.Get<CqTaskComponent>();
                         tac.OptionCount++;
@@ -263,7 +263,7 @@ namespace MagnumOpus.Helpers
                         FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {x},{y},{mapId} -> {action.id_next}");
 
                         var tpc = new TeleportComponent(ntt.Id, (ushort)x, (ushort)y, (ushort)mapId);
-                        ntt.Add(ref tpc);
+                        ntt.Set(ref tpc);
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_USER_CHGMAPRECORD:
@@ -274,7 +274,7 @@ namespace MagnumOpus.Helpers
                         if (rpc.EntityId != 0)
                         {
                             var tpc = new TeleportComponent(ntt.Id, rpc.X, rpc.Y, rpc.Map);
-                            ntt.Add(ref tpc);
+                            ntt.Set(ref tpc);
                             return action.id_next;
                         }
                         return action.id_nextfail;
@@ -294,7 +294,7 @@ namespace MagnumOpus.Helpers
                         var y = ushort.Parse(parameters[2]);
 
                         var rpc = new RecordPointComponent(ntt.Id, x, y, map);
-                        ntt.Add(ref rpc);
+                        ntt.Set(ref rpc);
 
                         FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {x},{y},{map} -> {action.id_next}");
 
@@ -402,10 +402,10 @@ namespace MagnumOpus.Helpers
 
                         var dura = (ushort)Random.Shared.Next(0, entry.AmountLimit);
                         var itemComp = new ItemComponent(itemNtt.Id, itemId, dura, entry.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
-                        itemNtt.Add(ref itemComp);
+                        itemNtt.Set(ref itemComp);
 
                         var drc = new RequestDropItemComponent(ntt.Id, itemNtt.NetId);
-                        ntt.Add(ref drc);
+                        ntt.Set(ref drc);
 
 
                         return action.id_next;
@@ -514,7 +514,7 @@ namespace MagnumOpus.Helpers
                         {
                             ref var itemNtt = ref PixelWorld.CreateEntity(EntityType.Item);
                             var item = new ItemComponent(itemNtt.Id, itemId, itemType.Amount, itemType.AmountLimit, 0, 0, 0, 0, 0, 0, RebornItemEffect.None, 0);
-                            itemNtt.Add(ref item);
+                            itemNtt.Set(ref item);
                             inv.Items[idx] = itemNtt;
                             var msg = MsgItemInformation.Create(in itemNtt, MsgItemInfoAction.AddItem, MsgItemPosition.Inventory);
                             ntt.NetSync(ref msg);

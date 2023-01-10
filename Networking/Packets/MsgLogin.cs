@@ -42,7 +42,7 @@ namespace MagnumOpus.Networking.Packets
             var bdy = new BodyComponent(ntt.Id, (uint)(net.Username == "trbl[PM]" ? 2003 : 2002));
             var hed = new HeadComponent(ntt.Id, 6);
             var dir = new DirectionComponent(ntt.Id, Direction.South);
-            var emo = new EmoteComponent(ntt.Id, Emote.Dance);
+            var emo = new EmoteComponent(ntt.Id, Emote.Stand);
             var vwp = new ViewportComponent(ntt.Id, 40);
             var pos = new PositionComponent(ntt.Id, new System.Numerics.Vector2(438,377), 1002);
             var eff = new StatusEffectComponent(ntt.Id);
@@ -56,30 +56,30 @@ namespace MagnumOpus.Networking.Packets
 
             sbc.Spells.Add(1000, (0, 0, 0));
             sbc.Spells.Add(1005, (0, 0, 0));
-            ntt.Add(ref bdy);
-            ntt.Add(ref ntc);
-            ntt.Add(ref dir);
-            ntt.Add(ref vwp);
-            ntt.Add(ref emo);
-            ntt.Add(ref pos);
-            ntt.Add(ref eff);
-            ntt.Add(ref sbc);
-            ntt.Add(ref inv);
-            ntt.Add(ref lvl);
-            ntt.Add(ref pro);
-            ntt.Add(ref hlt);
-            ntt.Add(ref mana);
-            ntt.Add(ref eqc);
-            ntt.Add(ref hed);
+            ntt.Set(ref bdy);
+            ntt.Set(ref ntc);
+            ntt.Set(ref dir);
+            ntt.Set(ref vwp);
+            ntt.Set(ref emo);
+            ntt.Set(ref pos);
+            ntt.Set(ref eff);
+            ntt.Set(ref sbc);
+            ntt.Set(ref inv);
+            ntt.Set(ref lvl);
+            ntt.Set(ref pro);
+            ntt.Set(ref hlt);
+            ntt.Set(ref mana);
+            ntt.Set(ref eqc);
+            ntt.Set(ref hed);
             
             var testItem = PixelWorld.CreateEntity(EntityType.Item);
             var itemComp = new ItemComponent(testItem.Id, 1001020, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-            testItem.Add(ref itemComp);
+            testItem.Set(ref itemComp);
             inv.Items[0] = testItem;
 
             var testItem2 = PixelWorld.CreateEntity(EntityType.Item);
             var itemComp2 = new ItemComponent(testItem2.Id, 1000000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-            testItem2.Add(ref itemComp2);
+            testItem2.Set(ref itemComp2);
             inv.Items[1] = testItem2;
 
             var ok = MsgText.Create("SYSTEM", "ALLUSERS", "ANSWER_OK", MsgTextType.LoginInformation);
