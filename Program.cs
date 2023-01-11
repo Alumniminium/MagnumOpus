@@ -1,5 +1,6 @@
 ﻿using System.Net.Sockets;
 using System.Text;
+using Co2Core.Security.Cryptography;
 using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
@@ -9,7 +10,6 @@ using MagnumOpus.Networking.Packets;
 using MagnumOpus.Simulation.Systems;
 using MagnumOpus.Squiggly;
 using SpacePartitioning;
-using CO2_CORE_DLL.Security.Cryptography;
 
 namespace MagnumOpus
 {

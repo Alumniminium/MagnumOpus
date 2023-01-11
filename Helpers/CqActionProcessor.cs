@@ -12,21 +12,19 @@ namespace MagnumOpus.Helpers
 {
     public static class CqProcessor
     {
-        public static cq_npc? GetNpc(int npcId)
+        public static cq_npc GetNpc(int npcId)
         {
             using var ctx = new SquigglyContext();
-            return ctx.cq_npc.Find((long)npcId);
+            var npc = ctx.cq_npc.Find((long)npcId);
+            return npc;
         }
-        public static cq_task? GetTask(long taskId)
+        public static cq_task GetTask(long taskId)
         {
             using var ctx = new SquigglyContext();
             return ctx.cq_task.Find(taskId);
         }
-        public static cq_action? GetAction(long? actionId)
+        public static cq_action GetAction(long actionId)
         {
-            if (actionId == null)
-                return null;
-
             using var ctx = new SquigglyContext();
             return ctx.cq_action.Find(actionId);
         }

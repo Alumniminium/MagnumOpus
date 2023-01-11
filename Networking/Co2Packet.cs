@@ -13,12 +13,6 @@ namespace MagnumOpus.Networking
 
             return buffer.AsMemory()[0..size];
         }
-        public static Memory<byte> Serialize<T>(ref T pacetStruct, int size) where T : unmanaged
-        {
-            var buffer = new byte[sizeof(T)];
-            MemoryMarshal.Write(buffer, ref pacetStruct);
-            return buffer.AsMemory()[0..size];
-        }
 
         public static T Deserialze<T>(in Memory<byte> buffer) where T : unmanaged 
         {

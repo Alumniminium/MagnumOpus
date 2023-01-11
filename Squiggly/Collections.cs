@@ -1,4 +1,4 @@
-using CO2_CORE_DLL.IO;
+using Co2Core.IO;
 using MagnumOpus.Squiggly.Models;
 
 namespace MagnumOpus.Squiggly
