@@ -1,6 +1,6 @@
+using Co2Core.IO;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Squiggly.Models;
 
 namespace MagnumOpus.Components
 {
@@ -10,7 +10,7 @@ namespace MagnumOpus.Components
         public readonly int EntityId;
         public readonly PixelEntity Target;
         public readonly MsgInteractType AttackType;
-        public uint SleepTicks;
+        public long SleepTicks;
 
         public AttackComponent(int nttId, in PixelEntity target, MsgInteractType attackType)
         {
@@ -21,4 +21,5 @@ namespace MagnumOpus.Components
 
         public override int GetHashCode() => EntityId;
     }
+    
 }

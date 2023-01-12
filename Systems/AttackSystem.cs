@@ -1,7 +1,7 @@
-using MagnumOpus.ECS;
-using MagnumOpus.Components;
-using MagnumOpus.Enums;
 using System.Numerics;
+using MagnumOpus.Components;
+using MagnumOpus.ECS;
+using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
@@ -12,13 +12,13 @@ namespace MagnumOpus.Simulation.Systems
 
         public override void Update(in PixelEntity ntt, ref AttackComponent atk, ref PositionComponent pos)
         {
-            if(atk.SleepTicks > 0)
+            if (atk.SleepTicks > 0)
             {
                 atk.SleepTicks--;
                 return;
             }
 
-            if(atk.Target.Has<DeathTagComponent>())
+            if (atk.Target.Has<DeathTagComponent>())
             {
                 ntt.Remove<AttackComponent>();
                 return;
@@ -28,18 +28,18 @@ namespace MagnumOpus.Simulation.Systems
             ref readonly var targetPos = ref atk.Target.Get<PositionComponent>();
 
             var distance = Vector2.Distance(pos.Position, targetPos.Position);
-            
-            if(atk.AttackType == MsgInteractType.Physical)
+
+            if (atk.AttackType == MsgInteractType.Physical)
             {
-                if(distance <= 2.5f)
+                if (distance <= 2.5f)
                 {
                     atk.SleepTicks = PixelWorld.TargetTps;
                     // TODO: calculate damage
 
-                    var damage = Random.Shared.Next(1,10);
-                    if(ntt.Type == EntityType.Player)
+                    var damage = Random.Shared.Next(1, 10);
+                    if (ntt.Type == EntityType.Player)
                         damage *= 2;
-                    if(ntt.Has<GuardPositionComponent>())
+                    if (ntt.Has<GuardPositionComponent>())
                         damage *= 10;
 
                     var dmg = new DamageComponent(in atk.Target, in ntt, damage);
@@ -51,14 +51,14 @@ namespace MagnumOpus.Simulation.Systems
                 else
                     ntt.Remove<AttackComponent>();
             }
-            else if(atk.AttackType == MsgInteractType.Archer)
+            else if (atk.AttackType == MsgInteractType.Archer)
             {
-                if(distance <= 10)
+                if (distance <= 10)
                 {
                     atk.SleepTicks = PixelWorld.TargetTps;
                     // TODO: calculate damage
 
-                    var damage = Random.Shared.Next(1,10);
+                    var damage = Random.Shared.Next(1, 10);
                     var dmg = new DamageComponent(in atk.Target, in ntt, damage);
                     atk.Target.Set(ref dmg);
 

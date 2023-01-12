@@ -6,7 +6,7 @@ namespace MagnumOpus.Components
     public readonly struct ReviveComponent
     {
         public readonly int EntityId;
-        public readonly uint ReviveTick;
+        public readonly long ReviveTick;
         public ReviveComponent(int id, uint seconds)
         {
             EntityId = id;

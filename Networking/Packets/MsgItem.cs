@@ -20,7 +20,7 @@ namespace MagnumOpus.Networking.Packets
         public uint Timestamp;
         public int Value;
 
-        public static MsgItem Create(int uid, int value, int param, uint timestamp, MsgItemType type)
+        public static MsgItem Create(int uid, int value, int param, MsgItemType type)
         {
             var msg = new MsgItem
             {
@@ -30,7 +30,7 @@ namespace MagnumOpus.Networking.Packets
                 Param = param,
                 Type = type,
                 Value = value,
-                Timestamp = timestamp,
+                Timestamp = (uint)PixelWorld.Tick,
             };
             return msg;
         }

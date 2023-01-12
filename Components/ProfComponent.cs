@@ -6,7 +6,7 @@ namespace MagnumOpus.Components
     public readonly struct ProfComponent
     {
         public readonly int EntityId;
-        public readonly uint ChangedTick;
+        public readonly long ChangedTick;
         public readonly ushort Id;
         public readonly ushort Level;
         public readonly ushort Experience;

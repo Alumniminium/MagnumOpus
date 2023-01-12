@@ -20,6 +20,7 @@ namespace MagnumOpus.Networking.Packets
         public ushort Y;
         public MsgInteractType Type;
         public int Value;
+        public int Value2;
 
         public static MsgInteract Create(in PixelEntity source, in PixelEntity target, MsgInteractType type, int value)
         {
@@ -101,17 +102,21 @@ namespace MagnumOpus.Networking.Packets
                     }
                 case MsgInteractType.Magic:
                     {
-                        var (id, targetId, x, y) = SpellCrypto.DecryptSkill(in ntt, ref msg);
+                        var (skillId, targetId, x, y) = SpellCrypto.DecryptSkill(in ntt, ref msg);
+
                         if (ntt.NetId != msg.AttackerUniqueId)
                         {
                             FConsole.WriteLine($"[MsgInteract] HAX! {ntt.NetId} != {msg.AttackerUniqueId}");
                             return;
                         }
 
-                        var target = PixelWorld.GetEntityByNetId((int)targetId);
+                        var mAtk = new MagicAttackRequestComponent(ntt.Id, skillId, targetId, x, y, PixelWorld.TargetTps);
+                        ntt.Set(ref mAtk);
 
-                        var atkMsg = MsgMagicEffect.Create(in ntt, in target, 10, id, 0);
-                        ntt.NetSync(ref atkMsg, true);
+                        // var target = PixelWorld.GetEntityByNetId((int)targetId);
+
+                        // var atkMsg = MsgMagicEffect.Create(in ntt, in target, 10, skillId, 0);
+                        // ntt.NetSync(ref atkMsg, true);
                         break;
                     }
             }

@@ -15,6 +15,12 @@ namespace MagnumOpus.Simulation.Systems
             if (emo.ChangedTick != PixelWorld.Tick)
                 return;
 
+            if(emo.Emote == Emote.Sit)
+            {
+                var stamina = MsgUserAttrib.Create(ntt.NetId, 100, MsgUserAttribType.Stamina);
+                ntt.NetSync(ref stamina);
+            }
+
             var msg = MsgAction.Create(ntt.NetId, (int)emo.Emote, 0,0, dir.Direction, MsgActionType.ChangeAction);
             ntt.NetSync(ref msg, true);
         }

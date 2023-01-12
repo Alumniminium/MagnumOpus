@@ -8,7 +8,7 @@ namespace MagnumOpus.ECS
     public static class PixelWorld
     {
         public const int MaxEntities = 1_500_000;
-        public static uint TargetTps { get; private set; } = 30;
+        public static int TargetTps { get; private set; } = 30;
         private static float UpdateTime;
 
         private static readonly PixelEntity[] Entities;
@@ -21,7 +21,7 @@ namespace MagnumOpus.ECS
 
         public static int EntityCount => MaxEntities - AvailableArrayIndicies.Count;
         private static PixelSystem[] Systems;
-        public static uint Tick { get; private set; }
+        public static long Tick { get; private set; }
         private static float TimeAcc;
         private static float UpdateTimeAcc;
 
@@ -41,7 +41,7 @@ namespace MagnumOpus.ECS
         }
 
         public static void SetSystems(params PixelSystem[] systems) => Systems = systems;
-        public static void SetTPS(uint fps)
+        public static void SetTPS(int fps)
         {
             TargetTps = fps;
             UpdateTime = 1f / TargetTps;

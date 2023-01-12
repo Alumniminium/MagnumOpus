@@ -54,7 +54,7 @@ namespace MagnumOpus.Simulation.Systems
                 {
                     if (inv.Items[i].Id != 0)
                     {
-                        var rmMsg = MsgItem.Create(inv.Items[i].NetId, inv.Items[i].NetId, inv.Items[i].NetId, 0, Enums.MsgItemType.RemoveInventory);
+                        var rmMsg = MsgItem.Create(inv.Items[i].NetId, inv.Items[i].NetId, inv.Items[i].NetId, Enums.MsgItemType.RemoveInventory);
                         ntt.NetSync(ref rmMsg);
                     }
                 }

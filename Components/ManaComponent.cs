@@ -7,7 +7,7 @@ namespace MagnumOpus.Components
     public struct ManaComponent
     {
         public readonly int EntityId;
-        public uint ChangedTick;
+        public long ChangedTick;
         public ushort Mana;
         public ushort MaxMana;
 

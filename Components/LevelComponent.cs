@@ -6,7 +6,7 @@ namespace MagnumOpus.Components
     public struct LevelComponent
     {
         public readonly int EntityId;
-        public uint ChangedTick;
+        public long ChangedTick;
         public byte Level;
         public uint Experience;
         public uint ExperienceToNextLevel;

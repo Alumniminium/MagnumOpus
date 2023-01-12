@@ -7,7 +7,7 @@ namespace MagnumOpus.Components
     public struct ViewportComponent
     {
         public readonly int EntityId;
-        public uint ChangedTick;
+        public long ChangedTick;
 
         public readonly List<PixelEntity> EntitiesVisible;
         public readonly List<PixelEntity> EntitiesVisibleLast;

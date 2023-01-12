@@ -7,7 +7,7 @@ namespace MagnumOpus.Components
     public struct EquipmentComponent
     {
         public readonly int EntityId;
-        public uint ChangedTick;
+        public long ChangedTick;
 
         public PixelEntity Head => Items[MsgItemPosition.Armor];
         public PixelEntity Necklace => Items[MsgItemPosition.Necklace];

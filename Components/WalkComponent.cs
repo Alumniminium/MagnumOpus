@@ -7,7 +7,7 @@ namespace MagnumOpus.Components
     public readonly struct WalkComponent
     {
         public readonly int EntityId;
-        public readonly uint ChangedTick;
+        public readonly long ChangedTick;
         public readonly Direction Direction;
         public readonly bool IsRunning;
 

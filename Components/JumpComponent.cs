@@ -7,8 +7,8 @@ namespace MagnumOpus.Components
     public struct JumpComponent
     {
         public readonly int EntityId;
-        public readonly uint CreatedTick;
-        public readonly uint ChangedTick;
+        public readonly long CreatedTick;
+        public readonly long ChangedTick;
         public readonly Vector2 Position;
         public float Time;
 

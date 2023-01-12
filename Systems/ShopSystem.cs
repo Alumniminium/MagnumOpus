@@ -83,7 +83,7 @@ namespace MagnumOpus.Simulation.Systems
 
                         inv.Items[i] = default;
 
-                        var remInv = MsgItem.Create(itemNtt.NetId, itemNtt.NetId, itemNtt.NetId, PixelWorld.Tick, MsgItemType.RemoveInventory);
+                        var remInv = MsgItem.Create(itemNtt.NetId, itemNtt.NetId, itemNtt.NetId, MsgItemType.RemoveInventory);
                         ntt.NetSync(ref remInv);
                         FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.NetId} sold {txc.ItemId} for {money} and now has {inv.Money:C}");
                     }

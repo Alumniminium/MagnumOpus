@@ -7,7 +7,7 @@ namespace MagnumOpus.Components
     public struct DirectionComponent
     {
         public readonly int EntityId;
-        public uint ChangedTick;
+        public long ChangedTick;
         public Direction Direction;
 
         public DirectionComponent(int entityId, Direction direction = Direction.South)

@@ -20,7 +20,7 @@ namespace MagnumOpus.Simulation.Systems
                 ref var inv = ref ntt.Get<InventoryComponent>();
                 var invIdx = Array.IndexOf(inv.Items, itemNtt);
                 inv.Items[invIdx] = default;
-                var msg = MsgItem.Create(itemNtt.NetId, itemNtt.NetId, itemNtt.NetId, PixelWorld.Tick, MsgItemType.RemoveInventory);
+                var msg = MsgItem.Create(itemNtt.NetId, itemNtt.NetId, itemNtt.NetId, MsgItemType.RemoveInventory);
                 ntt.NetSync(ref msg);
             }
 

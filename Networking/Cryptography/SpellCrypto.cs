@@ -7,7 +7,7 @@ namespace MagnumOpus.Networking.Cryptography
 {
     public static class SpellCrypto
     {
-        public static (ushort id, uint target, ushort x, ushort y) DecryptSkill(in PixelEntity player, ref MsgInteract packet)
+        public static (ushort id, int target, ushort x, ushort y) DecryptSkill(in PixelEntity player, ref MsgInteract packet)
         {
             var buffer = Co2Packet.Serialize(ref packet);
             var id = Convert.ToUInt16((long)buffer.Span[24] & 0xFF | ((long)buffer.Span[25] & 0xFF) << 8);
@@ -32,7 +32,7 @@ namespace MagnumOpus.Networking.Cryptography
 
             var target = BitConverter.ToUInt32(buffer.Span[12..]);
             target = (uint)(((target & 0xffffe000) >> 13 | (target & 0x1fff) << 19) ^ 0x5F2D2463 ^ player.NetId) - 0x746F4AE6;
-            return (id, target, (ushort)x, (ushort)y);
+            return (id, (int)target, (ushort)x, (ushort)y);
         }
     }
 }

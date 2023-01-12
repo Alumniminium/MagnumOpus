@@ -6,7 +6,7 @@ namespace MagnumOpus.Components
     public struct InventoryComponent
     {
         public readonly int EntityId;
-        public uint ChangedTick;
+        public long ChangedTick;
 
         public uint Money;
         public uint CPs;

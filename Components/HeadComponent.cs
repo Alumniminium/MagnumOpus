@@ -6,17 +6,17 @@ namespace MagnumOpus.Components
     public struct HeadComponent
     {
         public readonly int EntityId;
-        public uint ChangedTick;
+        public long ChangedTick;
 
         internal ushort Hair;
         public ushort FaceId;
 
-        public HeadComponent(int entityId, ushort face, ushort hair = 310)
+        public HeadComponent(int entityId, ushort face=6, ushort hair = 310)
         {
             EntityId = entityId;
             ChangedTick = PixelWorld.Tick;
             Hair = hair;
-            FaceId = 6;
+            FaceId = face;
         }
 
         public override int GetHashCode() => EntityId;

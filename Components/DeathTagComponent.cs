@@ -7,7 +7,7 @@ namespace MagnumOpus.Components
     {
         public readonly int EntityId;
         public readonly PixelEntity Killer;
-        public readonly uint Tick;
+        public readonly long Tick;
         
         public DeathTagComponent(int entityId, in PixelEntity killer)
         {

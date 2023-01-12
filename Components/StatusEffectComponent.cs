@@ -6,7 +6,7 @@ namespace MagnumOpus.Components
     public struct StatusEffectComponent
     {
         public readonly int EntityId;
-        public uint ChangedTick;
+        public long ChangedTick;
         
         public Enums.StatusEffect Effects;
 

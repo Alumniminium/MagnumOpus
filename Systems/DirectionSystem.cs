@@ -16,7 +16,7 @@ namespace MagnumOpus.Simulation.Systems
                 return;
 
             var msg = MsgAction.Create(ntt.NetId, 0, 0, 0, dir.Direction, MsgActionType.ChangeFacing);
-            // ntt.NetSync(ref msg, true);
+            ntt.NetSync(ref msg, true);
         }
     }
 }

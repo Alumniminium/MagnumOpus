@@ -12,22 +12,10 @@ namespace MagnumOpus.Helpers
 {
     public static class CqProcessor
     {
-        public static cq_npc GetNpc(int npcId)
-        {
-            using var ctx = new SquigglyContext();
-            var npc = ctx.cq_npc.Find((long)npcId);
-            return npc;
-        }
-        public static cq_task GetTask(long taskId)
-        {
-            using var ctx = new SquigglyContext();
-            return ctx.cq_task.Find(taskId);
-        }
-        public static cq_action GetAction(long actionId)
-        {
-            using var ctx = new SquigglyContext();
-            return ctx.cq_action.Find(actionId);
-        }
+        private static readonly SquigglyContext ctx = new();
+        public static cq_npc GetNpc(int npcId) => ctx.cq_npc.Find((long)npcId);
+        public static cq_task GetTask(long taskId) => ctx.cq_task.Find(taskId);
+        public static cq_action GetAction(long actionId) => ctx.cq_action.Find(actionId);
     }
     public static class CqActionProcessor
     {
@@ -466,7 +454,7 @@ namespace MagnumOpus.Helpers
 
                             if (chkRange.Contains(item.Id))
                             {
-                                var msg = MsgItem.Create(ntt.NetId, inv.Items[i].NetId, inv.Items[i].NetId, PixelWorld.Tick, MsgItemType.RemoveInventory);
+                                var msg = MsgItem.Create(ntt.NetId, inv.Items[i].NetId, inv.Items[i].NetId, MsgItemType.RemoveInventory);
                                 ntt.NetSync(ref msg);
                                 count++;
                                 inv.Items[i] = default;
@@ -531,7 +519,7 @@ namespace MagnumOpus.Helpers
 
                         if (foundIdx != -1)
                         {
-                            var removeInv = MsgItem.Create(inv.Items[foundIdx].NetId, inv.Items[foundIdx].NetId, inv.Items[foundIdx].NetId, PixelWorld.Tick, Enums.MsgItemType.RemoveInventory);
+                            var removeInv = MsgItem.Create(inv.Items[foundIdx].NetId, inv.Items[foundIdx].NetId, inv.Items[foundIdx].NetId, MsgItemType.RemoveInventory);
                             ntt.NetSync(ref removeInv);
                             inv.Items[foundIdx] = default;
                             FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {itemId} -> {(foundIdx != -1 ? "Success" : "Fail")} -> {(foundIdx != -1 ? action.id_next : action.id_nextfail)}");
@@ -556,7 +544,7 @@ namespace MagnumOpus.Helpers
 
                         if (foundIdx != -1)
                         {
-                            var removeInv = MsgItem.Create(inv.Items[foundIdx].NetId, inv.Items[foundIdx].NetId, inv.Items[foundIdx].NetId, PixelWorld.Tick, Enums.MsgItemType.RemoveInventory);
+                            var removeInv = MsgItem.Create(inv.Items[foundIdx].NetId, inv.Items[foundIdx].NetId, inv.Items[foundIdx].NetId, MsgItemType.RemoveInventory);
                             ntt.NetSync(ref removeInv);
                             inv.Items[foundIdx] = default;
                             FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {itemId} -> {(foundIdx != -1 ? "Success" : "Fail")} -> {(foundIdx != -1 ? action.id_next : action.id_nextfail)}");

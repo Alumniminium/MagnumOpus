@@ -6,7 +6,7 @@ namespace MagnumOpus.Components
     public struct BodyComponent
     {
         public readonly int EntityId;
-        public uint ChangedTick;
+        public long ChangedTick;
         
         public uint Look;
 

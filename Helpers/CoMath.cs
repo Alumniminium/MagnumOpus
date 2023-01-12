@@ -149,5 +149,120 @@ namespace MagnumOpus.Helpers
             }
             return time;
         }
+
+        public static bool IsInArc(Vector2 from, Vector2 end, Vector2 target, uint range)
+        {
+            const int defaultMagicArc = 90;
+            const float radianDelta = (float)(Math.PI * defaultMagicArc / 180);
+
+            var centerLine = GetRadian(from, end);
+            var targetLine = GetRadian(from, target);
+            var delta = Math.Abs(centerLine - targetLine);
+
+            return (delta <= radianDelta || delta >= 2 * Math.PI - radianDelta) && GetLineLength(from, target) < range;
+        }
+
+        public static bool DdaLine(Vector2 start, Vector2 end, uint range, Vector2 target)
+        {
+            if (start == end)
+                return false;
+
+            // var scale = (float)(1.0f * nRange / Math.Sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0)));
+            var scale = (float)(1.0f * range / GetLineLength(start, end));
+            var x0 = (int)start.X;
+            var y0 = (int)start.Y;
+            var x1 = (int)(0.5f + scale * (end.X - x0) + x0);
+            var y1 = (int)(0.5f + scale * (end.Y - y0) + y0);
+            return DdaLineEx(x0, y0, x1, y1, ref target);
+        }
+
+        /// <summary>
+        /// Return all points on that line. (From TQ)
+        /// </summary>
+        private static bool DdaLineEx(int x0, int y0, int x1, int y1, ref Vector2 target)
+        {
+            if (x0 == x1 && y0 == y1)
+                return false;
+                
+            var dx = x1 - x0;
+            var dy = y1 - y0;
+            var absDx = Math.Abs(dx);
+            var absDy = Math.Abs(dy);
+            Vector2 vector2;
+            var delta = absDy * (dx > 0 ? 1 : -1);
+            if (absDx > absDy)
+            {
+                delta = absDx * (dy > 0 ? 1 : -1);
+                var numerator = dy * 2;
+                var denominator = absDx * 2;
+                if (dx > 0)
+                {
+                    // x0 ++
+                    for (var i = 1; i <= absDx; i++)
+                    {
+                        vector2 = new Vector2((ushort)(x0 + i), (ushort)(y0 + (numerator * i + delta) / denominator));
+                        if (vector2 == target)
+                            return true;
+                    }
+                }
+                else if (dx < 0)
+                {
+                    // x0 --
+                    for (var i = 1; i <= absDx; i++)
+                    {
+                        vector2 = new Vector2((ushort)(x0 - i), (ushort)(y0 + (numerator * i + delta) / denominator));
+                        if (vector2 == target)
+                            return true;
+                    }
+                }
+            }
+            else
+            {
+                var numerator = dx * 2;
+                var denominator = absDy * 2;
+                if (dy > 0)
+                {
+                    // y0 ++
+                    for (var i = 1; i <= absDy; i++)
+                    {
+                        vector2 = new Vector2((ushort)(y0 + i), (ushort)(x0 + (numerator * i + delta) / denominator));
+                        if (vector2 == target)
+                            return true;
+                    }
+                }
+                else if (dy < 0)
+                {
+                    // y0 -- 
+                    for (var i = 1; i <= absDy; i++)
+                    {
+                        vector2 = new Vector2((ushort)(y0 - i), (ushort)(x0 + (numerator * i + delta) / denominator));
+                        if (vector2 == target)
+                            return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private static float GetRadian(Vector2 source, Vector2 target)
+        {
+            if (!(source.X != target.X || source.Y != target.Y))
+                return 0f;
+
+            var delta = target - source;
+            var distance = (float)Math.Sqrt(delta.X * delta.X + delta.Y * delta.Y);
+
+            if (!(delta.X <= distance && distance > 0))
+                return 0f;
+            var radian = Math.Asin(delta.X / distance);
+
+            return (float)(delta.Y > 0 ? Math.PI / 2 - radian : Math.PI + radian + Math.PI / 2);
+        }
+
+        private static int GetLineLength(Vector2 from, Vector2 to)
+        {
+            var delta = to - from;
+            return (int)Math.Sqrt(delta.X * delta.X + delta.Y * delta.Y);
+        }
     }
 }

@@ -38,8 +38,8 @@ namespace MagnumOpus.Networking.Packets
             var language = msg.GetLanguage();
             FConsole.WriteLine($"[GAME] Client Version: {msg.ClientVersion}, Language: {language}");
             ref readonly var net = ref ntt.Get<NetworkComponent>();
-            var ntc = new NameTagComponent(ntt.Id, net.Username+"[PM]");
-            var bdy = new BodyComponent(ntt.Id, (uint)(net.Username == "trbl[PM]" ? 2003 : 2002));
+            var ntc = new NameTagComponent(ntt.Id, net.Username);
+            var bdy = new BodyComponent(ntt.Id, (uint)(net.Username == "trbl" ? 2003 : 2002));
             var hed = new HeadComponent(ntt.Id, 6);
             var dir = new DirectionComponent(ntt.Id, Direction.South);
             var emo = new EmoteComponent(ntt.Id, Emote.Stand);
@@ -49,13 +49,17 @@ namespace MagnumOpus.Networking.Packets
             var inv = new InventoryComponent(ntt.Id, 1000, 0);
             var lvl = new LevelComponent(ntt.Id, 1);
             var hlt = new HealthComponent(ntt.Id, 330, 330);
-            var mana = new ManaComponent(ntt.Id, 100, 100);
+            var mana = new ManaComponent(ntt.Id, 1000, 1000);
             var pro = new ProfessionComponent(ntt.Id, ClasseName.InternTaoist);
             var sbc = new SpellBookComponent(ntt.Id);
             var eqc = new EquipmentComponent(ntt.Id);
 
             sbc.Spells.Add(1000, (0, 0, 0));
             sbc.Spells.Add(1005, (0, 0, 0));
+            sbc.Spells.Add(1120, (0, 0, 0));
+            sbc.Spells.Add(1165, (0, 0, 0));
+            sbc.Spells.Add(1045, (4, 0, 0));
+
             ntt.Set(ref bdy);
             ntt.Set(ref ntc);
             ntt.Set(ref dir);

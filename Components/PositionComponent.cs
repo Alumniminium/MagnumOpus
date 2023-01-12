@@ -7,7 +7,7 @@ namespace MagnumOpus.Components
     public struct PositionComponent
     {
         public readonly int EntityId;
-        public uint ChangedTick;
+        public long ChangedTick;
 
         public Vector2 Position;
         public Vector2 LastPosition;

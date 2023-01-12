@@ -21,18 +21,23 @@ namespace MagnumOpus.Simulation.Systems
             using var ctx = new SquigglyContext();
             var map = ctx.cq_map.Find((long)pos.Map);
 
-            pos.ChangedTick = PixelWorld.Tick+1;
-
-            if(map.reborn_map == pos.Map)
+            if (map != null)
             {
-                pos.Position = new Vector2(map.portal0_x, map.portal0_y);
+                pos.ChangedTick = PixelWorld.Tick + 1;
+
+                if (map.reborn_map == pos.Map)
+                {
+                    pos.Position = new Vector2(map.portal0_x, map.portal0_y);
+                }
+                else
+                {
+                    var portalId = map.reborn_portal;
+                    var portal = ctx.cq_portal.Find((int)portalId);
+                    pos.Map = (ushort)map.reborn_map;
+                }
             }
             else
-            {
-                var portalId = map.reborn_portal;
-                var portal = ctx.cq_portal.Find((int)portalId);
-                pos.Map = (ushort)map.reborn_map;
-            }
+                FConsole.WriteLine($"[{nameof(ReviveSystem)}]: Map {pos.Map} not found");
 
             hlt.Health = hlt.MaxHealth;
             eff.Effects &= ~StatusEffect.Dead;

@@ -20,9 +20,9 @@ namespace MagnumOpus.Simulation.Systems
                 inv.Items[newEqInvIdx] = oldEq;
                 eq.Items[change.Slot] = item;
 
-                var msg = MsgItem.Create(item.NetId, 0, (int)change.Slot, PixelWorld.Tick, MsgItemType.SetEquipPosition);
+                var msg = MsgItem.Create(item.NetId, 0, (int)change.Slot, MsgItemType.SetEquipPosition);
                 ntt.NetSync(ref msg);
-                var remInv = MsgItem.Create(item.NetId, item.NetId, item.NetId, PixelWorld.Tick, MsgItemType.RemoveInventory);
+                var remInv = MsgItem.Create(item.NetId, item.NetId, item.NetId, MsgItemType.RemoveInventory);
                 ntt.NetSync(ref remInv);
             }
             else

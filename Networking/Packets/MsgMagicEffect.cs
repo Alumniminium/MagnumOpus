@@ -64,7 +64,6 @@ namespace MagnumOpus.Networking.Packets
                 Size = 28,
                 Id = 1105,
                 UniqId = attacker.NetId,
-                // Param = (int)attacker.Get<DirectionComponent>().Direction,
                 X = (ushort)target.Get<PositionComponent>().Position.X,
                 Y = (ushort)target.Get<PositionComponent>().Position.Y,
                 Type = skillId,
@@ -77,7 +76,6 @@ namespace MagnumOpus.Networking.Packets
                 msg.Targets[1] = damage;
                 msg.Targets[2] = 0;
             }
-
 
             return msg;
         }
