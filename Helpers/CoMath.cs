@@ -1,13 +1,17 @@
 using System.Numerics;
+using HerstLib.IO;
 using MagnumOpus.Enums;
 
 namespace MagnumOpus.Helpers
 {
     public static class CoMath
     {
-        public static double GetDistance(Vector2 start, Vector2 end)
+        public static bool InRange(Vector2 start, Vector2 end, double range)
         {
-            return Math.Sqrt((start.X - end.X) * (start.X - end.X) + (start.Y - end.Y) * (start.Y - end.Y));
+            var deltaX = end.X - start.X;
+            var deltaY = end.Y - start.Y;
+            var distance = deltaX * deltaX + deltaY * deltaY;
+            return distance <= range*range;
         }
         public static Direction GetDirection(Vector2 end, Vector2 start) => (Direction)(GetRawDirection(end, start) % 8);
         public static byte GetRawDirection(Vector2 end, Vector2 start)
@@ -150,17 +154,18 @@ namespace MagnumOpus.Helpers
             return time;
         }
 
-        public static bool IsInArc(Vector2 from, Vector2 end, Vector2 target, uint range)
-        {
-            const int defaultMagicArc = 90;
-            const float radianDelta = (float)(Math.PI * defaultMagicArc / 180);
+        public static bool InSector(Vector2 pos, Vector2 click, Vector2 check, float widthRadians)
+            {
+                double aimRad = GetRadian(pos, click);
+                double checkRad = GetRadian(pos, check);
 
-            var centerLine = GetRadian(from, end);
-            var targetLine = GetRadian(from, target);
-            var delta = Math.Abs(centerLine - targetLine);
+                FConsole.WriteLine($"aimRad: {aimRad:0.00} checkRad: {checkRad:0.00}");
 
-            return (delta <= radianDelta || delta >= 2 * Math.PI - radianDelta) && GetLineLength(from, target) < range;
-        }
+                if (aimRad - widthRadians / 2 < checkRad)
+                    if (aimRad + widthRadians / 2 > checkRad)
+                        return true;
+                return false;
+            }
 
         public static bool DdaLine(Vector2 start, Vector2 end, uint range, Vector2 target)
         {

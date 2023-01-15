@@ -78,6 +78,21 @@ namespace MagnumOpus.Networking.Packets
             }
 
             return msg;
+        }public static MsgMagicEffect Create(in PixelEntity attacker, ushort x, ushort y, ushort skillId, byte skillLevel)
+        {
+            var msg = new MsgMagicEffect()
+            {
+                Size = 28,
+                Id = 1105,
+                UniqId = attacker.NetId,
+                X = x,
+                Y = y,
+                Type = skillId,
+                Level = skillLevel,
+                TargetCount = 1
+            };
+
+            return msg;
         }
     }
 }

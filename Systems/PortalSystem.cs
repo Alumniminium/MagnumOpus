@@ -21,6 +21,9 @@ namespace MagnumOpus.Simulation.Systems
             {
                 FConsole.WriteLine($"[{nameof(PortalSystem)}] {ntt.NetId} -> No Dmap Portal found at {ptc.X}, {ptc.Y} on map {mapId}");
                 ntt.Remove<PortalComponent>();
+
+                var backupTpc = new TeleportComponent(ntt.Id, 477, 380, 1002);
+                ntt.Set(ref backupTpc);
                 return;
             }
 
@@ -29,6 +32,9 @@ namespace MagnumOpus.Simulation.Systems
             {
                 FConsole.WriteLine($"[{nameof(PortalSystem)}] {ntt.NetId} -> No Passway for {entry.PortalId} on map {mapId}");
                 ntt.Remove<PortalComponent>();
+                
+                var backupTpc = new TeleportComponent(ntt.Id, 477, 380, 1002);
+                ntt.Set(ref backupTpc);
                 return;
             }
 
@@ -37,11 +43,16 @@ namespace MagnumOpus.Simulation.Systems
             {
                 FConsole.WriteLine($"[{nameof(PortalSystem)}] {ntt.NetId} -> No Exit Portal for {passway.passway_mapid} on map {passway.passway_mapportal}");
                 ntt.Remove<PortalComponent>();
+
+                var backupTpc = new TeleportComponent(ntt.Id, 477, 380, 1002);
+                ntt.Set(ref backupTpc);
                 return;
             }
 
             var tpc = new TeleportComponent(ntt.Id, (ushort)exit.X, (ushort)exit.Y, (ushort)exit.MapId);
             ntt.Set(ref tpc);
+
+            FConsole.WriteLine($"[{nameof(PortalSystem)}] {ntt.NetId} -> Teleporting to {exit.MapId} at {exit.X}, {exit.Y}");
 
             ntt.Remove<PortalComponent>();
         }

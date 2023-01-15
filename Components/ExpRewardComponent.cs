@@ -3,10 +3,10 @@ using MagnumOpus.ECS;
 namespace MagnumOpus.Components
 {
     [Component]
-    public readonly struct ExpRewardComponent
+    public struct ExpRewardComponent
     {
         public readonly int EntityId;
-        public readonly int Experience;
+        public int Experience;
 
         public ExpRewardComponent(in PixelEntity ntt, int experience)
         {

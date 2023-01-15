@@ -69,10 +69,12 @@ namespace MagnumOpus.Networking.Packets
                 ntt.NetSync(ref kickback,true);
                 return;
             }
+
             var wlk = new WalkComponent(ntt.Id, msg.RawDirection, msg.Type == 1);
             var emo = new EmoteComponent(ntt.Id, Emote.Stand);
             ntt.Set(ref wlk);
             ntt.Set(ref emo);
+            ntt.Remove<AttackComponent>();
         }
     }
 }

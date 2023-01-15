@@ -159,6 +159,26 @@ namespace MagnumOpus.Networking.Packets
             foreach (var entity in vwp.EntitiesVisible)
                 if (entity != ntt)
                     entity.NetSync(ref mem);
+
+            var txt = mem.Message();
+            var command = txt.Replace("/", "").Split(' ')[0];
+            var args = txt.Replace("/", "").Split(' ').ToArray()[1..];
+
+            switch (command)
+            {
+                case "cc":
+                    ref var pos = ref ntt.Get<PositionComponent>();
+                    pos.Position.X = ushort.Parse(args[0]);
+                    pos.Position.Y = ushort.Parse(args[1]);
+                    pos.Map = ushort.Parse(args[2]);
+                    var tpc = new TeleportComponent(ntt.Id, (ushort)pos.Position.X, (ushort)pos.Position.Y, (ushort)pos.Map);
+                    ntt.Set(ref tpc);
+                    break;
+                case "rev":
+                    var rev = new ReviveComponent(ntt.Id, 1);
+                    ntt.Set(ref rev);
+                    break;
+            }
         }
     }
 }

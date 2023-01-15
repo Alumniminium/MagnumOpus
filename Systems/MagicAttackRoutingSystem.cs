@@ -33,7 +33,6 @@ namespace MagnumOpus.Simulation.Systems
                     break;
                 case 11: // Roar
                 case 5: // Circle
-                case 2: // Team Heal
                     var circle = new CircleTargetComponent(ntt.Id, atk.X, atk.Y, magicType);
                     ntt.Set(ref circle);
                     break;

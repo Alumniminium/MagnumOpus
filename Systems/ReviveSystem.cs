@@ -17,27 +17,37 @@ namespace MagnumOpus.Simulation.Systems
             if (rev.ReviveTick < PixelWorld.Tick)
                 return;
 
+            FConsole.WriteLine($"[{nameof(ReviveSystem)}]: Revive on Map {pos.Map}");
+
             hlt.Health = hlt.MaxHealth;
             using var ctx = new SquigglyContext();
             var map = ctx.cq_map.Find((long)pos.Map);
 
             if (map != null)
             {
-                pos.ChangedTick = PixelWorld.Tick + 1;
+                var mapId = pos.Map;
+                var rebornMap = ctx.cq_map.FirstOrDefault(x => x.id == map.reborn_map);
 
-                if (map.reborn_map == pos.Map)
+                if (rebornMap != null)
                 {
-                    pos.Position = new Vector2(map.portal0_x, map.portal0_y);
+                    pos.ChangedTick = PixelWorld.Tick + 1;
+                    pos.Position = new Vector2(rebornMap.portal0_x, rebornMap.portal0_y);
+                    pos.Map = (ushort)rebornMap.id;
+                    FConsole.WriteLine($"[{nameof(ReviveSystem)}]: Revive at portal: {pos.Map}  x: {pos.Position.X} y: {pos.Position.Y}");
                 }
                 else
                 {
-                    var portalId = map.reborn_portal;
-                    var portal = ctx.cq_portal.Find((int)portalId);
-                    pos.Map = (ushort)map.reborn_map;
+                    FConsole.WriteLine($"[{nameof(ReviveSystem)}]: Reborn Map {pos.Map} not found");
+                    pos.Map = 1002;
+                    pos.Position = new Vector2(477, 380);
                 }
             }
             else
+            {
                 FConsole.WriteLine($"[{nameof(ReviveSystem)}]: Map {pos.Map} not found");
+                pos.Map = 1002;
+                pos.Position = new Vector2(477, 380);
+            }
 
             hlt.Health = hlt.MaxHealth;
             eff.Effects &= ~StatusEffect.Dead;
@@ -55,6 +65,7 @@ namespace MagnumOpus.Simulation.Systems
 
             ntt.Set(ref pos);
             ntt.Remove<ReviveComponent>();
+            ntt.Remove<DeathTagComponent>();
 
             FConsole.WriteLine($"[{nameof(ReviveSystem)}]: Revived {ntt.NetId} at {pos.Map} at {pos.Position.X}, {pos.Position.Y}");
         }

@@ -33,9 +33,9 @@ namespace MagnumOpus
                 new TeleportSystem(),
                 new ViewportSystem(),
                 new MagicAttackRoutingSystem(),
-                new CircularTargetFinderSystem(),
-                new LineTargetFinderSystem(),
-                new SectorTargetFinderSystem(),
+                new TargetFinderCircleSystem(),
+                new TargetFinderLineSystem(),
+                new TargetFinderSectorSystem(),
                 new MagicAttackSystem(),
                 new AttackSystem(),
                 new DamageSystem(),
@@ -92,7 +92,7 @@ namespace MagnumOpus
             PixelWorld.RegisterOnSecond(() =>
             {
                 var lines = PerformanceMetrics.Draw();
-                Console.WriteLine(lines);
+                // Console.WriteLine(lines);
                 PerformanceMetrics.Restart();
             });
 

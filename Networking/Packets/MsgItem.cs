@@ -66,8 +66,13 @@ namespace MagnumOpus.Networking.Packets
                 case MsgItemType.UnEquip:
                         var itemNttId = msg.UnqiueId;
                         var slot = msg.Param;
+                        ref var itemNtt = ref PixelWorld.GetEntityByNetId(itemNttId);
+                        ref var item = ref itemNtt.Get<ItemComponent>();
 
-                        if (slot == 0)
+                        var isArrow = ItemInfo.IsArrow(ref item);
+                        slot = isArrow ? 5 : slot;
+
+                        if (slot == 0 && !isArrow)
                         {
                             var uic = new RequestItemUseComponent(ntt.Id, itemNttId, slot);
                             ntt.Set(ref uic);

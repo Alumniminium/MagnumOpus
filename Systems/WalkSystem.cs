@@ -26,12 +26,17 @@ namespace MagnumOpus.Simulation.Systems
 
             var pkt = MsgWalk.Create(ntt.NetId, (byte)wlk.Direction, wlk.IsRunning);
             ntt.NetSync(ref pkt, true);
+
+            var eff = MsgFloorItem.Create((int)PixelWorld.Tick, (ushort)pos.Position.X, (ushort)pos.Position.Y, 12, MsgFloorItemType.DisplayEffect);
+            // var deff = MsgFloorItem.Create((int)PixelWorld.Tick-1, (ushort)pos.Position.X, (ushort)pos.Position.Y, 12, MsgFloorItemType.RemoveEffect);
+            ntt.NetSync(ref eff, true);
+            // ntt.NetSync(ref deff, true);
             
             var text = $"{wlk.Direction} -> {pos.Position}";
             var msgText = MsgText.Create(in ntt, text, MsgTextType.TopLeft);
             ntt.NetSync(ref msgText);
             
-            FConsole.WriteLine($"[{nameof(WalkSystem)}] {ntt.Id} -> {text}");
+            // FConsole.WriteLine($"[{nameof(WalkSystem)}] {ntt.Id} -> {text}");
 
             ntt.Remove<WalkComponent>();
         }

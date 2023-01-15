@@ -20,7 +20,7 @@ namespace MagnumOpus.Simulation.Systems
             dir.ChangedTick = PixelWorld.Tick;
 
             var direction = CoMath.GetDirection(new Vector2(jmp.Position.X, jmp.Position.Y), pos.Position);
-            var distance  = (int)CoMath.GetDistance(new Vector2(jmp.Position.X, jmp.Position.Y), pos.Position);
+            var distance  = (int)Vector2.Distance(new Vector2(jmp.Position.X, jmp.Position.Y), pos.Position);
             var jumpTime  = PixelWorld.TargetTps * CoMath.GetJumpTime(distance);
             
             if (jmp.CreatedTick + jumpTime < PixelWorld.Tick)
