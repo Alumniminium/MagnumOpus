@@ -1,68 +1,10 @@
 using MagnumOpus.Components;
 using MagnumOpus.Enums;
-using MagnumOpus.Squiggly;
 using MagnumOpus.Squiggly.Models;
 
-namespace MagnumOpus.Networking
+namespace MagnumOpus.Helpers
 {
-    public static class CqPortalProcessor
-    {
-        private class PasswayDef
-        {
-            public int Identity { get; set; }
-            public int MapIndex { get; set; }
-            public int MapId { get; set; }
-            public int TargetMapId { get; set; }
-            public int TargetPortal { get; set; }
-        }
-        private class PortalDef
-        {
-            public int Id { get; set; }
-            public int PasswayIndex { get; set; }
-            public int PasswayMapIndex { get; set; }
-            public int PasswayTargetMapId { get; set;}
-            public int PortalMapId { get; set; }
-            public int PortalX { get; set; }
-            public int PortalY { get; set; }
-        }
-        private static readonly Dictionary<int, PasswayDef> PasswayDefs = new();
-        private static readonly Dictionary<int, PortalDef> PortalDefs = new();
-
-        public static void Load()
-        {
-            using var ctx = new SquigglyContext();
-            var passways = ctx.cq_passway.ToArray();
-
-            foreach(var passway in passways)
-            {
-                var passwayDef = new PasswayDef
-                {
-                    Identity = (int)passway.id,
-                    MapIndex = (int)passway.passway_idx,
-                    MapId = (int)passway.mapid,
-                    TargetMapId = (int)passway.passway_mapid,
-                    TargetPortal = (int)passway.passway_mapportal
-                };
-                PasswayDefs.Add(passwayDef.Identity, passwayDef);
-            }
-
-            foreach(var passway in PasswayDefs)
-            {
-                var portal = ctx.cq_portal.FirstOrDefault(x => x.mapid == passway.Value.TargetMapId && x.portal_idx == passway.Value.TargetPortal);
-                var portalDef = new PortalDef
-                {
-                    Id = (int)portal.id,
-                    PasswayIndex = passway.Value.MapIndex,
-                    PasswayTargetMapId = passway.Value.MapId,
-                    PortalMapId = (int)portal.mapid,
-                    PortalX = (int)portal.portal_x,
-                    PortalY = (int)portal.portal_y
-                };
-                PortalDefs.Add(portalDef.Id, portalDef);
-            }
-        }
-    }
-    public static class ItemInfo
+    public static class ItemHelper
     {
         public static bool IsBroken(ref ItemComponent item) => item.CurrentDurability == 0;
         public static bool IsNeverDropWhenDead(ref ItemComponent item) => /*item.Monopoly == 3 || item..Monopoly == 3 || item..Monopoly == 9 || */ item.Plus > 5;
@@ -123,10 +65,8 @@ namespace MagnumOpus.Networking
             if (monster.drop_ring != 0)
                 possibleTypes.AddRange(RingType);
             if (monster.drop_weapon != 0)
-                possibleTypes.AddRange(OneHanderType);
-            // if (monster.drop_twohander != 0)        
-            //     possibleTypes.AddRange(TwoHanderType);
-
+                possibleTypes.AddRange(new [] {OneHanderType, TwoHanderType}.SelectMany(x => x));
+                
             var type = possibleTypes[Random.Shared.Next(0, possibleTypes.Count)];
             entry.Id = type * 1000 + Random.Shared.Next(1, 100) * 10 + Random.Shared.Next(1, 10);
             entry.CurrentDurability = entry.MaximumDurability = 100;

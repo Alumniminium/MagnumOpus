@@ -173,7 +173,7 @@ namespace MagnumOpus.Helpers
                 return false;
 
             // var scale = (float)(1.0f * nRange / Math.Sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0)));
-            var scale = (float)(1.0f * range / GetLineLength(start, end));
+            var scale = 1f;//(float)(1.0f * range / Vector2.Distance(start, end));
             var x0 = (int)start.X;
             var y0 = (int)start.Y;
             var x1 = (int)(0.5f + scale * (end.X - x0) + x0);
