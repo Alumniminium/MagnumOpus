@@ -47,6 +47,16 @@ namespace MagnumOpus.Simulation.Systems
                         var drop = new RequestDropMoneyComponent(ntt.Id, Random.Shared.Next(drp.Drops.Money));
                         ntt.Set(ref drop);
                     }
+
+                    var itemComp = ItemGenerator.Generate(drp.Drops);
+                    if(itemComp.Id != 0)
+                    {
+                        var itemNtt = PixelWorld.CreateEntity(EntityType.Item);
+                        itemNtt.Set(ref itemComp);
+    
+                        var rdi = new RequestDropItemComponent(ntt.Id, in itemNtt);
+                        ntt.Set(ref rdi);
+                    }
                 }
 
                 var effectsMsg = MsgUserAttrib.Create(ntt.NetId, (ulong)eff.Effects, MsgUserAttribType.StatusEffect);

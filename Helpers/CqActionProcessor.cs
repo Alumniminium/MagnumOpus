@@ -385,7 +385,7 @@ namespace MagnumOpus.Helpers
                         var itemComp = new ItemComponent(itemNtt.Id, itemId, dura, entry.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
                         itemNtt.Set(ref itemComp);
 
-                        var drc = new RequestDropItemComponent(ntt.Id, itemNtt.NetId);
+                        var drc = new RequestDropItemComponent(ntt.Id, in itemNtt);
                         ntt.Set(ref drc);
 
 

@@ -6,12 +6,12 @@ namespace MagnumOpus.Components
     public readonly struct RequestDropItemComponent
     {
         public readonly int EntityId;
-        public readonly int ItemNetId;
+        public readonly PixelEntity ItemNtt;
 
-        public RequestDropItemComponent(int entityId, int itemNetId)
+        public RequestDropItemComponent(int entityId, in PixelEntity itemNtt)
         {
             EntityId = entityId;
-            ItemNetId = itemNetId;
+            ItemNtt = itemNtt;
         }
 
         public override int GetHashCode() => EntityId;

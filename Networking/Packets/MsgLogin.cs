@@ -54,12 +54,14 @@ namespace MagnumOpus.Networking.Packets
             var sbc = new SpellBookComponent(ntt.Id);
             var eqc = new EquipmentComponent(ntt.Id);
 
-            sbc.Spells.Add(1000, (0, 0, 0));
-            sbc.Spells.Add(1005, (0, 0, 0));
-            sbc.Spells.Add(1120, (0, 0, 0));
-            sbc.Spells.Add(1165, (0, 0, 0));
+            sbc.Spells.Add(1000, (4, 0, 0));
+            sbc.Spells.Add(1005, (4, 0, 0));
+            sbc.Spells.Add(1120, (3, 0, 0));
+            sbc.Spells.Add(1165, (3, 0, 0));
+            sbc.Spells.Add(1166, (3, 0, 0));
+            sbc.Spells.Add(1167, (3, 0, 0));
             sbc.Spells.Add(1045, (4, 0, 0));
-            sbc.Spells.Add(8001, (4, 0, 0));
+            sbc.Spells.Add(8001, (5, 0, 0));
 
             ntt.Set(ref bdy);
             ntt.Set(ref ntc);

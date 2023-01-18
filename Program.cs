@@ -41,7 +41,7 @@ namespace MagnumOpus
                 new DamageSystem(),
                 new ExpRewardSystem(),
                 new DeathSystem(),
-                new DropSystem(),
+                new DropItemSystem(),
                 new DropMoneySystem(),
                 new PickupSystem(),
                 new ItemUseSystem(),

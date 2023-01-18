@@ -43,30 +43,35 @@ namespace MagnumOpus.Networking.Packets
             switch (msg.Type)
             {
                 case MsgItemType.Ping:
-                    var tick = MsgTick.Create(in ntt);
-                    ntt.NetSync(ref tick);
-                    ntt.NetSync(ref msg);
-                    break;
-
+                    {
+                        var tick = MsgTick.Create(in ntt);
+                        ntt.NetSync(ref tick);
+                        ntt.NetSync(ref msg);
+                        break;
+                    }
                 case MsgItemType.DropMoney:
-                    var rdmc = new RequestDropMoneyComponent(ntt.Id, msg.Value);
-                    ntt.Set(ref rdmc);
+                    {
+                        var rdmc = new RequestDropMoneyComponent(ntt.Id, msg.Value);
+                        ntt.Set(ref rdmc);
 
-                    ntt.NetSync(ref msg);
-                    break;
-                
+                        ntt.NetSync(ref msg);
+                        break;
+                    }
                 case MsgItemType.RemoveInventory:
-                        var drc = new RequestDropItemComponent(ntt.Id, msg.UnqiueId);
+                    {
+                        ref readonly var itemNtt = ref PixelWorld.GetEntityByNetId(msg.UnqiueId);
+                        var drc = new RequestDropItemComponent(ntt.Id, in itemNtt);
                         ntt.Set(ref drc);
 
                         ntt.NetSync(ref msg);
                         break;
-                
+                    }
                 case MsgItemType.Use:
                 case MsgItemType.UnEquip:
+                    {
                         var itemNttId = msg.UnqiueId;
                         var slot = msg.Param;
-                        ref var itemNtt = ref PixelWorld.GetEntityByNetId(itemNttId);
+                        ref readonly var itemNtt = ref PixelWorld.GetEntityByNetId(itemNttId);
                         ref var item = ref itemNtt.Get<ItemComponent>();
 
                         var isArrow = ItemHelper.IsArrow(ref item);
@@ -84,9 +89,10 @@ namespace MagnumOpus.Networking.Packets
                         }
                         ntt.NetSync(ref msg);
                         break;
-                    
+                    }
                 case MsgItemType.Sell:
                 case MsgItemType.Buy:
+                    {
                         var shopId = msg.UnqiueId;
                         var itemId = msg.Param;
 
@@ -95,7 +101,7 @@ namespace MagnumOpus.Networking.Packets
 
                         ntt.NetSync(ref msg);
                         break;
-                    
+                    }
                 default:
                     FConsole.WriteLine($"Unhandled MsgItem type: {msg.Type}");
                     FConsole.WriteLine(memory.Dump());

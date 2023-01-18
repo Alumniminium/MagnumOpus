@@ -1,5 +1,9 @@
+using System.Text;
+using Co2Core.IO;
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.Enums;
+using MagnumOpus.Squiggly;
 using MagnumOpus.Squiggly.Models;
 
 namespace MagnumOpus.Helpers
@@ -52,35 +56,59 @@ namespace MagnumOpus.Helpers
         private static readonly ushort[] OneHanderType = { 410, 420, 421, 430, 440, 450, 460, 480, 481, 490, 500 };//601 was here, but doesn't seem to be valid?
         private static readonly ushort[] TwoHanderType = { 510, 530, 560, 561, 580, 900 };
 
-        public static ItemComponent Generate(cq_monstertype monster)
+        public static ItemComponent Generate(Drops drop, int mobLevel = 0)
         {
-            var entry = new ItemComponent();
-            var possibleTypes = new List<ushort>();
-            if(monster.drop_armet != 0)
-                possibleTypes.AddRange(ArmetType);
-            if (monster.drop_armor != 0)
-                possibleTypes.AddRange(ArmorType);
-            if (monster.drop_necklace != 0)
-                possibleTypes.AddRange(NecklaceType);
-            if (monster.drop_ring != 0)
-                possibleTypes.AddRange(RingType);
-            if (monster.drop_weapon != 0)
-                possibleTypes.AddRange(new [] {OneHanderType, TwoHanderType}.SelectMany(x => x));
-                
-            var type = possibleTypes[Random.Shared.Next(0, possibleTypes.Count)];
-            entry.Id = type * 1000 + Random.Shared.Next(1, 100) * 10 + Random.Shared.Next(1, 10);
-            entry.CurrentDurability = entry.MaximumDurability = 100;
-            entry = AddBless(ref entry);
-            entry = AddPlus(ref entry);
-            entry = AddSockets(ref entry);
-            return entry;
+            var item = new ItemComponent();
+            var possibleTypes = new List<(int, ushort[])>();
+            if (drop.Armet != 99)
+                possibleTypes.Add((drop.Armet, ArmetType));
+            if (drop.Armor != 99)
+                possibleTypes.Add((drop.Armor, ArmorType));
+            if (drop.Necklace != 99)
+                possibleTypes.Add((drop.Necklace, NecklaceType));
+            if (drop.Ring != 99)
+                possibleTypes.Add((drop.Ring, RingType));
+            if (drop.Weapon != 99)
+            {
+                possibleTypes.Add((drop.Weapon, OneHanderType));
+                possibleTypes.Add((drop.Weapon, TwoHanderType));
+            }
+
+            if (possibleTypes.Count == 0)
+                return default;
+
+            var possibleCombination = possibleTypes[Random.Shared.Next(0, possibleTypes.Count)];
+            var level = possibleCombination.Item1;
+            var type = possibleCombination.Item2[Random.Shared.Next(0, possibleCombination.Item2.Length)];
+
+            item.Id = type * 1000 + level * 10 + Random.Shared.Next(0, 5);
+            // item = GenerateQuality(ref item, mobLevel);
+
+            if (!Collections.ItemType.TryGetValue(item.Id, out var entry))
+            {
+                FConsole.WriteLine($"[{nameof(ItemGenerator)}] Generated invalid {item.Id} - not found");
+                return default;
+            }
+
+            item.CurrentDurability = (ushort)Random.Shared.Next(0, entry.AmountLimit);
+            item.MaximumDurability = (ushort)Math.Min(entry.AmountLimit, item.CurrentDurability + Random.Shared.Next(0, entry.AmountLimit - item.CurrentDurability));
+
+            item = AddBless(ref item);
+            item = AddPlus(ref item);
+            item = AddSockets(ref item);
+
+            unsafe
+            {
+                FConsole.WriteLine($"[{nameof(ItemGenerator)}] Generated {item.Id} - {item.CurrentDurability}/{item.MaximumDurability} - {item.Bless} - {item.Plus} - {item.Gem1} - {item.Gem2} - {item.Enchant} | {Encoding.UTF8.GetString(entry.Name, ItemType.MAX_NAMESIZE).Trim('\0')}");
+            }
+            return item;
         }
 
 
         public static ref ItemComponent AddBless(ref ItemComponent entry)
         {
             var dice = Random.Shared.NextSingle();
-            if (dice < 0.01)
+            if (dice < 1)
                 entry.Bless = 1;
             if (dice < 0.001)
                 entry.Bless = 3;
@@ -104,30 +132,6 @@ namespace MagnumOpus.Helpers
                 entry.Gem1 = 255;
             if (dice < 0.001)
                 entry.Gem2 = 255;
-            return ref entry;
-        }
-
-        private static ref ItemComponent GenerateQuality(ref ItemComponent entry, int moblevel)
-        {
-            var q = Random.Shared.Next(1, 1000);
-            q -= moblevel / 25;
-
-            if (q < 1)
-                q= 9;//super
-            else if (q < 11)
-                q= 8;//eli
-            else if (q < 31)
-                q= 7;//uni
-            else if( q < 55)
-                q= 6;//refined
-            else if (q < 75)
-                q= 5;//Fixed 
-            else if (q < 95)
-                q= 4;//normal
-            else if (q < 115)
-                q= 3;//normal
-
-            entry.Id = entry.Id / 10 * 10 + q;
             return ref entry;
         }
     }
