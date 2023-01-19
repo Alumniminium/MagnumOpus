@@ -4,7 +4,6 @@ using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Simulation.Systems
 {
-
     public sealed class MagicAttackRoutingSystem : PixelSystem<MagicAttackRequestComponent, SpellBookComponent, PositionComponent>
     {
         public MagicAttackRoutingSystem() : base("Magic Attack Routing System", threads: 1) { }

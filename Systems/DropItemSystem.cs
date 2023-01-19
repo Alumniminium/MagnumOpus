@@ -6,32 +6,38 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class DropItemSystem : PixelSystem<PositionComponent, RequestDropItemComponent>
+    public sealed class DropItemSystem : PixelSystem<PositionComponent, RequestDropItemComponent, InventoryComponent>
     {
         public DropItemSystem() : base("Drop Item System", threads: 1) { }
-
-        public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref RequestDropItemComponent rdi)
+        public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref RequestDropItemComponent rdi, ref InventoryComponent inv)
         {
             ref var item = ref rdi.ItemNtt.Get<ItemComponent>();
+            var invIdx = Array.IndexOf(inv.Items, rdi.ItemNtt);
 
-            if (ntt.Has<InventoryComponent>())
+            if(invIdx == -1)
             {
-                ref var inv = ref ntt.Get<InventoryComponent>();
-                var invIdx = Array.IndexOf(inv.Items, rdi.ItemNtt);
-                inv.Items[invIdx] = default;
-                var msg = MsgItem.Create(rdi.ItemNtt.NetId, rdi.ItemNtt.NetId, rdi.ItemNtt.NetId, MsgItemType.RemoveInventory);
-                ntt.NetSync(ref msg);
+                FConsole.WriteLine($"[{nameof(DropItemSystem)}] {ntt.Id} - {rdi.ItemNtt} - Item not found in inventory.");
+                ntt.Remove<RequestDropItemComponent>();
+                return;
             }
 
-            Game.Grids[pos.Map].Add(in rdi.ItemNtt, ref pos);
+
+            inv.Items[invIdx] = default;
 
             var dropPos = new PositionComponent(rdi.ItemNtt.Id, pos.Position, pos.Map);
             rdi.ItemNtt.Set(ref dropPos);
+            Game.Grids[pos.Map].Add(in rdi.ItemNtt, ref pos);
 
-            var dropMsg = MsgFloorItem.Create(in rdi.ItemNtt, MsgFloorItemType.Create);
-            ntt.NetSync(ref dropMsg, true);
+            var msgRemoveInv = MsgItem.Create(rdi.ItemNtt.NetId, rdi.ItemNtt.NetId, rdi.ItemNtt.NetId, MsgItemType.RemoveInventory);
+            var msgDropFloor = MsgFloorItem.Create(in rdi.ItemNtt, MsgFloorItemType.Create);
+            ntt.NetSync(ref msgRemoveInv);
+            ntt.NetSync(ref msgDropFloor, true);
+
             FConsole.WriteLine($"[{nameof(DropItemSystem)}] {ntt.NetId} dropped {item.Id} at {pos.Position} on map {pos.Map}.");
             ntt.Remove<RequestDropItemComponent>();
         }
+
+        // TODO:
+        // - Add a check to see if the item is in the inventory
     }
 }

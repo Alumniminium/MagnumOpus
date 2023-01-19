@@ -33,6 +33,9 @@ namespace MagnumOpus.Simulation.Systems
                 if (b.Type == EntityType.Player && atk.MagicType.Crime != 0)
                     continue; // TODO: Check if player is in PK mode
 
+                if (b.Has<DeathTagComponent>())
+                    continue;
+
                 tcc.Targets.Add(b);
             }
             ntt.Set(ref tcc);

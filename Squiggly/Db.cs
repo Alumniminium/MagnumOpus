@@ -41,6 +41,15 @@ namespace MagnumOpus.Squiggly
                     var vwp = new ViewportComponent(obj.Id, 40f);
                     var inv = new InventoryComponent(obj.Id, 0, 0);
 
+                    foreach(var item in prefab.Drops.Items)
+                    {
+                        var idx = Array.FindIndex(inv.Items, x => x == default);
+                        var invItemNtt = PixelWorld.CreateEntity(EntityType.Item);
+                        var invItemComp = new ItemComponent(invItemNtt.Id, item.ID, 0,0,0,0,0,0,0,0,0,0);
+                        invItemNtt.Set(ref invItemComp);
+                        inv.Items[idx] = invItemNtt;
+                    }
+
                     if (prefab.CQAction != 0)
                     {
                         var cq = new CqActionComponent(obj.Id, prefab.CQAction);
@@ -64,7 +73,7 @@ namespace MagnumOpus.Squiggly
                     obj.Set(ref hp);
                     obj.Set(ref ntc);
                     obj.Set(ref vwp);
-                    // obj.Set(ref drop);
+                    obj.Set(ref inv);
 
                     var brn = new BrainComponent(obj.Id);
                     obj.Set(ref brn);
@@ -357,9 +366,7 @@ namespace MagnumOpus.Squiggly
         public static void LoadLevelExp()
         {
             var sw = Stopwatch.StartNew();
-            var exp = new Co2Core.IO.LevelExp();
-            exp.LoadFromDat("CLIENT_FILES/LevelExp.dat");
-            exp.
+            Collections.LevelExps.LoadFromDat("CLIENT_FILES/LevelExp.dat");
             sw.Stop();
             FConsole.WriteLine($"[SquigglyLite] Loaded {Collections.LevelExps.Count}\t LevelExps in {sw.Elapsed.TotalMilliseconds}ms");
         }

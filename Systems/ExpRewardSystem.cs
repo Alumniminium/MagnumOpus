@@ -18,7 +18,7 @@ namespace MagnumOpus.Simulation.Systems
                 ref var hlt = ref ntt.Get<HealthComponent>();
                 lvl.Level++;
                 lvl.Experience = 0;
-                lvl.ExperienceToNextLevel = (uint)Collections.LevelExps[lvl.Level].ExpReq;
+                lvl.ExperienceToNextLevel = (uint)Collections.LevelExps.Values[lvl.Level-1];
                 lvl.ChangedTick = PixelWorld.Tick;
                 hlt.Health = hlt.MaxHealth;
 

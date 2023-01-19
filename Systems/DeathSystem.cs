@@ -2,9 +2,7 @@ using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
-using MagnumOpus.Networking;
 using MagnumOpus.Networking.Packets;
-using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Simulation.Systems
 {
@@ -33,30 +31,40 @@ namespace MagnumOpus.Simulation.Systems
                     ntt.NetSync(ref msgUpdate, true);
                 }
 
-                if (ntt.Type == EntityType.Monster)
+                if (ntt.Has<CqActionComponent>())
                 {
                     ref readonly var cqc = ref ntt.Get<CqActionComponent>();
-
                     long action = cqc.cq_Action;
-                    while ((action = CqActionProcessor.Process(in ntt, in ntt, CqProcessor.GetAction(action))) != 0) ;
-
-                    var drp = ntt.Get<DropComponent>();
-
-                    if(drp.Drops.Money > 0 && Random.Shared.NextSingle() < 0.25f)
+                    for(int i =0; i < 32; i++)
                     {
-                        var drop = new RequestDropMoneyComponent(ntt.Id, Random.Shared.Next(drp.Drops.Money));
+                        if (action == 0)
+                            break;
+                        action = CqActionProcessor.Process(in ntt, in ntt, CqProcessor.GetAction(action));
+                    }
+                }
+                if(ntt.Has<InventoryComponent>())
+                {
+                    ref var inv = ref ntt.Get<InventoryComponent>();
+                    if (inv.Money > 0 && Random.Shared.NextSingle() < 0.25f)
+                    {
+                        var drop = new RequestDropMoneyComponent(ntt.Id, Random.Shared.Next((int)inv.Money));
                         ntt.Set(ref drop);
                     }
 
-                    var itemComp = ItemGenerator.Generate(drp.Drops);
-                    if(itemComp.Id != 0)
+                    inv.Items = inv.Items.OrderByDescending(x => x.Id).ToArray();
+                    var itemCount = inv.Items.Where(x => x.Id != 0).Count();
+                    for (int i = 0; i < itemCount; i++)
                     {
-                        var itemNtt = PixelWorld.CreateEntity(EntityType.Item);
-                        itemNtt.Set(ref itemComp);
-    
-                        var rdi = new RequestDropItemComponent(ntt.Id, in itemNtt);
-                        ntt.Set(ref rdi);
-                    }
+                        if(Random.Shared.NextSingle() < 0.1f)
+                        {
+                            ref var itemComp = ref inv.Items[i].Get<ItemComponent>();
+                            if (itemComp.Id != 0)
+                            {
+                                var rdi = new RequestDropItemComponent(ntt.Id, in inv.Items[i]);
+                                ntt.Set(ref rdi);
+                            }
+                        }
+                    }                    
                 }
 
                 var effectsMsg = MsgUserAttrib.Create(ntt.NetId, (ulong)eff.Effects, MsgUserAttribType.StatusEffect);
@@ -67,6 +75,8 @@ namespace MagnumOpus.Simulation.Systems
                 dtc.Killer.Remove<AttackComponent>();
                 ntt.Remove<AttackComponent>();
                 ntt.Remove<BrainComponent>();
+                ntt.Remove<WalkComponent>();
+                ntt.Remove<JumpComponent>();
             }
             else if (dtc.Tick + PixelWorld.TargetTps * 7 == PixelWorld.Tick && ntt.Type == EntityType.Monster)
             {
