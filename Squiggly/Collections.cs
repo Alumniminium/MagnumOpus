@@ -12,10 +12,10 @@ namespace MagnumOpus.Squiggly
         public static Dictionary<int, CqMonster> BaseMonsters { get; set; } = new();
         public static Dictionary<int, CqMonster> Monsters { get; set; } = new();
         public static Dictionary<int, CqSpawnGenerator> Spawns { get; set; } = new();
-        public static Dictionary<int, CqLevelExp> LevelExps { get; set; } = new();
         public static Dictionary<int, CqItemBonus> ItemBonus { get; set; } = new();
-        public static ItemType ItemType { get; set; } = new ItemType();
-        public static MagicType MagicType { get; set; } = new MagicType();
+        public static LevelExp LevelExps { get; set; } = new();
+        public static ItemType ItemType { get; set; } = new();
+        public static MagicType MagicType { get; set; } = new();
         public static Dictionary<int, ShopDatEntry> Shops { get; set; } = new();
     }
 }

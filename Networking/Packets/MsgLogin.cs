@@ -91,7 +91,7 @@ namespace MagnumOpus.Networking.Packets
 
             var ok = MsgText.Create("SYSTEM", "ALLUSERS", "ANSWER_OK", MsgTextType.LoginInformation);
             var info = MsgCharacter.Create(ntt);
-            var msgStatus = MsgMapStatus.Create(1002,3282567244);
+            var msgStatus = MsgMapStatus.Create(1002,(uint)(MapFlags.NewbieProtect | MapFlags.NoPk));
 
             ntt.NetSync(ref ok);
             ntt.NetSync(ref info);

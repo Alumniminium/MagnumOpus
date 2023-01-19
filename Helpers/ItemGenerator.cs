@@ -49,12 +49,12 @@ namespace MagnumOpus.Helpers
     }
     public static class ItemGenerator
     {
-        private static readonly ushort[] NecklaceType = { 120, 121 };//120 necklace 121 bags
-        private static readonly ushort[] RingType = { 150, 151, 152 };//150 att 151 agi 152 bracelets
-        private static readonly ushort[] ArmetType = { 111, 112, 113, 114, 117, 118 };
-        private static readonly ushort[] ArmorType = { 130, 131, 132, 133, 134 };
-        private static readonly ushort[] OneHanderType = { 410, 420, 421, 430, 440, 450, 460, 480, 481, 490, 500 };//601 was here, but doesn't seem to be valid?
-        private static readonly ushort[] TwoHanderType = { 510, 530, 560, 561, 580, 900 };
+        public static readonly ushort[] NecklaceType = { 120, 121 };//120 necklace 121 bags
+        public static readonly ushort[] RingType = { 150, 151, 152 };//150 att 151 agi 152 bracelets
+        public static readonly ushort[] ArmetType = { 111, 112, 113, 114, 117, 118 };
+        public static readonly ushort[] ArmorType = { 130, 131, 132, 133, 134 };
+        public static readonly ushort[] OneHanderType = { 410, 420, 421, 430, 440, 450, 460, 480, 481, 490, 500 };//601 was here, but doesn't seem to be valid?
+        public static readonly ushort[] TwoHanderType = { 510, 530, 560, 561, 580, 900 };
 
         public static ItemComponent Generate(Drops drop, int mobLevel = 0)
         {
