@@ -3,6 +3,7 @@ using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
+using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Simulation.Systems
 {
@@ -45,26 +46,38 @@ namespace MagnumOpus.Simulation.Systems
                 if(ntt.Has<InventoryComponent>())
                 {
                     ref var inv = ref ntt.Get<InventoryComponent>();
+
                     if (inv.Money > 0 && Random.Shared.NextSingle() < 0.25f)
                     {
                         var drop = new RequestDropMoneyComponent(ntt.Id, Random.Shared.Next((int)inv.Money));
                         ntt.Set(ref drop);
                     }
 
+                    if(ntt.Type == EntityType.Monster)
+                    {
+                        var cqm = ntt.Get<CqMonsterComponent>();
+                        var items = ItemGenerator.GetDropItemsFor(cqm.CqMonsterId);
+                        for (int i = 0; i < items.Count; i++)
+                        {
+                            var item = items[i];
+                            ref var invItemNtt = ref EntityFactory.MakeDefaultItem(item.ID, out var success, default, 0, true);
+                            inv.Items[i] = invItemNtt;
+                        }
+                    }
+                    
                     inv.Items = inv.Items.OrderByDescending(x => x.Id).ToArray();
                     var itemCount = inv.Items.Where(x => x.Id != 0).Count();
                     for (int i = 0; i < itemCount; i++)
                     {
-                        if(Random.Shared.NextSingle() < 0.1f)
-                        {
-                            ref var itemComp = ref inv.Items[i].Get<ItemComponent>();
-                            if (itemComp.Id != 0)
-                            {
-                                var rdi = new RequestDropItemComponent(ntt.Id, in inv.Items[i]);
-                                ntt.Set(ref rdi);
-                            }
-                        }
-                    }                    
+                        if (Random.Shared.NextSingle() >= 0.1f)
+                            continue;
+
+                        ref var itemComp = ref inv.Items[i].Get<ItemComponent>();
+                        if (itemComp.Id == 0)
+                            continue;
+                        var rdi = new RequestDropItemComponent(ntt.Id, in inv.Items[i]);
+                        ntt.Set(ref rdi);
+                    }
                 }
 
                 var effectsMsg = MsgUserAttrib.Create(ntt.NetId, (ulong)eff.Effects, MsgUserAttribType.StatusEffect);

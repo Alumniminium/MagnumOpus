@@ -148,5 +148,119 @@ namespace MagnumOpus.Helpers
                 entry.Gem2 = 255;
             return ref entry;
         }
+
+        public static List<ItemType.Entry> GetDropItemsFor(int mobId)
+        {
+            if(!Collections.Drops.TryGetValue(mobId, out var drops))
+                drops = new List<ItemType.Entry>();
+            else
+                return drops;
+            
+            using var ctx = new SquigglyContext();
+            var mob = ctx.cq_monstertype.FirstOrDefault(x=>x.id == mobId);
+            if(mob == null)
+                return drops;
+
+            var possibleTypes = new List<(int, ushort[])>();
+            if (mob.drop_armet != 99)
+                possibleTypes.Add((mob.drop_armet, ArmetType));
+            if (mob.drop_armor != 99)
+                possibleTypes.Add((mob.drop_armor, ArmorType));
+            if (mob.drop_necklace != 99)
+                possibleTypes.Add((mob.drop_necklace, NecklaceType));
+            if (mob.drop_ring != 99)
+                possibleTypes.Add((mob.drop_ring, RingType));
+            if (mob.drop_weapon != 99)
+            {
+                possibleTypes.Add((mob.drop_weapon, OneHanderType));
+                possibleTypes.Add((mob.drop_weapon, TwoHanderType));
+            }
+
+            if (Collections.ItemType.TryGetValue(mob.drop_hp, out var hp))
+                drops.Add(hp);
+
+            if (Collections.ItemType.TryGetValue(mob.drop_mp, out var mp))
+                drops.Add(mp);
+
+            foreach (var kvp in possibleTypes)
+            {
+                var level = kvp.Item1;
+                foreach (var t in kvp.Item2)
+                {
+                    for (int r = 0; r < 10; r++)
+                    {
+
+                        var item = new ItemComponent
+                        {
+                            Id = t * 1000 + level * 10
+                        };
+
+                        if (r > 0)
+                        {
+                            if (ArmetType.Contains(t))
+                                item.Id += 300;
+                            if (NecklaceType.Contains(t))
+                                item.Id += 10;
+                            if (RingType.Contains(t))
+                                item.Id -= 90;
+                        }
+
+                        if (ArmorType.Contains(t))
+                            item.Id += (r - 1) * 100;
+
+                        var entry = default(ItemType.Entry);
+                        for (int i = -2; i < 3; i++)
+                        {
+                            item.Id = t * 1000 + level * 10;
+                            item.Id += i * 100;
+
+                            if (Collections.ItemType.TryGetValue(item.Id, out entry))
+                                break;
+
+                            for (int ii = 0; ii < 5; ii++)
+                            {
+                                item.Id += ii;
+
+                                if (Collections.ItemType.TryGetValue(item.Id, out entry))
+                                    break;
+                            }
+                        }
+
+                        if (entry.ID == 0 || entry.RequiredLevel + 15 < mob.level || entry.RequiredLevel - 15 > mob.level)
+                        {
+                            // FConsole.WriteLine($"[{nameof(ItemGenerator)}] {mob.Name} (Level: {mob.Level}) Generated invalid {item.Id} - not found");
+                            continue;
+                        }
+                        // FConsole.WriteLine($"[{nameof(ItemGenerator)}] {mob.Name} (Level: {mob.Level}) drops {Encoding.UTF8.GetString(entry.Name, ItemType.MAX_NAMESIZE).Trim('\0')} (Level: {entry.RequiredLevel}) ({item.Id})");
+                        var exists = false;
+                        foreach (var d in drops)
+                        {
+                            // 1st digit from the right is the quality
+                            var id = d.ID / 10 * 10;
+                            var newId = item.Id / 10 * 10;
+
+                            id += 3;
+                            newId += 3;
+
+                            // 3rd digit from the left is the color
+                            var color = d.ID % 1000 / 100 * 100;
+                            var newColor = item.Id % 1000 / 100 * 100;
+                            id -= color;
+                            newId -= newColor;
+
+                            if (id == newId)
+                            {
+                                exists = true;
+                                break;
+                            }
+                        }
+                        if (!exists)
+                            drops.Add(entry);
+                    }
+                }
+            }
+            Collections.Drops.Add(mob.id, drops);
+            return drops;
+        }
     }
 }

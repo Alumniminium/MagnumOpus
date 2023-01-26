@@ -15,6 +15,8 @@ namespace MagnumOpus.Simulation.Systems
 
             if (change.Equip)
             {
+                // TODO: If current weapon is bow and new weapon is not bow, unequip arrows
+
                 var newEqInvIdx = Array.IndexOf(inv.Items, item);
                 var oldEq = eq.Items[change.Slot];
                 inv.Items[newEqInvIdx] = oldEq;

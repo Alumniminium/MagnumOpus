@@ -33,6 +33,10 @@ namespace MagnumOpus.Simulation.Systems
             for (var i = 0; i < vwp.EntitiesVisible.Count; i++)
             {
                 var b = vwp.EntitiesVisible[i];
+
+                if(b.Has<DeathTagComponent>())
+                    continue;
+                    
                 if(b.Has<ViewportComponent>())
                 {
                     ref readonly var bvwp = ref b.Get<ViewportComponent>();

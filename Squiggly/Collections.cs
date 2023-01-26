@@ -9,13 +9,11 @@ namespace MagnumOpus.Squiggly
         public static HashSet<Dmap_Portals> DmapPortals { get; set; } = new();
         public static HashSet<cq_passway> CqPassway { get; set; } = new();
         public static Dictionary<int, CqMap> Maps { get; set; } = new();
-        public static Dictionary<int, CqMonster> BaseMonsters { get; set; } = new();
-        public static Dictionary<int, CqMonster> Monsters { get; set; } = new();
-        public static Dictionary<int, CqSpawnGenerator> Spawns { get; set; } = new();
         public static Dictionary<int, CqItemBonus> ItemBonus { get; set; } = new();
         public static LevelExp LevelExps { get; set; } = new();
         public static ItemType ItemType { get; set; } = new();
         public static MagicType MagicType { get; set; } = new();
         public static Dictionary<int, ShopDatEntry> Shops { get; set; } = new();
+        public static Dictionary<int, List<ItemType.Entry>> Drops { get;set; } = new ();
     }
 }

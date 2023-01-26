@@ -82,8 +82,6 @@ namespace MagnumOpus
             SquigglyDb.LoadPortals();
             SquigglyDb.LoadLevelExp();
             SquigglyDb.LoadItemBonus();
-            SquigglyDb.LoadMobs();
-            SquigglyDb.LoadSpawns();
             SquigglyDb.Spawn();
             SquigglyDb.LoadNpcs();
 

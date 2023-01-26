@@ -159,8 +159,6 @@ namespace MagnumOpus.Helpers
                 double aimRad = GetRadian(pos, click);
                 double checkRad = GetRadian(pos, check);
 
-                FConsole.WriteLine($"aimRad: {aimRad:0.00} checkRad: {checkRad:0.00}");
-
                 if (aimRad - widthRadians / 2 < checkRad)
                     if (aimRad + widthRadians / 2 > checkRad)
                         return true;

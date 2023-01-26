@@ -1,12 +1,9 @@
 using System.Diagnostics;
 using System.Numerics;
-using System.Text;
-using Co2Core.IO;
 using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Helpers;
 using MagnumOpus.Squiggly.Models;
 using SpacePartitioning;
 
@@ -16,52 +13,46 @@ namespace MagnumOpus.Squiggly
     {
         public static void Spawn()
         {
+            using var ctx = new SquigglyContext();
             var sw = Stopwatch.StartNew();
-            foreach (var spawn in Collections.Spawns)
+            foreach (var spawn in ctx.cq_generator)
             {
-                var amount = spawn.Value.Amount;
+                var amount = spawn.maxnpc;
 
-                if (!Collections.BaseMonsters.TryGetValue(spawn.Value.MobId, out var monster))
-                    return;
+                var cqMob = ctx.cq_monstertype.FirstOrDefault(x=>x.id == spawn.npctype);
+                if(cqMob == null)
+                    continue;
 
-                if (monster.Look != 900 && monster.Look != 910)
+                if (cqMob.lookface != 900 && cqMob.lookface != 910)
                     amount = (ushort)(amount * 4);
 
                 for (var i = 0; i < amount; i++)
                 {
-                    var prefab = Collections.BaseMonsters[spawn.Value.MobId];
+                    var prefab = cqMob;
                     ref var obj = ref PixelWorld.CreateEntity(EntityType.Monster);
 
-                    var spw = new SpawnComponent(obj.Id, spawn.Key);
-                    var pos = new PositionComponent(obj.Id, new Vector2(spawn.Value.Xstart, spawn.Value.Ystart), spawn.Value.MapId);
-                    var bdy = new BodyComponent(obj.Id, (uint)prefab.Look);
+                    var spw = new SpawnComponent(obj.Id, (int)spawn.id);
+                    var cqm = new CqMonsterComponent(obj.Id, prefab.id);
+                    var pos = new PositionComponent(obj.Id, new Vector2(spawn.bound_x, spawn.bound_y), spawn.mapid);
+                    var bdy = new BodyComponent(obj.Id, prefab.lookface);
                     var dir = new DirectionComponent(obj.Id, (Direction)Random.Shared.Next(0, 9));
-                    var hp = new HealthComponent(obj.Id, prefab.Health, prefab.MaxHealth);
-                    var ntc = new NameTagComponent(obj.Id, prefab.Name);
+                    var hp = new HealthComponent(obj.Id, prefab.life, prefab.life);
+                    var ntc = new NameTagComponent(obj.Id, prefab.name);
                     var vwp = new ViewportComponent(obj.Id, 40f);
                     var inv = new InventoryComponent(obj.Id, 0, 0);
 
-                    foreach(var item in prefab.Drops.Items)
+                    if (prefab.action != 0)
                     {
-                        var idx = Array.FindIndex(inv.Items, x => x == default);
-                        var invItemNtt = PixelWorld.CreateEntity(EntityType.Item);
-                        var invItemComp = new ItemComponent(invItemNtt.Id, item.ID, 0,0,0,0,0,0,0,0,0,0);
-                        invItemNtt.Set(ref invItemComp);
-                        inv.Items[idx] = invItemNtt;
-                    }
-
-                    if (prefab.CQAction != 0)
-                    {
-                        var cq = new CqActionComponent(obj.Id, prefab.CQAction);
+                        var cq = new CqActionComponent(obj.Id, prefab.action);
                         obj.Set(ref cq);
                     }
 
-                    pos.Position.X = (ushort)Random.Shared.Next(spawn.Value.Xstart - 10, spawn.Value.Xstart + spawn.Value.Xend + 10);
-                    pos.Position.Y = (ushort)Random.Shared.Next(spawn.Value.Ystart - 10, spawn.Value.Ystart + spawn.Value.Yend + 10);
+                    pos.Position.X = (ushort)Random.Shared.Next(spawn.bound_x - 10, spawn.bound_x + spawn.bound_cx + 10);
+                    pos.Position.Y = (ushort)Random.Shared.Next(spawn.bound_y - 10, spawn.bound_y + spawn.bound_cy + 10);
 
-                    if (monster.Look == 900 || monster.Look == 910)
+                    if (prefab.lookface == 900 || prefab.lookface == 910)
                     {
-                        pos.Position = new Vector2(spawn.Value.Xstart, spawn.Value.Ystart);
+                        pos.Position = new Vector2(spawn.bound_x, spawn.bound_y);
                         var grd = new GuardPositionComponent(obj.Id, pos.Position);
                         obj.Set(ref grd);
                     }
@@ -74,6 +65,7 @@ namespace MagnumOpus.Squiggly
                     obj.Set(ref ntc);
                     obj.Set(ref vwp);
                     obj.Set(ref inv);
+                    obj.Set(ref cqm);
 
                     var brn = new BrainComponent(obj.Id);
                     obj.Set(ref brn);
@@ -89,7 +81,6 @@ namespace MagnumOpus.Squiggly
                 }
             }
             sw.Stop();
-            FConsole.WriteLine($"[MobGenerator] Spawnd {Collections.Monsters.Count}\t Monsters in {sw.Elapsed.TotalMilliseconds}ms");
         }
 
         public static void LoadMaps()
@@ -162,207 +153,6 @@ namespace MagnumOpus.Squiggly
             }
             sw.Stop();
             FConsole.WriteLine($"[SquigglyLite] Loaded \t Npcs in {sw.Elapsed.TotalMilliseconds}ms");
-        }
-        public static unsafe void LoadMobs()
-        {
-            var sw = Stopwatch.StartNew();
-            using (var db = new SquigglyContext())
-            {
-                foreach (var cqMob in db.cq_monstertype.AsQueryable().OrderBy(x => x.level))
-                {
-                    var mob = new CqMonster(
-                        cqMob.id,
-                        cqMob.name.Trim(),
-                        cqMob.lookface,
-                        cqMob.life,
-                        cqMob.life,
-                        cqMob.attack_max,
-                        cqMob.attack_min,
-                        cqMob.defence,
-                        cqMob.dexterity,
-                        cqMob.dodge,
-                        new Drops(cqMob.drop_armet, cqMob.drop_armor, cqMob.drop_weapon, cqMob.drop_hp, cqMob.drop_mp, cqMob.drop_itemtype, cqMob.drop_money, cqMob.drop_necklace, cqMob.drop_ring, cqMob.drop_shield, cqMob.drop_shoes),
-                        cqMob.attack_range,
-                        cqMob.view_range,
-                        cqMob.escape_life,
-                        cqMob.attack_speed,
-                        cqMob.move_speed,
-                        cqMob.run_speed,
-                        cqMob.level,
-                        cqMob.attack_user,
-                        cqMob.action,
-                        cqMob.magic_type,
-                        cqMob.magic_def,
-                        cqMob.magic_hitrate,
-                        cqMob.ai_type);
-
-                    if (Collections.BaseMonsters.ContainsKey(mob.Id))
-                        continue;
-
-                    var drop = mob.Drops;
-                    var possibleTypes = new List<(int, ushort[])>();
-                    if (drop.Armet != 99)
-                        possibleTypes.Add((drop.Armet, ItemGenerator.ArmetType));
-                    if (drop.Armor != 99)
-                        possibleTypes.Add((drop.Armor, ItemGenerator.ArmorType));
-                    if (drop.Necklace != 99)
-                        possibleTypes.Add((drop.Necklace, ItemGenerator.NecklaceType));
-                    if (drop.Ring != 99)
-                        possibleTypes.Add((drop.Ring, ItemGenerator.RingType));
-                    if (drop.Weapon != 99)
-                    {
-                        possibleTypes.Add((drop.Weapon, ItemGenerator.OneHanderType));
-                        possibleTypes.Add((drop.Weapon, ItemGenerator.TwoHanderType));
-                    }
-
-                    if (Collections.ItemType.TryGetValue(drop.Hp, out var hp))
-                        mob.Drops.Items.Add(hp);
-
-                    if (Collections.ItemType.TryGetValue(drop.Mp, out var mp))
-                        mob.Drops.Items.Add(mp);
-
-                    if (possibleTypes.Count > 0)
-                    {
-                        foreach (var kvp in possibleTypes)
-                        {
-                            var level = kvp.Item1;
-                            foreach (var t in kvp.Item2)
-                            {
-                                for (int r = 0; r < 10; r++)
-                                {
-
-                                    var item = new ItemComponent
-                                    {
-                                        Id = t * 1000 + level * 10
-                                    };
-
-                                    if (r > 0)
-                                    {
-                                        if (ItemGenerator.ArmetType.Contains(t))
-                                            item.Id += 300;
-                                        if (ItemGenerator.ArmorType.Contains(t))
-                                            item.Id += 100;
-                                        if (ItemGenerator.NecklaceType.Contains(t))
-                                            item.Id += 10;
-                                        if (ItemGenerator.RingType.Contains(t))
-                                            item.Id -= 90;
-                                    }
-                                    if (r > 1)
-                                    {
-                                        if (ItemGenerator.ArmorType.Contains(t))
-                                            item.Id += 100;
-                                    }
-                                    if (r > 2)
-                                    {
-                                        if (ItemGenerator.ArmorType.Contains(t))
-                                            item.Id += 100;
-                                    }
-                                    if (r > 3)
-                                    {
-                                        if (ItemGenerator.ArmorType.Contains(t))
-                                            item.Id += 100;
-                                    }
-                                    if (r > 4)
-                                    {
-                                        if (ItemGenerator.ArmorType.Contains(t))
-                                            item.Id += 100;
-                                    }
-                                    if (r > 5)
-                                    {
-                                        if (ItemGenerator.ArmorType.Contains(t))
-                                            item.Id += 100;
-                                    }
-                                    if (r > 6)
-                                    {
-                                        if (ItemGenerator.ArmorType.Contains(t))
-                                            item.Id += 100;
-                                    }
-                                    if (r > 7)
-                                    {
-                                        if (ItemGenerator.ArmorType.Contains(t))
-                                            item.Id += 100;
-                                    }
-                                    if (r > 8)
-                                    {
-                                        if (ItemGenerator.ArmorType.Contains(t))
-                                            item.Id += 100;
-                                    }
-
-                                    var entry = default(ItemType.Entry);
-                                    for (int i = -2; i < 3; i++)
-                                    {
-                                        item.Id = t * 1000 + level * 10;
-                                        item.Id += i * 100;
-
-                                        for (int ii = 0; ii < 5; ii++)
-                                        {
-                                            if (Collections.ItemType.TryGetValue(item.Id, out entry))
-                                                break;
-                                            item.Id += ii;
-                                        }
-                                        if (Collections.ItemType.TryGetValue(item.Id, out entry))
-                                            break;
-                                    }
-
-                                    if (entry.ID == 0 || entry.RequiredLevel + 10 < mob.Level || entry.RequiredLevel - 10 > mob.Level)
-                                    {
-                                        // FConsole.WriteLine($"[{nameof(ItemGenerator)}] {mob.Name} (Level: {mob.Level}) Generated invalid {item.Id} - not found");
-                                        continue;
-                                    }
-                                    // FConsole.WriteLine($"[{nameof(ItemGenerator)}] {mob.Name} (Level: {mob.Level}) drops {Encoding.UTF8.GetString(entry.Name, ItemType.MAX_NAMESIZE).Trim('\0')} (Level: {entry.RequiredLevel}) ({item.Id})");
-                                    var exists = false;
-                                    foreach (var d in mob.Drops.Items)
-                                    {
-                                        // 1st digit from the right is the quality
-                                        var id = d.ID / 10 * 10;
-                                        var newId = item.Id / 10 * 10;
-
-                                        id += 3;
-                                        newId += 3;
-
-                                        // 3rd digit from the left is the color
-                                        var color = d.ID % 1000 / 100 * 100;
-                                        var newColor = item.Id % 1000 / 100 * 100;
-                                        id -= color;
-                                        newId -= newColor;
-
-                                        if (id == newId)
-                                        {
-                                            exists = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!exists)
-                                        mob.Drops.Items.Add(entry);
-                                }
-                            }
-                        }
-                    }
-
-                    Collections.BaseMonsters.Add(mob.Id, mob);
-                    if (mob.Drops.Items.Count > 0)
-                        FConsole.WriteLine($"[{nameof(ItemGenerator)}] {mob.Drops.Items.Count} drops for {mob.Name} (Level: {mob.Level})");
-                }
-            }
-            sw.Stop();
-            FConsole.WriteLine($"[SquigglyLite] Loaded {Collections.BaseMonsters.Count}\t BaseMonsters in {sw.Elapsed.TotalMilliseconds}ms");
-        }
-        public static void LoadSpawns()
-        {
-            var sw = Stopwatch.StartNew();
-            using (var db = new SquigglyContext())
-            {
-                short counter = 0;
-                foreach (var cqSpawn in db.cq_generator.AsQueryable())
-                {
-                    var spawn = new CqSpawnGenerator(cqSpawn.mapid, cqSpawn.npctype, cqSpawn.maxnpc, cqSpawn.bound_x, cqSpawn.bound_y, cqSpawn.bound_cx, cqSpawn.bound_cy, cqSpawn.rest_secs, cqSpawn.max_per_gen);
-                    if (!Collections.Spawns.ContainsKey(counter))
-                        Collections.Spawns.TryAdd(counter, spawn);
-                    counter++;
-                }
-            }
-            sw.Stop();
-            FConsole.WriteLine($"[SquigglyLite] Loaded {Collections.Spawns.Count}\t Spawns in {sw.Elapsed.TotalMilliseconds}ms");
         }
 
         public static void LoadLevelExp()
