@@ -231,8 +231,10 @@ namespace MagnumOpus.Squiggly
                                 for (int r = 0; r < 10; r++)
                                 {
 
-                                    var item = new ItemComponent();
-                                    item.Id = t * 1000 + level * 10;
+                                    var item = new ItemComponent
+                                    {
+                                        Id = t * 1000 + level * 10
+                                    };
 
                                     if (r > 0)
                                     {
@@ -353,7 +355,7 @@ namespace MagnumOpus.Squiggly
                 short counter = 0;
                 foreach (var cqSpawn in db.cq_generator.AsQueryable())
                 {
-                    var spawn = new CqSpawnGenerator(cqSpawn.mapid, cqSpawn.npctype, cqSpawn.born_x, cqSpawn.born_y, cqSpawn.timer_begin, cqSpawn.timer_end, cqSpawn.maxnpc, cqSpawn.bound_x, cqSpawn.bound_y, cqSpawn.bound_cx, cqSpawn.bound_cy, cqSpawn.rest_secs, cqSpawn.max_per_gen);
+                    var spawn = new CqSpawnGenerator(cqSpawn.mapid, cqSpawn.npctype, cqSpawn.maxnpc, cqSpawn.bound_x, cqSpawn.bound_y, cqSpawn.bound_cx, cqSpawn.bound_cy, cqSpawn.rest_secs, cqSpawn.max_per_gen);
                     if (!Collections.Spawns.ContainsKey(counter))
                         Collections.Spawns.TryAdd(counter, spawn);
                     counter++;

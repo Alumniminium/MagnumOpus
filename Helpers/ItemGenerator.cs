@@ -46,6 +46,20 @@ namespace MagnumOpus.Helpers
         public static bool IsShield(ref ItemComponent item) => item.Id / 1000 == 900;
         public static ItemSort GetSort(ref ItemComponent item) => (ItemSort)(item.Id / 100000);
         public static ItemSort GetSort(int nType) => (ItemSort)(nType / 100000);
+
+        public static int GetItemIdFromMoney(int money)
+        {
+            int id = 1090000; //Silver
+            if (money <= 100 && money >= 10)
+                id = 1090010; //Sycee
+            else if (money <= 1000 && money >= 100)
+                id = 1090020; //Gold
+            else if (money <= 10000 && money >= 1000)
+                id = 1091010; //GoldBar
+            else if (money > 10000)
+                id = 1091020; //GoldBarsa
+            return id;
+        }
     }
     public static class ItemGenerator
     {

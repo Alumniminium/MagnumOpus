@@ -2,6 +2,7 @@ using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
@@ -11,21 +12,20 @@ namespace MagnumOpus.Simulation.Systems
         public DropItemSystem() : base("Drop Item System", threads: 1) { }
         public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref RequestDropItemComponent rdi, ref InventoryComponent inv)
         {
-            ref var item = ref rdi.ItemNtt.Get<ItemComponent>();
-            var invIdx = Array.IndexOf(inv.Items, rdi.ItemNtt);
+            var removed = InventoryHelper.RemoveNetIdFromInventory(in ntt, rdi.ItemNtt.NetId);
 
-            if(invIdx == -1)
+            if (!removed)
             {
-                FConsole.WriteLine($"[{nameof(DropItemSystem)}] {ntt.Id} - {rdi.ItemNtt} - Item not found in inventory.");
+                FConsole.WriteLine($"[{nameof(DropItemSystem)}] {ntt.NetId} tried to drop an Item he does not have in his Inventory at {pos.Position} on map {pos.Map}.");
                 ntt.Remove<RequestDropItemComponent>();
                 return;
             }
 
-
-            inv.Items[invIdx] = default;
-
+            ref var item = ref rdi.ItemNtt.Get<ItemComponent>();
+            
             var dropPos = new PositionComponent(rdi.ItemNtt.Id, pos.Position, pos.Map);
             rdi.ItemNtt.Set(ref dropPos);
+
             Game.Grids[pos.Map].Add(in rdi.ItemNtt, ref pos);
 
             var msgRemoveInv = MsgItem.Create(rdi.ItemNtt.NetId, rdi.ItemNtt.NetId, rdi.ItemNtt.NetId, MsgItemType.RemoveInventory);
@@ -36,8 +36,5 @@ namespace MagnumOpus.Simulation.Systems
             FConsole.WriteLine($"[{nameof(DropItemSystem)}] {ntt.NetId} dropped {item.Id} at {pos.Position} on map {pos.Map}.");
             ntt.Remove<RequestDropItemComponent>();
         }
-
-        // TODO:
-        // - Add a check to see if the item is in the inventory
     }
 }
