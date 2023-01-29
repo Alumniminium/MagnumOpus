@@ -4,7 +4,7 @@ using MagnumOpus.ECS;
 namespace MagnumOpus.Components
 {
     [Component]
-    public struct LineTargetComponent
+    public readonly struct LineTargetComponent
     {
         public readonly int EntityId;
         public readonly MagicType.Entry MagicType;

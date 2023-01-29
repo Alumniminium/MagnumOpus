@@ -5,7 +5,7 @@ namespace MagnumOpus.Components
 {
 
     [Component]
-    public struct CircleTargetComponent
+    public readonly struct CircleTargetComponent
     {
         public readonly int EntityId;
         public readonly MagicType.Entry MagicType;

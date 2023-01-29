@@ -101,9 +101,9 @@ namespace MagnumOpus.Squiggly
                         cqmap.Height, new Dictionary<ushort, CqPortal>()
                     );
                     Collections.Maps.Add((ushort)cqmap.id, map);
-                    if (!Game.Grids.TryGetValue((ushort)cqmap.id, out var grid))
+                    if (!Game.Grids.TryGetValue((ushort)cqmap.id, out var _))
                     {
-                        grid = new Grid(cqmap.Width, cqmap.Height, 10, 10);
+                        var grid = new Grid(cqmap.Width, cqmap.Height, 10, 10);
                         Game.Grids.Add((ushort)cqmap.id, grid);
                     }
                 }

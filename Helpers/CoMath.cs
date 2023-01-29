@@ -261,11 +261,5 @@ namespace MagnumOpus.Helpers
 
             return (float)(delta.Y > 0 ? Math.PI / 2 - radian : Math.PI + radian + Math.PI / 2);
         }
-
-        private static int GetLineLength(Vector2 from, Vector2 to)
-        {
-            var delta = to - from;
-            return (int)Math.Sqrt(delta.X * delta.X + delta.Y * delta.Y);
-        }
     }
 }

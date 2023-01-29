@@ -4,7 +4,7 @@ using MagnumOpus.ECS;
 namespace MagnumOpus.Components
 {
     [Component]
-    public struct TargetCollectionComponent
+    public readonly struct TargetCollectionComponent
     {
         public readonly int EntityId;
         public readonly List<PixelEntity> Targets;

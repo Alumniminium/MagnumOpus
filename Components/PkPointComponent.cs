@@ -3,7 +3,7 @@ using MagnumOpus.ECS;
 namespace MagnumOpus.Components
 {
     [Component]
-    public struct PkPointComponent
+    public readonly struct PkPointComponent
     {
         public readonly int EntityId;
         public readonly byte Points;

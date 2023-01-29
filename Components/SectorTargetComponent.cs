@@ -4,7 +4,7 @@ using MagnumOpus.ECS;
 namespace MagnumOpus.Components
 {
     [Component]
-    public struct SectorTargetComponent
+    public readonly struct SectorTargetComponent
     {
         public readonly int EntityId;
         public readonly MagicType.Entry MagicType;

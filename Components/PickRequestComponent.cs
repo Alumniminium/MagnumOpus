@@ -3,7 +3,7 @@ using MagnumOpus.ECS;
 namespace MagnumOpus.Components
 {
     [Component]
-    public struct PickupRequestComponent
+    public readonly struct PickupRequestComponent
     {
         public readonly int EntityId;
         public readonly PixelEntity Item;

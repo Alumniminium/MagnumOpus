@@ -42,6 +42,7 @@ namespace MagnumOpus.Components
             Gem2 = gem2;
             RebornEffect = rebornEffect;
             CustomTextId = customTextId;
+            StackAmount = stackAmount;
         }
         
 

@@ -4,7 +4,7 @@ using MagnumOpus.Enums;
 namespace MagnumOpus.Components
 {
     [Component]
-    public struct EmoteComponent
+    public readonly struct EmoteComponent
     {
         public readonly int EntityId;
         public readonly long ChangedTick;
