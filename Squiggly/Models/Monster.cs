@@ -1,3 +1,0 @@
-namespace MagnumOpus.Squiggly
-{
-}
