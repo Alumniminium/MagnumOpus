@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using MagnumOpus.ECS;
 
 namespace MagnumOpus.Components
@@ -13,7 +14,7 @@ namespace MagnumOpus.Components
             EntityId = ntt.Id;
             Experience = experience;
         }
-        
+
         public override int GetHashCode() => EntityId;
     }
 }

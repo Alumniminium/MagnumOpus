@@ -9,7 +9,7 @@ namespace MagnumOpus.Simulation.Systems
     {
         public TeamSystem() : base("Team System", threads: 1) { }
 
-        public override void Update(in PixelEn
+        public override void Update(in PixelEntity ntt, ref TeamComponent team)
         {
             
         }
