@@ -5,6 +5,15 @@ using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Simulation.Systems
 {
+    public sealed class TeamSystem : PixelSystem<TeamComponent>
+    {
+        public TeamSystem() : base("Team System", threads: 1) { }
+
+        public override void Update(in PixelEn
+        {
+            
+        }
+    }
     public sealed class ExpRewardSystem : PixelSystem<LevelComponent, ExpRewardComponent>
     {
         public ExpRewardSystem() : base("Exp Reward System", threads: 1) { }

@@ -1,11 +1,23 @@
 using System.Globalization;
+using System.Numerics;
 
 namespace MagnumOpus.Helpers
 {
     public static class Constants
     {
-        public static readonly int[] DeltaX = {0, -1, -1, -1, 0, 1, 1, 1};
-        public static readonly int[] DeltaY = {1, 1, 0, -1, -1, -1, 0, 1};
+        public static readonly Vector2[] DeltaPos = new Vector2[]
+        {
+        new Vector2(0, 1),
+             new Vector2(-1, 1),
+             new Vector2(-1, 0),
+             new Vector2(-1, -1),
+             new Vector2(0, -1),
+             new Vector2(1, -1),
+             new Vector2(1, 0),
+        new Vector2(1, 1)
+        };
+        // public static readonly int[] DeltaX = { 0, -1, -1, -1, 0, 1, 1, 1 };
+        // public static readonly int[] DeltaY = { 1, 1, 0, -1, -1, -1, 0, 1 };
     }
     public static class ByteExt
     {
@@ -14,7 +26,7 @@ namespace MagnumOpus.Helpers
             string Hex = "";
             foreach (byte b in packet.Span)
                 Hex = Hex + b.ToString("X2") + " ";
-            
+
             string Out = "";
             while (Hex.Length != 0)
             {
@@ -36,7 +48,7 @@ namespace MagnumOpus.Helpers
             {
                 if (tmpHex == "")
                     continue;
-                
+
                 byte ByteData = byte.Parse(tmpHex, NumberStyles.HexNumber);
                 if ((ByteData >= 32) & (ByteData <= 126))
                     Ansi += ((char)ByteData).ToString();

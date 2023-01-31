@@ -1,4 +1,5 @@
 using MagnumOpus.ECS;
+using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Networking
@@ -22,6 +23,19 @@ namespace MagnumOpus.Networking
                 var spawnPacket = MsgFloorItem.Create(in ntt, Enums.MsgFloorItemType.Create);
                 to.NetSync(ref spawnPacket);
             }
+        }
+
+        internal static void SendMsgTo(in PixelEntity ntt, string text, MsgTextType channel)
+        {
+            var msgText = MsgText.Create(in ntt, text, channel);
+            ntt.NetSync(ref msgText);
+        }
+        internal static void BroadcastMsg(string text, MsgTextType channel, string from = "SYSTEM")
+        {
+            var msgText = MsgText.Create(from, "ALLUSERS", text, channel);
+
+            foreach (var ntt in PixelWorld.Players)
+                ntt.NetSync(ref msgText);
         }
     }
 }
