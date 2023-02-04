@@ -1,4 +1,3 @@
-using Humanizer;
 using MagnumOpus.ECS;
 using MagnumOpus.Networking;
 using MagnumOpus.Networking.Packets;

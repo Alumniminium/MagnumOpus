@@ -18,9 +18,9 @@ namespace MagnumOpus.Networking.Packets
         public GuildRanks Rank;
         public fixed byte LeaderName[16];
 
-        public static Memory<byte> Create(in PixelEntity human)
+        public static Memory<byte> Create(in PixelEntity ntt)
         {
-            ref readonly var gld = ref human.Get<GuildComponent>();
+            ref readonly var gld = ref ntt.Get<GuildComponent>();
             ref readonly var leader = ref PixelWorld.GetEntity(gld.LeaderId);
             ref readonly var ntc = ref leader.Get<NameTagComponent>();
 
@@ -28,7 +28,7 @@ namespace MagnumOpus.Networking.Packets
 
             msgP->Size = (ushort)sizeof(MsgSyndicateSpawn);
             msgP->Id = 1106;
-            if (gld.EntityId == human.NetId)
+            if (gld.EntityId == ntt.NetId)
             {
                 msgP->UniqueId = gld.GuildId;
                 msgP->Donation = gld.Donation;

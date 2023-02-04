@@ -265,7 +265,7 @@ ACTION_USER_UNLEARN_MAGIC = 1039, / / reincarnation, the forgotten magic skills,
 ACTION_USER_REBIRTH = 1040, / / reincarnation. If you have not turned or grade, and will fail. Check whether the player has been transferred, occupational requirements, level. Automatically modify player career, class, body and equipment levels, the redistribution of points. param = "nProf nLook"
 / / The following features completed by other ACTION: Task Award; 15,40,100 class inaugural awards; mounts incentives; at any time back to town; skills incentives.
 ACTION_USER_WEBPAGE = 1041, / / notify the client to open the page. param = "http:// ....."
-ACTION_USER_BBS = 1042, / / in the BBS bulletin boards, add a SYSTEM news channel, message the name of human players. The need for USER objects, retaining only one of each USER. param is the message.
+ACTION_USER_BBS = 1042, / / in the BBS bulletin boards, add a SYSTEM news channel, message the name of ntt players. The need for USER objects, retaining only one of each USER. param is the message.
 ACTION_USER_UNLEARN_SKILL = 1043, / / reincarnation, the forgotten all weapons skills, the skills of the future could be "epiphany."
 ACTION_USER_DROP_MAGIC = 1044, / / reincarnation, deleted magic skills. param = "type1 type2 ...", at least one parameter, a maximum of 20 parameters.
 ACTION_USER_OPEN_DIALOG = 1046, / / notify the client to open an interface. data = idDialog. param = "task_id0 task_id1 task_id2 task_id3 ...", can no param, a maximum of 20 task_id, task_id not to 0, allowing the client to choose the next TASK. Non-param when the client can only upload "the client can trigger the TASK". Param when there is, cq_task.client_active must be to 0.

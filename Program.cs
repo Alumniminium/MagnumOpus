@@ -39,7 +39,9 @@ namespace MagnumOpus
                 new MagicAttackSystem(),
                 new AttackSystem(),
                 new DamageSystem(),
+                new TeamSystem(),
                 new ExpRewardSystem(),
+                new LifetimeSystem(),
                 new DeathSystem(),
                 new DropItemSystem(),
                 new DropMoneySystem(),
@@ -90,7 +92,7 @@ namespace MagnumOpus
             PixelWorld.RegisterOnSecond(() =>
             {
                 var lines = PerformanceMetrics.Draw();
-                // Console.WriteLine(lines);
+                FConsole.WriteLine(lines);
                 PerformanceMetrics.Restart();
             });
 

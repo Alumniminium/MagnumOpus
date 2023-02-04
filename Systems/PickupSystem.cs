@@ -17,20 +17,20 @@ namespace MagnumOpus.Simulation.Systems
             {
                 ref readonly var rew = ref pic.Item.Get<MoneyRewardComponent>();
                 inv.Money += (uint)rew.Amount;
-                var ded = new DestroyEndOfFrameComponent(pic.Item.Id);
-                pic.Item.Set(ref ded);
 
                 var moneyMsg = MsgUserAttrib.Create(ntt.NetId, inv.Money, Enums.MsgUserAttribType.MoneyInventory);
+                var moneyTxtMsg = MsgText.Create(in ntt, $"You picked up {rew.Amount} gold", Enums.MsgTextType.TopLeft);
                 ntt.NetSync(ref moneyMsg);
-
-                var moneyTxtMsg = MsgText.Create(in ntt, $"You picked up {rew.Amount} gold", Enums.MsgTextType.Action);
-                ntt.NetSync(ref moneyMsg);
+                ntt.NetSync(ref moneyTxtMsg);
 
                 if(rew.Amount > 1000)
                 {
-                    var moneyActionMsg = MsgAction.Create(ntt.NetId, 0, 0, 0, 0, Enums.MsgActionType.GetMoney);
+                    var moneyActionMsg = MsgAction.Create(ntt.NetId, ntt.NetId, 0, 0, 0, Enums.MsgActionType.GetMoney);
                     ntt.NetSync(ref moneyActionMsg, true);
                 }
+
+                var ded = new DestroyEndOfFrameComponent(pic.Item.Id);
+                pic.Item.Set(ref ded);
             }
             else
             {

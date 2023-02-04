@@ -7,7 +7,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class DirectionSystem : PixelSystem<DirectionComponent>
     {
-        public DirectionSystem() : base("Direction System", threads: 1) { }
+        public DirectionSystem() : base("Direction System", threads: 6) { }
         protected override bool MatchesFilter(in PixelEntity ntt) => ntt.Type != EntityType.Item && base.MatchesFilter(in ntt);
 
         public override void Update(in PixelEntity ntt, ref DirectionComponent dir)

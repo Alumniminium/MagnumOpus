@@ -423,7 +423,7 @@ enum {
 		ACTION_WANTED_SUPERADD = 3008, // plays the family to return to pszAccept to assign the money which the supplement posts a reward, with ACTION_WANTED_ID union use.
 		ACTION_POLICEWANTED_NEXT = 3010, under // search the official posts a reward, reads in idx TASK_ITERATOR
 		ACTION_POLICEWANTED_ORDER = 3011, // publishes the results (in pszAccept to assign serial number)
-		ACTION_POLICEWANTED_CHECK = 3012, // inspects triggers the human whether to be issued a warrant for arrest by the government authorities
+		ACTION_POLICEWANTED_CHECK = 3012, // inspects triggers the ntt whether to be issued a warrant for arrest by the government authorities
 		ACTION_WANTED_LIMIT = 3099,	
 		
 		// ghost gem magic part  ----------------------------------------------------------------------------------

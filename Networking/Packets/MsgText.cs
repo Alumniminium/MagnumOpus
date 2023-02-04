@@ -137,7 +137,7 @@ namespace MagnumOpus.Networking.Packets
             ref readonly var vwp = ref ntt.Get<ViewportComponent>();
             foreach (var entity in vwp.EntitiesVisible)
             {
-                ref readonly var job = ref entity.Get<ProfessionComponent>();
+                ref readonly var job = ref entity.Get<ClassComponent>();
 
                 switch (job.Class)
                 {

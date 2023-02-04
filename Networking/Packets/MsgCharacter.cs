@@ -62,7 +62,7 @@ namespace MagnumOpus.Networking.Packets
             ref var pkp = ref ntt.Get<PkPointComponent>();
             ref var hlt = ref ntt.Get<HealthComponent>();
             ref var mna = ref ntt.Get<ManaComponent>();
-            ref var pro = ref ntt.Get<ProfessionComponent>();
+            ref var pro = ref ntt.Get<ClassComponent>();
             ref var ntc = ref ntt.Get<NameTagComponent>();
             ref var mar = ref ntt.Get<MarriageComponent>();
             ref var inv = ref ntt.Get<InventoryComponent>();

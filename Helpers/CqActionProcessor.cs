@@ -76,7 +76,7 @@ namespace MagnumOpus.Helpers
             },
             { "profession", (ntt, targetVal, op) =>
                 {
-                    ref var x = ref ntt.Get<ProfessionComponent>();
+                    ref var x = ref ntt.Get<ClassComponent>();
                     if(AttrOpts.TryGetValue(op, out var func))
                     {
                         var result = func((long)x.Class, targetVal);
@@ -119,7 +119,7 @@ namespace MagnumOpus.Helpers
                     ref var x = ref ntt.Get<HealthComponent>();
                     if(AttrOpts.TryGetValue(op, out var func))
                     {
-                        var result = func((long)x.Health, targetVal);
+                        var result = func(x.Health, targetVal);
                         if(result >= 0)
                         {
                             x.Health = (byte)result;
@@ -130,7 +130,7 @@ namespace MagnumOpus.Helpers
                         return false;
                     }
                     if(BooleanAttrOpts.TryGetValue(op, out var boolFunc))
-                        return boolFunc((long)x.Health, targetVal);
+                        return boolFunc(x.Health, targetVal);
                     return false;
                 }
             },
@@ -139,7 +139,7 @@ namespace MagnumOpus.Helpers
                     ref var x = ref ntt.Get<RebornComponent>();
                     if(AttrOpts.TryGetValue(op, out var func))
                     {
-                        var result = func((long)x.Count, targetVal);
+                        var result = func(x.Count, targetVal);
                         if(result >= 0)
                         {
                             x.Count = (byte)result;
@@ -148,7 +148,7 @@ namespace MagnumOpus.Helpers
                         return false;
                     }
                     if(BooleanAttrOpts.TryGetValue(op, out var boolFunc))
-                        return boolFunc((long)x.Count, targetVal);
+                        return boolFunc(x.Count, targetVal);
                     return false;
                 }
             }

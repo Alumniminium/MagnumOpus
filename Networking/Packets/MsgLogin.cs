@@ -50,7 +50,7 @@ namespace MagnumOpus.Networking.Packets
             var lvl = new LevelComponent(ntt.Id, 1);
             var hlt = new HealthComponent(ntt.Id, 330, 330);
             var mana = new ManaComponent(ntt.Id, 1000, 1000);
-            var pro = new ProfessionComponent(ntt.Id, ClasseName.Archer);
+            var pro = new ClassComponent(ntt.Id, ClasseName.Archer);
             var sbc = new SpellBookComponent(ntt.Id);
             var eqc = new EquipmentComponent(ntt.Id);
 

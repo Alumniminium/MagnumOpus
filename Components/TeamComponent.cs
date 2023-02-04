@@ -6,6 +6,7 @@ namespace MagnumOpus.Components
     public struct TeamComponent
     {
         public readonly int EntityId;
+        public int MemberCount;
         public PixelEntity[] Members;
         public PixelEntity Leader => Members[0];
         public bool ShareItems;
@@ -16,6 +17,7 @@ namespace MagnumOpus.Components
             EntityId = ntt.Id;
             Members = new PixelEntity[5];
             Members[0] = ntt;
+            MemberCount = 1;
         }
 
         public override int GetHashCode() => EntityId;

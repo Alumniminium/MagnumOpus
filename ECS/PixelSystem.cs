@@ -5,18 +5,17 @@ namespace MagnumOpus.ECS
         protected PixelSystem(string name, int threads = 1) : base(name, threads) { }
         protected override bool MatchesFilter(in PixelEntity nttId)
         {
-            return nttId.Has<T>()&& base.MatchesFilter(in nttId);
+            return nttId.Has<T>() && base.MatchesFilter(in nttId);
         }
 
         protected override void Update()
         {
-            // for (var i = 0; i < _entities.Count; i++)
-            foreach (var ntt in _entities)
+            Parallel.ForEach(_entities, parallelOptions, ntt =>
             {
                 // var ntt = _entities[i];
                 ref var c1 = ref ntt.Get<T>();
                 Update(in ntt, ref c1);
-            }
+            });
         }
         public abstract void Update(in PixelEntity ntt, ref T c1);
     }
@@ -25,17 +24,17 @@ namespace MagnumOpus.ECS
         protected PixelSystem(string name, int threads = 1) : base(name, threads) { }
         protected override bool MatchesFilter(in PixelEntity nttId)
         {
-            return nttId.Has<T, T2>()&& base.MatchesFilter(in nttId);
+            return nttId.Has<T, T2>() && base.MatchesFilter(in nttId);
         }
 
         protected override void Update()
         {
-            foreach (var ntt in _entities)
+            Parallel.ForEach(_entities, parallelOptions, ntt =>
             {
                 ref var c1 = ref ntt.Get<T>();
                 ref var c2 = ref ntt.Get<T2>();
                 Update(in ntt, ref c1, ref c2);
-            }
+            });
         }
         public abstract void Update(in PixelEntity ntt, ref T c1, ref T2 c2);
     }
@@ -44,19 +43,19 @@ namespace MagnumOpus.ECS
         protected PixelSystem(string name, int threads = 1) : base(name, threads) { }
         protected override bool MatchesFilter(in PixelEntity nttId)
         {
-            return nttId.Has<T, T2, T3>()&& base.MatchesFilter(in nttId);
+            return nttId.Has<T, T2, T3>() && base.MatchesFilter(in nttId);
         }
 
         protected override void Update()
-        {// for (var i = 0; i < _entities.Count; i++)
-            foreach (var ntt in _entities)
+        {
+            Parallel.ForEach(_entities, parallelOptions, ntt =>
             {
                 // var ntt = _entities[i];
                 ref var c1 = ref ntt.Get<T>();
                 ref var c2 = ref ntt.Get<T2>();
                 ref var c3 = ref ntt.Get<T3>();
                 Update(in ntt, ref c1, ref c2, ref c3);
-            }
+            });
         }
         public abstract void Update(in PixelEntity ntt, ref T c1, ref T2 c2, ref T3 c3);
     }
@@ -65,12 +64,12 @@ namespace MagnumOpus.ECS
         protected PixelSystem(string name, int threads = 1) : base(name, threads) { }
         protected override bool MatchesFilter(in PixelEntity nttId)
         {
-            return nttId.Has<T, T2, T3, T4>()&& base.MatchesFilter(in nttId);
+            return nttId.Has<T, T2, T3, T4>() && base.MatchesFilter(in nttId);
         }
 
         protected override void Update()
-        {// for (var i = 0; i < _entities.Count; i++)
-            foreach (var ntt in _entities)
+        {
+            Parallel.ForEach(_entities, parallelOptions, ntt =>
             {
                 // var ntt = _entities[i];
                 ref var c1 = ref ntt.Get<T>();
@@ -78,7 +77,7 @@ namespace MagnumOpus.ECS
                 ref var c3 = ref ntt.Get<T3>();
                 ref var c4 = ref ntt.Get<T4>();
                 Update(in ntt, ref c1, ref c2, ref c3, ref c4);
-            }
+            });
         }
         public abstract void Update(in PixelEntity ntt, ref T c1, ref T2 c2, ref T3 c3, ref T4 c4);
     }
@@ -91,8 +90,8 @@ namespace MagnumOpus.ECS
         }
 
         protected override void Update()
-        {// for (var i = 0; i < _entities.Count; i++)
-            foreach (var ntt in _entities)
+        {
+            Parallel.ForEach(_entities, parallelOptions, ntt =>
             {
                 // var ntt = _entities[i];
                 ref var c1 = ref ntt.Get<T>();
@@ -101,21 +100,22 @@ namespace MagnumOpus.ECS
                 ref var c4 = ref ntt.Get<T4>();
                 ref var c5 = ref ntt.Get<T5>();
                 Update(in ntt, ref c1, ref c2, ref c3, ref c4, ref c5);
-            }
+            });
         }
         public abstract void Update(in PixelEntity ntt, ref T c1, ref T2 c2, ref T3 c3, ref T4 c4, ref T5 c5);
     }
     public abstract class PixelSystem
     {
         public string Name;
-        public readonly int ThreadCount;
         internal readonly HashSet<PixelEntity> _entities = new();
         internal float deltaTime;
+
+        public readonly ParallelOptions parallelOptions;
 
         protected PixelSystem(string name, int threads = 1)
         {
             Name = name;
-            ThreadCount = threads;
+            parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = threads, TaskScheduler = new PixelTaskScheduler(threads) };
             PerformanceMetrics.RegisterSystem(this);
         }
 
@@ -129,8 +129,8 @@ namespace MagnumOpus.ECS
         protected virtual void PostUpdate() { }
         protected virtual void Update() { }
         protected virtual void PreUpdate() { }
-        protected virtual bool MatchesFilter(in PixelEntity nttId)=> nttId.Id != 0;
-        
+        protected virtual bool MatchesFilter(in PixelEntity nttId) => nttId.Id != 0;
+
         internal void EntityChanged(in PixelEntity ntt)
         {
             var isMatch = MatchesFilter(in ntt);

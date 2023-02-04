@@ -5,15 +5,6 @@ using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class TeamSystem : PixelSystem<TeamComponent>
-    {
-        public TeamSystem() : base("Team System", threads: 1) { }
-
-        public override void Update(in PixelEntity ntt, ref TeamComponent team)
-        {
-            
-        }
-    }
     public sealed class ExpRewardSystem : PixelSystem<LevelComponent, ExpRewardComponent>
     {
         public ExpRewardSystem() : base("Exp Reward System", threads: 1) { }
@@ -22,19 +13,19 @@ namespace MagnumOpus.Simulation.Systems
         {
             lvl.Experience += (uint)rew.Experience;
 
-            if(lvl.Experience >= lvl.ExperienceToNextLevel)
+            if (lvl.Experience >= lvl.ExperienceToNextLevel)
             {
                 ref var hlt = ref ntt.Get<HealthComponent>();
                 lvl.Level++;
                 lvl.Experience = 0;
-                lvl.ExperienceToNextLevel = (uint)Collections.LevelExps.Values[lvl.Level-1];
+                lvl.ExperienceToNextLevel = (uint)Collections.LevelExps.Values[lvl.Level - 1];
                 lvl.ChangedTick = PixelWorld.Tick;
                 hlt.Health = hlt.MaxHealth;
 
                 var lvlUp = MsgUserAttrib.Create(ntt.NetId, lvl.Level, Enums.MsgUserAttribType.Level);
                 ntt.NetSync(ref lvlUp, false);
 
-                var lvlActionMsg = MsgAction.Create(ntt.NetId,0,0,0,0, Enums.MsgActionType.LevelUp);
+                var lvlActionMsg = MsgAction.Create(ntt.NetId, 0, 0, 0, 0, Enums.MsgActionType.LevelUp);
                 ntt.NetSync(ref lvlActionMsg, true);
             }
 

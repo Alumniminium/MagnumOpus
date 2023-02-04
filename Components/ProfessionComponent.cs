@@ -4,12 +4,12 @@ using MagnumOpus.Enums;
 namespace MagnumOpus.Components
 {
     [Component]
-    public struct ProfessionComponent
+    public struct ClassComponent
     {
         public readonly int EntityId;
         public ClasseName Class;
 
-        public ProfessionComponent(int entityId, ClasseName profession)
+        public ClassComponent(int entityId, ClasseName profession)
         {
             EntityId = entityId;
             Class = profession;

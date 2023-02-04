@@ -403,7 +403,7 @@
         ACTION_USER_WEBPAGE = 1041, // notify the client to open the page.param = "http:// ....."
 
         ACTION_USER_BBS =
-            1042, // in the BBS bulletin boards, add a SYSTEM news channel, message the name of human players. The need for USER objects, retaining only one of each USER. param is the message. 
+            1042, // in the BBS bulletin boards, add a SYSTEM news channel, message the name of ntt players. The need for USER objects, retaining only one of each USER. param is the message. 
 
         ACTION_USER_UNLEARN_SKILL =
             1043, // reincarnation, the forgotten all weapons skills, the skills of the future could be "epiphany." 

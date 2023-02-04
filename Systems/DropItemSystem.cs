@@ -12,9 +12,7 @@ namespace MagnumOpus.Simulation.Systems
         public DropItemSystem() : base("Drop Item System", threads: 1) { }
         public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref RequestDropItemComponent rdi, ref InventoryComponent inv)
         {
-            var removed = InventoryHelper.RemoveNetIdFromInventory(in ntt, rdi.ItemNtt.NetId);
-
-            if (!removed)
+            if (!InventoryHelper.RemoveNetIdFromInventory(in ntt, rdi.ItemNtt.NetId))
             {
                 FConsole.WriteLine($"[{nameof(DropItemSystem)}] {ntt.NetId} tried to drop an Item he does not have in his Inventory at {pos.Position} on map {pos.Map}.");
                 ntt.Remove<RequestDropItemComponent>();
@@ -22,9 +20,10 @@ namespace MagnumOpus.Simulation.Systems
             }
 
             ref var item = ref rdi.ItemNtt.Get<ItemComponent>();
-            
             var dropPos = new PositionComponent(rdi.ItemNtt.Id, pos.Position, pos.Map);
+            var ltc = new LifeTimeComponent(rdi.ItemNtt.Id, TimeSpan.FromSeconds(30));
             rdi.ItemNtt.Set(ref dropPos);
+            rdi.ItemNtt.Set(ref ltc);
 
             Game.Grids[pos.Map].Add(in rdi.ItemNtt, ref pos);
 

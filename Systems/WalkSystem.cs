@@ -30,7 +30,6 @@ namespace MagnumOpus.Simulation.Systems
             
             var text = $"{wlk.Direction} -> {pos.Position}";
             NetworkHelper.SendMsgTo(in ntt, text, MsgTextType.TopLeft);
-            
             // FConsole.WriteLine($"[{nameof(WalkSystem)}] {ntt.Id} -> {text}");
 
             ntt.Remove<WalkComponent>();
