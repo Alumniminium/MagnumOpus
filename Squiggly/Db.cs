@@ -34,8 +34,7 @@ namespace MagnumOpus.Squiggly
                     var spw = new SpawnComponent(obj.Id, (int)spawn.id);
                     var cqm = new CqMonsterComponent(obj.Id, prefab.id);
                     var pos = new PositionComponent(obj.Id, new Vector2(spawn.bound_x, spawn.bound_y), spawn.mapid);
-                    var bdy = new BodyComponent(obj.Id, prefab.lookface);
-                    var dir = new DirectionComponent(obj.Id, (Direction)Random.Shared.Next(0, 9));
+                    var bdy = new BodyComponent(obj.Id, prefab.lookface,(Direction)Random.Shared.Next(0, 9));
                     var hp = new HealthComponent(obj.Id, prefab.life, prefab.life);
                     var ntc = new NameTagComponent(obj.Id, prefab.name);
                     var vwp = new ViewportComponent(obj.Id, 40f);
@@ -60,7 +59,6 @@ namespace MagnumOpus.Squiggly
                     obj.Set(ref spw);
                     obj.Set(ref pos);
                     obj.Set(ref bdy);
-                    obj.Set(ref dir);
                     obj.Set(ref hp);
                     obj.Set(ref ntc);
                     obj.Set(ref vwp);

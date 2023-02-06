@@ -27,7 +27,6 @@ namespace MagnumOpus
                 new GuardAISystem(),
                 new WalkSystem(),
                 new JumpSystem(),
-                new DirectionSystem(),
                 new EmoteSystem(),
                 new PortalSystem(),
                 new TeleportSystem(),
@@ -55,7 +54,7 @@ namespace MagnumOpus
             FConsole.WriteLine("[DATABASE] Loading...");
             var Cipher = new COFAC();
             string TmpFile = Path.GetTempFileName();
-            Cipher.GenerateKey(0x2537); // must be changed to 2537
+            Cipher.GenerateKey(0x2537);
 
             using (FileStream Reader = new ("CLIENT_FILES/itemtype.dat", FileMode.Open, FileAccess.Read, FileShare.Read))
             using (FileStream Writer = new (TmpFile, FileMode.Open, FileAccess.Write, FileShare.Read))

@@ -8,7 +8,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class BasicAISystem : PixelSystem<PositionComponent, ViewportComponent, BrainComponent>
     {
-        public BasicAISystem() : base("Basic AI System", threads: 2) { }
+        public BasicAISystem() : base("Basic AI System", threads: 1) { }
         protected override bool MatchesFilter(in PixelEntity ntt) => ntt.Type == EntityType.Monster && !ntt.Has<GuardPositionComponent>() && base.MatchesFilter(in ntt);
 
         public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref ViewportComponent vwp, ref BrainComponent brn)

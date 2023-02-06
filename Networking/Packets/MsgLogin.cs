@@ -41,7 +41,6 @@ namespace MagnumOpus.Networking.Packets
             var ntc = new NameTagComponent(ntt.Id, net.Username);
             var bdy = new BodyComponent(ntt.Id, (uint)(net.Username == "trbl" ? 2003 : 2002));
             var hed = new HeadComponent(ntt.Id, 6);
-            var dir = new DirectionComponent(ntt.Id, Direction.South);
             var emo = new EmoteComponent(ntt.Id, Emote.Stand);
             var vwp = new ViewportComponent(ntt.Id, 40);
             var pos = new PositionComponent(ntt.Id, new System.Numerics.Vector2(438,377), 1002);
@@ -65,7 +64,6 @@ namespace MagnumOpus.Networking.Packets
 
             ntt.Set(ref bdy);
             ntt.Set(ref ntc);
-            ntt.Set(ref dir);
             ntt.Set(ref vwp);
             ntt.Set(ref emo);
             ntt.Set(ref pos);

@@ -1,4 +1,5 @@
 using MagnumOpus.ECS;
+using MagnumOpus.Enums;
 
 namespace MagnumOpus.Components
 {
@@ -7,14 +8,15 @@ namespace MagnumOpus.Components
     {
         public readonly int EntityId;
         public long ChangedTick;
-        
+        public Direction Direction;
         public uint Look;
 
-        public BodyComponent(int entityId, uint look = 1003)
+        public BodyComponent(int entityId, uint look = 1003, Direction direction = Direction.South)
         {
             EntityId = entityId;
             ChangedTick = PixelWorld.Tick;
             Look = look;
+            Direction = direction;
         }
 
         public override int GetHashCode() => EntityId;

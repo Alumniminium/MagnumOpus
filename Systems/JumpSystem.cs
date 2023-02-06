@@ -9,15 +9,15 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class JumpSystem : PixelSystem<PositionComponent, JumpComponent, DirectionComponent>
+    public sealed class JumpSystem : PixelSystem<PositionComponent, JumpComponent, BodyComponent>
     {
         public JumpSystem() : base("Jump System", threads: 1) { }
         protected override bool MatchesFilter(in PixelEntity ntt) => ntt.Type != EntityType.Item && base.MatchesFilter(in ntt);
 
-        public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref JumpComponent jmp, ref DirectionComponent dir)
+        public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref JumpComponent jmp, ref BodyComponent bdy)
         {
             pos.ChangedTick = PixelWorld.Tick;
-            dir.ChangedTick = PixelWorld.Tick;
+            bdy.ChangedTick = PixelWorld.Tick;
 
             var direction = CoMath.GetDirection(new Vector2(jmp.Position.X, jmp.Position.Y), pos.Position);
             var distance  = (int)Vector2.Distance(new Vector2(jmp.Position.X, jmp.Position.Y), pos.Position);
@@ -29,9 +29,8 @@ namespace MagnumOpus.Simulation.Systems
                 ntt.Remove<JumpComponent>();
             }
             else
-            {
                 pos.Position = Vector2.Lerp(pos.Position, jmp.Position, 2 / jumpTime);
-            }
+            
             // var eff = MsgFloorItem.Create((int)PixelWorld.Tick, (ushort)pos.Position.X, (ushort)pos.Position.Y, 12, MsgFloorItemType.DisplayEffect);
             // var deff = MsgFloorItem.Create((int)PixelWorld.Tick-1, (ushort)pos.Position.X, (ushort)pos.Position.Y, 12, MsgFloorItemType.RemoveEffect);
             // ntt.NetSync(ref eff, true);
@@ -42,7 +41,7 @@ namespace MagnumOpus.Simulation.Systems
 
             if (jmp.CreatedTick == PixelWorld.Tick)
             {
-                dir.Direction = direction;
+                bdy.Direction = direction;
                 var packet = MsgAction.CreateJump(in ntt, in jmp);
                 ntt.NetSync(ref packet, true);
             }

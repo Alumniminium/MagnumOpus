@@ -156,8 +156,9 @@ namespace MagnumOpus.Networking.Packets
                 case MsgActionType.ChangeFacing:
                     {
                         FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.Direction}");
-                        var dir = new DirectionComponent(ntt.Id, msg.Direction);
-                        ntt.Set(ref dir);
+                        ref var bdy = ref ntt.Get<BodyComponent>();
+                        bdy.Direction = msg.Direction;
+                        ntt.NetSync(ref msg, true);
                         break;
                     }
                 case MsgActionType.ChangeAction:
@@ -171,10 +172,8 @@ namespace MagnumOpus.Networking.Packets
                     {
                         FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.JumpX}, {msg.JumpY}");
                         var jmp = new JumpComponent(ntt.Id, msg.JumpX, msg.JumpY);
-                        var dir = new DirectionComponent(ntt.Id, msg.Direction);
                         var emo = new EmoteComponent(ntt.Id, Emote.Stand);
                         ntt.Set(ref jmp);
-                        ntt.Set(ref dir);
                         ntt.Set(ref emo);
                         break;
                     }

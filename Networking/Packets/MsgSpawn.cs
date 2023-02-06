@@ -91,7 +91,7 @@ namespace MagnumOpus.Networking.Packets
                 X = (ushort)pos.Position.X,
                 Y = (ushort)pos.Position.Y,
                 Hair = hed.Hair,
-                Direction = ntt.Get<DirectionComponent>().Direction,
+                Direction = bdy.Direction,
                 Emote = ntt.Get<EmoteComponent>().Emote,
                 Reborn = ntt.Get<RebornComponent>().Count,
                 GuildId = (ushort)gld.GuildId,
@@ -113,7 +113,6 @@ namespace MagnumOpus.Networking.Packets
             ref readonly var hlt = ref ntt.Get<HealthComponent>();
             ref readonly var pos = ref ntt.Get<PositionComponent>();
             ref readonly var eff = ref ntt.Get<StatusEffectComponent>();
-            ref readonly var dir = ref ntt.Get<DirectionComponent>();
 
             var msg = new MsgSpawn
             {
@@ -124,7 +123,7 @@ namespace MagnumOpus.Networking.Packets
                 StatusEffects = eff.Effects,
                 CurrentHp = (ushort)hlt.Health,
                 Level = lvl.Level,
-                Direction = dir.Direction,
+                Direction = bdy.Direction,
                 Emote = Emote.Stand,
                 StringCount = 1,
                 NameLen = (byte)ntc.Name.Trim().Length,

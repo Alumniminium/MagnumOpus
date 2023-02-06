@@ -24,7 +24,6 @@ namespace MagnumOpus.Networking.Packets
         {
             ref readonly var bdy = ref ntt.Get<BodyComponent>();
             ref readonly var pos = ref ntt.Get<PositionComponent>();
-            ref readonly var dir = ref ntt.Get<DirectionComponent>();
 
             var packet = new MsgColor
             {
@@ -34,7 +33,7 @@ namespace MagnumOpus.Networking.Packets
                 UniqueId = ntt.NetId,
                 X = (ushort)pos.Position.X,
                 Y = (ushort)pos.Position.Y,
-                Direction = dir.Direction,
+                Direction = bdy.Direction,
                 Rgb = ColorToUInt(color),
                 Type = 104
             };
@@ -44,7 +43,6 @@ namespace MagnumOpus.Networking.Packets
         {
             ref readonly var bdy = ref ntt.Get<BodyComponent>();
             ref readonly var pos = ref ntt.Get<PositionComponent>();
-            ref readonly var dir = ref ntt.Get<DirectionComponent>();
 
             var packet = new MsgColor
             {
@@ -54,7 +52,7 @@ namespace MagnumOpus.Networking.Packets
                 UniqueId = ntt.NetId,
                 X = (ushort)pos.Position.X,
                 Y = (ushort)pos.Position.Y,
-                Direction = dir.Direction,
+                Direction = bdy.Direction,
                 Rgb = color,
                 Type = 104
             };

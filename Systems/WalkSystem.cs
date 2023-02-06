@@ -1,4 +1,3 @@
-using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -8,16 +7,16 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class WalkSystem : PixelSystem<PositionComponent, WalkComponent, DirectionComponent>
+    public sealed class WalkSystem : PixelSystem<PositionComponent, WalkComponent, BodyComponent>
     {
         public WalkSystem() : base("Walk System", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref WalkComponent wlk, ref DirectionComponent dir)
+        public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref WalkComponent wlk, ref BodyComponent bdy)
         {
-            dir.ChangedTick = PixelWorld.Tick;
+            bdy.ChangedTick = PixelWorld.Tick;
             pos.ChangedTick = PixelWorld.Tick;
 
-            dir.Direction = wlk.Direction;
+            bdy.Direction = wlk.Direction;
             pos.Position += Constants.DeltaPos[(int)wlk.Direction];
 
             var pkt = MsgWalk.Create(ntt.NetId, (byte)wlk.Direction, wlk.IsRunning);
