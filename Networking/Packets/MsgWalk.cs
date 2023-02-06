@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using HerstLib.IO;
 using MagnumOpus.Components;
+using MagnumOpus.Components.NetSyncComponents;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;

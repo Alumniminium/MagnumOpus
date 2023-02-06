@@ -124,13 +124,15 @@ namespace MagnumOpus.ECS
             {
                 IncomingPacketQueue.ProcessAll();
 
+                while (ToBeRemoved.Count != 0)
+                    DestroyInternal(ToBeRemoved.Pop());
+
                 lock (ChangedThisTick)
                 {
                     foreach (var ntt in ChangedThisTick)
-                    {
                         for (int x = 0; x < Systems.Length; x++)
                             Systems[x].EntityChanged(in ntt);
-                    }
+                    ChangedThisTick.Clear();
                 }
 
                 UpdateTimeAcc -= UpdateTime;
@@ -139,18 +141,6 @@ namespace MagnumOpus.ECS
                     last = Stopwatch.Elapsed.TotalMilliseconds;
                     var system = Systems[i];
                     system.Update(dt);
-                    while (ToBeRemoved.Count != 0)
-                        DestroyInternal(ToBeRemoved.Pop());
-
-                    lock (ChangedThisTick)
-                    {
-                        foreach (var ntt in ChangedThisTick)
-                        {
-                            for (int x = 0; x < Systems.Length; x++)
-                                Systems[x].EntityChanged(in ntt);
-                        }
-                        ChangedThisTick.Clear();
-                    }
                     PerformanceMetrics.AddSample(system.Name, Stopwatch.Elapsed.TotalMilliseconds - last);
                     last = Stopwatch.Elapsed.TotalMilliseconds;
                 }

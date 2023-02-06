@@ -250,7 +250,7 @@ namespace MagnumOpus.Helpers
                 case TaskActionType.ACTION_USER_CHGMAPRECORD:
                     {
                         ref readonly var rpc = ref ntt.Get<RecordPointComponent>();
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {rpc.X},{rpc.Y},{rpc.Map} {(rpc.EntityId != 0 ? action.id_next : action.id_nextfail)}");
+                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {rpc.X},{rpc.Y},{rpc.Map} {(rpc.EntityId != 0 ? action.id_next : action.id_nextfail)}");
 
                         if (rpc.EntityId != 0)
                         {
@@ -347,7 +347,7 @@ namespace MagnumOpus.Helpers
                         var chance = a / (float)b;
                         var result = Random.Shared.NextSingle();
 
-                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {a}/{b} -> {chance*100}% -> {result*100}% -> {(result < chance ? "Success" : "Fail")} -> {(result < chance ? action.id_next : action.id_nextfail)}");
+                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {a}/{b} -> {chance * 100}% -> {result * 100}% -> {(result < chance ? "Success" : "Fail")} -> {(result < chance ? action.id_next : action.id_nextfail)}");
 
                         if (result < chance)
                             return action.id_next;
@@ -389,7 +389,7 @@ namespace MagnumOpus.Helpers
                         var idx = Array.FindIndex(inv.Items, x => x.Id == 0);
                         if (idx == -1)
                             return action.id_nextfail;
-                        
+
                         inv.Items[idx] = itemNtt;
 
                         var drc = new RequestDropItemComponent(ntt.Id, in itemNtt);
@@ -533,7 +533,7 @@ namespace MagnumOpus.Helpers
 
                         return foundIdx != -1 ? action.id_next : action.id_nextfail;
                     }
-                    case TaskActionType.ACTION_ITEM_DELTHIS:
+                case TaskActionType.ACTION_ITEM_DELTHIS:
                     {
                         ref readonly var inv = ref ntt.Get<InventoryComponent>();
                         var itemId = trigger.Id;
@@ -558,23 +558,44 @@ namespace MagnumOpus.Helpers
 
                         return foundIdx != -1 ? action.id_next : action.id_nextfail;
                     }
-                    case TaskActionType.ACTION_CHKTIME:
+                case TaskActionType.ACTION_CHKTIME:
                     {
-                        var timestamps = action.param.Trim().Split(' ');
-                        var start = string.Join(' ',timestamps[0..2]);
-                        var end = string.Join(' ', timestamps[2..4]);
+                        if (action.data == 3)
+                        {
+                            var param = action.param.Trim().Split(' ');
+                            var startDayOfWeek = int.Parse(param[0]);
+                            var startTime = param[1];
+                            var endDayOfWeek = int.Parse(param[2]);
+                            var endTime = param[3];
+                            var isNow = false;
 
-                        var startTime = DateTime.ParseExact(start, "yyyy-M-d HH:mm", CultureInfo.InvariantCulture);
-                        var endTime = DateTime.ParseExact(end, "yyyy-M-d HH:mm", CultureInfo.InvariantCulture);
+                            if (((int)DateTime.Now.DayOfWeek) >= startDayOfWeek && ((int)DateTime.Now.DayOfWeek) <= endDayOfWeek)
+                            {
+                                var startDT = DateTime.ParseExact(startTime, "H:mm", null, DateTimeStyles.None);
+                                var endDT = DateTime.ParseExact(endTime, "H:mm", null, DateTimeStyles.None);
+                                isNow = DateTime.Now.Hour >= startDT.Hour && DateTime.Now.Hour <= endDT.Hour;
+                            }
 
-                        startTime = startTime.AddYears(DateTime.Now.Year - startTime.Year);
-                        endTime = endTime.AddYears(DateTime.Now.Year - endTime.Year);
+                            return isNow ? action.id_next : action.id_nextfail;
+                        }
+                        else
+                        {
+                            var timestamps = action.param.Trim().Split(' ');
+                            var start = string.Join(' ', timestamps[0..2]);
+                            var end = string.Join(' ', timestamps[2..4]);
 
-                        var isNow = startTime <= DateTime.Now && DateTime.Now <= endTime;
-                        
-                        FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {startTime} to {endTime} -> {(isNow ? "Success" : "Fail")} -> {(isNow ?  action.id_next : action.id_nextfail)}");
+                            var startTime = DateTime.ParseExact(start, "yyyy-M-d HH:mm", CultureInfo.InvariantCulture);
+                            var endTime = DateTime.ParseExact(end, "yyyy-M-d HH:mm", CultureInfo.InvariantCulture);
 
-                        return isNow ? action.id_next : action.id_nextfail;
+                            startTime = startTime.AddYears(DateTime.Now.Year - startTime.Year);
+                            endTime = endTime.AddYears(DateTime.Now.Year - endTime.Year);
+
+                            var isNow = startTime <= DateTime.Now && DateTime.Now <= endTime;
+
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {startTime} to {endTime} -> {(isNow ? "Success" : "Fail")} -> {(isNow ? action.id_next : action.id_nextfail)}");
+
+                            return isNow ? action.id_next : action.id_nextfail;
+                        }
                     }
                 default:
                     FConsole.WriteLine($"[FAIL] Unknown task type: {taskType}");

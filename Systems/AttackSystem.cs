@@ -1,5 +1,6 @@
 using System.Numerics;
 using MagnumOpus.Components;
+using MagnumOpus.Components.NetSyncComponents;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
