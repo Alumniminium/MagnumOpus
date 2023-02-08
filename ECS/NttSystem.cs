@@ -10,7 +10,9 @@ namespace MagnumOpus.ECS
         internal readonly List<NTT> _entitiesList = new();
         internal readonly Thread[] _threads;
         internal readonly AutoResetEvent[] _blocks;
-        internal volatile int _readyThreads =0;
+        private readonly AutoResetEvent _allReady = new(false);
+        internal volatile int _readyThreads = 0;
+
 
         protected NttSystem(string name, int threads = 1)
         {
@@ -33,42 +35,43 @@ namespace MagnumOpus.ECS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void BeginUpdate()
         {
-            for(int i = 0; i < _threads.Length; i++)
+            Interlocked.Exchange(ref _readyThreads, 0);
+            
+            for (int i = 0; i < _threads.Length; i++)
                 _blocks[i].Set();
 
-            while (_readyThreads != _threads.Length)
-                continue;
+            _allReady.WaitOne();
         }
+
         public void ThreadLoop(object id)
         {
             int idx = (int)id;
             while (true)
             {
-                FConsole.WriteLine($"[{Name}] Thread {idx} waiting");
                 Interlocked.Increment(ref _readyThreads);
+                if (_readyThreads == _threads.Length)
+                    _allReady.Set();
                 _blocks[idx].WaitOne();
-                FConsole.WriteLine($"[{Name}] Thread {idx} running");
-                Interlocked.Decrement(ref _readyThreads);
 
                 int start = 0;
                 int amount = _entitiesList.Count;
-                
+
                 if (_threads.Length > 1)
                 {
                     amount = _entitiesList.Count / _threads.Length;
                     start = amount * idx;
-                    if (idx == _threads.Length)
-                        amount += _entitiesList.Count % _threads.Length;
+                    if (idx == _threads.Length - 1)
+                        start += _entitiesList.Count % _threads.Length;
 
                     amount = Math.Min(amount, _entitiesList.Count - start);
                 }
-                if(amount != 0)
-                Update(start, amount);
+
+                Update(start, start + amount);
             }
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual void Update(int start,int end) { }
+        protected virtual void Update(int start, int end) { }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected virtual bool MatchesFilter(in NTT nttId) => nttId.Id != 0;
 
@@ -78,12 +81,12 @@ namespace MagnumOpus.ECS
             var isMatch = MatchesFilter(in ntt);
             if (!isMatch)
             {
-                if(_entities.Remove(ntt))
+                if (_entities.Remove(ntt))
                     _entitiesList.Remove(ntt);
             }
             else
             {
-                if(_entities.Add(ntt))
+                if (_entities.Add(ntt))
                     _entitiesList.Add(ntt);
             }
         }
@@ -95,7 +98,7 @@ namespace MagnumOpus.ECS
 
         protected override void Update(int start, int end)
         {
-            for (int i = start; i < end; i++)
+            for (int i = start; i < Math.Min(end, _entitiesList.Count); i++)
             {
                 NTT ntt = _entitiesList[i];
                 ref var c1 = ref ntt.Get<T>();
@@ -112,7 +115,7 @@ namespace MagnumOpus.ECS
 
         protected override void Update(int start, int end)
         {
-            for (int i = start; i < end; i++)
+            for (int i = start; i < Math.Min(end, _entitiesList.Count); i++)
             {
                 NTT ntt = _entitiesList[i];
                 ref var c1 = ref ntt.Get<T>();
@@ -130,7 +133,7 @@ namespace MagnumOpus.ECS
 
         protected override void Update(int start, int end)
         {
-            for (int i = start; i < end; i++)
+            for (int i = start; i < Math.Min(end, _entitiesList.Count); i++)
             {
                 NTT ntt = _entitiesList[i];
                 ref var c1 = ref ntt.Get<T>();
@@ -149,7 +152,7 @@ namespace MagnumOpus.ECS
 
         protected override void Update(int start, int end)
         {
-            for (int i = start; i < end; i++)
+            for (int i = start; i < Math.Min(end, _entitiesList.Count); i++)
             {
                 NTT ntt = _entitiesList[i];
                 ref var c1 = ref ntt.Get<T>();
@@ -169,7 +172,7 @@ namespace MagnumOpus.ECS
 
         protected override void Update(int start, int end)
         {
-            for (int i = start; i < end; i++)
+            for (int i = start; i < Math.Min(end, _entitiesList.Count); i++)
             {
                 NTT ntt = _entitiesList[i];
                 ref var c1 = ref ntt.Get<T>();

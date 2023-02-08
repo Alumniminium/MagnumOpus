@@ -6,6 +6,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class LifetimeSystem : NttSystem<LifeTimeComponent>
     {
+        public static bool Trace = false;
         public LifetimeSystem() : base("Lifetime", threads: 1) { }
 
         public override void Update(in NTT ntt, ref LifeTimeComponent ltc)
@@ -19,12 +20,14 @@ namespace MagnumOpus.Simulation.Systems
                     return;
 
                 string text = $"{ticksLeft / NttWorld.TargetTps} seconds left";
+                if (Trace)
                 FConsole.WriteLine($"[{nameof(LifetimeSystem)}] {ntt.Id} -> {text}");
             }
 
             var dtc = new DeathTagComponent();
             ntt.Set(ref dtc);
             ntt.Remove<LifeTimeComponent>();
+                if (Trace)
             FConsole.WriteLine($"[{nameof(LifetimeSystem)}] {ntt.Id} -> EXPIRED");
         }
     }
