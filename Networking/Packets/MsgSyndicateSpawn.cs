@@ -18,10 +18,10 @@ namespace MagnumOpus.Networking.Packets
         public GuildRanks Rank;
         public fixed byte LeaderName[16];
 
-        public static Memory<byte> Create(in PixelEntity ntt)
+        public static Memory<byte> Create(in NTT ntt)
         {
             ref readonly var gld = ref ntt.Get<GuildComponent>();
-            ref readonly var leader = ref PixelWorld.GetEntity(gld.LeaderId);
+            ref readonly var leader = ref NttWorld.GetEntity(gld.LeaderId);
             ref readonly var ntc = ref leader.Get<NameTagComponent>();
 
             MsgSyndicateSpawn* msgP = stackalloc MsgSyndicateSpawn[1];

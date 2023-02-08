@@ -11,7 +11,7 @@ namespace MagnumOpus.Components
         public LifeTimeComponent(int entityId, TimeSpan timespan)
         {
             EntityId = entityId;
-            ExpireTick = (uint)(PixelWorld.Tick + (PixelWorld.TargetTps * timespan.TotalSeconds));
+            ExpireTick = (uint)(NttWorld.Tick + (NttWorld.TargetTps * timespan.TotalSeconds));
         }
         public override int GetHashCode() => EntityId;
     }

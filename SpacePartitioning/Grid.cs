@@ -15,8 +15,8 @@ namespace SpacePartitioning
         public readonly int Height;
         public readonly int CellWidth;
         public readonly int CellHeight;
-        public readonly ConcurrentDictionary<PixelEntity, int> EntityCells = new();
-        public readonly ConcurrentDictionary<int, List<PixelEntity>> CellEntities = new();
+        public readonly ConcurrentDictionary<NTT, int> EntityCells = new();
+        public readonly ConcurrentDictionary<int, List<NTT>> CellEntities = new();
         public Grid(int mapWidth, int mapHeight, int cellWidth, int cellHeight)
         {
             Width = mapWidth;
@@ -30,18 +30,18 @@ namespace SpacePartitioning
                     var iv = new Vector2(x / cellWidth, y / cellHeight);
                     var id = (int)(iv.X + (Width / cellWidth * iv.Y));
 
-                    CellEntities.TryAdd(id, new List<PixelEntity>());
+                    CellEntities.TryAdd(id, new List<NTT>());
                 }
         }
 
         // Adds an entity to the grid and puts it in the correct cell
-        public void Add(in PixelEntity entity, ref PositionComponent pos)
+        public void Add(in NTT entity, ref PositionComponent pos)
         {
             var cell = FindCell(new Vector2(pos.Position.X, pos.Position.Y));
             EntityCells.TryAdd(entity, cell.Id);
             if (!CellEntities.TryGetValue(cell.Id, out var list))
             {
-                list = new List<PixelEntity>();
+                list = new List<NTT>();
                 CellEntities.TryAdd(cell.Id, list);
             }
             // lock (list)
@@ -52,7 +52,7 @@ namespace SpacePartitioning
         }
 
         // Removes an entity from the cell
-        public void Remove(in PixelEntity entity)
+        public void Remove(in NTT entity)
         {
             if (!EntityCells.TryRemove(entity, out var cell))
                 return;
@@ -65,7 +65,7 @@ namespace SpacePartitioning
             }
         }
 
-        public void Move(in PixelEntity entity, ref PositionComponent pos)
+        public void Move(in NTT entity, ref PositionComponent pos)
         {
             Remove(in entity);
             Add(in entity, ref pos);

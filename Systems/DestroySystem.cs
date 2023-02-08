@@ -3,10 +3,10 @@ using MagnumOpus.ECS;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class DestroySystem : PixelSystem<DestroyEndOfFrameComponent>
+    public sealed class DestroySystem : NttSystem<DestroyEndOfFrameComponent>
     {
-        public DestroySystem() : base("Destroy System", threads: 1) { }
+        public DestroySystem() : base("Destroy", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref DestroyEndOfFrameComponent def) => PixelWorld.Destroy(in ntt);
+        public override void Update(in NTT ntt, ref DestroyEndOfFrameComponent def) => NttWorld.Destroy(in ntt);
     }
 }

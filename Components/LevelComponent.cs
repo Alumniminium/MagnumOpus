@@ -17,7 +17,7 @@ namespace MagnumOpus.Components
             Level = level;
             Experience = experience;
             ExperienceToNextLevel = experienceToNextLevel;
-            ChangedTick = PixelWorld.Tick;
+            ChangedTick = NttWorld.Tick;
         }
         public override int GetHashCode() => EntityId;
     }

@@ -7,11 +7,11 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class PickupSystem : PixelSystem<PositionComponent, InventoryComponent, PickupRequestComponent>
+    public sealed class PickupSystem : NttSystem<PositionComponent, InventoryComponent, PickupRequestComponent>
     {
-        public PickupSystem() : base("Pickup System", threads: 1) { }
+        public PickupSystem() : base("Pickup", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref InventoryComponent inv, ref PickupRequestComponent pic)
+        public override void Update(in NTT ntt, ref PositionComponent pos, ref InventoryComponent inv, ref PickupRequestComponent pic)
         {
             if (pic.Item.Has<MoneyRewardComponent>())
             {

@@ -21,7 +21,7 @@ namespace MagnumOpus.Networking.Packets
         public uint Junk4;
         public uint Hash;
 
-        public static MsgTick Create(in PixelEntity target)
+        public static MsgTick Create(in NTT target)
         {
             var msg = new MsgTick
             {
@@ -39,7 +39,7 @@ namespace MagnumOpus.Networking.Packets
         }
 
         [PacketHandler(PacketId.MsgTick)]
-        public static void Process(PixelEntity ntt, Memory<byte> memory)
+        public static void Process(NTT ntt, Memory<byte> memory)
         {
             var msg = Co2Packet.Deserialze<MsgTick>(memory);
             ref readonly var ntc = ref ntt.Get<NameTagComponent>();

@@ -14,7 +14,7 @@ namespace MagnumOpus.Components
         public BodyComponent(int entityId, uint look = 1003, Direction direction = Direction.South)
         {
             EntityId = entityId;
-            ChangedTick = PixelWorld.Tick;
+            ChangedTick = NttWorld.Tick;
             Look = look;
             Direction = direction;
         }

@@ -3,13 +3,13 @@ using MagnumOpus.Networking;
 
 namespace MagnumOpus.ECS
 {
-    public readonly struct PixelEntity
+    public readonly struct NTT
     {
         public readonly int Id;
         public readonly int NetId;
         public readonly EntityType Type;
 
-        public PixelEntity(int id, int netId, EntityType type)
+        public NTT(int id, int netId, EntityType type)
         {
             Id = id;
             NetId = netId;
@@ -60,9 +60,9 @@ namespace MagnumOpus.ECS
         }
 
         public override int GetHashCode() => Id;
-        public override bool Equals(object? obj) => obj is PixelEntity nttId && nttId.Id == Id;
-        public static bool operator ==(in PixelEntity a, in PixelEntity b) => a.Id == b.Id;
-        public static bool operator !=(in PixelEntity a, in PixelEntity b) => a.Id != b.Id;
+        public override bool Equals(object? obj) => obj is NTT nttId && nttId.Id == Id;
+        public static bool operator ==(in NTT a, in NTT b) => a.Id == b.Id;
+        public static bool operator !=(in NTT a, in NTT b) => a.Id != b.Id;
         public override string ToString() => $"NTT {Id} ({Type})";
     }
 }

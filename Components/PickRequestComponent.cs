@@ -6,9 +6,9 @@ namespace MagnumOpus.Components
     public readonly struct PickupRequestComponent
     {
         public readonly int EntityId;
-        public readonly PixelEntity Item;
+        public readonly NTT Item;
 
-        public PickupRequestComponent(int nttId, in PixelEntity item)
+        public PickupRequestComponent(int nttId, in NTT item)
         {
             EntityId = nttId;
             Item = item;

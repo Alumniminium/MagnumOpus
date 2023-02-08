@@ -4,11 +4,11 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class DamageSystem : PixelSystem<HealthComponent, DamageComponent>
+    public sealed class DamageSystem : NttSystem<HealthComponent, DamageComponent>
     {
-        public DamageSystem() : base("Damage System", threads: 1) { }
+        public DamageSystem() : base("Damage", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref HealthComponent hlt, ref DamageComponent dmg)
+        public override void Update(in NTT ntt, ref HealthComponent hlt, ref DamageComponent dmg)
         {
             var actualDamage = Math.Clamp(dmg.Damage, 0,hlt.Health);
             hlt.Health -= (ushort)actualDamage;

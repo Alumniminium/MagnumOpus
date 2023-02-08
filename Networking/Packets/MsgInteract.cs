@@ -22,7 +22,7 @@ namespace MagnumOpus.Networking.Packets
         public int Value;
         public int Value2;
 
-        public static MsgInteract Create(in PixelEntity source, in PixelEntity target, MsgInteractType type, int value)
+        public static MsgInteract Create(in NTT source, in NTT target, MsgInteractType type, int value)
         {
             ref readonly var bdy = ref target.Get<BodyComponent>();
             ref readonly var pos = ref target.Get<PositionComponent>();
@@ -57,7 +57,7 @@ namespace MagnumOpus.Networking.Packets
             };
             return msg;
         }
-        public static MsgInteract Die(in PixelEntity attacker, PixelEntity target)
+        public static MsgInteract Die(in NTT attacker, NTT target)
         {
             ref readonly var bdy = ref target.Get<PositionComponent>();
             var msg = new MsgInteract
@@ -77,7 +77,7 @@ namespace MagnumOpus.Networking.Packets
         }
 
         [PacketHandler(PacketId.MsgInteraction)]
-        public static void Process(PixelEntity ntt, Memory<byte> memory)
+        public static void Process(NTT ntt, Memory<byte> memory)
         {
             var msg = Co2Packet.Deserialze<MsgInteract>(memory);
 
@@ -92,7 +92,7 @@ namespace MagnumOpus.Networking.Packets
                             return;
                         }
 
-                        var target = PixelWorld.GetEntityByNetId(msg.TargetUniqueId);
+                        var target = NttWorld.GetEntityByNetId(msg.TargetUniqueId);
 
                         // TODO: check if target not invalid
 
@@ -110,7 +110,7 @@ namespace MagnumOpus.Networking.Packets
                             return;
                         }
 
-                        var mAtk = new MagicAttackRequestComponent(ntt.Id, skillId, targetId, x, y, PixelWorld.TargetTps);
+                        var mAtk = new MagicAttackRequestComponent(ntt.Id, skillId, targetId, x, y, NttWorld.TargetTps);
                         ntt.Set(ref mAtk);
 
                         // var target = PixelWorld.GetEntityByNetId((int)targetId);

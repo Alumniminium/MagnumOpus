@@ -12,7 +12,7 @@ namespace MagnumOpus.Networking.Packets
         public MsgTeamAction Mode;
         public int TargetUniqueId;
 
-        public static MsgTeam Create(in PixelEntity ntt, MsgTeamAction action)
+        public static MsgTeam Create(in NTT ntt, MsgTeamAction action)
         {
             var msg = new MsgTeam
             {
@@ -24,10 +24,10 @@ namespace MagnumOpus.Networking.Packets
             return msg;
         }
 
-        public static MsgTeam CreateTeam(in PixelEntity ntt) => Create(ntt, MsgTeamAction.Create);
-        public static MsgTeam DisbandTeam(in PixelEntity ntt) => Create(ntt, MsgTeamAction.Dismiss);
-        public static MsgTeam Kick(in PixelEntity ntt) => Create(ntt, MsgTeamAction.Kick);
-        public static MsgTeam Invite(in PixelEntity ntt) => Create(ntt, MsgTeamAction.Invite);
-        public static MsgTeam Leave(in PixelEntity ntt) => Create(ntt, MsgTeamAction.LeaveTeam);
+        public static MsgTeam CreateTeam(in NTT ntt) => Create(ntt, MsgTeamAction.Create);
+        public static MsgTeam DisbandTeam(in NTT ntt) => Create(ntt, MsgTeamAction.Dismiss);
+        public static MsgTeam Kick(in NTT ntt) => Create(ntt, MsgTeamAction.Kick);
+        public static MsgTeam Invite(in NTT ntt) => Create(ntt, MsgTeamAction.Invite);
+        public static MsgTeam Leave(in NTT ntt) => Create(ntt, MsgTeamAction.LeaveTeam);
     }
 }

@@ -18,7 +18,7 @@ namespace MagnumOpus.Networking.Packets
         public ushort Sort;
         public ushort Base;
 
-        public static MsgNpcSpawn Create(in PixelEntity ntt)
+        public static MsgNpcSpawn Create(in NTT ntt)
         {
             ref readonly var bdy = ref ntt.Get<BodyComponent>();
             ref readonly var npc = ref ntt.Get<NpcComponent>();

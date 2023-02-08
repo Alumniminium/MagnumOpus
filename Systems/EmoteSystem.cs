@@ -5,14 +5,14 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class EmoteSystem : PixelSystem<EmoteComponent, BodyComponent>
+    public sealed class EmoteSystem : NttSystem<EmoteComponent, BodyComponent>
     {
-        public EmoteSystem() : base("Emote System", threads: 1) { }
-        protected override bool MatchesFilter(in PixelEntity ntt) => ntt.Type != EntityType.Item && base.MatchesFilter(in ntt);
+        public EmoteSystem() : base("Emote", threads: 1) { }
+        protected override bool MatchesFilter(in NTT ntt) => ntt.Type != EntityType.Item && base.MatchesFilter(in ntt);
 
-        public override void Update(in PixelEntity ntt, ref EmoteComponent emo, ref BodyComponent bdt)
+        public override void Update(in NTT ntt, ref EmoteComponent emo, ref BodyComponent bdt)
         {
-            if (emo.ChangedTick != PixelWorld.Tick)
+            if (emo.ChangedTick != NttWorld.Tick)
                 return;
 
             if(emo.Emote == Emote.Sit)

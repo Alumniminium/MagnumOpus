@@ -12,7 +12,7 @@ namespace MagnumOpus.Components
         public RespawnTagComponent(int entityId, uint expPenalty, int respawnTimeDelaySeconds)
         {
             EntityId = entityId;
-            RespawnTimeTick = PixelWorld.Tick + PixelWorld.TargetTps * respawnTimeDelaySeconds;
+            RespawnTimeTick = NttWorld.Tick + NttWorld.TargetTps * respawnTimeDelaySeconds;
             ExpPenalty = expPenalty;
         }
         

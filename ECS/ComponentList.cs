@@ -2,21 +2,21 @@ namespace MagnumOpus.ECS
 {
     public static class ComponentList<T> where T : struct
     {
-        private static readonly T[] Array = new T[PixelWorld.MaxEntities];
+        private static readonly T[] Array = new T[NttWorld.MaxEntities];
 
-        public static void AddFor(in PixelEntity owner, ref T component)
+        public static void AddFor(in NTT owner, ref T component)
         {
             Array[owner.Id] = component;
-            PixelWorld.InformChangesFor(in owner);
+            NttWorld.InformChangesFor(in owner);
         }
-        public static bool HasFor(in PixelEntity owner) => Array[owner.Id].GetHashCode() == owner.Id;
-        public static ref T Get(PixelEntity owner) => ref Array[owner.Id];
+        public static bool HasFor(in NTT owner) => Array[owner.Id].GetHashCode() == owner.Id;
+        public static ref T Get(NTT owner) => ref Array[owner.Id];
         // called via reflection @ ReflectionHelper.Remove<T>()
-        public static void Remove(PixelEntity owner, bool notify)
+        public static void Remove(NTT owner, bool notify)
         {
             Array[owner.Id] = default;
             if (notify)
-                PixelWorld.InformChangesFor(in owner);
+                NttWorld.InformChangesFor(in owner);
         }
     }
 }

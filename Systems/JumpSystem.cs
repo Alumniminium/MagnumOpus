@@ -9,21 +9,21 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class JumpSystem : PixelSystem<PositionComponent, JumpComponent, BodyComponent>
+    public sealed class JumpSystem : NttSystem<PositionComponent, JumpComponent, BodyComponent>
     {
-        public JumpSystem() : base("Jump System", threads: 1) { }
-        protected override bool MatchesFilter(in PixelEntity ntt) => ntt.Type != EntityType.Item && base.MatchesFilter(in ntt);
+        public JumpSystem() : base("Jump", threads: 1) { }
+        protected override bool MatchesFilter(in NTT ntt) => ntt.Type != EntityType.Item && base.MatchesFilter(in ntt);
 
-        public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref JumpComponent jmp, ref BodyComponent bdy)
+        public override void Update(in NTT ntt, ref PositionComponent pos, ref JumpComponent jmp, ref BodyComponent bdy)
         {
-            pos.ChangedTick = PixelWorld.Tick;
-            bdy.ChangedTick = PixelWorld.Tick;
+            pos.ChangedTick = NttWorld.Tick;
+            bdy.ChangedTick = NttWorld.Tick;
 
             var direction = CoMath.GetDirection(new Vector2(jmp.Position.X, jmp.Position.Y), pos.Position);
             var distance  = (int)Vector2.Distance(new Vector2(jmp.Position.X, jmp.Position.Y), pos.Position);
-            var jumpTime  = PixelWorld.TargetTps * CoMath.GetJumpTime(distance);
+            var jumpTime  = NttWorld.TargetTps * CoMath.GetJumpTime(distance);
             
-            if (jmp.CreatedTick + jumpTime < PixelWorld.Tick)
+            if (jmp.CreatedTick + jumpTime < NttWorld.Tick)
             {
                 pos.Position = jmp.Position;
                 ntt.Remove<JumpComponent>();
@@ -39,7 +39,7 @@ namespace MagnumOpus.Simulation.Systems
             // var text = $"{direction} -> {pos.Position}";
             // var msgText = MsgText.Create(in ntt, text, MsgTextType.Talk);
 
-            if (jmp.CreatedTick == PixelWorld.Tick)
+            if (jmp.CreatedTick == NttWorld.Tick)
             {
                 bdy.Direction = direction;
                 var packet = MsgAction.CreateJump(in ntt, in jmp);

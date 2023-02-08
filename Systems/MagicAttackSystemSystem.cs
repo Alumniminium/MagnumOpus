@@ -4,11 +4,11 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class MagicAttackSystem : PixelSystem<TargetCollectionComponent>
+    public sealed class MagicAttackSystem : NttSystem<TargetCollectionComponent>
     {
-        public MagicAttackSystem() : base("Magic Attack System", threads: 1) { }
+        public MagicAttackSystem() : base("Magic Attack", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref TargetCollectionComponent atk)
+        public override void Update(in NTT ntt, ref TargetCollectionComponent atk)
         {
             foreach(var target in atk.Targets)
             {

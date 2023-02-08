@@ -6,11 +6,11 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class TargetFinderLineSystem : PixelSystem<LineTargetComponent, PositionComponent, ViewportComponent>
+    public sealed class TargetFinderLineSystem : NttSystem<LineTargetComponent, PositionComponent, ViewportComponent>
     {
-        public TargetFinderLineSystem() : base("Line Target Finder System", threads: 1) { }
+        public TargetFinderLineSystem() : base("Line Target Finder", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref LineTargetComponent atk, ref PositionComponent pos, ref ViewportComponent vwp)
+        public override void Update(in NTT ntt, ref LineTargetComponent atk, ref PositionComponent pos, ref ViewportComponent vwp)
         {
             var tcc = new TargetCollectionComponent(ntt.Id, atk.MagicType);
 

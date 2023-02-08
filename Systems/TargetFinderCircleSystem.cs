@@ -6,11 +6,11 @@ using MagnumOpus.Helpers;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class TargetFinderCircleSystem : PixelSystem<CircleTargetComponent, ViewportComponent>
+    public sealed class TargetFinderCircleSystem : NttSystem<CircleTargetComponent, ViewportComponent>
     {
-        public TargetFinderCircleSystem() : base("Circular Target Finder System", threads: 1) { }
+        public TargetFinderCircleSystem() : base("Circular Target Finder", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref CircleTargetComponent atk, ref ViewportComponent vwp)
+        public override void Update(in NTT ntt, ref CircleTargetComponent atk, ref ViewportComponent vwp)
         {
             var tcc = new TargetCollectionComponent(ntt.Id, atk.MagicType);
             for (int i = 0; i < vwp.EntitiesVisible.Count; i++)

@@ -6,7 +6,7 @@ namespace MagnumOpus.Networking
 {
     public static class NetworkHelper
     {
-        public static void FullSync(in PixelEntity to, in PixelEntity ntt)
+        public static void FullSync(in NTT to, in NTT ntt)
         {
             if (ntt.Type == EntityType.Npc)
             {
@@ -25,7 +25,7 @@ namespace MagnumOpus.Networking
             }
         }
 
-        internal static void SendMsgTo(in PixelEntity ntt, string text, MsgTextType channel)
+        internal static void SendMsgTo(in NTT ntt, string text, MsgTextType channel)
         {
             var msgText = MsgText.Create(in ntt, text, channel);
             ntt.NetSync(ref msgText);
@@ -34,7 +34,7 @@ namespace MagnumOpus.Networking
         {
             var msgText = MsgText.Create(from, "ALLUSERS", text, channel);
 
-            foreach (var ntt in PixelWorld.Players)
+            foreach (var ntt in NttWorld.Players)
                 ntt.NetSync(ref msgText);
         }
     }

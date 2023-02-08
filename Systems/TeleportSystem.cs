@@ -6,15 +6,15 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class TeleportSystem : PixelSystem<TeleportComponent, PositionComponent>
+    public sealed class TeleportSystem : NttSystem<TeleportComponent, PositionComponent>
     {
-        public TeleportSystem() : base("Teleport System", threads: 1) { }
+        public TeleportSystem() : base("Teleport", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref TeleportComponent tpc, ref PositionComponent pos)
+        public override void Update(in NTT ntt, ref TeleportComponent tpc, ref PositionComponent pos)
         {
             pos.Position = new Vector2(tpc.X, tpc.Y);
             pos.Map = tpc.Map;
-            pos.ChangedTick = PixelWorld.Tick;
+            pos.ChangedTick = NttWorld.Tick;
 
             var tpP = MsgAction.Create(ntt.NetId, tpc.Map, tpc.X, tpc.Y, Enums.Direction.South, Enums.MsgActionType.SendLocation);
             ntt.NetSync(ref tpP);

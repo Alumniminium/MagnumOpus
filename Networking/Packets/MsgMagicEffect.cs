@@ -57,7 +57,7 @@ namespace MagnumOpus.Networking.Packets
         //     return packets;
         // }
 
-        public static MsgMagicEffect Create(in PixelEntity attacker, in PixelEntity target, int damage, ushort skillId, byte skillLevel)
+        public static MsgMagicEffect Create(in NTT attacker, in NTT target, int damage, ushort skillId, byte skillLevel)
         {
             var msg = new MsgMagicEffect()
             {
@@ -78,7 +78,7 @@ namespace MagnumOpus.Networking.Packets
             }
 
             return msg;
-        }public static MsgMagicEffect Create(in PixelEntity attacker, ushort x, ushort y, ushort skillId, byte skillLevel)
+        }public static MsgMagicEffect Create(in NTT attacker, ushort x, ushort y, ushort skillId, byte skillLevel)
         {
             var msg = new MsgMagicEffect()
             {

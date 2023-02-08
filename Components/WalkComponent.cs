@@ -14,7 +14,7 @@ namespace MagnumOpus.Components
         public WalkComponent(int entityId, byte direction, bool isRunning)
         {
             EntityId = entityId;
-            ChangedTick = PixelWorld.Tick;
+            ChangedTick = NttWorld.Tick;
             Direction = (Direction)(direction%8);
             IsRunning = isRunning;
         }

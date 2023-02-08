@@ -17,7 +17,7 @@ namespace MagnumOpus.Networking.Packets
         public ushort Y;
         public fixed byte Summoner[16];
 
-        public static MsgAssignPet Create(in PixelEntity obj, int uid)
+        public static MsgAssignPet Create(in NTT obj, int uid)
         {
             ref readonly var bdy = ref obj.Get<BodyComponent>();
             ref readonly var pos = ref obj.Get<PositionComponent>();

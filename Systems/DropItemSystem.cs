@@ -7,10 +7,10 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class DropItemSystem : PixelSystem<PositionComponent, RequestDropItemComponent, InventoryComponent>
+    public sealed class DropItemSystem : NttSystem<PositionComponent, RequestDropItemComponent, InventoryComponent>
     {
-        public DropItemSystem() : base("Drop Item System", threads: 1) { }
-        public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref RequestDropItemComponent rdi, ref InventoryComponent inv)
+        public DropItemSystem() : base("Drop Item", threads: 1) { }
+        public override void Update(in NTT ntt, ref PositionComponent pos, ref RequestDropItemComponent rdi, ref InventoryComponent inv)
         {
             if (!InventoryHelper.RemoveNetIdFromInventory(in ntt, rdi.ItemNtt.NetId))
             {

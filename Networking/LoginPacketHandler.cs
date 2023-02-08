@@ -10,7 +10,7 @@ namespace MagnumOpus.Networking
 {
     public static unsafe class LoginPacketHandler
     {
-        internal static void Process(in PixelEntity ntt, in Memory<byte> packet)
+        internal static void Process(in NTT ntt, in Memory<byte> packet)
         {
             var id = BitConverter.ToUInt16(packet.Span[2..]);
 
@@ -36,7 +36,7 @@ namespace MagnumOpus.Networking
                     {
                         var msg = Co2Packet.Deserialze<MsgConnectLogin>(packet);
                         
-                        var player = PixelWorld.GetEntity((int)msg.UniqueId);
+                        var player = NttWorld.GetEntity((int)msg.UniqueId);
                         var filename = msg.GetFileName();
                         FConsole.WriteLine($"[LOGIN/1052] Client Id: {msg.UniqueId}, File: {filename} Contents: {msg.Contents}");
 

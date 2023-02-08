@@ -9,7 +9,7 @@ namespace MagnumOpus.Components
         public readonly int EntityId;
         public int Experience;
 
-        public ExpRewardComponent(in PixelEntity ntt, int experience)
+        public ExpRewardComponent(in NTT ntt, int experience)
         {
             EntityId = ntt.Id;
             Experience = experience;

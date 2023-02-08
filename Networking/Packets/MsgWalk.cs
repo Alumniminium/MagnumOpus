@@ -36,7 +36,7 @@ namespace MagnumOpus.Networking.Packets
                 UniqueId = uniqueId,
                 RawDirection = direction,
                 Type = running ? (byte)1 : (byte)0,
-                IDK = (ushort)PixelWorld.Tick,
+                IDK = (ushort)NttWorld.Tick,
             }; 
             return msg;
         }
@@ -49,13 +49,13 @@ namespace MagnumOpus.Networking.Packets
                 UniqueId = uniqueId,
                 Direction = direction,
                 Type = running ? (byte)1 : (byte)0,
-                IDK = (ushort)PixelWorld.Tick,
+                IDK = (ushort)NttWorld.Tick,
             }; 
             return msg;
         }
 
         [PacketHandler(PacketId.MsgWalk)]
-        public static void Process(PixelEntity ntt, Memory<byte> memory)
+        public static void Process(NTT ntt, Memory<byte> memory)
         {
             var msg = Co2Packet.Deserialze<MsgWalk>(memory);
             if (ntt.NetId != msg.UniqueId)
@@ -64,7 +64,7 @@ namespace MagnumOpus.Networking.Packets
             if (ntt.Has<WalkComponent>())
             {
                 ref var pos = ref ntt.Get<PositionComponent>();
-                pos.ChangedTick = PixelWorld.Tick;
+                pos.ChangedTick = NttWorld.Tick;
                 var kickback = MsgAction.Create(ntt.NetId, 0, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.South, MsgActionType.Kickback);
                 ntt.NetSync(ref kickback,true);
                 return;

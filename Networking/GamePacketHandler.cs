@@ -14,7 +14,7 @@ namespace MagnumOpus.Networking
     }
     public static unsafe class GamePacketHandler
     {
-        public static readonly Dictionary<PacketId, Action<PixelEntity, Memory<byte>>> PacketHandlers = new();
+        public static readonly Dictionary<PacketId, Action<NTT, Memory<byte>>> PacketHandlers = new();
 
         static GamePacketHandler()
         {
@@ -27,12 +27,12 @@ namespace MagnumOpus.Networking
                     if (attributes.Length == 0)
                         continue;
                     var attribute = (PacketHandlerAttribute)attributes[0];
-                    PacketHandlers.Add(attribute.Id, (Action<PixelEntity, Memory<byte>>)Delegate.CreateDelegate(typeof(Action<PixelEntity, Memory<byte>>), method));
+                    PacketHandlers.Add(attribute.Id, (Action<NTT, Memory<byte>>)Delegate.CreateDelegate(typeof(Action<NTT, Memory<byte>>), method));
                 }
             }
         }
 
-        public static void Process(in PixelEntity player, in Memory<byte> packet)
+        public static void Process(in NTT player, in Memory<byte> packet)
         {
             var packetType = (PacketId)BitConverter.ToUInt16(packet.Span[2..4]);
 

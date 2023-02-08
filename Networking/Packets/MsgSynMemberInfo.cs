@@ -15,7 +15,7 @@ namespace MagnumOpus.Networking.Packets
         public GuildRanks Rank;
         public fixed byte Name[16];
 
-        public static MsgSynMemberInfo Create(in PixelEntity member)
+        public static MsgSynMemberInfo Create(in NTT member)
         {
             ref readonly var gld = ref member.Get<GuildComponent>();
             ref readonly var ntc = ref member.Get<NameTagComponent>();

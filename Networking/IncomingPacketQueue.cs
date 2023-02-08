@@ -4,8 +4,8 @@ namespace MagnumOpus.Networking
 {
     public static class IncomingPacketQueue
     {
-        private static readonly Dictionary<PixelEntity, Queue<Memory<byte>>> Queues = new();
-        public static void Add(in PixelEntity player, in Memory<byte> packet)
+        private static readonly Dictionary<NTT, Queue<Memory<byte>>> Queues = new();
+        public static void Add(in NTT player, in Memory<byte> packet)
         {
             if (!Queues.TryGetValue(player, out var queue))
             {
@@ -17,7 +17,7 @@ namespace MagnumOpus.Networking
             queue.Enqueue(packet);
         }
 
-        public static void Remove(in PixelEntity player) => Queues.Remove(player);
+        public static void Remove(in NTT player) => Queues.Remove(player);
 
         public static void ProcessAll()
         {

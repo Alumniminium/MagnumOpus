@@ -29,7 +29,7 @@ namespace MagnumOpus.Squiggly
                 for (var i = 0; i < amount; i++)
                 {
                     var prefab = cqMob;
-                    ref var obj = ref PixelWorld.CreateEntity(EntityType.Monster);
+                    ref var obj = ref NttWorld.CreateEntity(EntityType.Monster);
 
                     var spw = new SpawnComponent(obj.Id, (int)spawn.id);
                     var cqm = new CqMonsterComponent(obj.Id, prefab.id);
@@ -56,6 +56,8 @@ namespace MagnumOpus.Squiggly
                         obj.Set(ref grd);
                     }
 
+                    vwp.Viewport.X = pos.Position.X;
+                    vwp.Viewport.Y = pos.Position.Y;
                     obj.Set(ref spw);
                     obj.Set(ref pos);
                     obj.Set(ref bdy);
@@ -129,7 +131,7 @@ namespace MagnumOpus.Squiggly
                         cqNpc.mapid, cqNpc.sort, cqNpc.@base, cqNpc.type, cqNpc.lookface, cqNpc.name.Trim(), cqNpc.task0, cqNpc.task1,
                         cqNpc.task2, cqNpc.task3, cqNpc.task4, cqNpc.task5, cqNpc.task6, cqNpc.task7);
 
-                    var ntt = PixelWorld.CreateEntityWithNetId(EntityType.Npc, (int)cqNpc.id);
+                    var ntt = NttWorld.CreateEntityWithNetId(EntityType.Npc, (int)cqNpc.id);
                     var pos = new PositionComponent(ntt.Id, new Vector2(cqNpc.cellx, cqNpc.celly), cqNpc.mapid);
                     var bdy = new BodyComponent(ntt.Id, cqNpc.lookface);
                     var npcc = new NpcComponent(ntt.Id, npc.Base, npc.Type, npc.Sort);

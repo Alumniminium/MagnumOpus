@@ -15,8 +15,8 @@ namespace MagnumOpus.Components
         public JumpComponent(int entityId, ushort x, ushort y)
         {
             EntityId = entityId;
-            ChangedTick = PixelWorld.Tick;
-            CreatedTick = PixelWorld.Tick;
+            ChangedTick = NttWorld.Tick;
+            CreatedTick = NttWorld.Tick;
             Position = new Vector2(x, y);
             Time = 0;
         }

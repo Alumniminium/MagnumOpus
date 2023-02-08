@@ -14,7 +14,7 @@ namespace MagnumOpus.Components
         public ManaComponent(int entityId, ushort mana, ushort maxMana)
         {
             EntityId = entityId;
-            ChangedTick = PixelWorld.Tick;
+            ChangedTick = NttWorld.Tick;
             Mana = mana;
             MaxMana = maxMana;
         }

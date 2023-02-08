@@ -42,7 +42,7 @@ namespace MagnumOpus.Networking.Packets
             {
                 Size = (ushort)sizeof(MsgAction),
                 Id = 1010,
-                Timestamp = (int)PixelWorld.Tick,
+                Timestamp = (int)NttWorld.Tick,
                 UniqueId = uniqueId,
                 Param = uniqueId,
                 Type = MsgActionType.RemoveEntity
@@ -55,7 +55,7 @@ namespace MagnumOpus.Networking.Packets
             {
                 Size = (ushort)sizeof(MsgAction),
                 Id = 1010,
-                Timestamp = (int)PixelWorld.Tick,
+                Timestamp = (int)NttWorld.Tick,
                 UniqueId = uniqueId,
                 Param = param,
                 X = x,
@@ -65,13 +65,13 @@ namespace MagnumOpus.Networking.Packets
             };
             return msgP;
         }
-        public static MsgAction CreateJump(in PixelEntity ntt, in JumpComponent jmp)
+        public static MsgAction CreateJump(in NTT ntt, in JumpComponent jmp)
         {
             MsgAction msgP = new()
             {
                 Size = (ushort)sizeof(MsgAction),
                 Id = 1010,
-                Timestamp = (int)PixelWorld.Tick,
+                Timestamp = (int)NttWorld.Tick,
                 UniqueId = ntt.NetId,
                 JumpX = (ushort)jmp.Position.X,
                 JumpY = (ushort)jmp.Position.Y,
@@ -82,7 +82,7 @@ namespace MagnumOpus.Networking.Packets
         }
 
         [PacketHandler(PacketId.MsgAction)]
-        public static void Process(PixelEntity ntt, Memory<byte> memory)
+        public static void Process(NTT ntt, Memory<byte> memory)
         {
             var msg = Co2Packet.Deserialze<MsgAction>(in memory);
 
@@ -104,7 +104,7 @@ namespace MagnumOpus.Networking.Packets
                         ntt.NetSync(ref reply);
                         FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {reply.X}, {reply.Y}");
 
-                        PixelWorld.Players.Add(ntt);
+                        NttWorld.Players.Add(ntt);
                         break;
                     }
                 case MsgActionType.LeaveBooth:
@@ -187,7 +187,7 @@ namespace MagnumOpus.Networking.Packets
                 case MsgActionType.QueryEntity:
                     {
                         FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.Param}");
-                        ref readonly var ent = ref PixelWorld.GetEntityByNetId(msg.Param);
+                        ref readonly var ent = ref NttWorld.GetEntityByNetId(msg.Param);
                         if (ent.Id != 0)
                             NetworkHelper.FullSync(in ntt, in ent);
                         else
@@ -199,7 +199,7 @@ namespace MagnumOpus.Networking.Packets
                         FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.JumpX}, {msg.JumpY}");
                         ref var pos = ref ntt.Get<PositionComponent>();
                         pos.Position = new Vector2(msg.JumpX, msg.JumpY);
-                        pos.ChangedTick = PixelWorld.Tick;
+                        pos.ChangedTick = NttWorld.Tick;
                         ntt.NetSync(ref msg);
                         break;
                     }

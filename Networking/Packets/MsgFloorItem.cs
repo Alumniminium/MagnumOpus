@@ -17,7 +17,7 @@ namespace MagnumOpus.Networking.Packets
         public ushort X, Y;
         public MsgFloorItemType MsgFloorItemType;
 
-        public static MsgFloorItem Create(in PixelEntity item, MsgFloorItemType type)
+        public static MsgFloorItem Create(in NTT item, MsgFloorItemType type)
         {
             ref readonly var pos = ref item.Get<PositionComponent>();
             ref readonly var itemComponent = ref item.Get<ItemComponent>();
@@ -50,7 +50,7 @@ namespace MagnumOpus.Networking.Packets
         }
 
         [PacketHandler(PacketId.MsgFloorItem)]
-        public static void Process(PixelEntity ntt, Memory<byte> memory)
+        public static void Process(NTT ntt, Memory<byte> memory)
         {
             var msg = Co2Packet.Deserialze<MsgFloorItem>(in memory);
 
@@ -58,7 +58,7 @@ namespace MagnumOpus.Networking.Packets
             {
                 case MsgFloorItemType.Pick:
                 {
-                    ref readonly var item = ref PixelWorld.GetEntityByNetId(msg.UniqueId);
+                    ref readonly var item = ref NttWorld.GetEntityByNetId(msg.UniqueId);
                     var pic = new PickupRequestComponent(ntt.Id, in item);
                     ntt.Set(ref pic);
 

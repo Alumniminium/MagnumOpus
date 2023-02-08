@@ -6,7 +6,7 @@ namespace MagnumOpus.Networking.Cryptography
 {
     public static class SpellCrypto
     {
-        public static (ushort id, int target, ushort x, ushort y) DecryptSkill(in PixelEntity player, ref MsgInteract packet)
+        public static (ushort id, int target, ushort x, ushort y) DecryptSkill(in NTT player, ref MsgInteract packet)
         {
             var buffer = Co2Packet.Serialize(ref packet);
             var id = Convert.ToUInt16((long)buffer.Span[24] & 0xFF | ((long)buffer.Span[25] & 0xFF) << 8);

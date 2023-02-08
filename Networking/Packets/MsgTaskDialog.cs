@@ -20,7 +20,7 @@ namespace MagnumOpus.Networking.Packets
         public MsgTaskDialogAction Action;
         public fixed byte Unknown[512];
 
-        public static MsgTaskDialog Create(in PixelEntity target, byte optionId, MsgTaskDialogAction action, string text = "")
+        public static MsgTaskDialog Create(in NTT target, byte optionId, MsgTaskDialogAction action, string text = "")
         {
             ref readonly var hed = ref target.Get<HeadComponent>();
             var packet = new MsgTaskDialog
@@ -42,10 +42,10 @@ namespace MagnumOpus.Networking.Packets
         }
 
         [PacketHandler(PacketId.MsgDialog)]
-        public static void Process(PixelEntity ntt, Memory<byte> memory)
+        public static void Process(NTT ntt, Memory<byte> memory)
         {
             var msgTaskDialog = Co2Packet.Deserialze<MsgTaskDialog>(in memory);
-            var npc = PixelWorld.GetEntityByNetId(msgTaskDialog.UniqeId);
+            var npc = NttWorld.GetEntityByNetId(msgTaskDialog.UniqeId);
 
             FConsole.WriteLine($"MsgTaskDialog: Npc {npc.NetId}, action: {msgTaskDialog.Action}, Option: {msgTaskDialog.OptionId}");
             var cq_npc = CqProcessor.GetNpc(npc.NetId);
@@ -79,7 +79,7 @@ namespace MagnumOpus.Networking.Packets
         }
 
         [PacketHandler(PacketId.MsgDialog2)]
-        public static void Process2(PixelEntity ntt, Memory<byte> memory)
+        public static void Process2(NTT ntt, Memory<byte> memory)
         {
             if (!ntt.Has<CqTaskComponent>())
                 return;
@@ -92,7 +92,7 @@ namespace MagnumOpus.Networking.Packets
                 return;
             }
 
-            var npc = PixelWorld.GetEntityByNetId(msgTaskDialog.UniqeId);
+            var npc = NttWorld.GetEntityByNetId(msgTaskDialog.UniqeId);
             using var ctx = new SquigglyContext();
 
             ref readonly var taskComponent = ref ntt.Get<CqTaskComponent>();

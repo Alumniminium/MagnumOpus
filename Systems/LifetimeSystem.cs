@@ -4,21 +4,21 @@ using MagnumOpus.ECS;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class LifetimeSystem : PixelSystem<LifeTimeComponent>
+    public sealed class LifetimeSystem : NttSystem<LifeTimeComponent>
     {
-        public LifetimeSystem() : base("Lifetime System", threads: 1) { }
+        public LifetimeSystem() : base("Lifetime", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref LifeTimeComponent ltc)
+        public override void Update(in NTT ntt, ref LifeTimeComponent ltc)
         {
-            if (ltc.ExpireTick > PixelWorld.Tick)
+            if (ltc.ExpireTick > NttWorld.Tick)
             {
-                var ticksLeft = ltc.ExpireTick - PixelWorld.Tick;
-                uint[] countdown = new uint[] { 5, 4, 3, 2, 1 }.Select(sec => (uint)PixelWorld.TargetTps * sec).ToArray();
+                var ticksLeft = ltc.ExpireTick - NttWorld.Tick;
+                uint[] countdown = new uint[] { 5, 4, 3, 2, 1 }.Select(sec => (uint)NttWorld.TargetTps * sec).ToArray();
 
                 if (!Array.Exists(countdown, x => x == ticksLeft))
                     return;
 
-                string text = $"{ticksLeft / PixelWorld.TargetTps} seconds left";
+                string text = $"{ticksLeft / NttWorld.TargetTps} seconds left";
                 FConsole.WriteLine($"[{nameof(LifetimeSystem)}] {ntt.Id} -> {text}");
             }
 

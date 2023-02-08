@@ -3,13 +3,13 @@ using MagnumOpus.ECS;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class RespawnSystem : PixelSystem<RespawnTagComponent, BodyComponent, LevelComponent, HealthComponent>
+    public sealed class RespawnSystem : NttSystem<RespawnTagComponent, BodyComponent, LevelComponent, HealthComponent>
     {
-        public RespawnSystem() : base("Respawn System", threads: 1) { }
+        public RespawnSystem() : base("Respawn", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref RespawnTagComponent rtc, ref BodyComponent bdy, ref LevelComponent lvl, ref HealthComponent hlt)
+        public override void Update(in NTT ntt, ref RespawnTagComponent rtc, ref BodyComponent bdy, ref LevelComponent lvl, ref HealthComponent hlt)
         {
-            if (rtc.RespawnTimeTick > PixelWorld.Tick)
+            if (rtc.RespawnTimeTick > NttWorld.Tick)
                 return;
 
             

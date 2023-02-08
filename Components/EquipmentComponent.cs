@@ -9,23 +9,23 @@ namespace MagnumOpus.Components
         public readonly int EntityId;
         public long ChangedTick;
 
-        public PixelEntity Head => Items[MsgItemPosition.Armor];
-        public PixelEntity Necklace => Items[MsgItemPosition.Necklace];
-        public PixelEntity Garment => Items[MsgItemPosition.Garment];
-        public PixelEntity Bottle => Items[MsgItemPosition.Bottle];
-        public PixelEntity Armor => Items[MsgItemPosition.Armor];
-        public PixelEntity Ring => Items[MsgItemPosition.Ring];
-        public PixelEntity MainHand => Items[MsgItemPosition.RightWeapon];
-        public PixelEntity OffHand => Items[MsgItemPosition.LeftWeapon];
-        public PixelEntity Boots => Items[MsgItemPosition.Boots];
+        public NTT Head => Items[MsgItemPosition.Armor];
+        public NTT Necklace => Items[MsgItemPosition.Necklace];
+        public NTT Garment => Items[MsgItemPosition.Garment];
+        public NTT Bottle => Items[MsgItemPosition.Bottle];
+        public NTT Armor => Items[MsgItemPosition.Armor];
+        public NTT Ring => Items[MsgItemPosition.Ring];
+        public NTT MainHand => Items[MsgItemPosition.RightWeapon];
+        public NTT OffHand => Items[MsgItemPosition.LeftWeapon];
+        public NTT Boots => Items[MsgItemPosition.Boots];
 
-        public Dictionary<MsgItemPosition, PixelEntity> Items;
+        public Dictionary<MsgItemPosition, NTT> Items;
 
         public EquipmentComponent(int entityId)
         {
             EntityId = entityId;
-            ChangedTick = PixelWorld.Tick;
-            Items = new Dictionary<MsgItemPosition, PixelEntity>
+            ChangedTick = NttWorld.Tick;
+            Items = new Dictionary<MsgItemPosition, NTT>
             {
                 { MsgItemPosition.Head, default },
                 { MsgItemPosition.Necklace, default },

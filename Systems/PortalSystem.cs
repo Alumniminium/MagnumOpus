@@ -6,11 +6,11 @@ using MagnumOpus.Squiggly.Models;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class PortalSystem : PixelSystem<PortalComponent, PositionComponent>
+    public sealed class PortalSystem : NttSystem<PortalComponent, PositionComponent>
     {
-        public PortalSystem() : base("Portal System", threads: 1) { }
+        public PortalSystem() : base("Portal", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref PortalComponent ptc, ref PositionComponent pos)
+        public override void Update(in NTT ntt, ref PortalComponent ptc, ref PositionComponent pos)
         {
             var mapId = pos.Map;
             var x = ptc.X;

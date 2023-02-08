@@ -18,7 +18,7 @@ namespace MagnumOpus.Components
             EntityId = nttId;
             Position = position;
             LastPosition = position;
-            ChangedTick = PixelWorld.Tick;
+            ChangedTick = NttWorld.Tick;
             Map = map;
         }
 

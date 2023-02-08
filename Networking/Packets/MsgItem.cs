@@ -30,13 +30,13 @@ namespace MagnumOpus.Networking.Packets
                 Param = param,
                 Type = type,
                 Value = value,
-                Timestamp = (uint)PixelWorld.Tick,
+                Timestamp = (uint)NttWorld.Tick,
             };
             return msg;
         }
 
         [PacketHandler(PacketId.MsgItem)]
-        public static void Process(PixelEntity ntt, Memory<byte> memory)
+        public static void Process(NTT ntt, Memory<byte> memory)
         {
             var msg = Co2Packet.Deserialze<MsgItem>(in memory);
 
@@ -59,7 +59,7 @@ namespace MagnumOpus.Networking.Packets
                     }
                 case MsgItemType.RemoveInventory:
                     {
-                        ref readonly var itemNtt = ref PixelWorld.GetEntityByNetId(msg.UnqiueId);
+                        ref readonly var itemNtt = ref NttWorld.GetEntityByNetId(msg.UnqiueId);
                         var drc = new RequestDropItemComponent(ntt.Id, in itemNtt);
                         ntt.Set(ref drc);
 
@@ -71,7 +71,7 @@ namespace MagnumOpus.Networking.Packets
                     {
                         var itemNttId = msg.UnqiueId;
                         var slot = msg.Param;
-                        ref readonly var itemNtt = ref PixelWorld.GetEntityByNetId(itemNttId);
+                        ref readonly var itemNtt = ref NttWorld.GetEntityByNetId(itemNttId);
                         ref var item = ref itemNtt.Get<ItemComponent>();
 
                         var isArrow = ItemHelper.IsArrow(ref item);

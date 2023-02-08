@@ -6,9 +6,9 @@ namespace MagnumOpus.Components
     public readonly struct RequestDropItemComponent
     {
         public readonly int EntityId;
-        public readonly PixelEntity ItemNtt;
+        public readonly NTT ItemNtt;
 
-        public RequestDropItemComponent(int entityId, in PixelEntity itemNtt)
+        public RequestDropItemComponent(int entityId, in NTT itemNtt)
         {
             EntityId = entityId;
             ItemNtt = itemNtt;

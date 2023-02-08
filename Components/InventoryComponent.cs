@@ -11,15 +11,15 @@ namespace MagnumOpus.Components
         public uint Money;
         public uint CPs;
 
-        public PixelEntity[] Items;
+        public NTT[] Items;
 
         public InventoryComponent(int entityId, uint money, uint cps)
         {
             EntityId = entityId;
-            ChangedTick = PixelWorld.Tick;
+            ChangedTick = NttWorld.Tick;
             Money = money;
             CPs = cps;
-            Items = new PixelEntity[40];
+            Items = new NTT[40];
         }
 
         public override int GetHashCode()

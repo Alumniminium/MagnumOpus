@@ -20,7 +20,7 @@ namespace MagnumOpus.Networking.Packets
         public Direction Direction;
         public uint Type;
 
-        public static MsgColor Create(in PixelEntity ntt, Color color)
+        public static MsgColor Create(in NTT ntt, Color color)
         {
             ref readonly var bdy = ref ntt.Get<BodyComponent>();
             ref readonly var pos = ref ntt.Get<PositionComponent>();
@@ -39,7 +39,7 @@ namespace MagnumOpus.Networking.Packets
             };
             return packet;
         }
-        public static MsgColor Create(in PixelEntity ntt, uint color)
+        public static MsgColor Create(in NTT ntt, uint color)
         {
             ref readonly var bdy = ref ntt.Get<BodyComponent>();
             ref readonly var pos = ref ntt.Get<PositionComponent>();

@@ -15,7 +15,7 @@ namespace MagnumOpus.Components
         public ProfComponent(int entityId, ushort skillId, ushort level, ushort experience, ushort experienceToNextLevel)
         {
             EntityId = entityId;
-            ChangedTick = PixelWorld.Tick;
+            ChangedTick = NttWorld.Tick;
             Id = skillId;
             Level = level;
             Experience = experience;

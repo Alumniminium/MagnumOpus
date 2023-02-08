@@ -7,14 +7,14 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class WalkSystem : PixelSystem<PositionComponent, WalkComponent, BodyComponent>
+    public sealed class WalkSystem : NttSystem<PositionComponent, WalkComponent, BodyComponent>
     {
-        public WalkSystem() : base("Walk System", threads: 1) { }
+        public WalkSystem() : base("Walk", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref WalkComponent wlk, ref BodyComponent bdy)
+        public override void Update(in NTT ntt, ref PositionComponent pos, ref WalkComponent wlk, ref BodyComponent bdy)
         {
-            bdy.ChangedTick = PixelWorld.Tick;
-            pos.ChangedTick = PixelWorld.Tick;
+            bdy.ChangedTick = NttWorld.Tick;
+            pos.ChangedTick = NttWorld.Tick;
 
             bdy.Direction = wlk.Direction;
             pos.Position += Constants.DeltaPos[(int)wlk.Direction];

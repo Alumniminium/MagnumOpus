@@ -7,16 +7,16 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class TeamSystem : PixelSystem<TeamComponent>
+    public sealed class TeamSystem : NttSystem<TeamComponent>
     {
-        public TeamSystem() : base("Team System", threads: 1) { }
+        public TeamSystem() : base("Team", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref TeamComponent team)
+        public override void Update(in NTT ntt, ref TeamComponent team)
         {
             if (ntt.Id == team.Leader.Id)
             {
                 ref readonly var pos = ref ntt.Get<PositionComponent>();
-                if(pos.ChangedTick == PixelWorld.Tick)
+                if(pos.ChangedTick == NttWorld.Tick)
                     MsgAction.Create(ntt.NetId, ntt.NetId, (ushort)pos.Position.X, (ushort)pos.Position.Y, 0, MsgActionType.TeamMemberPos);
             
                 var leaderMoveMsg = $"[{nameof(TeamSystem)}] {ntt.NetId} moved to {pos.Position}";

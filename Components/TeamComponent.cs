@@ -7,15 +7,15 @@ namespace MagnumOpus.Components
     {
         public readonly int EntityId;
         public int MemberCount;
-        public PixelEntity[] Members;
-        public PixelEntity Leader => Members[0];
+        public NTT[] Members;
+        public NTT Leader => Members[0];
         public bool ShareItems;
         public bool ShareGold;
 
-        public TeamComponent(in PixelEntity ntt)
+        public TeamComponent(in NTT ntt)
         {
             EntityId = ntt.Id;
-            Members = new PixelEntity[5];
+            Members = new NTT[5];
             Members[0] = ntt;
             MemberCount = 1;
         }

@@ -20,7 +20,7 @@ namespace MagnumOpus.Networking.Packets
         public byte Position;
         public fixed byte Spouse[16];
 
-        public static MsgFriendInfo Create(in PixelEntity target)
+        public static MsgFriendInfo Create(in NTT target)
         {
             ref readonly var bdy = ref target.Get<BodyComponent>();
             ref readonly var gld = ref target.Get<GuildComponent>();
@@ -29,7 +29,7 @@ namespace MagnumOpus.Networking.Packets
             ref readonly var lvl = ref target.Get<LevelComponent>();
             ref readonly var pro = ref target.Get<ClassComponent>();
 
-            ref readonly var spouse = ref PixelWorld.GetEntity(mar.SpouseId);
+            ref readonly var spouse = ref NttWorld.GetEntity(mar.SpouseId);
             ref readonly var spouseNtc = ref spouse.Get<NameTagComponent>();
             
             var packet = new MsgFriendInfo

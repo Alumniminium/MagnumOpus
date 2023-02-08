@@ -6,13 +6,13 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class DeathSystem : PixelSystem<DeathTagComponent>
+    public sealed class DeathSystem : NttSystem<DeathTagComponent>
     {
-        public DeathSystem() : base("Death System", threads: 1) { }
+        public DeathSystem() : base("Death", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref DeathTagComponent dtc)
+        public override void Update(in NTT ntt, ref DeathTagComponent dtc)
         {
-            if (dtc.Tick == PixelWorld.Tick)
+            if (dtc.Tick == NttWorld.Tick)
             {
                 ref var eff = ref ntt.Get<StatusEffectComponent>();
                 eff.Effects |= StatusEffect.Dead; 
@@ -90,7 +90,7 @@ namespace MagnumOpus.Simulation.Systems
                 ntt.Remove<WalkComponent>();
                 ntt.Remove<JumpComponent>();
             }
-            else if (dtc.Tick + PixelWorld.TargetTps * 7 == PixelWorld.Tick && ntt.Type == EntityType.Monster)
+            else if (dtc.Tick + NttWorld.TargetTps * 7 == NttWorld.Tick && ntt.Type == EntityType.Monster)
             {
                 ref var eff = ref ntt.Get<StatusEffectComponent>();
                 eff.Effects |= StatusEffect.Fade;
@@ -98,7 +98,7 @@ namespace MagnumOpus.Simulation.Systems
                 var update = MsgUserAttrib.Create(ntt.NetId, (ulong)eff.Effects, MsgUserAttribType.StatusEffect);
                 ntt.NetSync(ref update, true);
             }
-            else if (dtc.Tick + PixelWorld.TargetTps * 10 == PixelWorld.Tick && ntt.Type == EntityType.Monster)
+            else if (dtc.Tick + NttWorld.TargetTps * 10 == NttWorld.Tick && ntt.Type == EntityType.Monster)
             {
                 var despwan = MsgAction.RemoveEntity(ntt.NetId);
                 ntt.NetSync(ref despwan, true);

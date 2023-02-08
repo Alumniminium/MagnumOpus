@@ -11,9 +11,9 @@ namespace MagnumOpus.Networking
     public static class OutgoingPacketQueue
     {
         // private const int MAX_PACKET_SIZE = 1024 * 8;
-        private static readonly ConcurrentDictionary<PixelEntity, Queue<Memory<byte>>> Packets = new();
+        private static readonly ConcurrentDictionary<NTT, Queue<Memory<byte>>> Packets = new();
 
-        public static void Add(in PixelEntity player, in Memory<byte> packet)
+        public static void Add(in NTT player, in Memory<byte> packet)
         {
             if (!Packets.TryGetValue(player, out var queue))
             {
@@ -25,7 +25,7 @@ namespace MagnumOpus.Networking
             queue.Enqueue(copy);
         }
 
-        public static void Remove(in PixelEntity player) => Packets.TryRemove(player, out _);
+        public static void Remove(in NTT player) => Packets.TryRemove(player, out _);
 
         public static async void SendAll()
         {
@@ -39,7 +39,7 @@ namespace MagnumOpus.Networking
                         if(net.Socket == null || !net.Socket.Connected)
                         {
                             queue.Clear();
-                            PixelWorld.Players.Remove(ntt);
+                            NttWorld.Players.Remove(ntt);
                             continue;
                         }
                         while (queue.Count > 0)
@@ -66,7 +66,7 @@ namespace MagnumOpus.Networking
                     {
                         FConsole.WriteLine(e.Message);
                         queue.Clear();
-                        PixelWorld.Players.Remove(ntt);
+                        NttWorld.Players.Remove(ntt);
                     }
                 }
             }

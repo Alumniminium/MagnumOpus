@@ -71,7 +71,7 @@ namespace MagnumOpus.Networking.Packets
                 return Encoding.ASCII.GetString(txtBytes);
             }
         }
-        public static MsgText Create(in PixelEntity to, string message, MsgTextType type = MsgTextType.Talk)
+        public static MsgText Create(in NTT to, string message, MsgTextType type = MsgTextType.Talk)
         {
             ref readonly var ntc = ref to.Get<NameTagComponent>();
             return Create(ntc.Name, ntc.Name, message, type);
@@ -112,7 +112,7 @@ namespace MagnumOpus.Networking.Packets
         }
 
         [PacketHandler(PacketId.MsgText)]
-        public static void Process(PixelEntity ntt, Memory<byte> memory)
+        public static void Process(NTT ntt, Memory<byte> memory)
         {
             var msg = Co2Packet.Deserialze<MsgText>(memory);
             FConsole.WriteLine($"MsgText: {msg.Channel} {msg.From()} -> {msg.To()}: {msg.Message()}");
@@ -132,7 +132,7 @@ namespace MagnumOpus.Networking.Packets
             }
         }
 
-        private static void GhostChat(in PixelEntity ntt, ref MsgText mem)
+        private static void GhostChat(in NTT ntt, ref MsgText mem)
         {
             ref readonly var vwp = ref ntt.Get<ViewportComponent>();
             foreach (var entity in vwp.EntitiesVisible)
@@ -153,7 +153,7 @@ namespace MagnumOpus.Networking.Packets
             }
         }
 
-        private static void TalkChat(in PixelEntity ntt, ref MsgText mem)
+        private static void TalkChat(in NTT ntt, ref MsgText mem)
         {
             ref readonly var vwp = ref ntt.Get<ViewportComponent>();
             foreach (var entity in vwp.EntitiesVisible)

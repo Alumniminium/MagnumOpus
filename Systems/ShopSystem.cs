@@ -7,17 +7,17 @@ using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class ShopSystem : PixelSystem<InventoryComponent, RequestShopItemTransactionComponent>
+    public sealed class ShopSystem : NttSystem<InventoryComponent, RequestShopItemTransactionComponent>
     {
-        public ShopSystem() : base("Shop System", threads: 1) { }
+        public ShopSystem() : base("Shop", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref InventoryComponent inv, ref RequestShopItemTransactionComponent txc)
+        public override void Update(in NTT ntt, ref InventoryComponent inv, ref RequestShopItemTransactionComponent txc)
         {
             var itemId = txc.ItemId;
 
             if (!txc.Buy)
             {
-                ref readonly var itemNtt = ref PixelWorld.GetEntityByNetId(itemId);
+                ref readonly var itemNtt = ref NttWorld.GetEntityByNetId(itemId);
                 ref readonly var itemComp = ref itemNtt.Get<ItemComponent>();
                 itemId = itemComp.Id;
             }
@@ -59,7 +59,7 @@ namespace MagnumOpus.Simulation.Systems
                     if (txc.Buy)
                     {
                         inv.Money -= itemEntry.Price;
-                        ref var itemNtt = ref PixelWorld.CreateEntity(EntityType.Item);
+                        ref var itemNtt = ref NttWorld.CreateEntity(EntityType.Item);
                         var newItemComp = new ItemComponent(itemNtt.Id, txc.ItemId, itemEntry.Amount, itemEntry.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
                         itemNtt.Set(ref newItemComp);
                         inv.Items[i] = itemNtt;
@@ -77,7 +77,7 @@ namespace MagnumOpus.Simulation.Systems
                         money = (uint)((double)money * ((float)itemComp.CurrentDurability / itemComp.MaximumDurability));
                         inv.Money += money;
 
-                        ref var itemNtt = ref PixelWorld.GetEntityByNetId(txc.ItemId);
+                        ref var itemNtt = ref NttWorld.GetEntityByNetId(txc.ItemId);
                         var def = new DestroyEndOfFrameComponent();
                         itemNtt.Set(ref def);
 

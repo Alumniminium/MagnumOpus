@@ -10,7 +10,7 @@ namespace MagnumOpus.Components
         public ReviveComponent(int id, uint seconds)
         {
             EntityId = id;
-            ReviveTick = PixelWorld.Tick + (seconds * PixelWorld.TargetTps);
+            ReviveTick = NttWorld.Tick + (seconds * NttWorld.TargetTps);
         }
 
         public override int GetHashCode() => EntityId;

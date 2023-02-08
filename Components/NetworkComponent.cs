@@ -18,7 +18,7 @@ namespace MagnumOpus.Components
         public readonly Memory<byte> ServerIV = new byte[8];
         public string Username;
 
-        public NetworkComponent(in PixelEntity ntt, Socket socket)
+        public NetworkComponent(in NTT ntt, Socket socket)
         {
             UseGameCrypto=false;
             EntityId = ntt.Id;

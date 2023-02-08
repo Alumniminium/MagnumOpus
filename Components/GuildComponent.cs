@@ -14,7 +14,7 @@ namespace MagnumOpus.Components
         public readonly GuildRanks Rank;
         public int Donation;
         public int Funds;
-        public PixelEntity[] Members;
+        public NTT[] Members;
 
         public GuildComponent(int entityId, int guildId, int leaderId, string guildName, string guildTag, int donation, int funds, GuildRanks guildRank)
         {
@@ -26,7 +26,7 @@ namespace MagnumOpus.Components
             LeaderId = leaderId;
             Donation = donation;
             Funds = funds;
-            Members = Array.Empty<PixelEntity>();
+            Members = Array.Empty<NTT>();
         }
 
         public override int GetHashCode()

@@ -6,10 +6,10 @@ namespace MagnumOpus.Components
     public struct DamageComponent
     {
         public readonly int EntityId;
-        public readonly PixelEntity Attacker;
+        public readonly NTT Attacker;
         public int Damage;
 
-        public DamageComponent(in PixelEntity attacked, in PixelEntity attacker, int damage)
+        public DamageComponent(in NTT attacked, in NTT attacker, int damage)
         {
             EntityId = attacked.Id;
             Attacker = attacker;

@@ -8,7 +8,7 @@ namespace MagnumOpus.Helpers
         /// <summary>
         /// Returns the first item in the inventory that matches the given netId.
         /// </summary>
-        public static PixelEntity GetInventoryItemByNetIdFrom(in PixelEntity ntt, int netId)
+        public static NTT GetInventoryItemByNetIdFrom(in NTT ntt, int netId)
         {
             ref readonly var inv = ref ntt.Get<InventoryComponent>();
             for (int i = 0; i < inv.Items.Length; i++)
@@ -16,7 +16,7 @@ namespace MagnumOpus.Helpers
                     return inv.Items[i];
             return default;
         }
-        public static bool RemoveNetIdFromInventory(in PixelEntity ntt, int netId)
+        public static bool RemoveNetIdFromInventory(in NTT ntt, int netId)
         {
             ref readonly var inv = ref ntt.Get<InventoryComponent>();
            
@@ -28,7 +28,7 @@ namespace MagnumOpus.Helpers
                 }
             return false;
         }        
-        public static void RemoveNttFromInventory(in PixelEntity ntt, in PixelEntity item)
+        public static void RemoveNttFromInventory(in NTT ntt, in NTT item)
         {
             ref readonly var inv = ref ntt.Get<InventoryComponent>();
             var invIdx = Array.IndexOf(inv.Items, item);

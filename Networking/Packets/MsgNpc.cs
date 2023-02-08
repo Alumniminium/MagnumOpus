@@ -16,7 +16,7 @@ namespace MagnumOpus.Networking.Packets
         public MsgNpcAction Action;//12
         public short Type;//14
 
-        public static MsgNpc Create(in PixelEntity target, ushort param, MsgNpcAction action)
+        public static MsgNpc Create(in NTT target, ushort param, MsgNpcAction action)
         {
             var packet = new MsgNpc
             {

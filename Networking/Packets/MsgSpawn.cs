@@ -41,7 +41,7 @@ namespace MagnumOpus.Networking.Packets
         public byte NameLen;
         public fixed byte Name[16];
 
-        public static MsgSpawn Create(in PixelEntity ntt)
+        public static MsgSpawn Create(in NTT ntt)
         {
             return ntt.Type switch
             {
@@ -55,7 +55,7 @@ namespace MagnumOpus.Networking.Packets
             };
         }
 
-        public static MsgSpawn CreatePlayer(in PixelEntity ntt)
+        public static MsgSpawn CreatePlayer(in NTT ntt)
         {
             ref readonly var hed = ref ntt.Get<HeadComponent>();
             ref readonly var bdy = ref ntt.Get<BodyComponent>();
@@ -104,7 +104,7 @@ namespace MagnumOpus.Networking.Packets
             return msg;
         }
 
-        public static MsgSpawn CreateMonster(in PixelEntity ntt)
+        public static MsgSpawn CreateMonster(in NTT ntt)
         {
             ref readonly var bdy = ref ntt.Get<BodyComponent>();
             ref readonly var ntc = ref ntt.Get<NameTagComponent>();

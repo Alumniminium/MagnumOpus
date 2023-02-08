@@ -20,7 +20,7 @@ namespace MagnumOpus.Networking.Packets
         public ushort MaxHp;
         public ushort CurHp;
 
-        public static MsgTeamUpdate JoinLeave(in PixelEntity owner, MsgTeamMemberAction addMember)
+        public static MsgTeamUpdate JoinLeave(in NTT owner, MsgTeamMemberAction addMember)
         {
             ref readonly var ntc = ref owner.Get<NameTagComponent>();
             ref readonly var bdy = ref owner.Get<BodyComponent>();

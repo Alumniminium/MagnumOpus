@@ -7,9 +7,9 @@ namespace MagnumOpus.Helpers
 {
     public static class EntityFactory
     {
-        public static ref PixelEntity MakeDefaultItem(int itemId, out bool success, Vector2 pos = default, int map = 0, bool randomDurability = false)
+        public static ref NTT MakeDefaultItem(int itemId, out bool success, Vector2 pos = default, int map = 0, bool randomDurability = false)
         {
-            ref var ntt = ref PixelWorld.CreateEntity(EntityType.Item);
+            ref var ntt = ref NttWorld.CreateEntity(EntityType.Item);
 
             if(Collections.ItemType.TryGetValue(itemId, out var itemType) == false)
             {
@@ -31,7 +31,7 @@ namespace MagnumOpus.Helpers
             return ref ntt;
         }
 
-        public static ref PixelEntity MakeMoneyDrop(int amount, ref PositionComponent pos, out bool success)
+        public static ref NTT MakeMoneyDrop(int amount, ref PositionComponent pos, out bool success)
         {
             var itemId = ItemHelper.GetItemIdFromMoney(amount);
             ref var ntt = ref MakeDefaultItem(itemId, out success, pos.Position, pos.Map);

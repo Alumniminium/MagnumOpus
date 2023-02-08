@@ -6,12 +6,12 @@ using MagnumOpus.Helpers;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class GuardAISystem : PixelSystem<PositionComponent, ViewportComponent, GuardPositionComponent, BrainComponent>
+    public sealed class GuardAISystem : NttSystem<PositionComponent, ViewportComponent, GuardPositionComponent, BrainComponent>
     {
-        public GuardAISystem() : base("Guard AI System", threads: 1) { }
-        protected override bool MatchesFilter(in PixelEntity ntt) => ntt.Type == EntityType.Monster && base.MatchesFilter(in ntt);
+        public GuardAISystem() : base("Guard AI", threads: 1) { }
+        protected override bool MatchesFilter(in NTT ntt) => ntt.Type == EntityType.Monster && base.MatchesFilter(in ntt);
 
-        public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref ViewportComponent vwp, ref GuardPositionComponent grd, ref BrainComponent brn)
+        public override void Update(in NTT ntt, ref PositionComponent pos, ref ViewportComponent vwp, ref GuardPositionComponent grd, ref BrainComponent brn)
         {
             if (brn.State == BrainState.Sleeping)
             {
@@ -28,7 +28,7 @@ namespace MagnumOpus.Simulation.Systems
                 vwp.EntitiesVisible.Clear();
                 Game.Grids[pos.Map].GetVisibleEntities(ref vwp);
                 var closestDistance = int.MaxValue;
-                var closestEntity = default(PixelEntity);
+                var closestEntity = default(NTT);
 
                 for (var i = 0; i < vwp.EntitiesVisible.Count; i++)
                 {
@@ -69,13 +69,13 @@ namespace MagnumOpus.Simulation.Systems
             }
             else
             {
-                if (!PixelWorld.EntityExists(brn.TargetId))
+                if (!NttWorld.EntityExists(brn.TargetId))
                 {
                     brn.TargetId = 0;
                     return;
                 }
 
-                ref readonly var _target = ref PixelWorld.GetEntity(brn.TargetId);
+                ref readonly var _target = ref NttWorld.GetEntity(brn.TargetId);
                 if(_target.Has<DeathTagComponent>())
                 {
                     brn.TargetId = 0;
@@ -100,13 +100,13 @@ namespace MagnumOpus.Simulation.Systems
 
             if (brn.State == BrainState.Attacking)
             {
-                ref readonly var _target = ref PixelWorld.GetEntity(brn.TargetId);
+                ref readonly var _target = ref NttWorld.GetEntity(brn.TargetId);
                 var atk = new AttackComponent(ntt.Id, in _target, MsgInteractType.Physical);
                 ntt.Set(ref atk);
             }
 
             brn.State = BrainState.Sleeping;
-            brn.SleepTicks = (int)(PixelWorld.TargetTps * 0.33f);
+            brn.SleepTicks = (int)(NttWorld.TargetTps * 0.33f);
         }
     }
 }

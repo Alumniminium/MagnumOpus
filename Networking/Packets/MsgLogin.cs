@@ -32,7 +32,7 @@ namespace MagnumOpus.Networking.Packets
         }
 
         [PacketHandler(PacketId.MsgLogin)]
-        public static void Process(PixelEntity ntt, Memory<byte> packet)
+        public static void Process(NTT ntt, Memory<byte> packet)
         {
             var msg = Co2Packet.Deserialze<MsgLogin>(packet);
             var language = msg.GetLanguage();
@@ -77,12 +77,12 @@ namespace MagnumOpus.Networking.Packets
             ntt.Set(ref eqc);
             ntt.Set(ref hed);
             
-            var testItem = PixelWorld.CreateEntity(EntityType.Item);
+            var testItem = NttWorld.CreateEntity(EntityType.Item);
             var itemComp = new ItemComponent(testItem.Id, 1001020, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
             testItem.Set(ref itemComp);
             inv.Items[0] = testItem;
 
-            var testItem2 = PixelWorld.CreateEntity(EntityType.Item);
+            var testItem2 = NttWorld.CreateEntity(EntityType.Item);
             var itemComp2 = new ItemComponent(testItem2.Id, 1000000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
             testItem2.Set(ref itemComp2);
             inv.Items[1] = testItem2;

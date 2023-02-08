@@ -21,7 +21,7 @@ namespace MagnumOpus
 
         private static unsafe void Main()
         {
-            var systems = new List<PixelSystem>
+            var systems = new List<NttSystem>
             {
                 new BasicAISystem(),
                 new GuardAISystem(),
@@ -86,9 +86,9 @@ namespace MagnumOpus
             SquigglyDb.Spawn();
             SquigglyDb.LoadNpcs();
 
-            PixelWorld.SetSystems(systems.ToArray());
-            PixelWorld.SetTPS(30);
-            PixelWorld.RegisterOnSecond(() =>
+            NttWorld.SetSystems(systems.ToArray());
+            NttWorld.SetTPS(30);
+            NttWorld.RegisterOnSecond(() =>
             {
                 var lines = PerformanceMetrics.Draw();
                 FConsole.WriteLine(lines);
@@ -106,7 +106,7 @@ namespace MagnumOpus
             gameThread.Start();
 
             while (true)
-                PixelWorld.Update();
+                NttWorld.Update();
         }
 
         private static void LoginServerLoop()
@@ -114,7 +114,7 @@ namespace MagnumOpus
             while (true)
             {
                 var client = LoginListener.AcceptTcpClient();
-                var player = PixelWorld.CreateEntity(EntityType.Player);
+                var player = NttWorld.CreateEntity(EntityType.Player);
                 var net = new NetworkComponent(in player, client.Client);
                 player.Set(ref net);
 
@@ -134,7 +134,7 @@ namespace MagnumOpus
             }
         }
 
-        private static void LoginClientLoop(in PixelEntity player)
+        private static void LoginClientLoop(in NTT player)
         {
             ref var net = ref player.Get<NetworkComponent>();
             try
@@ -213,7 +213,7 @@ namespace MagnumOpus
             }
         }
 
-        private static void GameClientLoop(in PixelEntity ntt)
+        private static void GameClientLoop(in NTT ntt)
         {
             ref var net = ref ntt.Get<NetworkComponent>();
             while (true)
@@ -249,12 +249,12 @@ namespace MagnumOpus
                     FConsole.WriteLine($"[GAME] Client disconnected: {net.Username}");
                     net.Socket?.Close();
                     net.Socket?.Dispose();
-                    PixelWorld.Destroy(in ntt);
+                    NttWorld.Destroy(in ntt);
                     break;
                 }
             }
             
-            PixelWorld.Destroy(in ntt);
+            NttWorld.Destroy(in ntt);
         }
     }
 }

@@ -5,11 +5,11 @@ using MagnumOpus.Helpers;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class TargetFinderSectorSystem : PixelSystem<SectorTargetComponent, PositionComponent, ViewportComponent>
+    public sealed class TargetFinderSectorSystem : NttSystem<SectorTargetComponent, PositionComponent, ViewportComponent>
     {
-        public TargetFinderSectorSystem() : base("Sector Target Finder System", threads: 1) { }
+        public TargetFinderSectorSystem() : base("Sector Target Finder", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref SectorTargetComponent atk, ref PositionComponent pos, ref ViewportComponent vwp)
+        public override void Update(in NTT ntt, ref SectorTargetComponent atk, ref PositionComponent pos, ref ViewportComponent vwp)
         {
             var tcc = new TargetCollectionComponent(ntt.Id, atk.MagicType);
             for (int i = 0; i < vwp.EntitiesVisible.Count; i++)

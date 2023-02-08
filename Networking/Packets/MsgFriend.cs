@@ -18,7 +18,7 @@ namespace MagnumOpus.Networking.Packets
         public short Unknow2;
         public fixed byte Name[16];
 
-        public static MsgFriend Create(in PixelEntity target, MsgFriendActionType action, MsgFriendStatusType status)
+        public static MsgFriend Create(in NTT target, MsgFriendActionType action, MsgFriendStatusType status)
         {
             ref readonly var ntc = ref target.Get<NameTagComponent>();
             var packet = new MsgFriend

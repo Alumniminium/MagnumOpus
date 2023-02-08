@@ -4,11 +4,11 @@ using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class MagicAttackRoutingSystem : PixelSystem<MagicAttackRequestComponent, SpellBookComponent, PositionComponent>
+    public sealed class MagicAttackRoutingSystem : NttSystem<MagicAttackRequestComponent, SpellBookComponent, PositionComponent>
     {
-        public MagicAttackRoutingSystem() : base("Magic Attack Routing System", threads: 1) { }
+        public MagicAttackRoutingSystem() : base("Magic Attack Routing", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref MagicAttackRequestComponent atk, ref SpellBookComponent sbc, ref PositionComponent pos)
+        public override void Update(in NTT ntt, ref MagicAttackRequestComponent atk, ref SpellBookComponent sbc, ref PositionComponent pos)
         {
             if (!sbc.Spells.TryGetValue((ushort)atk.SkillId, out var spell))
             {
@@ -26,7 +26,7 @@ namespace MagnumOpus.Simulation.Systems
             {
                 case 2: // heal self
                     var tcc = new TargetCollectionComponent(ntt.Id, magicType);
-                    var target = PixelWorld.GetEntityByNetId(atk.TargetId);
+                    var target = NttWorld.GetEntityByNetId(atk.TargetId);
                     tcc.Targets.Add(target);
                     ntt.Set(ref tcc);
                     break;

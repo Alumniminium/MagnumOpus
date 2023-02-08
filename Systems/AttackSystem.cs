@@ -6,11 +6,11 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class AttackSystem : PixelSystem<AttackComponent, PositionComponent>
+    public sealed class AttackSystem : NttSystem<AttackComponent, PositionComponent>
     {
-        public AttackSystem() : base("Attack System", threads: 1) { }
+        public AttackSystem() : base("Attack", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref AttackComponent atk, ref PositionComponent pos)
+        public override void Update(in NTT ntt, ref AttackComponent atk, ref PositionComponent pos)
         {
             if (atk.SleepTicks > 0)
             {
@@ -33,7 +33,7 @@ namespace MagnumOpus.Simulation.Systems
             {
                 if (distance <= 2.5f)
                 {
-                    atk.SleepTicks = PixelWorld.TargetTps;
+                    atk.SleepTicks = NttWorld.TargetTps;
                     // TODO: calculate damage
 
                     var damage = Random.Shared.Next(1, 10);
@@ -55,7 +55,7 @@ namespace MagnumOpus.Simulation.Systems
             {
                 if (distance <= 10)
                 {
-                    atk.SleepTicks = PixelWorld.TargetTps;
+                    atk.SleepTicks = NttWorld.TargetTps;
                     // TODO: calculate damage
 
                     var damage = Random.Shared.Next(1, 10);

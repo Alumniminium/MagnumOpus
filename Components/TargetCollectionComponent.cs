@@ -7,14 +7,14 @@ namespace MagnumOpus.Components
     public readonly struct TargetCollectionComponent
     {
         public readonly int EntityId;
-        public readonly List<PixelEntity> Targets;
+        public readonly List<NTT> Targets;
         public readonly MagicType.Entry MagicType;
 
         public TargetCollectionComponent(int nttId, MagicType.Entry magicType)
         {
             EntityId = nttId;
             MagicType = magicType;
-            Targets = new List<PixelEntity>();
+            Targets = new List<NTT>();
         }
         
         public override int GetHashCode() => EntityId;

@@ -14,7 +14,7 @@ namespace MagnumOpus.Components
         public HeadComponent(int entityId, ushort face=6, ushort hair = 310)
         {
             EntityId = entityId;
-            ChangedTick = PixelWorld.Tick;
+            ChangedTick = NttWorld.Tick;
             Hair = hair;
             FaceId = face;
         }

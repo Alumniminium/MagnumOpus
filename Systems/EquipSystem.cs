@@ -5,13 +5,13 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class EquipSystem : PixelSystem<InventoryComponent, EquipmentComponent, RequestChangeEquipComponent>
+    public sealed class EquipSystem : NttSystem<InventoryComponent, EquipmentComponent, RequestChangeEquipComponent>
     {
-        public EquipSystem() : base("Equip System", threads: 1) { }
+        public EquipSystem() : base("Equip", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref InventoryComponent inv, ref EquipmentComponent eq, ref RequestChangeEquipComponent change)
+        public override void Update(in NTT ntt, ref InventoryComponent inv, ref EquipmentComponent eq, ref RequestChangeEquipComponent change)
         {
-            ref var item = ref PixelWorld.GetEntityByNetId(change.ItemNetId);
+            ref var item = ref NttWorld.GetEntityByNetId(change.ItemNetId);
 
             if (change.Equip)
             {

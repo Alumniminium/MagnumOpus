@@ -33,7 +33,7 @@ namespace MagnumOpus.Helpers
             { "<=", (a, b) => a <= b },
         };
 
-        public static readonly Dictionary<string, Func<PixelEntity, long, string, bool>> AttrVals = new()
+        public static readonly Dictionary<string, Func<NTT, long, string, bool>> AttrVals = new()
         {
             { "money", (ntt, targetVal, op) =>
                 {
@@ -154,7 +154,7 @@ namespace MagnumOpus.Helpers
             }
         };
 
-        public static long Process(in PixelEntity ntt, in PixelEntity trigger, cq_action action)
+        public static long Process(in NTT ntt, in NTT trigger, cq_action action)
         {
             if (action == null)
                 return 0;
@@ -379,7 +379,7 @@ namespace MagnumOpus.Helpers
                         if (!itemExists)
                             return action.id_nextfail;
 
-                        ref var itemNtt = ref PixelWorld.CreateEntity(EntityType.Item);
+                        ref var itemNtt = ref NttWorld.CreateEntity(EntityType.Item);
 
                         var dura = (ushort)Random.Shared.Next(0, entry.AmountLimit);
                         var itemComp = new ItemComponent(itemNtt.Id, itemId, dura, entry.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -498,7 +498,7 @@ namespace MagnumOpus.Helpers
 
                         if (idx != -1)
                         {
-                            ref var itemNtt = ref PixelWorld.CreateEntity(EntityType.Item);
+                            ref var itemNtt = ref NttWorld.CreateEntity(EntityType.Item);
                             var item = new ItemComponent(itemNtt.Id, itemId, itemType.Amount, itemType.AmountLimit, 0, 0, 0, 0, 0, 0, RebornItemEffect.None, 0);
                             itemNtt.Set(ref item);
                             inv.Items[idx] = itemNtt;

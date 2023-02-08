@@ -6,14 +6,14 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class ViewportSystem : PixelSystem<PositionComponent, ViewportComponent>
+    public sealed class ViewportSystem : NttSystem<PositionComponent, ViewportComponent>
     {
-        public ViewportSystem() : base("Viewport System", threads: 10) { }
-        protected override bool MatchesFilter(in PixelEntity ntt) => base.MatchesFilter(in ntt);
+        public ViewportSystem() : base("Viewport", threads: 1) { }
+        protected override bool MatchesFilter(in NTT ntt) => base.MatchesFilter(in ntt);
 
-        public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref ViewportComponent vwp)
+        public override void Update(in NTT ntt, ref PositionComponent pos, ref ViewportComponent vwp)
         {
-            if (pos.ChangedTick != PixelWorld.Tick)
+            if (pos.ChangedTick != NttWorld.Tick)
                 return;
 
             vwp.Viewport.X = pos.Position.X - vwp.Viewport.Width / 2;

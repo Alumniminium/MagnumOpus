@@ -8,13 +8,13 @@ using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class ItemUseSystem : PixelSystem<InventoryComponent, RequestItemUseComponent>
+    public sealed class ItemUseSystem : NttSystem<InventoryComponent, RequestItemUseComponent>
     {
-        public ItemUseSystem() : base("ItemUse System", threads: 1) { }
+        public ItemUseSystem() : base("Item Use", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref InventoryComponent inv, ref RequestItemUseComponent use)
+        public override void Update(in NTT ntt, ref InventoryComponent inv, ref RequestItemUseComponent use)
         {
-            ref var item = ref PixelWorld.GetEntityByNetId(use.ItemNetId);
+            ref var item = ref NttWorld.GetEntityByNetId(use.ItemNetId);
             ref var itemComp = ref item.Get<ItemComponent>();
 
             if (Collections.ItemType.TryGetValue(itemComp.Id, out var entry))
@@ -28,7 +28,7 @@ namespace MagnumOpus.Simulation.Systems
                 {
                     ref var hlt = ref ntt.Get<HealthComponent>();
                     hlt.Health = Math.Clamp(hlt.Health + entry.Life, 0, hlt.MaxHealth);
-                    hlt.ChangedTick = PixelWorld.Tick;
+                    hlt.ChangedTick = NttWorld.Tick;
                     var def = new DestroyEndOfFrameComponent(use.ItemNetId);
                     item.Set(ref def);
                     var msg = MsgItem.Create(ntt.NetId, use.ItemNetId, use.ItemNetId, MsgItemType.RemoveInventory);
@@ -38,7 +38,7 @@ namespace MagnumOpus.Simulation.Systems
                 {
                     ref var mna = ref ntt.Get<ManaComponent>();
                     mna.Mana = (ushort)Math.Clamp(mna.Mana + entry.Mana, 0, mna.MaxMana);
-                    mna.ChangedTick = PixelWorld.Tick;
+                    mna.ChangedTick = NttWorld.Tick;
                     var def = new DestroyEndOfFrameComponent(use.ItemNetId);
                     item.Set(ref def);
                     var msg = MsgItem.Create(ntt.NetId, use.ItemNetId, use.ItemNetId, MsgItemType.RemoveInventory);

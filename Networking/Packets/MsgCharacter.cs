@@ -54,7 +54,7 @@ namespace MagnumOpus.Networking.Packets
         [FieldOffset(68)]
         public fixed byte Name[32];
 
-        public static MsgCharacter Create(in PixelEntity ntt)
+        public static MsgCharacter Create(in NTT ntt)
         {
             ref var hed = ref ntt.Get<HeadComponent>();
             ref var bdy = ref ntt.Get<BodyComponent>();

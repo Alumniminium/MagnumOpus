@@ -5,11 +5,11 @@ using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class ExpRewardSystem : PixelSystem<LevelComponent, ExpRewardComponent>
+    public sealed class ExpRewardSystem : NttSystem<LevelComponent, ExpRewardComponent>
     {
-        public ExpRewardSystem() : base("Exp Reward System", threads: 1) { }
+        public ExpRewardSystem() : base("Exp Reward", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref LevelComponent lvl, ref ExpRewardComponent rew)
+        public override void Update(in NTT ntt, ref LevelComponent lvl, ref ExpRewardComponent rew)
         {
             lvl.Experience += (uint)rew.Experience;
 
@@ -19,7 +19,7 @@ namespace MagnumOpus.Simulation.Systems
                 lvl.Level++;
                 lvl.Experience = 0;
                 lvl.ExperienceToNextLevel = (uint)Collections.LevelExps.Values[lvl.Level - 1];
-                lvl.ChangedTick = PixelWorld.Tick;
+                lvl.ChangedTick = NttWorld.Tick;
                 hlt.Health = hlt.MaxHealth;
 
                 var lvlUp = MsgUserAttrib.Create(ntt.NetId, lvl.Level, Enums.MsgUserAttribType.Level);

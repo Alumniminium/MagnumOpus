@@ -8,13 +8,13 @@ using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class ReviveSystem : PixelSystem<ReviveComponent, HealthComponent, PositionComponent, BodyComponent, StatusEffectComponent>
+    public sealed class ReviveSystem : NttSystem<ReviveComponent, HealthComponent, PositionComponent, BodyComponent, StatusEffectComponent>
     {
-        public ReviveSystem() : base("Revive System", threads: 1) { }
+        public ReviveSystem() : base("Revive", threads: 1) { }
 
-        public override void Update(in PixelEntity ntt, ref ReviveComponent rev, ref HealthComponent hlt, ref PositionComponent pos, ref BodyComponent bdy, ref StatusEffectComponent eff)
+        public override void Update(in NTT ntt, ref ReviveComponent rev, ref HealthComponent hlt, ref PositionComponent pos, ref BodyComponent bdy, ref StatusEffectComponent eff)
         {
-            if (rev.ReviveTick < PixelWorld.Tick)
+            if (rev.ReviveTick < NttWorld.Tick)
                 return;
 
             FConsole.WriteLine($"[{nameof(ReviveSystem)}]: Revive on Map {pos.Map}");
@@ -30,7 +30,7 @@ namespace MagnumOpus.Simulation.Systems
 
                 if (rebornMap != null)
                 {
-                    pos.ChangedTick = PixelWorld.Tick + 1;
+                    pos.ChangedTick = NttWorld.Tick + 1;
                     pos.Position = new Vector2(rebornMap.portal0_x, rebornMap.portal0_y);
                     pos.Map = (ushort)rebornMap.id;
                     FConsole.WriteLine($"[{nameof(ReviveSystem)}]: Revive at portal: {pos.Map}  x: {pos.Position.X} y: {pos.Position.Y}");

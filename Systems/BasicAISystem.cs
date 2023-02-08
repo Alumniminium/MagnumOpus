@@ -6,12 +6,12 @@ using MagnumOpus.Helpers;
 
 namespace MagnumOpus.Simulation.Systems
 {
-    public sealed class BasicAISystem : PixelSystem<PositionComponent, ViewportComponent, BrainComponent>
+    public sealed class BasicAISystem : NttSystem<PositionComponent, ViewportComponent, BrainComponent>
     {
-        public BasicAISystem() : base("Basic AI System", threads: 1) { }
-        protected override bool MatchesFilter(in PixelEntity ntt) => ntt.Type == EntityType.Monster && !ntt.Has<GuardPositionComponent>() && base.MatchesFilter(in ntt);
+        public BasicAISystem() : base("Basic AI", threads: 10) { }
+        protected override bool MatchesFilter(in NTT ntt) => ntt.Type == EntityType.Monster && !ntt.Has<GuardPositionComponent>() && base.MatchesFilter(in ntt);
 
-        public override void Update(in PixelEntity ntt, ref PositionComponent pos, ref ViewportComponent vwp, ref BrainComponent brn)
+        public override void Update(in NTT ntt, ref PositionComponent pos, ref ViewportComponent vwp, ref BrainComponent brn)
         {
             if (brn.State == BrainState.Idle)
                 return;
@@ -57,7 +57,7 @@ namespace MagnumOpus.Simulation.Systems
                 return;
             }
 
-            ref readonly var target = ref PixelWorld.GetEntity(brn.TargetId);
+            ref readonly var target = ref NttWorld.GetEntity(brn.TargetId);
             ref readonly var targetPos = ref target.Get<PositionComponent>();
             ref readonly var targetEff = ref target.Get<StatusEffectComponent>();
 
@@ -98,7 +98,7 @@ namespace MagnumOpus.Simulation.Systems
             }
 
             brn.State = BrainState.Sleeping;
-            brn.SleepTicks = (int)(PixelWorld.TargetTps * 2.5f);
+            brn.SleepTicks = (int)(NttWorld.TargetTps * 2.5f);
         }
     }
 }

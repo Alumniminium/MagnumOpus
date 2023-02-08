@@ -5,22 +5,22 @@ using MagnumOpus.Networking;
 
 namespace MagnumOpus.ECS
 {
-    public static class PixelWorld
+    public static class NttWorld
     {
         public const int MaxEntities = 1_500_000;
         public static int TargetTps { get; private set; } = 30;
         private static float UpdateTime;
 
-        private static readonly PixelEntity[] Entities;
+        private static readonly NTT[] Entities;
         private static readonly Dictionary<int, int> NetIdToEntityIndex = new();
         private static readonly Stack<int> AvailableArrayIndicies;
-        private static readonly Stack<PixelEntity> ToBeRemoved = new();
-        public static readonly List<PixelEntity> Players = new();
-        public static readonly HashSet<PixelEntity> ChangedThisTick = new();
+        private static readonly Stack<NTT> ToBeRemoved = new();
+        public static readonly List<NTT> Players = new();
+        public static readonly HashSet<NTT> ChangedThisTick = new();
         private static readonly Stopwatch Stopwatch = new();
 
         public static int EntityCount => MaxEntities - AvailableArrayIndicies.Count;
-        private static PixelSystem[] Systems;
+        private static NttSystem[] Systems;
         public static long Tick { get; private set; }
         private static float TimeAcc;
         private static float UpdateTimeAcc;
@@ -28,19 +28,19 @@ namespace MagnumOpus.ECS
         private static Action? OnSecond;
         private static Action? OnTick;
 
-        static PixelWorld()
+        static NttWorld()
         {
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
-            Entities = new PixelEntity[MaxEntities];
+            Entities = new NTT[MaxEntities];
             AvailableArrayIndicies = new(Enumerable.Range(1, MaxEntities - 1));
-            Systems = Array.Empty<PixelSystem>();
+            Systems = Array.Empty<NttSystem>();
             PerformanceMetrics.RegisterSystem(nameof(IncomingPacketQueue));
             PerformanceMetrics.RegisterSystem(nameof(OutgoingPacketQueue));
             PerformanceMetrics.RegisterSystem("SLEEP");
-            PerformanceMetrics.RegisterSystem(nameof(PixelWorld));
+            PerformanceMetrics.RegisterSystem(nameof(NttWorld));
         }
 
-        public static void SetSystems(params PixelSystem[] systems) => Systems = systems;
+        public static void SetSystems(params NttSystem[] systems) => Systems = systems;
         public static void SetTPS(int fps)
         {
             TargetTps = fps;
@@ -50,30 +50,30 @@ namespace MagnumOpus.ECS
         public static void RegisterOnSecond(Action action) => OnSecond += action;
         public static void RegisterOnTick(Action action) => OnTick += action;
 
-        public static ref PixelEntity CreateEntity(EntityType type)
+        public static ref NTT CreateEntity(EntityType type)
         {
             if (AvailableArrayIndicies.TryPop(out var arrayIndex))
             {
                 var netId = IdGenerator.Get(type);
-                Entities[arrayIndex] = new PixelEntity(arrayIndex, netId, type);
+                Entities[arrayIndex] = new NTT(arrayIndex, netId, type);
                 NetIdToEntityIndex.Add(netId, arrayIndex);
                 return ref Entities[arrayIndex];
             }
             throw new IndexOutOfRangeException("Failed to pop an array index");
         }
-        public static ref PixelEntity CreateEntityWithNetId(EntityType type, int netId = 0)
+        public static ref NTT CreateEntityWithNetId(EntityType type, int netId = 0)
         {
             if (AvailableArrayIndicies.TryPop(out var arrayIndex))
             {
-                Entities[arrayIndex] = new PixelEntity(arrayIndex, netId, type);
+                Entities[arrayIndex] = new NTT(arrayIndex, netId, type);
                 NetIdToEntityIndex.Add(netId, arrayIndex);
                 return ref Entities[arrayIndex];
             }
             throw new IndexOutOfRangeException("Failed to pop an array index");
         }
-        public static ref PixelEntity GetEntity(int nttId) => ref Entities[nttId];
+        public static ref NTT GetEntity(int nttId) => ref Entities[nttId];
 
-        public static ref PixelEntity GetEntityByNetId(int netId)
+        public static ref NTT GetEntityByNetId(int netId)
         {
             if (!NetIdToEntityIndex.TryGetValue(netId, out var index))
                 return ref Entities[0];
@@ -83,15 +83,15 @@ namespace MagnumOpus.ECS
 
         public static bool EntityExists(int nttId) => Entities[nttId].Id == nttId;
 
-        public static void InformChangesFor(in PixelEntity ntt)
+        public static void InformChangesFor(in NTT ntt)
         {
             lock (ChangedThisTick)
                 ChangedThisTick.Add(ntt);
         }
 
-        public static void Destroy(in PixelEntity ntt) => ToBeRemoved.Push(ntt);
+        public static void Destroy(in NTT ntt) => ToBeRemoved.Push(ntt);
 
-        private static void DestroyInternal(in PixelEntity ntt)
+        private static void DestroyInternal(in NTT ntt)
         {
             lock (ChangedThisTick)
             {
@@ -140,7 +140,7 @@ namespace MagnumOpus.ECS
                 {
                     last = Stopwatch.Elapsed.TotalMilliseconds;
                     var system = Systems[i];
-                    system.Update(dt);
+                    system.BeginUpdate();
 
                     while (ToBeRemoved.Count != 0)
                         DestroyInternal(ToBeRemoved.Pop());
@@ -170,7 +170,7 @@ namespace MagnumOpus.ECS
             last = Stopwatch.Elapsed.TotalMilliseconds;
             OutgoingPacketQueue.SendAll();
             PerformanceMetrics.AddSample(nameof(OutgoingPacketQueue), Stopwatch.Elapsed.TotalMilliseconds - last);
-            PerformanceMetrics.AddSample(nameof(PixelWorld), Stopwatch.Elapsed.TotalMilliseconds);
+            PerformanceMetrics.AddSample(nameof(NttWorld), Stopwatch.Elapsed.TotalMilliseconds);
 
             last = Stopwatch.Elapsed.TotalMilliseconds;
             var sleepTime = (int)Math.Max(0, -1 + (UpdateTime * 1000) - last);

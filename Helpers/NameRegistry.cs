@@ -4,10 +4,10 @@ namespace MagnumOpus.Helpers
 {
     public static class NameRegistry
     {
-        private static readonly Dictionary<string, PixelEntity> NameToEntity = new ();
-        private static readonly Dictionary<PixelEntity, string> EntityToName = new ();
+        private static readonly Dictionary<string, NTT> NameToEntity = new ();
+        private static readonly Dictionary<NTT, string> EntityToName = new ();
 
-        public static void Register(in PixelEntity entity, string name)
+        public static void Register(in NTT entity, string name)
         {
             if (NameToEntity.TryGetValue(name, out var value))
             {
@@ -19,13 +19,13 @@ namespace MagnumOpus.Helpers
             EntityToName.Add(entity, name);
         }
 
-        public static (bool found, string name) GetName(in PixelEntity entity)
+        public static (bool found, string name) GetName(in NTT entity)
         {
             return EntityToName.TryGetValue(entity, out var name) ? ((bool found, string name))(true, name) : ((bool found, string name))(false, string.Empty);
         }
-        public static (bool found, PixelEntity ntt) GetEntity(string name)
+        public static (bool found, NTT ntt) GetEntity(string name)
         {
-            return NameToEntity.TryGetValue(name, out var entity) ? ((bool found, PixelEntity ntt))(true, entity) : ((bool found, PixelEntity ntt))(false, default);
+            return NameToEntity.TryGetValue(name, out var entity) ? ((bool found, NTT ntt))(true, entity) : ((bool found, NTT ntt))(false, default);
         }
     }
 }
