@@ -32,9 +32,9 @@ namespace MagnumOpus.ECS
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void BeginUpdate()
         {
+            _allReady.Reset();
             Interlocked.Exchange(ref _readyThreads, 0);
             
             for (int i = 0; i < _threads.Length; i++)
@@ -43,8 +43,11 @@ namespace MagnumOpus.ECS
             _allReady.WaitOne();
         }
 
-        public void ThreadLoop(object id)
+        public void ThreadLoop(object? id)
         {
+            if(id == null)
+                throw new ArgumentNullException(nameof(id));
+
             int idx = (int)id;
             while (true)
             {
@@ -70,12 +73,8 @@ namespace MagnumOpus.ECS
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected virtual void Update(int start, int end) { }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected virtual bool MatchesFilter(in NTT nttId) => nttId.Id != 0;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void EntityChanged(in NTT ntt)
         {
             var isMatch = MatchesFilter(in ntt);
@@ -105,7 +104,6 @@ namespace MagnumOpus.ECS
                 Update(in ntt, ref c1);
             }
         }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public abstract void Update(in NTT ntt, ref T c1);
     }
     public abstract class NttSystem<T, T2> : NttSystem where T : struct where T2 : struct
@@ -123,7 +121,6 @@ namespace MagnumOpus.ECS
                 Update(in ntt, ref c1, ref c2);
             }
         }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public abstract void Update(in NTT ntt, ref T c1, ref T2 c2);
     }
     public abstract class NttSystem<T, T2, T3> : NttSystem where T : struct where T2 : struct where T3 : struct
@@ -142,7 +139,6 @@ namespace MagnumOpus.ECS
                 Update(in ntt, ref c1, ref c2, ref c3);
             }
         }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public abstract void Update(in NTT ntt, ref T c1, ref T2 c2, ref T3 c3);
     }
     public abstract class NttSystem<T, T2, T3, T4> : NttSystem where T : struct where T2 : struct where T3 : struct where T4 : struct
@@ -162,7 +158,6 @@ namespace MagnumOpus.ECS
                 Update(in ntt, ref c1, ref c2, ref c3, ref c4);
             }
         }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public abstract void Update(in NTT ntt, ref T c1, ref T2 c2, ref T3 c3, ref T4 c4);
     }
     public abstract class NttSystem<T, T2, T3, T4, T5> : NttSystem where T : struct where T2 : struct where T3 : struct where T4 : struct where T5 : struct
@@ -183,7 +178,6 @@ namespace MagnumOpus.ECS
                 Update(in ntt, ref c1, ref c2, ref c3, ref c4, ref c5);
             }
         }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public abstract void Update(in NTT ntt, ref T c1, ref T2 c2, ref T3 c3, ref T4 c4, ref T5 c5);
     }
 }

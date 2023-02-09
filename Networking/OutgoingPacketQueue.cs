@@ -8,7 +8,7 @@ using MagnumOpus.Enums;
 
 namespace MagnumOpus.Networking
 {
-    public static class OutgoingPacketQueue
+    public static class PacketsOut
     {
         // private const int MAX_PACKET_SIZE = 1024 * 8;
         private static readonly ConcurrentDictionary<NTT, Queue<Memory<byte>>> Packets = new();
@@ -27,7 +27,7 @@ namespace MagnumOpus.Networking
 
         public static void Remove(in NTT player) => Packets.TryRemove(player, out _);
 
-        public static async void SendAll()
+        public static void SendAll()
         {
             try
             {
@@ -35,7 +35,7 @@ namespace MagnumOpus.Networking
                 {
                     try
                     {
-                        var net = ntt.Get<NetworkComponent>();
+                        ref var net = ref ntt.Get<NetworkComponent>();
                         if(net.Socket == null || !net.Socket.Connected)
                         {
                             queue.Clear();
@@ -59,7 +59,7 @@ namespace MagnumOpus.Networking
                             else
                                 net.AuthCrypto.Encrypt(packet.Span);
                                 
-                            await net.Socket.SendAsync(packet, SocketFlags.None, CancellationToken.None);
+                            net.Socket.SendAsync(packet, SocketFlags.None, CancellationToken.None);
                         }
                     }
                     catch (Exception e)

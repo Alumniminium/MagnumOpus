@@ -34,8 +34,8 @@ namespace MagnumOpus.ECS
             Entities = new NTT[MaxEntities];
             AvailableArrayIndicies = new(Enumerable.Range(1, MaxEntities - 1));
             Systems = Array.Empty<NttSystem>();
-            PerformanceMetrics.RegisterSystem(nameof(IncomingPacketQueue));
-            PerformanceMetrics.RegisterSystem(nameof(OutgoingPacketQueue));
+            PerformanceMetrics.RegisterSystem(nameof(PacketsIn));
+            PerformanceMetrics.RegisterSystem(nameof(PacketsOut));
             PerformanceMetrics.RegisterSystem("SLEEP");
             PerformanceMetrics.RegisterSystem(nameof(NttWorld));
         }
@@ -101,8 +101,8 @@ namespace MagnumOpus.ECS
 
             AvailableArrayIndicies.Push(ntt.Id);
             Players.Remove(ntt);
-            OutgoingPacketQueue.Remove(in ntt);
-            IncomingPacketQueue.Remove(in ntt);
+            PacketsOut.Remove(in ntt);
+            PacketsIn.Remove(in ntt);
             ntt.Recycle();
             NetIdToEntityIndex.Remove(ntt.NetId);
             Entities[ntt.Id] = default;
@@ -118,13 +118,13 @@ namespace MagnumOpus.ECS
             Stopwatch.Restart();
             double last = Stopwatch.Elapsed.TotalMilliseconds;
 
-            PerformanceMetrics.AddSample(nameof(IncomingPacketQueue), Stopwatch.Elapsed.TotalMilliseconds - last);
+            PerformanceMetrics.AddSample(nameof(PacketsIn), Stopwatch.Elapsed.TotalMilliseconds - last);
 
             if (UpdateTimeAcc >= UpdateTime)
             {
                 UpdateTimeAcc -= UpdateTime;
-                
-                IncomingPacketQueue.ProcessAll();
+
+                PacketsIn.ProcessAll();
 
                 while (ToBeRemoved.Count != 0)
                     DestroyInternal(ToBeRemoved.Pop());
@@ -168,8 +168,8 @@ namespace MagnumOpus.ECS
             }
 
             last = Stopwatch.Elapsed.TotalMilliseconds;
-            OutgoingPacketQueue.SendAll();
-            PerformanceMetrics.AddSample(nameof(OutgoingPacketQueue), Stopwatch.Elapsed.TotalMilliseconds - last);
+            PacketsOut.SendAll();
+            PerformanceMetrics.AddSample(nameof(PacketsOut), Stopwatch.Elapsed.TotalMilliseconds - last);
             PerformanceMetrics.AddSample(nameof(NttWorld), Stopwatch.Elapsed.TotalMilliseconds);
 
             last = Stopwatch.Elapsed.TotalMilliseconds;

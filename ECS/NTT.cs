@@ -31,7 +31,7 @@ namespace MagnumOpus.ECS
             if (Type == EntityType.Player)
             {
                 var packet = Co2Packet.Serialize(ref msg);
-                OutgoingPacketQueue.Add(in this, in packet);
+                PacketsOut.Add(in this, in packet);
             }
 
             if (broadcast)
@@ -45,7 +45,7 @@ namespace MagnumOpus.ECS
                         continue;
 
                     var packet = Co2Packet.Serialize(ref msg);
-                    OutgoingPacketQueue.Add(in b, in packet);
+                    PacketsOut.Add(in b, in packet);
                 }
                 for (var i = 0; i < vwp.EntitiesVisibleLast.Count; i++)
                 {
@@ -54,7 +54,7 @@ namespace MagnumOpus.ECS
                         continue;
 
                     var packet = Co2Packet.Serialize(ref msg);
-                    OutgoingPacketQueue.Add(in b, in packet);
+                    PacketsOut.Add(in b, in packet);
                 }
             }
         }
