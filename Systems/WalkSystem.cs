@@ -9,7 +9,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class WalkSystem : NttSystem<PositionComponent, WalkComponent, BodyComponent>
     {
-        public WalkSystem() : base("Walk", threads: 1) { }
+        public WalkSystem() : base("Walk", threads: 2) { }
 
         public override void Update(in NTT ntt, ref PositionComponent pos, ref WalkComponent wlk, ref BodyComponent bdy)
         {

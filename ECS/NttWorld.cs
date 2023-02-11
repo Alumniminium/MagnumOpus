@@ -93,11 +93,8 @@ namespace MagnumOpus.ECS
 
         private static void DestroyInternal(in NTT ntt)
         {
-            lock (ChangedThisTick)
-            {
-                if (ChangedThisTick.Contains(ntt))
-                    ChangedThisTick.Remove(ntt);
-            }
+            if (ChangedThisTick.Contains(ntt))
+                ChangedThisTick.Remove(ntt);
 
             AvailableArrayIndicies.Push(ntt.Id);
             Players.Remove(ntt);
@@ -123,18 +120,13 @@ namespace MagnumOpus.ECS
             if (UpdateTimeAcc >= UpdateTime)
             {
                 UpdateTimeAcc -= UpdateTime;
-                
+
                 IncomingPacketQueue.ProcessAll();
 
-                while (ToBeRemoved.Count != 0)
-                    DestroyInternal(ToBeRemoved.Pop());
-                lock (ChangedThisTick)
-                {
-                    foreach (var ntt in ChangedThisTick)
-                        for (int x = 0; x < Systems.Length; x++)
-                            Systems[x].EntityChanged(in ntt);
-                    ChangedThisTick.Clear();
-                }
+                foreach (var ntt in ChangedThisTick)
+                    for (int x = 0; x < Systems.Length; x++)
+                        Systems[x].EntityChanged(in ntt);
+                ChangedThisTick.Clear();
 
                 for (int i = 0; i < Systems.Length; i++)
                 {

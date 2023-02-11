@@ -1,10 +1,7 @@
 using System.Collections.Concurrent;
-using System.Drawing;
 using System.Numerics;
-using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
-using MagnumOpus.Helpers;
 
 namespace SpacePartitioning
 {
@@ -88,21 +85,19 @@ namespace SpacePartitioning
                 for (int y = start.Y; y <= end.Y; y += CellHeight)
                 {
                     var cell = FindCell(new Vector2(x, y));
-                    if (CellEntities.TryGetValue(cell.Id, out var list))
-                    {
-                        lock(list)
-                        {
-                            foreach (var other in list)
-                            {
-                                if (other.Id == vwp.EntityId)
-                                    continue;
+                    if (!CellEntities.TryGetValue(cell.Id, out var list))
+                        continue;
 
-                                ref readonly var pos = ref other.Get<PositionComponent>();
-                                var distance = Vector2.Distance(pos.Position, center);
-                                if (distance <= 18f)
-                                    vwp.EntitiesVisible.Add(other);
-                            }
-                        }
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        NTT other = list[i];
+                        if (other.Id == vwp.EntityId)
+                            continue;
+
+                        ref readonly var pos = ref other.Get<PositionComponent>();
+                        var distance = Vector2.Distance(pos.Position, center);
+                        if (distance <= 18f)
+                            vwp.EntitiesVisible.Add(other);
                     }
                 }
         }
