@@ -7,7 +7,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     // public sealed class HealthSystem : PixelSystem<HealthComponent>
     // {
-    //     public HealthSystem() : base("Health System", threads: 1) { }
+    //     public HealthSystem() : base("Health System", threads: Environment.ProcessorCount) { }
 
     //     public override void Update(in PixelEntity ntt, ref HealthComponent hlt)
     //     {
@@ -20,7 +20,7 @@ namespace MagnumOpus.Simulation.Systems
     // }
     // public sealed class ManaSystem : PixelSystem<ManaComponent>
     // {
-    //     public ManaSystem() : base("Mana System", threads: 1) { }
+    //     public ManaSystem() : base("Mana System", threads: Environment.ProcessorCount) { }
 
     //     public override void Update(in PixelEntity ntt, ref ManaComponent mna)
     //     {

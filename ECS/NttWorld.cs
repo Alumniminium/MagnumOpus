@@ -123,10 +123,16 @@ namespace MagnumOpus.ECS
 
                 PacketsIn.ProcessAll();
 
-                foreach (var ntt in ChangedThisTick)
-                    for (int x = 0; x < Systems.Length; x++)
-                        Systems[x].EntityChanged(in ntt);
-                ChangedThisTick.Clear();
+                lock (ChangedThisTick)
+                {
+                    if (ChangedThisTick.Count != 0)
+                    {
+                        foreach (var ntt in ChangedThisTick)
+                            for (int x = 0; x < Systems.Length; x++)
+                                Systems[x].EntityChanged(in ntt);
+                        ChangedThisTick.Clear();
+                    }
+                }
 
                 for (int i = 0; i < Systems.Length; i++)
                 {
@@ -139,12 +145,15 @@ namespace MagnumOpus.ECS
 
                     lock (ChangedThisTick)
                     {
-                        foreach (var ntt in ChangedThisTick)
+                        if (ChangedThisTick.Count != 0)
                         {
-                            for (int x = 0; x < Systems.Length; x++)
-                                Systems[x].EntityChanged(in ntt);
+                            foreach (var ntt in ChangedThisTick)
+                            {
+                                for (int x = 0; x < Systems.Length; x++)
+                                    Systems[x].EntityChanged(in ntt);
+                            }
+                            ChangedThisTick.Clear();
                         }
-                        ChangedThisTick.Clear();
                     }
                     PerformanceMetrics.AddSample(system.Name, Stopwatch.Elapsed.TotalMilliseconds - last);
                     last = Stopwatch.Elapsed.TotalMilliseconds;

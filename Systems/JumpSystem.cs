@@ -11,7 +11,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class JumpSystem : NttSystem<PositionComponent, JumpComponent, BodyComponent>
     {
-        public JumpSystem() : base("Jump", threads: 1) { }
+        public JumpSystem() : base("Jump", threads: Environment.ProcessorCount) { }
         protected override bool MatchesFilter(in NTT ntt) => ntt.Type != EntityType.Item && base.MatchesFilter(in ntt);
 
         public override void Update(in NTT ntt, ref PositionComponent pos, ref JumpComponent jmp, ref BodyComponent bdy)

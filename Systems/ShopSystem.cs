@@ -9,7 +9,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class ShopSystem : NttSystem<InventoryComponent, RequestShopItemTransactionComponent>
     {
-        public ShopSystem() : base("Shop", threads: 1) { }
+        public ShopSystem() : base("Shop", threads: Environment.ProcessorCount) { }
 
         public override void Update(in NTT ntt, ref InventoryComponent inv, ref RequestShopItemTransactionComponent txc)
         {

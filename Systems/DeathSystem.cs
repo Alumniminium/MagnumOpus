@@ -8,7 +8,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class DeathSystem : NttSystem<DeathTagComponent>
     {
-        public DeathSystem() : base("Death", threads: 1) { }
+        public DeathSystem() : base("Death") { }
 
         public override void Update(in NTT ntt, ref DeathTagComponent dtc)
         {

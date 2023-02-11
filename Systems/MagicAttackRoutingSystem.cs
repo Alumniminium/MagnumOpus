@@ -6,7 +6,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class MagicAttackRoutingSystem : NttSystem<MagicAttackRequestComponent, SpellBookComponent, PositionComponent>
     {
-        public MagicAttackRoutingSystem() : base("Attack Router", threads: 1) { }
+        public MagicAttackRoutingSystem() : base("Attack Router", threads: Environment.ProcessorCount) { }
 
         public override void Update(in NTT ntt, ref MagicAttackRequestComponent atk, ref SpellBookComponent sbc, ref PositionComponent pos)
         {

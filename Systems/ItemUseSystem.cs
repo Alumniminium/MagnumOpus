@@ -10,7 +10,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class ItemUseSystem : NttSystem<InventoryComponent, RequestItemUseComponent>
     {
-        public ItemUseSystem() : base("Item Use", threads: 1) { }
+        public ItemUseSystem() : base("Item Use", threads: Environment.ProcessorCount) { }
 
         public override void Update(in NTT ntt, ref InventoryComponent inv, ref RequestItemUseComponent use)
         {

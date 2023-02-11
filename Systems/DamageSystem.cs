@@ -6,7 +6,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class DamageSystem : NttSystem<HealthComponent, DamageComponent>
     {
-        public DamageSystem() : base("Damage", threads: 1) { }
+        public DamageSystem() : base("Damage") { }
 
         public override void Update(in NTT ntt, ref HealthComponent hlt, ref DamageComponent dmg)
         {

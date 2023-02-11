@@ -8,8 +8,8 @@ namespace MagnumOpus.ECS
         public string Name;
         internal readonly HashSet<NTT> _entities = new();
         internal readonly List<NTT> _entitiesList = new();
-        internal readonly Thread[] _threads;
-        internal readonly AutoResetEvent[] _blocks;
+        internal readonly List<Thread> _threads;
+        internal readonly List<AutoResetEvent> _blocks;
         private readonly AutoResetEvent _allReady = new(false);
         internal volatile int _readyThreads = 0;
 
@@ -18,8 +18,8 @@ namespace MagnumOpus.ECS
         {
             Name = name;
             PerformanceMetrics.RegisterSystem(this);
-            _threads = new Thread[threads];
-            _blocks = new AutoResetEvent[threads];
+            _threads = new List<Thread>(threads);
+            _blocks = new List<AutoResetEvent>(threads);
             for (var i = 0; i < threads; i++)
             {
                 _blocks[i] = new AutoResetEvent(false);
@@ -37,7 +37,7 @@ namespace MagnumOpus.ECS
             _allReady.Reset();
             Interlocked.Exchange(ref _readyThreads, 0);
             
-            for (int i = 0; i < _threads.Length; i++)
+            for (int i = 0; i < _threads.Count; i++)
                 _blocks[i].Set();
 
             _allReady.WaitOne();
@@ -52,19 +52,19 @@ namespace MagnumOpus.ECS
             while (true)
             {
                 Interlocked.Increment(ref _readyThreads);
-                if (_readyThreads == _threads.Length)
+                if (_readyThreads == _threads.Count)
                     _allReady.Set();
                 _blocks[idx].WaitOne();
 
                 int start = 0;
                 int amount = _entitiesList.Count;
 
-                if (_threads.Length > 1)
+                if (_threads.Count > 1)
                 {
-                    amount = _entitiesList.Count / _threads.Length;
+                    amount = _entitiesList.Count / _threads.Count;
                     start = amount * idx;
-                    if (idx == _threads.Length - 1)
-                        start += _entitiesList.Count % _threads.Length;
+                    if (idx == _threads.Count - 1)
+                        start += _entitiesList.Count % _threads.Count;
 
                     amount = Math.Min(amount, _entitiesList.Count - start);
                 }

@@ -8,7 +8,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class TargetFinderLineSystem : NttSystem<LineTargetComponent, PositionComponent, ViewportComponent>
     {
-        public TargetFinderLineSystem() : base("| Targets", threads: 1) { }
+        public TargetFinderLineSystem() : base("| Targets", threads: Environment.ProcessorCount) { }
 
         public override void Update(in NTT ntt, ref LineTargetComponent atk, ref PositionComponent pos, ref ViewportComponent vwp)
         {

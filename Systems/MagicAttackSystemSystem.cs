@@ -6,7 +6,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class MagicAttackSystem : NttSystem<TargetCollectionComponent>
     {
-        public MagicAttackSystem() : base("Magic Attack", threads: 1) { }
+        public MagicAttackSystem() : base("Magic Attack", threads: Environment.ProcessorCount) { }
 
         public override void Update(in NTT ntt, ref TargetCollectionComponent atk)
         {

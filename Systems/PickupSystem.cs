@@ -9,7 +9,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class PickupSystem : NttSystem<PositionComponent, InventoryComponent, PickupRequestComponent>
     {
-        public PickupSystem() : base("Pickup", threads: 1) { }
+        public PickupSystem() : base("Pickup", threads: Environment.ProcessorCount) { }
 
         public override void Update(in NTT ntt, ref PositionComponent pos, ref InventoryComponent inv, ref PickupRequestComponent pic)
         {

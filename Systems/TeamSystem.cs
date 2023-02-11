@@ -9,7 +9,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class TeamSystem : NttSystem<TeamComponent>
     {
-        public TeamSystem() : base("Team", threads: 1) { }
+        public TeamSystem() : base("Team", threads: Environment.ProcessorCount) { }
 
         public override void Update(in NTT ntt, ref TeamComponent team)
         {
