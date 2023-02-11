@@ -91,7 +91,26 @@ namespace MagnumOpus
             NttWorld.RegisterOnSecond(() =>
             {
                 var lines = PerformanceMetrics.Draw();
+                var linesArr = lines.Split('\r', '\n');
                 FConsole.WriteLine(lines);
+
+                for(int i = 0; i < linesArr.Length; i++)
+                {
+                    foreach(var player in NttWorld.Players)
+                    {
+                        if(i == 0)
+                        {
+                            var msg = MsgText.Create(player, linesArr[i], Enums.MsgTextType.MiniMap);
+                            player.NetSync(ref msg);
+                        }
+                        else
+                        {
+                            var msg = MsgText.Create(player, linesArr[i], Enums.MsgTextType.MiniMap2);
+                            player.NetSync(ref msg);
+                        }
+                    }
+                }
+
                 PerformanceMetrics.Restart();
             });
 
@@ -242,7 +261,7 @@ namespace MagnumOpus
                     packet.Span.CopyTo(copy);
 
                     net.GameCrypto.Decrypt(copy[2..size]);
-                    IncomingPacketQueue.Add(in ntt, copy.ToArray());
+                    PacketsIn.Add(in ntt, copy.ToArray());
                 }
                 catch
                 {

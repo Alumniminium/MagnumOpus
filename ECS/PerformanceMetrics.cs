@@ -83,7 +83,7 @@ namespace MagnumOpus.ECS
         public static string Draw()
         {
             var total = 0d;
-            sb.AppendLine($"{"Name",-30}{"Avg",-10}{"Min",-10}{"Max",-10}{"Total",-10}{"Entities",-10}");
+            sb.AppendLine($"{"Name",-13}{"Avg",-5}{"Min",-5}{"Max",-5}{"Entities",-5}");
             foreach (var (name, samples) in SystemTimesLastPeriod)
             {
                 if (name == nameof(NttWorld))
@@ -91,9 +91,9 @@ namespace MagnumOpus.ECS
                     total = samples.Average;
                     continue;
                 }
-                sb.AppendLine($"{name,-30}{$"{samples.Average:#0.00}",-10}{$"{samples.Min:#0.00}",-10}{$"{samples.Max:#0.00}",-10}{$"{samples.Total:#0.00}",-10}{$"{Systems[name]?._entities.Count}",-10}");
+                sb.AppendLine($"{name,-13}{$"{samples.Average:#0.0}",-5}{$"{samples.Min:#0.0}",-5}{$"{samples.Max:#0.0}",-5}{$"{Systems[name]?._entities.Count}",-5}");
             }
-            sb.AppendLine($"{total:#0.00}/{1000f / NttWorld.TargetTps:#0.00}ms ({100 * total / (1000f / NttWorld.TargetTps):#0.00}% of budget)");
+            sb.AppendLine($"{total:#0.0}/{1000f / NttWorld.TargetTps:#0.0}ms ({100 * total / (1000f / NttWorld.TargetTps):#0.0}% of budget)");
 
             sb.Append("GC: ");
             for (var i = 0; i < GC.MaxGeneration; i++)

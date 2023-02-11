@@ -24,6 +24,8 @@ namespace MagnumOpus.Simulation.Systems
             Game.Grids[pos.Map].Move(in ntt, ref pos);
             Game.Grids[pos.Map].GetVisibleEntities(ref vwp);
 
+            // FConsole.WriteLine($"[{nameof(ViewportSystem)}] {ntt.Id} -> {vwp.EntitiesVisible.Count} entities visible");
+
             if (ntt.Type != EntityType.Player)
                 return;
 
@@ -31,30 +33,40 @@ namespace MagnumOpus.Simulation.Systems
             {
                 var b = vwp.EntitiesVisible[i];
 
-                if (b.Has<DeathTagComponent>())
+                if(b.Has<DeathTagComponent>())
                     continue;
 
-                if (b.Has<ViewportComponent>() && !b.Get<ViewportComponent>().EntitiesVisible.Contains(ntt))
-                    b.Get<ViewportComponent>().EntitiesVisible.Add(ntt);
+                if(b.Has<ViewportComponent>())
+                {
+                    ref readonly var bvwp = ref b.Get<ViewportComponent>();
+                    if (!bvwp.EntitiesVisible.Contains(ntt))
+                        bvwp.EntitiesVisible.Add(ntt);
+                }
 
-                if (b.Has<BrainComponent>() && b.Get<BrainComponent>().State == Enums.BrainState.Idle)
-                    b.Get<BrainComponent>().State = Enums.BrainState.WakingUp;
+                if(b.Has<BrainComponent>())
+                {
+                    ref var brn = ref b.Get<BrainComponent>();
+                    if(brn.State == Enums.BrainState.Idle)
+                        brn.State = Enums.BrainState.WakingUp;
+                }
 
-                if (vwp.EntitiesVisibleLast.Contains(b))
+                if(vwp.EntitiesVisibleLast.Contains(b))
                     continue;
 
                 NetworkHelper.FullSync(in ntt, in b);
                 NetworkHelper.FullSync(in b, in b);
 
-                if (b.Has<JumpComponent>())
+                if(b.Has<JumpComponent>())
                 {
-                    var packet = MsgAction.CreateJump(in ntt, in b.Get<JumpComponent>());
+                    ref readonly var jmp = ref b.Get<JumpComponent>();
+                    var packet = MsgAction.CreateJump(in ntt, in jmp);
                     ntt.NetSync(ref packet, true);
                 }
 
-                if (b.Has<WalkComponent>())
+                if(b.Has<WalkComponent>())
                 {
-                    var packet = MsgWalk.Create(ntt.NetId, b.Get<WalkComponent>().Direction, b.Get<WalkComponent>().IsRunning);
+                    ref readonly var wlk = ref b.Get<WalkComponent>();
+                    var packet = MsgWalk.Create(ntt.NetId, wlk.Direction, wlk.IsRunning);
                     ntt.NetSync(ref packet, true);
                 }
             }

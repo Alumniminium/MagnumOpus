@@ -71,7 +71,7 @@ namespace SpacePartitioning
         public void GetVisibleEntities(ref ViewportComponent vwp)
         {
             var rect = vwp.Viewport;
-            var center = new Vector2(rect.X + rect.Width / 2f, rect.Y + rect.Height / 2f);
+            var center = new Vector2(rect.X + rect.Width / 2, rect.Y + rect.Height / 2);
             var topLeft = new Vector2(rect.Left, rect.Top);
             var bottomRight = new Vector2(rect.Right, rect.Bottom);
 
@@ -85,19 +85,21 @@ namespace SpacePartitioning
                 for (int y = start.Y; y <= end.Y; y += CellHeight)
                 {
                     var cell = FindCell(new Vector2(x, y));
-                    if (!CellEntities.TryGetValue(cell.Id, out var list))
-                        continue;
-
-                    for (int i = 0; i < list.Count; i++)
+                    if (CellEntities.TryGetValue(cell.Id, out var list))
                     {
-                        NTT other = list[i];
-                        if (other.Id == vwp.EntityId)
-                            continue;
+                        lock (list)
+                        foreach (var other in list)
+                        {
+                            if (other.Id == vwp.EntityId)
+                                continue;
 
-                        ref readonly var pos = ref other.Get<PositionComponent>();
-                        var distance = Vector2.Distance(pos.Position, center);
-                        if (distance <= 18f)
-                            vwp.EntitiesVisible.Add(other);
+                            ref readonly var pos = ref other.Get<PositionComponent>();
+                            var distance = Vector2.Distance(pos.Position, center);
+                            if (distance <= 18f)
+                                vwp.EntitiesVisible.Add(other);
+
+                            // FConsole.WriteLine($"[{nameof(Grid)}] {vwp.EntityId} -> {other.Id} -> {distance}");
+                        }
                     }
                 }
         }

@@ -7,7 +7,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class TargetFinderSectorSystem : NttSystem<SectorTargetComponent, PositionComponent, ViewportComponent>
     {
-        public TargetFinderSectorSystem() : base("Sector Target Finder", threads: 1) { }
+        public TargetFinderSectorSystem() : base("< Targets", threads: 1) { }
 
         public override void Update(in NTT ntt, ref SectorTargetComponent atk, ref PositionComponent pos, ref ViewportComponent vwp)
         {

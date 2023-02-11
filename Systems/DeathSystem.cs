@@ -54,7 +54,7 @@ namespace MagnumOpus.Simulation.Systems
 
                     if(ntt.Type == EntityType.Monster)
                     {
-                        var cqm = ntt.Get<CqMonsterComponent>();
+                        ref var cqm = ref ntt.Get<CqMonsterComponent>();
                         var items = ItemGenerator.GetDropItemsFor(cqm.CqMonsterId);
                         for (int i = 0; i < items.Count; i++)
                         {

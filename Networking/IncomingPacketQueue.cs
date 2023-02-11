@@ -2,7 +2,7 @@ using MagnumOpus.ECS;
 
 namespace MagnumOpus.Networking
 {
-    public static class IncomingPacketQueue
+    public static class PacketsIn
     {
         private static readonly Dictionary<NTT, Queue<Memory<byte>>> Queues = new();
         public static void Add(in NTT player, in Memory<byte> packet)
