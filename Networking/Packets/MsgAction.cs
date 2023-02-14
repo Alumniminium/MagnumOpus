@@ -194,6 +194,20 @@ namespace MagnumOpus.Networking.Packets
                             ntt.NetSync(ref msg);
                         break;
                     }
+                    case MsgActionType.QueryTeamMember:
+                    {
+                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.Param}");
+                        ref readonly var ent = ref NttWorld.GetEntityByNetId(msg.Param);
+                        if(ent.Id != 0)
+                        {
+                            ref readonly var team = ref ent.Get<TeamComponent>();
+                            ref readonly var pos = ref ent.Get<PositionComponent>();
+
+                            var leaderPos = MsgAction.Create(ntt.NetId, ntt.NetId, (ushort)pos.Position.X, (ushort)pos.Position.Y, 0, MsgActionType.QueryTeamMember);
+                            ntt.NetSync(ref leaderPos);
+                        }
+                        break;
+                    }
                 case MsgActionType.TeleportReply:
                     {
                         FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.JumpX}, {msg.JumpY}");

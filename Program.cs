@@ -27,7 +27,6 @@ namespace MagnumOpus
                 new GuardAISystem(),
                 new WalkSystem(),
                 new JumpSystem(),
-                new EmoteSystem(),
                 new PortalSystem(),
                 new TeleportSystem(),
                 new ViewportSystem(),
@@ -46,11 +45,13 @@ namespace MagnumOpus
                 new DropMoneySystem(),
                 new PickupSystem(),
                 new ItemUseSystem(),
+                new EmoteSystem(),
                 new ReviveSystem(),
                 new ShopSystem(),
                 new EquipSystem(),
                 new DestroySystem(),
             };
+
             FConsole.WriteLine("[DATABASE] Loading...");
             var Cipher = new COFAC();
             string TmpFile = Path.GetTempFileName();
@@ -87,7 +88,7 @@ namespace MagnumOpus
             SquigglyDb.LoadNpcs();
 
             NttWorld.SetSystems(systems.ToArray());
-            NttWorld.SetTPS(30);
+            NttWorld.SetTPS(60);
             NttWorld.RegisterOnSecond(() =>
             {
                 var lines = PerformanceMetrics.Draw();

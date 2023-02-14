@@ -9,7 +9,6 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class DropItemSystem : NttSystem<PositionComponent, RequestDropItemComponent, InventoryComponent>
     {
-        public static bool Trace = false;
         public DropItemSystem() : base("Drop Item") { }
         public override void Update(in NTT ntt, ref PositionComponent pos, ref RequestDropItemComponent rdi, ref InventoryComponent inv)
         {

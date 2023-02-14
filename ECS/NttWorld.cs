@@ -8,7 +8,7 @@ namespace MagnumOpus.ECS
     public static class NttWorld
     {
         public const int MaxEntities = 1_500_000;
-        public static int TargetTps { get; private set; } = 30;
+        public static int TargetTps { get; private set; } = 60;
         private static float UpdateTime;
 
         private static readonly NTT[] Entities;
@@ -125,18 +125,17 @@ namespace MagnumOpus.ECS
 
                 lock (ChangedThisTick)
                 {
-                    if (ChangedThisTick.Count != 0)
-                    {
+                    // if (ChangedThisTick.Count != 0)
+                    // {
                         foreach (var ntt in ChangedThisTick)
                             for (int x = 0; x < Systems.Length; x++)
                                 Systems[x].EntityChanged(in ntt);
                         ChangedThisTick.Clear();
-                    }
+                    // }
                 }
 
                 for (int i = 0; i < Systems.Length; i++)
                 {
-                    last = Stopwatch.Elapsed.TotalMilliseconds;
                     var system = Systems[i];
                     system.BeginUpdate();
 
@@ -145,18 +144,16 @@ namespace MagnumOpus.ECS
 
                     lock (ChangedThisTick)
                     {
-                        if (ChangedThisTick.Count != 0)
-                        {
+                        // if (ChangedThisTick.Count != 0)
+                        // {
                             foreach (var ntt in ChangedThisTick)
                             {
                                 for (int x = 0; x < Systems.Length; x++)
                                     Systems[x].EntityChanged(in ntt);
                             }
                             ChangedThisTick.Clear();
-                        }
+                        // }
                     }
-                    PerformanceMetrics.AddSample(system.Name, Stopwatch.Elapsed.TotalMilliseconds - last);
-                    last = Stopwatch.Elapsed.TotalMilliseconds;
                 }
 
                 if (TimeAcc >= 1)

@@ -13,15 +13,39 @@ namespace MagnumOpus.Simulation.Systems
 
         public override void Update(in NTT ntt, ref TeamComponent team)
         {
+            if(team.CreatedTick == NttWorld.Tick)
+            {
+                var msg = MsgTeam.CreateTeam(in ntt);
+                var msgJoin = MsgTeamUpdate.JoinLeave(in ntt, MsgTeamMemberAction.AddMember);
+                ntt.NetSync(ref msg);
+                ntt.NetSync(ref msgJoin);
+                ref var eff = ref ntt.Get<StatusEffectComponent>();
+                eff.Effects |= StatusEffect.TeamLeader;
+
+                var msgUpdate = MsgUserAttrib.Create(ntt.NetId, (ulong)eff.Effects,MsgUserAttribType.StatusEffect);
+                ntt.NetSync(ref msgUpdate, true);
+            }
             if (ntt.Id == team.Leader.Id)
             {
                 ref readonly var pos = ref ntt.Get<PositionComponent>();
                 if(pos.ChangedTick == NttWorld.Tick)
-                    MsgAction.Create(ntt.NetId, ntt.NetId, (ushort)pos.Position.X, (ushort)pos.Position.Y, 0, MsgActionType.TeamMemberPos);
-            
-                var leaderMoveMsg = $"[{nameof(TeamSystem)}] {ntt.NetId} moved to {pos.Position}";
-                NetworkHelper.SendMsgTo(in ntt, leaderMoveMsg, MsgTextType.TopLeft);
-                FConsole.WriteLine(leaderMoveMsg);
+                {
+                    var leaderPos = MsgAction.Create(ntt.NetId, ntt.NetId, (ushort)pos.Position.X, (ushort)pos.Position.Y, 0, MsgActionType.QueryTeamLeaderPos);
+
+                    // member 0 is the leader
+                    for(int i = 1; i < team.MemberCount+1; i++)
+                    {
+                        var member = team.Members[i];
+                        if (member.Id == ntt.Id)
+                            continue;
+
+                        member.NetSync(ref leaderPos);
+                    }
+
+                    var leaderMoveMsg = $"[{nameof(TeamSystem)}] {ntt.NetId} moved to {pos.Position}";
+                    NetworkHelper.SendMsgTo(in ntt, leaderMoveMsg, MsgTextType.TopLeft);
+                    FConsole.WriteLine(leaderMoveMsg);
+                }
             }
 
             if (ntt.Has<ExpRewardComponent>())

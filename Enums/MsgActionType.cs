@@ -31,7 +31,7 @@ namespace MagnumOpus.Enums
         /// Data3Low = PositionX,
         /// Data3High = PositionY
         /// </summary>
-        TeamMemberPos = 101,
+        QueryTeamLeaderPos = 101,
         QueryEntity = 102,
         AbortMagic = 103,
         MapARGB = 104,
