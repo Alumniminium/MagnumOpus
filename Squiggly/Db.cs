@@ -4,6 +4,7 @@ using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using MagnumOpus.SpacePartitioning;
 using MagnumOpus.Squiggly.Models;
 using SpacePartitioning;
 
@@ -70,14 +71,14 @@ namespace MagnumOpus.Squiggly
                     var brn = new BrainComponent(obj.Id);
                     obj.Set(ref brn);
 
-                    if (!Game.Grids.ContainsKey(pos.Map))
+                    if (!Game.SpatialHashs.ContainsKey(pos.Map))
                     {
                         if (!Collections.Maps.TryGetValue(pos.Map, out var map))
                             continue;
 
-                        Game.Grids[pos.Map] = new Grid(map.Width, map.Height, 10, 10);
+                        Game.SpatialHashs[pos.Map] = new SpacePartitioning.SpatialHash(10);//new Grid(map.Width, map.Height, 10, 10);
                     }
-                    Game.Grids[pos.Map].Add(in obj, ref pos);
+                    Game.SpatialHashs[pos.Map].Add(in obj);
                 }
             }
             sw.Stop();
@@ -101,10 +102,10 @@ namespace MagnumOpus.Squiggly
                         cqmap.Height, new Dictionary<ushort, CqPortal>()
                     );
                     Collections.Maps.Add((ushort)cqmap.id, map);
-                    if (!Game.Grids.TryGetValue((ushort)cqmap.id, out var _))
+                    if (!Game.SpatialHashs.TryGetValue((ushort)cqmap.id, out var _))
                     {
-                        var grid = new Grid(cqmap.Width, cqmap.Height, 10, 10);
-                        Game.Grids.Add((ushort)cqmap.id, grid);
+                        var grid = new SpatialHash(10);//new Grid(cqmap.Width, cqmap.Height, 10, 10);
+                        Game.SpatialHashs.Add((ushort)cqmap.id, grid);
                     }
                 }
                 foreach (var dportal in db.Dmap_Portals)
@@ -141,14 +142,14 @@ namespace MagnumOpus.Squiggly
                     ntt.Set(ref npcc);
                     ntt.Set(ref vwp);
 
-                    if (!Game.Grids.ContainsKey(pos.Map))
+                    if (!Game.SpatialHashs.ContainsKey(pos.Map))
                     {
                         if (!Collections.Maps.TryGetValue(pos.Map, out var map))
                             continue;
 
-                        Game.Grids[pos.Map] = new Grid(map.Width, map.Height, 10, 10);
+                        Game.SpatialHashs[pos.Map] = new SpatialHash(10);//new Grid(map.Width, map.Height, 10, 10);
                     }
-                    Game.Grids[pos.Map].Add(in ntt, ref pos);
+                    Game.SpatialHashs[pos.Map].Add(in ntt);
                 }
             }
             sw.Stop();

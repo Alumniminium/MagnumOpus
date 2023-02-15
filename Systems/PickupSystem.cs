@@ -68,7 +68,7 @@ namespace MagnumOpus.Simulation.Systems
                 }
             }
 
-            Game.Grids[pos.Map].Remove(in pic.Item);
+            Game.SpatialHashs[pos.Map].Remove(in pic.Item);
 
             var delFloorMsg = MsgFloorItem.Create(in pic.Item, Enums.MsgFloorItemType.Delete);
             ntt.NetSync(ref delFloorMsg, true);

@@ -26,7 +26,7 @@ namespace MagnumOpus.Simulation.Systems
             if (brn.State == BrainState.WakingUp)
             {
                 vwp.EntitiesVisible.Clear();
-                Game.Grids[pos.Map].GetVisibleEntities(ref vwp);
+                Game.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
                 var closestDistance = int.MaxValue;
                 var closestEntity = default(NTT);
 

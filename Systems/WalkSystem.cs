@@ -1,3 +1,4 @@
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -9,7 +10,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class WalkSystem : NttSystem<PositionComponent, WalkComponent, BodyComponent>
     {
-        public WalkSystem() : base("Walk", threads: Environment.ProcessorCount) { }
+        public WalkSystem() : base("Walk", threads: 12) { }
 
         public override void Update(in NTT ntt, ref PositionComponent pos, ref WalkComponent wlk, ref BodyComponent bdy)
         {
@@ -29,7 +30,8 @@ namespace MagnumOpus.Simulation.Systems
             
             var text = $"{wlk.Direction} -> {pos.Position}";
             NetworkHelper.SendMsgTo(in ntt, text, MsgTextType.TopLeft);
-            // FConsole.WriteLine($"[{nameof(WalkSystem)}] {ntt.Id} -> {text}");
+            if(pos.Map == 1002)
+            FConsole.WriteLine($"[{NttWorld.Tick}][{nameof(WalkSystem)}] (Thread {Environment.CurrentManagedThreadId}) {ntt.Id} -> {text}");
 
             ntt.Remove<WalkComponent>();
         }

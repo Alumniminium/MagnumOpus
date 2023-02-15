@@ -26,7 +26,7 @@ namespace MagnumOpus.Simulation.Systems
             rdi.ItemNtt.Set(ref dropPos);
             rdi.ItemNtt.Set(ref ltc);
 
-            Game.Grids[pos.Map].Add(in rdi.ItemNtt, ref pos);
+            Game.SpatialHashs[pos.Map].Add(in rdi.ItemNtt);
 
             var msgRemoveInv = MsgItem.Create(rdi.ItemNtt.NetId, rdi.ItemNtt.NetId, rdi.ItemNtt.NetId, MsgItemType.RemoveInventory);
             var msgDropFloor = MsgFloorItem.Create(in rdi.ItemNtt, MsgFloorItemType.Create);

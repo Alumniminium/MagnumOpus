@@ -23,7 +23,7 @@ namespace MagnumOpus.Simulation.Systems
             ref var itemNtt = ref EntityFactory.MakeMoneyDrop(drc.Amount, ref pos, out var success);
             if (success)
             {
-                Game.Grids[pos.Map].Add(in itemNtt, ref pos);
+                Game.SpatialHashs[pos.Map].Add(in itemNtt);
                 var dropMsg = MsgFloorItem.Create(in itemNtt, Enums.MsgFloorItemType.Create);
                 ntt.NetSync(ref dropMsg, true);
             }

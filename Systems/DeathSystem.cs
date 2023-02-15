@@ -106,7 +106,7 @@ namespace MagnumOpus.Simulation.Systems
                 ntt.Set(ref ded);
 
                 ref readonly var pos = ref ntt.Get<PositionComponent>();
-                Game.Grids[pos.Map].Remove(in ntt);
+                Game.SpatialHashs[pos.Map].Remove(in ntt);
             }
         }
     }

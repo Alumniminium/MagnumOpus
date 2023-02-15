@@ -8,7 +8,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class BasicAISystem : NttSystem<PositionComponent, ViewportComponent, BrainComponent>
     {
-        public BasicAISystem() : base("Basic AI", threads: 10) { }
+        public BasicAISystem() : base("Basic AI", threads: 12) { }
         protected override bool MatchesFilter(in NTT ntt) => ntt.Type == EntityType.Monster && !ntt.Has<GuardPositionComponent>() && base.MatchesFilter(in ntt);
 
         public override void Update(in NTT ntt, ref PositionComponent pos, ref ViewportComponent vwp, ref BrainComponent brn)
@@ -27,7 +27,7 @@ namespace MagnumOpus.Simulation.Systems
             if (brn.State == BrainState.WakingUp)
             {
                 vwp.EntitiesVisible.Clear();
-                Game.Grids[pos.Map].GetVisibleEntities(ref vwp);
+                Game.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
             }
 
             if (brn.TargetId == 0)

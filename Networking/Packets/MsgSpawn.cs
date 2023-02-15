@@ -130,7 +130,7 @@ namespace MagnumOpus.Networking.Packets
                 X = (ushort)pos.Position.X,
                 Y = (ushort)pos.Position.Y,
             };
-            for (byte i = 0; i < ntc.Name.Trim().Length; i++)
+            for (byte i = 0; i < ntc.Name?.Trim().Length; i++)
                 msg.Name[i] = (byte)ntc.Name.Trim()[i];
 
             return msg;

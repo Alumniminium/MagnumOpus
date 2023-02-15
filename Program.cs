@@ -8,6 +8,7 @@ using MagnumOpus.Helpers;
 using MagnumOpus.Networking;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Simulation.Systems;
+using MagnumOpus.SpacePartitioning;
 using MagnumOpus.Squiggly;
 using SpacePartitioning;
 
@@ -15,7 +16,8 @@ namespace MagnumOpus
 {
     public static class Game
     {
-        internal static readonly Dictionary<int, Grid> Grids = new();
+        // internal static readonly Dictionary<int, Grid> Grids = new();
+        internal static readonly Dictionary<int, SpatialHash> SpatialHashs = new();
         private static readonly TcpListener GameListener = new(System.Net.IPAddress.Any, 5816);
         private static readonly TcpListener LoginListener = new(System.Net.IPAddress.Any, 9958);
 
@@ -88,12 +90,12 @@ namespace MagnumOpus
             SquigglyDb.LoadNpcs();
 
             NttWorld.SetSystems(systems.ToArray());
-            NttWorld.SetTPS(60);
+            NttWorld.SetTPS(30);
             NttWorld.RegisterOnSecond(() =>
             {
                 var lines = PerformanceMetrics.Draw();
                 var linesArr = lines.Split('\r', '\n');
-                // FConsole.WriteLine(lines);
+                FConsole.WriteLine(lines);
 
                 // for(int i = 0; i < linesArr.Length; i++)
                 // {

@@ -21,8 +21,11 @@ namespace MagnumOpus.Simulation.Systems
             vwp.EntitiesVisibleLast.AddRange(vwp.EntitiesVisible);
             vwp.EntitiesVisible.Clear();
 
-            Game.Grids[pos.Map].Move(in ntt, ref pos);
-            Game.Grids[pos.Map].GetVisibleEntities(ref vwp);
+            Game.SpatialHashs[pos.Map].Remove(in ntt);
+            Game.SpatialHashs[pos.Map].Add(in ntt);
+            Game.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
+
+
 
             // FConsole.WriteLine($"[{nameof(ViewportSystem)}] {ntt.Id} -> {vwp.EntitiesVisible.Count} entities visible");
 
