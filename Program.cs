@@ -93,24 +93,24 @@ namespace MagnumOpus
             {
                 var lines = PerformanceMetrics.Draw();
                 var linesArr = lines.Split('\r', '\n');
-                FConsole.WriteLine(lines);
+                // FConsole.WriteLine(lines);
 
-                for(int i = 0; i < linesArr.Length; i++)
-                {
-                    foreach(var player in NttWorld.Players)
-                    {
-                        if(i == 0)
-                        {
-                            var msg = MsgText.Create(player, linesArr[i], Enums.MsgTextType.MiniMap);
-                            player.NetSync(ref msg);
-                        }
-                        else
-                        {
-                            var msg = MsgText.Create(player, linesArr[i], Enums.MsgTextType.MiniMap2);
-                            player.NetSync(ref msg);
-                        }
-                    }
-                }
+                // for(int i = 0; i < linesArr.Length; i++)
+                // {
+                //     foreach(var player in NttWorld.Players)
+                //     {
+                //         if(i == 0)
+                //         {
+                //             var msg = MsgText.Create(player, linesArr[i], Enums.MsgTextType.MiniMap);
+                //             player.NetSync(ref msg);
+                //         }
+                //         else
+                //         {
+                //             var msg = MsgText.Create(player, linesArr[i], Enums.MsgTextType.MiniMap2);
+                //             player.NetSync(ref msg);
+                //         }
+                //     }
+                // }
 
                 PerformanceMetrics.Restart();
             });

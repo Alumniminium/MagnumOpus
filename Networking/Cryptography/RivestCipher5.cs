@@ -74,39 +74,34 @@ namespace MagnumOpus.Networking.Cryptography
         /// </summary>
         public static void Decrypt(byte* buf, int aLength)
         {
-            if (aLength % 8 != 0)
+            if ((aLength & 7) != 0)
                 throw new ArgumentException("Length of the buffer must be a multiple of 64 bits.", nameof(aLength));
 
             uint* data = (uint*)buf;
-            for (int k = 0, len = aLength / 8; k < len; ++k)
-            {
-                uint lv = data[2 * k];
-                uint rv = data[2 * k + 1];
-                for (int i = RC5_12; i >= 1; --i)
-                {
-                    rv = RotR(rv - mSub[2 * i + 1], lv) ^ lv;
-                    lv = RotR(lv - mSub[2 * i], rv) ^ rv;
-                }
 
-                data[2 * k] = lv - mSub[0];
-                data[2 * k + 1] = rv - mSub[1];
+            fixed (uint* sub = mSub)
+            {
+
+                for (int k = 0, len = aLength >> 3; k < len; ++k)
+                {
+                    uint lv = data[k << 1];
+                    uint rv = data[(k << 1) + 1];
+
+                    for (int i = RC5_12; i >= 1; --i)
+                    {
+                        rv = RotR(rv - sub[(i << 1) + 1], lv) ^ lv;
+                        lv = RotR(lv - sub[i << 1], rv) ^ rv;
+                    }
+
+                    data[k << 1] = lv - sub[0];
+                    data[(k << 1) + 1] = rv - sub[1];
+                }
             }
         }
 
-        private static uint RotL(uint aValue, uint aCount)
-        {
-            int leftShift = (int)(aCount % 32);
-            int rightShift = 32 - leftShift;
+        private static uint RotL(uint aValue, uint aCount) => (aValue << (int)aCount) | (aValue >> (32 - (int)aCount));
 
-            return aValue << leftShift | aValue >> rightShift;
-        }
+        private static uint RotR(uint aValue, uint aCount) => (aValue >> (int)aCount) | (aValue << (32 - (int)aCount));
 
-        private static uint RotR(uint aValue, uint aCount)
-        {
-            int rightShift = (int)(aCount % 32);
-            int leftShift = 32 - rightShift;
-
-            return aValue >> rightShift | aValue << leftShift;
-        }
     }
 }
