@@ -20,7 +20,7 @@ namespace MagnumOpus.Simulation.Systems
                 vwp.EntitiesVisibleLast.Add(e);
 
             vwp.EntitiesVisible.Clear();
-
+            
             Game.SpatialHashs[pos.Map].Remove(in ntt);
             Game.SpatialHashs[pos.Map].Add(in ntt);
             Game.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
@@ -39,8 +39,7 @@ namespace MagnumOpus.Simulation.Systems
                 if(b.Has<ViewportComponent>())
                 {
                     ref readonly var bvwp = ref b.Get<ViewportComponent>();
-                    if (!bvwp.EntitiesVisible.Contains(ntt))
-                        bvwp.EntitiesVisible.Add(ntt);
+                    bvwp.EntitiesVisible.Add(ntt);
                 }
 
                 if(b.Has<BrainComponent>())

@@ -35,6 +35,11 @@ namespace MagnumOpus.Helpers
         {
             var itemId = ItemHelper.GetItemIdFromMoney(amount);
             ref var ntt = ref MakeDefaultItem(itemId, out success, pos.Position, pos.Map);
+            var ltc = new LifeTimeComponent(ntt.Id, TimeSpan.FromSeconds(30));
+            var vwp = new ViewportComponent(ntt.Id, 18f);
+            ntt.Set(ref vwp);
+            ntt.Set(ref ltc);
+            
             if(success == false)
                 return ref ntt;
 

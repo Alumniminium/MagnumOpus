@@ -156,7 +156,7 @@ namespace MagnumOpus.Squiggly
 
                     if (!Game.SpatialHashs.ContainsKey(pos.Map))
                     {
-                        if (!Collections.Maps.TryGetValue(pos.Map, out var map))
+                        if (!Collections.Maps.TryGetValue(pos.Map, out var _))
                             continue;
 // 
                         Game.SpatialHashs[pos.Map] = new SpatialHash(10);//new Grid(map.Width, map.Height, 10, 10);

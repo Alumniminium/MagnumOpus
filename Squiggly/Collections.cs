@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Co2Core.IO;
 using MagnumOpus.Squiggly.Models;
 
@@ -14,6 +15,6 @@ namespace MagnumOpus.Squiggly
         public static ItemType ItemType { get; set; } = new();
         public static MagicType MagicType { get; set; } = new();
         public static Dictionary<int, ShopDatEntry> Shops { get; set; } = new();
-        public static Dictionary<int, List<ItemType.Entry>> Drops { get;set; } = new ();
+        public static ConcurrentDictionary<int, List<ItemType.Entry>> Drops { get;set; } = new ();
     }
 }

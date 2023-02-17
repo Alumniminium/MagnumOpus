@@ -23,11 +23,12 @@ namespace MagnumOpus.Simulation.Systems
             ref var item = ref rdi.ItemNtt.Get<ItemComponent>();
             var dropPos = new PositionComponent(rdi.ItemNtt.Id, pos.Position, pos.Map);
             var ltc = new LifeTimeComponent(rdi.ItemNtt.Id, TimeSpan.FromSeconds(30));
+            var vwp = new ViewportComponent(rdi.ItemNtt.Id, 18f);
             rdi.ItemNtt.Set(ref dropPos);
             rdi.ItemNtt.Set(ref ltc);
+            rdi.ItemNtt.Set(ref vwp);
 
             Game.SpatialHashs[pos.Map].Add(in rdi.ItemNtt);
-            // Game.Grids[pos.Map].Add(in rdi.ItemNtt, ref pos);
 
             var msgRemoveInv = MsgItem.Create(rdi.ItemNtt.NetId, rdi.ItemNtt.NetId, rdi.ItemNtt.NetId, MsgItemType.RemoveInventory);
             var msgDropFloor = MsgFloorItem.Create(in rdi.ItemNtt, MsgFloorItemType.Create);

@@ -24,7 +24,6 @@ namespace MagnumOpus.Simulation.Systems
             if (success)
             {
                 Game.SpatialHashs[pos.Map].Add(in itemNtt);
-                // Game.Grids[pos.Map].Add(in itemNtt, ref pos);
                 var dropMsg = MsgFloorItem.Create(in itemNtt, Enums.MsgFloorItemType.Create);
                 ntt.NetSync(ref dropMsg, true);
             }

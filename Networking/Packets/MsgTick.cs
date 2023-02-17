@@ -59,8 +59,8 @@ namespace MagnumOpus.Networking.Packets
             pin.Ping = Math.Abs(msg.Timestamp - pin.LastPing - 10000);
             pin.LastPing = msg.Timestamp;
             
-            var pingMsg = MsgText.Create("SYSTEM", "PING", $"10s Avg Ping: {pin.Ping}ms", MsgTextType.MiniMap);
-            ntt.NetSync(ref pingMsg);
+            // var pingMsg = MsgText.Create("SYSTEM", "PING", $"10s Avg Ping: {pin.Ping}ms", MsgTextType.MiniMap);
+            // ntt.NetSync(ref pingMsg);
         }
 
         public static uint HashName(string name)

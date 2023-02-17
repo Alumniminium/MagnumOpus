@@ -178,6 +178,10 @@ namespace MagnumOpus.Networking.Packets
                     var rev = new ReviveComponent(ntt.Id, 1);
                     ntt.Set(ref rev);
                     break;
+                case "eff":
+                    var eff = MsgName.Create(ntt.NetId, args[0], (byte)MsgNameType.RoleEffect);
+                    ntt.NetSync(ref eff, true);
+                    break;
             }
         }
     }

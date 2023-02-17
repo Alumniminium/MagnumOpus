@@ -91,6 +91,8 @@ namespace MagnumOpus.ECS
                     total = samples.Average;
                     continue;
                 }
+                if(Systems[name]?._entities.Count == 0)
+                    continue;
                 sb.AppendLine($"{name,-13}{$"{samples.Average:#0.0}",-5}{$"{samples.Min:#0.0}",-5}{$"{samples.Max:#0.0}",-5}{$"{Systems[name]?._entities.Count}",-5}");
             }
             sb.AppendLine($"{total:#0.0}/{1000f / NttWorld.TargetTps:#0.0}ms ({100 * total / (1000f / NttWorld.TargetTps):#0.0}% of budget)");

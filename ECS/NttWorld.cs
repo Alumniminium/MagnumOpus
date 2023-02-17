@@ -1,5 +1,7 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime;
+using System.Runtime.CompilerServices;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking;
 
@@ -13,10 +15,10 @@ namespace MagnumOpus.ECS
 
         private static readonly NTT[] Entities;
         private static readonly Dictionary<int, int> NetIdToEntityIndex = new();
-        private static readonly Stack<int> AvailableArrayIndicies;
-        private static readonly HashSet<NTT> ToBeRemoved = new();
-        public static readonly List<NTT> Players = new();
-        public static readonly HashSet<NTT> ChangedThisTick = new();
+        private static readonly ConcurrentQueue<int> AvailableArrayIndicies;
+        private static readonly ConcurrentQueue<NTT> ToBeRemoved = new();
+        public static readonly HashSet<NTT> Players = new();
+        public static readonly ConcurrentQueue<NTT> ChangedThisTick = new();
         private static readonly Stopwatch Stopwatch = new();
 
         public static int EntityCount => MaxEntities - AvailableArrayIndicies.Count;
@@ -52,22 +54,28 @@ namespace MagnumOpus.ECS
 
         public static ref NTT CreateEntity(EntityType type)
         {
-            if (AvailableArrayIndicies.TryPop(out var arrayIndex))
+            lock (Entities)
             {
-                var netId = IdGenerator.Get(type);
-                Entities[arrayIndex] = new NTT(arrayIndex, netId, type);
-                NetIdToEntityIndex.Add(netId, arrayIndex);
-                return ref Entities[arrayIndex];
+                if (AvailableArrayIndicies.TryDequeue(out var arrayIndex))
+                {
+                    var netId = IdGenerator.Get(type);
+                    Entities[arrayIndex] = new NTT(arrayIndex, netId, type);
+                    NetIdToEntityIndex.Add(netId, arrayIndex);
+                    return ref Entities[arrayIndex];
+                }
             }
             throw new IndexOutOfRangeException("Failed to pop an array index");
         }
         public static ref NTT CreateEntityWithNetId(EntityType type, int netId = 0)
         {
-            if (AvailableArrayIndicies.TryPop(out var arrayIndex))
+            lock (Entities)
             {
-                Entities[arrayIndex] = new NTT(arrayIndex, netId, type);
-                NetIdToEntityIndex.Add(netId, arrayIndex);
-                return ref Entities[arrayIndex];
+                if (AvailableArrayIndicies.TryDequeue(out var arrayIndex))
+                {
+                    Entities[arrayIndex] = new NTT(arrayIndex, netId, type);
+                    NetIdToEntityIndex.Add(netId, arrayIndex);
+                    return ref Entities[arrayIndex];
+                }
             }
             throw new IndexOutOfRangeException("Failed to pop an array index");
         }
@@ -82,85 +90,25 @@ namespace MagnumOpus.ECS
         }
 
         public static bool EntityExists(int nttId) => Entities[nttId].Id == nttId;
-
-        public static void InformChangesFor(in NTT ntt)
-        {
-            lock (ChangedThisTick)
-                ChangedThisTick.Add(ntt);
-        }
-
-        public static void Destroy(in NTT ntt) => ToBeRemoved.Add(ntt);
+        public static void InformChangesFor(in NTT ntt) => ChangedThisTick.Enqueue(ntt);
+        public static void Destroy(in NTT ntt) => ToBeRemoved.Enqueue(ntt);
 
         private static void DestroyInternal(in NTT ntt)
         {
-            if (ChangedThisTick.Contains(ntt))
-                ChangedThisTick.Remove(ntt);
-
-            AvailableArrayIndicies.Push(ntt.Id);
-            Players.Remove(ntt);
-            PacketsOut.Remove(in ntt);
-            PacketsIn.Remove(in ntt);
-            ntt.Recycle();
-            NetIdToEntityIndex.Remove(ntt.NetId);
-            Entities[ntt.Id] = default;
+            lock (Entities)
+            {
+                AvailableArrayIndicies.Enqueue(ntt.Id);
+                Players.Remove(ntt);
+                PacketsOut.Remove(in ntt);
+                PacketsIn.Remove(in ntt);
+                ntt.Recycle();
+                NetIdToEntityIndex.Remove(ntt.NetId);
+                Entities[ntt.Id] = default;
+            }
 
             for (int i = 0; i < Systems.Length; i++)
                 Systems[i].EntityChanged(in ntt);
         }
-        // public static void Update()
-        // {
-        //     var dt = MathF.Min(1f / TargetTps, (float)Stopwatch.Elapsed.TotalSeconds);
-        //     TimeAcc += dt;
-        //     UpdateTimeAcc += dt;
-        //     Stopwatch.Restart();
-        //     double last = Stopwatch.Elapsed.TotalMilliseconds;
-
-        //     PerformanceMetrics.AddSample(nameof(PacketsIn), Stopwatch.Elapsed.TotalMilliseconds - last);
-
-        //     if (UpdateTimeAcc >= UpdateTime)
-        //     {
-        //         UpdateTimeAcc -= UpdateTime;
-
-        //         PacketsIn.ProcessAll();
-
-        //         for (int i = 0; i < Systems.Length; i++)
-        //         {
-        //             lock (ChangedThisTick)
-        //             {
-        //                 foreach (var ntt in ChangedThisTick)
-        //                 {
-        //                     for (int x = 0; x < Systems.Length; x++)
-        //                         Systems[x].EntityChanged(in ntt);
-        //                 }
-        //                 ChangedThisTick.Clear();
-        //             }
-        //             var system = Systems[i];
-        //             system.BeginUpdate();
-
-        //         }
-
-        //         while (ToBeRemoved.Count != 0)
-        //             DestroyInternal(ToBeRemoved.Pop());
-
-        //         if (TimeAcc >= 1)
-        //         {
-        //             OnSecond?.Invoke();
-        //             TimeAcc = 0;
-        //         }
-        //         OnTick?.Invoke();
-        //         Tick++;
-        //     }
-
-        //     last = Stopwatch.Elapsed.TotalMilliseconds;
-        //     PacketsOut.SendAll();
-        //     PerformanceMetrics.AddSample(nameof(PacketsOut), Stopwatch.Elapsed.TotalMilliseconds - last);
-        //     PerformanceMetrics.AddSample(nameof(NttWorld), Stopwatch.Elapsed.TotalMilliseconds);
-
-        //     last = Stopwatch.Elapsed.TotalMilliseconds;
-        //     var sleepTime = (int)Math.Max(0, -1 + (UpdateTime * 1000) - last);
-        //     Thread.Sleep(sleepTime);
-        //     PerformanceMetrics.AddSample("SLEEP", Stopwatch.Elapsed.TotalMilliseconds - last);
-        // }
         public static void Update()
         {
             var dt = MathF.Min(1f / TargetTps, (float)Stopwatch.Elapsed.TotalSeconds);
@@ -175,36 +123,15 @@ namespace MagnumOpus.ECS
             {
                 UpdateTimeAcc -= UpdateTime;
 
-                foreach (var ntt in ToBeRemoved)
-                    DestroyInternal(ntt);
-                ToBeRemoved.Clear();
-
+                DestroyNTTs();
                 PacketsIn.ProcessAll();
 
                 for (int i = 0; i < Systems.Length; i++)
                 {
-                    lock (ChangedThisTick)
-                    {
-                        foreach (var ntt in ChangedThisTick)
-                        {
-                            for (int x = 0; x < Systems.Length; x++)
-                                Systems[x].EntityChanged(in ntt);
-                        }
-                        ChangedThisTick.Clear();
-                    }
-
-                    var system = Systems[i];
-                    system.BeginUpdate();
+                    UpdateNTTs();
+                    Systems[i].BeginUpdate();
                 }
-                lock (ChangedThisTick)
-                {
-                    foreach (var ntt in ChangedThisTick)
-                    {
-                        for (int x = 0; x < Systems.Length; x++)
-                            Systems[x].EntityChanged(in ntt);
-                    }
-                    ChangedThisTick.Clear();
-                }
+                UpdateNTTs();
 
                 if (TimeAcc >= 1)
                 {
@@ -224,6 +151,23 @@ namespace MagnumOpus.ECS
             var sleepTime = (int)Math.Max(0, -1 + (UpdateTime * 1000) - last);
             Thread.Sleep(sleepTime);
             PerformanceMetrics.AddSample("SLEEP", Stopwatch.Elapsed.TotalMilliseconds - last);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void DestroyNTTs()
+        {
+            while (ToBeRemoved.TryDequeue(out var ntt))
+                DestroyInternal(ntt);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void UpdateNTTs()
+        {
+            while (ChangedThisTick.TryDequeue(out var ntt))
+            {
+                for (int x = 0; x < Systems.Length; x++)
+                    Systems[x].EntityChanged(in ntt);
+            }
         }
     }
 }

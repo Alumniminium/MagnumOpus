@@ -15,7 +15,7 @@ namespace MagnumOpus.Simulation.Systems
             if (dtc.Tick == NttWorld.Tick)
             {
                 ref var eff = ref ntt.Get<StatusEffectComponent>();
-                eff.Effects |= StatusEffect.Dead; 
+                eff.Effects |= StatusEffect.Dead;
                 eff.Effects |= StatusEffect.FrozenRemoveName;
 
                 if (ntt.Type == EntityType.Player)
@@ -31,18 +31,18 @@ namespace MagnumOpus.Simulation.Systems
                     ntt.NetSync(ref msgUpdate, true);
                 }
 
-                // if (ntt.Has<CqActionComponent>())
-                // {
-                //     ref readonly var cqc = ref ntt.Get<CqActionComponent>();
-                //     long action = cqc.cq_Action;
-                //     for(int i =0; i < 32; i++)
-                //     {
-                //         if (action == 0)
-                //             break;
-                //         action = CqActionProcessor.Process(in ntt, in ntt, CqProcessor.GetAction(action));
-                //     }
-                // }
-                if(ntt.Has<InventoryComponent>())
+                if (ntt.Has<CqActionComponent>())
+                {
+                    ref readonly var cqc = ref ntt.Get<CqActionComponent>();
+                    long action = cqc.cq_Action;
+                    for (int i = 0; i < 32; i++)
+                    {
+                        if (action == 0)
+                            break;
+                        action = CqActionProcessor.Process(in ntt, in ntt, CqProcessor.GetAction(action));
+                    }
+                }
+                if (ntt.Has<InventoryComponent>())
                 {
                     ref var inv = ref ntt.Get<InventoryComponent>();
 
@@ -52,7 +52,7 @@ namespace MagnumOpus.Simulation.Systems
                         ntt.Set(ref drop);
                     }
 
-                    if(ntt.Type == EntityType.Monster)
+                    if (ntt.Type == EntityType.Monster)
                     {
                         ref var cqm = ref ntt.Get<CqMonsterComponent>();
                         var items = ItemGenerator.GetDropItemsFor(cqm.CqMonsterId);
@@ -63,7 +63,7 @@ namespace MagnumOpus.Simulation.Systems
                             inv.Items[i] = invItemNtt;
                         }
                     }
-                    
+
                     inv.Items = inv.Items.OrderByDescending(x => x.Id).ToArray();
                     var itemCount = inv.Items.Where(x => x.Id != 0).Count();
                     for (int i = 0; i < itemCount; i++)
@@ -79,16 +79,24 @@ namespace MagnumOpus.Simulation.Systems
                     }
                 }
 
-                var effectsMsg = MsgUserAttrib.Create(ntt.NetId, (ulong)eff.Effects, MsgUserAttribType.StatusEffect);
-                var deathMsg = MsgInteract.Create(in dtc.Killer, in ntt, MsgInteractType.Death, 0);
-                ntt.NetSync(ref effectsMsg, true);
-                ntt.NetSync(ref deathMsg, true);
+                if (ntt.Type != EntityType.Item)
+                {
+                    var effectsMsg = MsgUserAttrib.Create(ntt.NetId, (ulong)eff.Effects, MsgUserAttribType.StatusEffect);
+                    var deathMsg = MsgInteract.Create(in dtc.Killer, in ntt, MsgInteractType.Death, 0);
+                    ntt.NetSync(ref effectsMsg, true);
+                    ntt.NetSync(ref deathMsg, true);
+                }
 
                 dtc.Killer.Remove<AttackComponent>();
                 ntt.Remove<AttackComponent>();
                 ntt.Remove<BrainComponent>();
                 ntt.Remove<WalkComponent>();
                 ntt.Remove<JumpComponent>();
+            }
+            else if (dtc.Tick + NttWorld.TargetTps == NttWorld.Tick && ntt.Type == EntityType.Item)
+            {
+                var despawn = MsgFloorItem.Create(in ntt, MsgFloorItemType.Delete);
+                ntt.NetSync(ref despawn, true);
             }
             else if (dtc.Tick + NttWorld.TargetTps * 7 == NttWorld.Tick && ntt.Type == EntityType.Monster)
             {

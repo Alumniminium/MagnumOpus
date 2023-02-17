@@ -6,7 +6,7 @@ namespace MagnumOpus.Networking.Cryptography
         private static readonly Memory<byte> KInit = new byte[0x200];
 
         // Local fields and properties
-        private Memory<byte> K;
+        private readonly Memory<byte> K;
         private readonly Memory<byte> K1 = new byte[0x200];
         private readonly Memory<byte> K2 = new byte[0x200];
         private ushort DecryptCounter, EncryptCounter;

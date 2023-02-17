@@ -80,8 +80,8 @@ namespace MagnumOpus.Simulation.Systems
                     return;
                 }
 
-                ref readonly var _target = ref NttWorld.GetEntity(brn.TargetId);
-                if(_target.Has<DeathTagComponent>())
+                ref readonly var target = ref NttWorld.GetEntity(brn.TargetId);
+                if(target.Has<DeathTagComponent>() || target.Type != EntityType.Monster)
                 {
                     brn.TargetId = 0;
                     return;

@@ -9,7 +9,7 @@ namespace MagnumOpus.SpacePartitioning
     {
         private readonly int cellSize;
         private readonly ConcurrentDictionary<int, List<NTT>> Hashtbl;
-        private readonly object _lock = new object();
+        private readonly object _lock = new ();
 
         public SpatialHash(int cellSize)
         {

@@ -113,7 +113,7 @@ namespace MagnumOpus.Networking.Packets
 
 
             var nextId = task.id_next;
-            do
+            for(int i = 0; i < 32; i++)
             {
                 var action = CqProcessor.GetAction(nextId);
                 if (action == null)
@@ -124,7 +124,6 @@ namespace MagnumOpus.Networking.Packets
                 nextId = CqActionProcessor.Process(in ntt, in npc, action);
                 task = CqProcessor.GetTask(nextId);
             }
-            while (nextId != 0); // copilot is a bit 
         }
     }
 }
