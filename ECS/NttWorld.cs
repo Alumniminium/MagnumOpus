@@ -14,7 +14,7 @@ namespace MagnumOpus.ECS
         private static readonly NTT[] Entities;
         private static readonly Dictionary<int, int> NetIdToEntityIndex = new();
         private static readonly Stack<int> AvailableArrayIndicies;
-        private static readonly Stack<NTT> ToBeRemoved = new();
+        private static readonly HashSet<NTT> ToBeRemoved = new();
         public static readonly List<NTT> Players = new();
         public static readonly HashSet<NTT> ChangedThisTick = new();
         private static readonly Stopwatch Stopwatch = new();
@@ -89,7 +89,7 @@ namespace MagnumOpus.ECS
                 ChangedThisTick.Add(ntt);
         }
 
-        public static void Destroy(in NTT ntt) => ToBeRemoved.Push(ntt);
+        public static void Destroy(in NTT ntt) => ToBeRemoved.Add(ntt);
 
         private static void DestroyInternal(in NTT ntt)
         {
@@ -107,6 +107,60 @@ namespace MagnumOpus.ECS
             for (int i = 0; i < Systems.Length; i++)
                 Systems[i].EntityChanged(in ntt);
         }
+        // public static void Update()
+        // {
+        //     var dt = MathF.Min(1f / TargetTps, (float)Stopwatch.Elapsed.TotalSeconds);
+        //     TimeAcc += dt;
+        //     UpdateTimeAcc += dt;
+        //     Stopwatch.Restart();
+        //     double last = Stopwatch.Elapsed.TotalMilliseconds;
+
+        //     PerformanceMetrics.AddSample(nameof(PacketsIn), Stopwatch.Elapsed.TotalMilliseconds - last);
+
+        //     if (UpdateTimeAcc >= UpdateTime)
+        //     {
+        //         UpdateTimeAcc -= UpdateTime;
+
+        //         PacketsIn.ProcessAll();
+
+        //         for (int i = 0; i < Systems.Length; i++)
+        //         {
+        //             lock (ChangedThisTick)
+        //             {
+        //                 foreach (var ntt in ChangedThisTick)
+        //                 {
+        //                     for (int x = 0; x < Systems.Length; x++)
+        //                         Systems[x].EntityChanged(in ntt);
+        //                 }
+        //                 ChangedThisTick.Clear();
+        //             }
+        //             var system = Systems[i];
+        //             system.BeginUpdate();
+
+        //         }
+
+        //         while (ToBeRemoved.Count != 0)
+        //             DestroyInternal(ToBeRemoved.Pop());
+
+        //         if (TimeAcc >= 1)
+        //         {
+        //             OnSecond?.Invoke();
+        //             TimeAcc = 0;
+        //         }
+        //         OnTick?.Invoke();
+        //         Tick++;
+        //     }
+
+        //     last = Stopwatch.Elapsed.TotalMilliseconds;
+        //     PacketsOut.SendAll();
+        //     PerformanceMetrics.AddSample(nameof(PacketsOut), Stopwatch.Elapsed.TotalMilliseconds - last);
+        //     PerformanceMetrics.AddSample(nameof(NttWorld), Stopwatch.Elapsed.TotalMilliseconds);
+
+        //     last = Stopwatch.Elapsed.TotalMilliseconds;
+        //     var sleepTime = (int)Math.Max(0, -1 + (UpdateTime * 1000) - last);
+        //     Thread.Sleep(sleepTime);
+        //     PerformanceMetrics.AddSample("SLEEP", Stopwatch.Elapsed.TotalMilliseconds - last);
+        // }
         public static void Update()
         {
             var dt = MathF.Min(1f / TargetTps, (float)Stopwatch.Elapsed.TotalSeconds);
@@ -121,39 +175,35 @@ namespace MagnumOpus.ECS
             {
                 UpdateTimeAcc -= UpdateTime;
 
-                PacketsIn.ProcessAll();
+                foreach (var ntt in ToBeRemoved)
+                    DestroyInternal(ntt);
+                ToBeRemoved.Clear();
 
-                lock (ChangedThisTick)
-                {
-                    // if (ChangedThisTick.Count != 0)
-                    // {
-                        foreach (var ntt in ChangedThisTick)
-                            for (int x = 0; x < Systems.Length; x++)
-                                Systems[x].EntityChanged(in ntt);
-                        ChangedThisTick.Clear();
-                    // }
-                }
+                PacketsIn.ProcessAll();
 
                 for (int i = 0; i < Systems.Length; i++)
                 {
-                    var system = Systems[i];
-                    system.BeginUpdate();
-
-                    while (ToBeRemoved.Count != 0)
-                        DestroyInternal(ToBeRemoved.Pop());
-
                     lock (ChangedThisTick)
                     {
-                        // if (ChangedThisTick.Count != 0)
-                        // {
-                            foreach (var ntt in ChangedThisTick)
-                            {
-                                for (int x = 0; x < Systems.Length; x++)
-                                    Systems[x].EntityChanged(in ntt);
-                            }
-                            ChangedThisTick.Clear();
-                        // }
+                        foreach (var ntt in ChangedThisTick)
+                        {
+                            for (int x = 0; x < Systems.Length; x++)
+                                Systems[x].EntityChanged(in ntt);
+                        }
+                        ChangedThisTick.Clear();
                     }
+
+                    var system = Systems[i];
+                    system.BeginUpdate();
+                }
+                lock (ChangedThisTick)
+                {
+                    foreach (var ntt in ChangedThisTick)
+                    {
+                        for (int x = 0; x < Systems.Length; x++)
+                            Systems[x].EntityChanged(in ntt);
+                    }
+                    ChangedThisTick.Clear();
                 }
 
                 if (TimeAcc >= 1)

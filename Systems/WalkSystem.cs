@@ -10,7 +10,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class WalkSystem : NttSystem<PositionComponent, WalkComponent, BodyComponent>
     {
-        public WalkSystem() : base("Walk", threads: 12) { }
+        public WalkSystem() : base("Walk", threads: 6) { Trace = true; }
 
         public override void Update(in NTT ntt, ref PositionComponent pos, ref WalkComponent wlk, ref BodyComponent bdy)
         {
@@ -24,14 +24,13 @@ namespace MagnumOpus.Simulation.Systems
             ntt.NetSync(ref pkt, true);
 
             // var eff = MsgFloorItem.Create((int)PixelWorld.Tick, (ushort)pos.Position.X, (ushort)pos.Position.Y, 12, MsgFloorItemType.DisplayEffect);
-            // var deff = MsgFloorItem.Create((int)PixelWorld.Tick-1, (ushort)pos.Position.X, (ushort)pos.Position.Y, 12, MsgFloorItemType.RemoveEffect);
             // ntt.NetSync(ref eff, true);
+            // var deff = MsgFloorItem.Create((int)PixelWorld.Tick-1, (ushort)pos.Position.X, (ushort)pos.Position.Y, 12, MsgFloorItemType.RemoveEffect);
             // ntt.NetSync(ref deff, true);
-            
+
             var text = $"{wlk.Direction} -> {pos.Position}";
             NetworkHelper.SendMsgTo(in ntt, text, MsgTextType.TopLeft);
-            if(pos.Map == 1002)
-            FConsole.WriteLine($"[{NttWorld.Tick}][{nameof(WalkSystem)}] (Thread {Environment.CurrentManagedThreadId}) {ntt.Id} -> {text}");
+            //FConsole.WriteLine($"[{NttWorld.Tick}][{nameof(WalkSystem)}] (Thread {Environment.CurrentManagedThreadId}) {ntt.Id} -> {text}");
 
             ntt.Remove<WalkComponent>();
         }

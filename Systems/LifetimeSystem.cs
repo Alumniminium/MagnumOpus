@@ -6,7 +6,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class LifetimeSystem : NttSystem<LifeTimeComponent>
     {
-        public LifetimeSystem() : base("Lifetime", threads: Environment.ProcessorCount) { }
+        public LifetimeSystem() : base("Lifetime", threads: 4) { }
 
         public override void Update(in NTT ntt, ref LifeTimeComponent ltc)
         {

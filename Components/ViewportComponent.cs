@@ -9,8 +9,8 @@ namespace MagnumOpus.Components
         public readonly int EntityId;
         public long ChangedTick;
 
-        public readonly List<NTT> EntitiesVisible;
-        public readonly List<NTT> EntitiesVisibleLast;
+        public readonly HashSet<NTT> EntitiesVisible;
+        public readonly HashSet<NTT> EntitiesVisibleLast;
         public RectangleF Viewport;
 
         public ViewportComponent(int entityId, float viewDistance)

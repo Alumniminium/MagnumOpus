@@ -55,34 +55,30 @@ namespace MagnumOpus.SpacePartitioning
             int minY = (int)((vwp.Viewport.Top - vwp.Viewport.Height / 2) / cellSize);
             int maxY = (int)((vwp.Viewport.Bottom + vwp.Viewport.Height / 2) / cellSize);
 
-            var hashes = new List<int>();
-
             for (int x = minX; x <= maxX; x++)
             {
                 for (int y = minY; y <= maxY; y++)
                 {
                     int hash = GetHash(new Vector2(x * cellSize, y * cellSize));
 
-                    if (Hashtbl.ContainsKey(hash))
-                        hashes.Add(hash);
-                }
-            }
+                    if (!Hashtbl.TryGetValue(hash, out var entities))
+                        continue;
 
-            lock (_lock)
-            {
-                foreach (int hash in hashes)
-                {
-                    foreach (NTT entity in Hashtbl[hash])
+                    lock (_lock)
                     {
-                        ref readonly PositionComponent pos = ref entity.Get<PositionComponent>();
-                        float distance = Vector2.Distance(pos.Position, new Vector2(cx, cy));
+                        foreach (var entity in entities)
+                        {
+                            ref readonly var pos = ref entity.Get<PositionComponent>();
+                            var distanceSquared = Vector2.DistanceSquared(pos.Position, new Vector2(cx, cy));
 
-                        if (distance <= 18f)
-                            vwp.EntitiesVisible.Add(entity);
+                            if (distanceSquared <= 324f)
+                                vwp.EntitiesVisible.Add(entity);
+                        }
                     }
                 }
             }
         }
+
 
 
         private int GetHash(Vector2 position)

@@ -1,4 +1,5 @@
 using System.Numerics;
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -19,6 +20,7 @@ namespace MagnumOpus.Simulation.Systems
             if (brn.State == BrainState.Sleeping)
             {
                 brn.SleepTicks--;
+                // FConsole.WriteLine($"[{NttWorld.Tick}][{Environment.CurrentManagedThreadId}] {brn.EntityId} Sleeping {brn.SleepTicks}");
 
                 if (brn.SleepTicks > 0)
                     return;
@@ -28,41 +30,39 @@ namespace MagnumOpus.Simulation.Systems
             {
                 vwp.EntitiesVisible.Clear();
                 Game.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
+                // Game.Grids[pos.Map].GetVisibleEntities(ref vwp);
             }
 
             if (brn.TargetId == 0)
             {
-                for (var i = 0; i < vwp.EntitiesVisible.Count; i++)
+                foreach (var b in vwp.EntitiesVisible)
                 {
-                    var b = vwp.EntitiesVisible[i];
-
                     if (b.Type != EntityType.Player)
                         continue;
 
-                    ref readonly var bEff = ref b.Get<StatusEffectComponent>();
-
-                    if (bEff.Effects.HasFlag(StatusEffect.Dead))
-                        brn.TargetId = 0;
+                    if (b.Has<DeathTagComponent>())
+                        continue;
 
                     brn.TargetId = b.Id;
                     brn.State = BrainState.Approaching;
                     break;
                 }
-            }
 
-
-            if (brn.TargetId == 0)
-            {
-                brn.State = BrainState.Idle;
-                return;
+                if (brn.TargetId == 0)
+                {
+                    brn.State = BrainState.Idle;
+                    return;
+                }
             }
 
             ref readonly var target = ref NttWorld.GetEntity(brn.TargetId);
             ref readonly var targetPos = ref target.Get<PositionComponent>();
-            ref readonly var targetEff = ref target.Get<StatusEffectComponent>();
 
-            if (targetEff.Effects.HasFlag(StatusEffect.Dead))
+            if (target.Has<DeathTagComponent>())
+            {
                 brn.TargetId = 0;
+                return;
+            }
 
             if (brn.TargetId == 0)
             {
@@ -90,15 +90,16 @@ namespace MagnumOpus.Simulation.Systems
 
                 var wlk = new WalkComponent(ntt.Id, dir, false);
                 ntt.Set(ref wlk);
+                // FConsole.WriteLine($"[{NttWorld.Tick}][{Environment.CurrentManagedThreadId}] {brn.EntityId} Walking {dir}");
             }
-            if(brn.State == BrainState.Attacking)
+            if (brn.State == BrainState.Attacking)
             {
                 var atk = new AttackComponent(ntt.Id, in target, MsgInteractType.Physical);
                 ntt.Set(ref atk);
             }
 
             brn.State = BrainState.Sleeping;
-            brn.SleepTicks = (int)(NttWorld.TargetTps * 2.5f);
+            brn.SleepTicks = (int)(NttWorld.TargetTps * (1+Random.Shared.NextSingle()));
         }
     }
 }

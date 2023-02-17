@@ -9,7 +9,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class PickupSystem : NttSystem<PositionComponent, InventoryComponent, PickupRequestComponent>
     {
-        public PickupSystem() : base("Pickup", threads: Environment.ProcessorCount) { }
+        public PickupSystem() : base("Pickup", threads: 2) { }
 
         public override void Update(in NTT ntt, ref PositionComponent pos, ref InventoryComponent inv, ref PickupRequestComponent pic)
         {
@@ -69,6 +69,7 @@ namespace MagnumOpus.Simulation.Systems
             }
 
             Game.SpatialHashs[pos.Map].Remove(in pic.Item);
+            // Game.Grids[pos.Map].Remove(in pic.Item);
 
             var delFloorMsg = MsgFloorItem.Create(in pic.Item, Enums.MsgFloorItemType.Delete);
             ntt.NetSync(ref delFloorMsg, true);

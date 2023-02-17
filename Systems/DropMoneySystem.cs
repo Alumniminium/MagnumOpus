@@ -8,7 +8,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class DropMoneySystem : NttSystem<PositionComponent, InventoryComponent, RequestDropMoneyComponent>
     {
-        public DropMoneySystem() : base("DropMoney", threads: Environment.ProcessorCount) { }
+        public DropMoneySystem() : base("DropMoney", threads: 2) { }
 
         public override void Update(in NTT ntt, ref PositionComponent pos, ref InventoryComponent inv, ref RequestDropMoneyComponent drc)
         {
@@ -24,6 +24,7 @@ namespace MagnumOpus.Simulation.Systems
             if (success)
             {
                 Game.SpatialHashs[pos.Map].Add(in itemNtt);
+                // Game.Grids[pos.Map].Add(in itemNtt, ref pos);
                 var dropMsg = MsgFloorItem.Create(in itemNtt, Enums.MsgFloorItemType.Create);
                 ntt.NetSync(ref dropMsg, true);
             }

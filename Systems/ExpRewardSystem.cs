@@ -7,7 +7,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class ExpRewardSystem : NttSystem<LevelComponent, ExpRewardComponent>
     {
-        public ExpRewardSystem() : base("Exp Reward", threads: Environment.ProcessorCount) { }
+        public ExpRewardSystem() : base("Exp Reward", threads: 2) { }
 
         public override void Update(in NTT ntt, ref LevelComponent lvl, ref ExpRewardComponent rew)
         {

@@ -8,7 +8,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class PortalSystem : NttSystem<PortalComponent, PositionComponent>
     {
-        public PortalSystem() : base("Portal", threads: Environment.ProcessorCount) { }
+        public PortalSystem() : base("Portal", threads: 2) { }
 
         public override void Update(in NTT ntt, ref PortalComponent ptc, ref PositionComponent pos)
         {

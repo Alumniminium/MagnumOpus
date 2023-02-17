@@ -28,34 +28,23 @@ namespace MagnumOpus.ECS
 
         public readonly void NetSync<T>(ref T msg, bool broadcast = false) where T : unmanaged
         {
-            if (Type == EntityType.Player)
-            {
-                var packet = Co2Packet.Serialize(ref msg);
-                PacketsOut.Add(in this, in packet);
-            }
-
             if (broadcast)
             {
                 ref readonly var vwp = ref Get<ViewportComponent>();
 
-                for (var i = 0; i < vwp.EntitiesVisible.Count; i++)
+                foreach (var b in vwp.EntitiesVisible)
                 {
-                    var b = vwp.EntitiesVisible[i];
-                    if (b.Type != EntityType.Player || b.Id == Id)
+                    if (b.Type != EntityType.Player)
                         continue;
 
                     var packet = Co2Packet.Serialize(ref msg);
                     PacketsOut.Add(in b, in packet);
                 }
-                for (var i = 0; i < vwp.EntitiesVisibleLast.Count; i++)
-                {
-                    var b = vwp.EntitiesVisibleLast[i];
-                    if (b.Type != EntityType.Player || b.Id == Id || vwp.EntitiesVisible.Contains(b))
-                        continue;
-
-                    var packet = Co2Packet.Serialize(ref msg);
-                    PacketsOut.Add(in b, in packet);
-                }
+            }
+            else if (Type == EntityType.Player)
+            {
+                var packet = Co2Packet.Serialize(ref msg);
+                PacketsOut.Add(in this, in packet);
             }
         }
 

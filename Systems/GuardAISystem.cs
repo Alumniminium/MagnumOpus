@@ -13,6 +13,8 @@ namespace MagnumOpus.Simulation.Systems
 
         public override void Update(in NTT ntt, ref PositionComponent pos, ref ViewportComponent vwp, ref GuardPositionComponent grd, ref BrainComponent brn)
         {
+            if (brn.State == BrainState.Idle)
+                return;
             if (brn.State == BrainState.Sleeping)
             {
                 brn.SleepTicks--;
@@ -27,13 +29,12 @@ namespace MagnumOpus.Simulation.Systems
             {
                 vwp.EntitiesVisible.Clear();
                 Game.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
+                // Game.Grids[pos.Map].GetVisibleEntities(ref vwp);
                 var closestDistance = int.MaxValue;
                 var closestEntity = default(NTT);
 
-                for (var i = 0; i < vwp.EntitiesVisible.Count; i++)
+                foreach (var b in vwp.EntitiesVisible)
                 {
-                    var b = vwp.EntitiesVisible[i];
-
                     if (b.Type != EntityType.Monster)
                         continue;
 
@@ -65,6 +66,10 @@ namespace MagnumOpus.Simulation.Systems
                 {
                     brn.TargetPosition = grd.Position;
                     brn.State = BrainState.Approaching;
+                }
+                else
+                {
+                    brn.State = BrainState.Idle;
                 }
             }
             else
@@ -106,7 +111,7 @@ namespace MagnumOpus.Simulation.Systems
             }
 
             brn.State = BrainState.Sleeping;
-            brn.SleepTicks = (int)(NttWorld.TargetTps * 0.33f);
+            brn.SleepTicks = (int)(NttWorld.TargetTps * Random.Shared.NextSingle());
         }
     }
 }

@@ -6,7 +6,6 @@ using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.SpacePartitioning;
 using MagnumOpus.Squiggly.Models;
-using SpacePartitioning;
 
 namespace MagnumOpus.Squiggly
 {
@@ -24,8 +23,8 @@ namespace MagnumOpus.Squiggly
                 if(cqMob == null)
                     continue;
 
-                if (cqMob.lookface != 900 && cqMob.lookface != 910)
-                    amount = (ushort)(amount * 4);
+                // if (cqMob.lookface != 900 && cqMob.lookface != 910)
+                //     amount = (ushort)(amount * 4);
 
                 for (var i = 0; i < amount; i++)
                 {
@@ -79,6 +78,14 @@ namespace MagnumOpus.Squiggly
                         Game.SpatialHashs[pos.Map] = new SpacePartitioning.SpatialHash(10);//new Grid(map.Width, map.Height, 10, 10);
                     }
                     Game.SpatialHashs[pos.Map].Add(in obj);
+                    // if(!Game.Grids.TryGetValue(pos.Map, out var grid))
+                    // {
+                    //     if (!Collections.Maps.TryGetValue(pos.Map, out var map))
+                    //         continue;
+
+                    //     grid = new Grid(map.Width, map.Height, 10, 10);
+                    //     Game.Grids[pos.Map] = grid;
+                    // }
                 }
             }
             sw.Stop();
@@ -107,6 +114,11 @@ namespace MagnumOpus.Squiggly
                         var grid = new SpatialHash(10);//new Grid(cqmap.Width, cqmap.Height, 10, 10);
                         Game.SpatialHashs.Add((ushort)cqmap.id, grid);
                     }
+                    // if(!Game.Grids.TryGetValue((ushort)cqmap.id, out var _))
+                    // {
+                    //     var grid = new Grid(cqmap.Width, cqmap.Height, 10, 10);
+                    //     Game.Grids.Add((ushort)cqmap.id, grid);
+                    // }
                 }
                 foreach (var dportal in db.Dmap_Portals)
                 {
@@ -146,10 +158,18 @@ namespace MagnumOpus.Squiggly
                     {
                         if (!Collections.Maps.TryGetValue(pos.Map, out var map))
                             continue;
-
+// 
                         Game.SpatialHashs[pos.Map] = new SpatialHash(10);//new Grid(map.Width, map.Height, 10, 10);
                     }
                     Game.SpatialHashs[pos.Map].Add(in ntt);
+                    // if(!Game.Grids.TryGetValue(pos.Map, out var grid))
+                    // {
+                    //     if (!Collections.Maps.TryGetValue(pos.Map, out var map))
+                    //         continue;
+
+                    //     grid = new Grid(map.Width, map.Height, 10, 10);
+                    //     Game.Grids[pos.Map] = grid;
+                    // }
                 }
             }
             sw.Stop();

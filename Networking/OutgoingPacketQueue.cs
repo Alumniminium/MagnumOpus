@@ -11,13 +11,13 @@ namespace MagnumOpus.Networking
     public static class PacketsOut
     {
         // private const int MAX_PACKET_SIZE = 1024 * 8;
-        private static readonly ConcurrentDictionary<NTT, Queue<Memory<byte>>> Packets = new();
+        private static readonly ConcurrentDictionary<NTT, ConcurrentQueue<Memory<byte>>> Packets = new();
 
         public static void Add(in NTT player, in Memory<byte> packet)
         {
             if (!Packets.TryGetValue(player, out var queue))
             {
-                queue = new Queue<Memory<byte>>();
+                queue = new ConcurrentQueue<Memory<byte>>();
                 Packets.TryAdd(player, queue);
             }
             var copy = new byte[packet.Length];
@@ -42,9 +42,10 @@ namespace MagnumOpus.Networking
                             NttWorld.Players.Remove(ntt);
                             continue;
                         }
-                        while (queue.Count > 0)
+                        while (!queue.IsEmpty)
                         {
-                            var packet = queue.Dequeue();
+                            if(!queue.TryDequeue(out var packet))
+                                continue;
                             var id = BitConverter.ToInt16(packet.Span[2..4]);
                             // FConsole.WriteLine($"Sending {(PacketId)id} {id} (Size: {packet.Length}) to {ntt.Id}...");
                             if(net.UseGameCrypto)

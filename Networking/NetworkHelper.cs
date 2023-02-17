@@ -8,6 +8,8 @@ namespace MagnumOpus.Networking
     {
         public static void FullSync(in NTT to, in NTT ntt)
         {
+            if(to.Type != EntityType.Player)
+                return;
             if (ntt.Type == EntityType.Npc)
             {
                 var spawnPacket = MsgNpcSpawn.Create(ntt);
@@ -25,10 +27,12 @@ namespace MagnumOpus.Networking
             }
         }
 
-        internal static void SendMsgTo(in NTT ntt, string text, MsgTextType channel)
+        internal static void SendMsgTo(in NTT to, string text, MsgTextType channel)
         {
-            var msgText = MsgText.Create(in ntt, text, channel);
-            ntt.NetSync(ref msgText);
+            if(to.Type != EntityType.Player)
+                return;
+            var msgText = MsgText.Create(in to, text, channel);
+            to.NetSync(ref msgText);
         }
         internal static void BroadcastMsg(string text, MsgTextType channel, string from = "SYSTEM")
         {

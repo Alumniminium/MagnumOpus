@@ -7,7 +7,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class EquipSystem : NttSystem<InventoryComponent, EquipmentComponent, RequestChangeEquipComponent>
     {
-        public EquipSystem() : base("Equip", threads: Environment.ProcessorCount) { }
+        public EquipSystem() : base("Equip", threads: 2) { }
 
         public override void Update(in NTT ntt, ref InventoryComponent inv, ref EquipmentComponent eq, ref RequestChangeEquipComponent change)
         {

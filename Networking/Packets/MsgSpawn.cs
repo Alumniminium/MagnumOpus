@@ -107,12 +107,15 @@ namespace MagnumOpus.Networking.Packets
         public static MsgSpawn CreateMonster(in NTT ntt)
         {
             ref readonly var bdy = ref ntt.Get<BodyComponent>();
-            ref readonly var ntc = ref ntt.Get<NameTagComponent>();
+            ref var ntc = ref ntt.Get<NameTagComponent>();
             ref readonly var lvl = ref ntt.Get<LevelComponent>();
             ref readonly var gld = ref ntt.Get<GuildComponent>();
             ref readonly var hlt = ref ntt.Get<HealthComponent>();
             ref readonly var pos = ref ntt.Get<PositionComponent>();
             ref readonly var eff = ref ntt.Get<StatusEffectComponent>();
+
+            if(string.IsNullOrEmpty(ntc.Name))
+                ntc.Name = "";
 
             var msg = new MsgSpawn
             {
@@ -130,7 +133,7 @@ namespace MagnumOpus.Networking.Packets
                 X = (ushort)pos.Position.X,
                 Y = (ushort)pos.Position.Y,
             };
-            for (byte i = 0; i < ntc.Name?.Trim().Length; i++)
+            for (byte i = 0; i < ntc.Name.Trim().Length; i++)
                 msg.Name[i] = (byte)ntc.Name.Trim()[i];
 
             return msg;

@@ -8,7 +8,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class DeathSystem : NttSystem<DeathTagComponent>
     {
-        public DeathSystem() : base("Death") { }
+        public DeathSystem() : base("Death", threads: 2) { }
 
         public override void Update(in NTT ntt, ref DeathTagComponent dtc)
         {
@@ -107,6 +107,7 @@ namespace MagnumOpus.Simulation.Systems
 
                 ref readonly var pos = ref ntt.Get<PositionComponent>();
                 Game.SpatialHashs[pos.Map].Remove(in ntt);
+                // Game.Grids[pos.Map].Remove(in ntt);
             }
         }
     }

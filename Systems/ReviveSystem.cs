@@ -10,7 +10,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class ReviveSystem : NttSystem<ReviveComponent, HealthComponent, PositionComponent, BodyComponent, StatusEffectComponent>
     {
-        public ReviveSystem() : base("Revive", threads: Environment.ProcessorCount) { }
+        public ReviveSystem() : base("Revive", threads: 2) { }
 
         public override void Update(in NTT ntt, ref ReviveComponent rev, ref HealthComponent hlt, ref PositionComponent pos, ref BodyComponent bdy, ref StatusEffectComponent eff)
         {

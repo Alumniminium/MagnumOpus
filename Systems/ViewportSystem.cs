@@ -1,8 +1,6 @@
-using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Networking;
-using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
@@ -18,7 +16,9 @@ namespace MagnumOpus.Simulation.Systems
             vwp.Viewport.Y = pos.Position.Y - vwp.Viewport.Height / 2;
 
             vwp.EntitiesVisibleLast.Clear();
-            vwp.EntitiesVisibleLast.AddRange(vwp.EntitiesVisible);
+            foreach(var e in vwp.EntitiesVisible)
+                vwp.EntitiesVisibleLast.Add(e);
+
             vwp.EntitiesVisible.Clear();
 
             Game.SpatialHashs[pos.Map].Remove(in ntt);
@@ -26,17 +26,14 @@ namespace MagnumOpus.Simulation.Systems
             Game.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
 
 
-
             // FConsole.WriteLine($"[{nameof(ViewportSystem)}] {ntt.Id} -> {vwp.EntitiesVisible.Count} entities visible");
 
             if (ntt.Type != EntityType.Player)
                 return;
 
-            for (var i = 0; i < vwp.EntitiesVisible.Count; i++)
+            foreach (var b in vwp.EntitiesVisible)
             {
-                var b = vwp.EntitiesVisible[i];
-
-                if(b.Has<DeathTagComponent>())
+                if (b.Has<DeathTagComponent>())
                     continue;
 
                 if(b.Has<ViewportComponent>())
@@ -59,19 +56,19 @@ namespace MagnumOpus.Simulation.Systems
                 NetworkHelper.FullSync(in ntt, in b);
                 NetworkHelper.FullSync(in b, in b);
 
-                if(b.Has<JumpComponent>())
-                {
-                    ref readonly var jmp = ref b.Get<JumpComponent>();
-                    var packet = MsgAction.CreateJump(in ntt, in jmp);
-                    ntt.NetSync(ref packet, true);
-                }
+                // if(b.Has<JumpComponent>())
+                // {
+                //     ref readonly var jmp = ref b.Get<JumpComponent>();
+                //     var packet = MsgAction.CreateJump(in ntt, in jmp);
+                //     ntt.NetSync(ref packet, true);
+                // }
 
-                if(b.Has<WalkComponent>())
-                {
-                    ref readonly var wlk = ref b.Get<WalkComponent>();
-                    var packet = MsgWalk.Create(ntt.NetId, wlk.Direction, wlk.IsRunning);
-                    ntt.NetSync(ref packet, true);
-                }
+                // if(b.Has<WalkComponent>())
+                // {
+                //     ref readonly var wlk = ref b.Get<WalkComponent>();
+                //     var packet = MsgWalk.Create(ntt.NetId, wlk.Direction, wlk.IsRunning);
+                //     ntt.NetSync(ref packet, true);
+                // }
             }
         }
     }

@@ -14,9 +14,8 @@ namespace MagnumOpus.Simulation.Systems
         {
             var tcc = new TargetCollectionComponent(ntt.Id, atk.MagicType);
 
-            for (int i = 0; i < vwp.EntitiesVisible.Count; i++)
+            foreach (var b in vwp.EntitiesVisible)
             {
-                var b = vwp.EntitiesVisible[i];
                 ref readonly var bPos = ref b.Get<PositionComponent>();
 
                 if (b.Type == EntityType.Player && atk.MagicType.Crime != 0)

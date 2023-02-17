@@ -13,9 +13,8 @@ namespace MagnumOpus.Simulation.Systems
         public override void Update(in NTT ntt, ref CircleTargetComponent atk, ref ViewportComponent vwp)
         {
             var tcc = new TargetCollectionComponent(ntt.Id, atk.MagicType);
-            for (int i = 0; i < vwp.EntitiesVisible.Count; i++)
+            foreach (var b in vwp.EntitiesVisible)
             {
-                var b = vwp.EntitiesVisible[i];
                 ref readonly var bPos = ref b.Get<PositionComponent>();
                 var dir = CoMath.GetDirection(bPos.Position, new Vector2(atk.X, atk.Y));
                 var range = atk.MagicType.Distance+1;

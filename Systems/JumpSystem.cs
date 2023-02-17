@@ -1,17 +1,14 @@
 using System.Numerics;
-using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
-using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
-using MagnumOpus.Networking;
 using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
     public sealed class JumpSystem : NttSystem<PositionComponent, JumpComponent, BodyComponent>
     {
-        public JumpSystem() : base("Jump", threads: 1) { }
+        public JumpSystem() : base("Jump", threads: 2) { }
         protected override bool MatchesFilter(in NTT ntt) => ntt.Type != EntityType.Item && base.MatchesFilter(in ntt);
 
         public override void Update(in NTT ntt, ref PositionComponent pos, ref JumpComponent jmp, ref BodyComponent bdy)

@@ -7,7 +7,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class EmoteSystem : NttSystem<EmoteComponent, BodyComponent>
     {
-        public EmoteSystem() : base("Emote", threads: Environment.ProcessorCount) { }
+        public EmoteSystem() : base("Emote", threads: 2) { }
         protected override bool MatchesFilter(in NTT ntt) => ntt.Type != EntityType.Item && base.MatchesFilter(in ntt);
 
         public override void Update(in NTT ntt, ref EmoteComponent emo, ref BodyComponent bdt)

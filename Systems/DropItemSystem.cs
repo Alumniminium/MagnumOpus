@@ -9,7 +9,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class DropItemSystem : NttSystem<PositionComponent, RequestDropItemComponent, InventoryComponent>
     {
-        public DropItemSystem() : base("Drop Item") { }
+        public DropItemSystem() : base("Drop Item", threads:2) { }
         public override void Update(in NTT ntt, ref PositionComponent pos, ref RequestDropItemComponent rdi, ref InventoryComponent inv)
         {
             if (!InventoryHelper.RemoveNetIdFromInventory(in ntt, rdi.ItemNtt.NetId))
@@ -27,6 +27,7 @@ namespace MagnumOpus.Simulation.Systems
             rdi.ItemNtt.Set(ref ltc);
 
             Game.SpatialHashs[pos.Map].Add(in rdi.ItemNtt);
+            // Game.Grids[pos.Map].Add(in rdi.ItemNtt, ref pos);
 
             var msgRemoveInv = MsgItem.Create(rdi.ItemNtt.NetId, rdi.ItemNtt.NetId, rdi.ItemNtt.NetId, MsgItemType.RemoveInventory);
             var msgDropFloor = MsgFloorItem.Create(in rdi.ItemNtt, MsgFloorItemType.Create);

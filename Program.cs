@@ -10,13 +10,11 @@ using MagnumOpus.Networking.Packets;
 using MagnumOpus.Simulation.Systems;
 using MagnumOpus.SpacePartitioning;
 using MagnumOpus.Squiggly;
-using SpacePartitioning;
 
 namespace MagnumOpus
 {
     public static class Game
     {
-        // internal static readonly Dictionary<int, Grid> Grids = new();
         internal static readonly Dictionary<int, SpatialHash> SpatialHashs = new();
         private static readonly TcpListener GameListener = new(System.Net.IPAddress.Any, 5816);
         private static readonly TcpListener LoginListener = new(System.Net.IPAddress.Any, 9958);
@@ -29,6 +27,7 @@ namespace MagnumOpus
                 new GuardAISystem(),
                 new WalkSystem(),
                 new JumpSystem(),
+                new EmoteSystem(),
                 new PortalSystem(),
                 new TeleportSystem(),
                 new ViewportSystem(),
@@ -47,7 +46,6 @@ namespace MagnumOpus
                 new DropMoneySystem(),
                 new PickupSystem(),
                 new ItemUseSystem(),
-                new EmoteSystem(),
                 new ReviveSystem(),
                 new ShopSystem(),
                 new EquipSystem(),

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MagnumOpus.ECS
 {
@@ -8,8 +9,8 @@ namespace MagnumOpus.ECS
         public bool Trace = false;
         internal readonly HashSet<NTT> _entities = new();
         internal readonly List<NTT> _entitiesList = new();
-        internal readonly List<Thread> _threads;
-        internal readonly List<AutoResetEvent> _blocks;
+        internal readonly Thread[] _threads;
+        internal readonly AutoResetEvent[] _blocks;
         private readonly AutoResetEvent _allReady = new(false);
         internal volatile int _readyThreads = 0;
         private float _lastUpdateTime = float.MaxValue;
@@ -19,16 +20,16 @@ namespace MagnumOpus.ECS
         {
             Name = name;
             PerformanceMetrics.RegisterSystem(this);
-            _threads = new List<Thread>(threads);
-            _blocks = new List<AutoResetEvent>(threads);
+            _threads = new Thread[threads];
+            _blocks = new AutoResetEvent[threads];
             for (var i = 0; i < threads; i++)
             {
-                _blocks.Add(new AutoResetEvent(false));
-                _threads.Add(new Thread(ThreadLoop)
+                _blocks[i] = new AutoResetEvent(false);
+                _threads[i] = new Thread(ThreadLoop)
                 {
                     IsBackground = true,
                     Priority = ThreadPriority.Highest
-                });
+                };
                 _threads[i].Start(i);
             }
         }
@@ -36,10 +37,16 @@ namespace MagnumOpus.ECS
         public void BeginUpdate()
         {
             var ts = Stopwatch.GetTimestamp();
+            if(_entities.Count == 0)
+            {
+                _lastUpdateTime = (float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds;
+                PerformanceMetrics.AddSample(Name, _lastUpdateTime);
+                return;
+            }
             _allReady.Reset();
             Interlocked.Exchange(ref _readyThreads, 0);
 
-            for (int i = 0; i < _threads.Count; i++)
+            for (int i = 0; i < _threads.Length; i++)
                 _blocks[i].Set();
 
             _allReady.WaitOne();
@@ -47,16 +54,13 @@ namespace MagnumOpus.ECS
             PerformanceMetrics.AddSample(Name, _lastUpdateTime);
         }
 
-        public void ThreadLoop(object? id)
+        public void ThreadLoop(object id)
         {
-            if (id == null)
-                throw new ArgumentNullException(nameof(id));
-
             int idx = (int)id;
             while (true)
             {
                 Interlocked.Increment(ref _readyThreads);
-                if (_readyThreads >= _threads.Count)
+                if (_readyThreads >= _threads.Length)
                     _allReady.Set();
 
                 _blocks[idx].WaitOne();
@@ -64,13 +68,15 @@ namespace MagnumOpus.ECS
                 int start = 0;
                 int amount = _entitiesList.Count;
 
-                if (_threads.Count > 1)
+                if (_entitiesList.Count >= _threads.Length)
                 {
-                    int chunkSize = _entitiesList.Count / _threads.Count;
-                    int remaining = _entitiesList.Count % _threads.Count;
+                    int chunkSize = _entitiesList.Count / _threads.Length;
+                    int remaining = _entitiesList.Count % _threads.Length;
                     start = chunkSize * idx + Math.Min(idx, remaining);
                     amount = chunkSize + (idx < remaining ? 1 : 0);
                 }
+                else if (idx != 0)
+                    continue;
 
                 Update(start, start + amount);
             }
