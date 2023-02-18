@@ -21,9 +21,6 @@ namespace MagnumOpus.Simulation.Systems
                 ntt.NetSync(ref msgJoin);
                 ref var eff = ref ntt.Get<StatusEffectComponent>();
                 eff.Effects |= StatusEffect.TeamLeader;
-
-                var msgUpdate = MsgUserAttrib.Create(ntt.NetId, (ulong)eff.Effects,MsgUserAttribType.StatusEffect);
-                ntt.NetSync(ref msgUpdate, true);
             }
             if (ntt.Id == team.Leader.Id)
             {
@@ -66,10 +63,10 @@ namespace MagnumOpus.Simulation.Systems
                     if (member.Id == ntt.Id)
                         continue;
 
-                    ref readonly var pro = ref member.Get<ClassComponent>();
+                    ref readonly var pro = ref member.Get<ProfessionComponent>();
                     ref readonly var mrg = ref member.Get<MarriageComponent>();
                         
-                    if ((int)pro.Class is > 132 and < 136) // Water Taoiust
+                    if ((int)pro.Profession is > 132 and < 136) // Water Taoiust
                         sharedExp *= 2;                    // Bonus Exp
 
                     if(mrg.EntityId == member.Id)   // 

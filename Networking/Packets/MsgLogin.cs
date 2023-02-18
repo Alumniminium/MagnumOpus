@@ -42,14 +42,14 @@ namespace MagnumOpus.Networking.Packets
             var bdy = new BodyComponent(ntt.Id, (uint)(net.Username == "trbl" ? 2003 : 2002));
             var hed = new HeadComponent(ntt.Id, 6);
             var emo = new EmoteComponent(ntt.Id, Emote.Stand);
-            var vwp = new ViewportComponent(ntt.Id, 40);
+            var vwp = new ViewportComponent(ntt.Id, 21);
             var pos = new PositionComponent(ntt.Id, new System.Numerics.Vector2(438,377), 1002);
             var eff = new StatusEffectComponent(ntt.Id);
             var inv = new InventoryComponent(ntt.Id, 1000, 0);
             var lvl = new LevelComponent(ntt.Id, 1);
             var hlt = new HealthComponent(ntt.Id, 330, 330);
             var mana = new ManaComponent(ntt.Id, 1000, 1000);
-            var pro = new ClassComponent(ntt.Id, ClasseName.Archer);
+            var pro = new ProfessionComponent(ntt.Id, ClasseName.Archer);
             var sbc = new SpellBookComponent(ntt.Id);
             var eqc = new EquipmentComponent(ntt.Id);
 

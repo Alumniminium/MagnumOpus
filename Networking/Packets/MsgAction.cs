@@ -99,7 +99,10 @@ namespace MagnumOpus.Networking.Packets
                     {
                         FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.X}, {msg.Y}");
                         ref var pos = ref ntt.Get<PositionComponent>();
-
+                        ref var vwp = ref ntt.Get<ViewportComponent>();
+                        vwp.EntitiesVisible.Clear();
+                        vwp.EntitiesVisibleLast.Clear();
+                        pos.ChangedTick = NttWorld.Tick;
                         var reply = Create(ntt.NetId, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
                         ntt.NetSync(ref reply);
                         FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {reply.X}, {reply.Y}");

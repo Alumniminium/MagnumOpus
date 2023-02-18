@@ -18,9 +18,7 @@ namespace MagnumOpus.Simulation.Systems
                 ref readonly var rew = ref pic.Item.Get<MoneyRewardComponent>();
                 inv.Money += (uint)rew.Amount;
 
-                var moneyMsg = MsgUserAttrib.Create(ntt.NetId, inv.Money, Enums.MsgUserAttribType.MoneyInventory);
                 var moneyTxtMsg = MsgText.Create(in ntt, $"You picked up {rew.Amount} gold", Enums.MsgTextType.TopLeft);
-                ntt.NetSync(ref moneyMsg);
                 ntt.NetSync(ref moneyTxtMsg);
 
                 if(rew.Amount > 1000)

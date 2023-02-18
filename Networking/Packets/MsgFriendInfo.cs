@@ -27,7 +27,7 @@ namespace MagnumOpus.Networking.Packets
             ref readonly var mar = ref target.Get<MarriageComponent>();
             ref readonly var pkp = ref target.Get<PkPointComponent>();
             ref readonly var lvl = ref target.Get<LevelComponent>();
-            ref readonly var pro = ref target.Get<ClassComponent>();
+            ref readonly var pro = ref target.Get<ProfessionComponent>();
 
             ref readonly var spouse = ref NttWorld.GetEntity(mar.SpouseId);
             ref readonly var spouseNtc = ref spouse.Get<NameTagComponent>();
@@ -39,7 +39,7 @@ namespace MagnumOpus.Networking.Packets
                 UniqId = target.NetId,
                 Look = bdy.Look,
                 Level = lvl.Level,
-                Profession = (byte)pro.Class,
+                Profession = (byte)pro.Profession,
                 PkPoints = pkp.Points,
                 GuildUID = 0,
                 Unknow = 0,

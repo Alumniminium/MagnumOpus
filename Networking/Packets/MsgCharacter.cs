@@ -62,7 +62,7 @@ namespace MagnumOpus.Networking.Packets
             ref var pkp = ref ntt.Get<PkPointComponent>();
             ref var hlt = ref ntt.Get<HealthComponent>();
             ref var mna = ref ntt.Get<ManaComponent>();
-            ref var pro = ref ntt.Get<ClassComponent>();
+            ref var pro = ref ntt.Get<ProfessionComponent>();
             ref var ntc = ref ntt.Get<NameTagComponent>();
             ref var mar = ref ntt.Get<MarriageComponent>();
             ref var inv = ref ntt.Get<InventoryComponent>();
@@ -109,7 +109,7 @@ namespace MagnumOpus.Networking.Packets
                 Mana = mna.Mana,
                 PkPoints = pkp.Points,
                 Level = lvl.Level,
-                Class = (byte)pro.Class,
+                Class = (byte)pro.Profession,
                 Reborn = rbn.Count,
                 ShowName = true,
                 StringCount = 2,

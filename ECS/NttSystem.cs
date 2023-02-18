@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
 namespace MagnumOpus.ECS
 {
@@ -82,7 +81,7 @@ namespace MagnumOpus.ECS
             }
         }
 
-        protected virtual void Update(int start, int end) { }
+        protected abstract void Update(int start, int end);
         protected virtual bool MatchesFilter(in NTT nttId) => nttId.Id != 0;
         internal void EntityChanged(in NTT ntt)
         {

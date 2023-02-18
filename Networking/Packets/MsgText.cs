@@ -89,7 +89,7 @@ namespace MagnumOpus.Networking.Packets
                 StringCount = 4,
                 Channel = type,
                 SenderUniqueId = Environment.TickCount,
-                // Color = 0x00FF00FF,
+                Color = 0x000000F0,
             };
 
             // if (GameWorld.Find(to, out YiObj found))
@@ -137,9 +137,9 @@ namespace MagnumOpus.Networking.Packets
             ref readonly var vwp = ref ntt.Get<ViewportComponent>();
             foreach (var entity in vwp.EntitiesVisible)
             {
-                ref readonly var job = ref entity.Get<ClassComponent>();
+                ref readonly var job = ref entity.Get<ProfessionComponent>();
 
-                switch (job.Class)
+                switch (job.Profession)
                 {
                     case ClasseName.WaterMaster:
                     case ClasseName.WaterSaint:

@@ -30,9 +30,6 @@ namespace MagnumOpus.Simulation.Systems
                 ref var expReward = ref dmg.Attacker.Get<ExpRewardComponent>();
                 expReward.Experience += (ushort)actualDamage;
             }
-
-            var healthUpdate = MsgUserAttrib.Create(ntt.NetId, (ushort)hlt.Health, Enums.MsgUserAttribType.Health);
-            ntt.NetSync(ref healthUpdate, true);
             ntt.Remove<DamageComponent>();
         }
     }

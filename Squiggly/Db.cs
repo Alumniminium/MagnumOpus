@@ -91,6 +91,33 @@ namespace MagnumOpus.Squiggly
             sw.Stop();
         }
 
+        public static void LoadCqNpc()
+        {
+            var sw = Stopwatch.StartNew();
+            using var db = new SquigglyContext();
+            foreach(var cq in db.cq_npc)
+                Collections.CqNpc.TryAdd(cq.id, cq);
+            sw.Stop();
+            FConsole.WriteLine($"Loaded {Collections.CqNpc.Count} CqNpcs in {sw.ElapsedMilliseconds}ms");
+        }
+        public static void LoadCqAction()
+        {
+            var sw = Stopwatch.StartNew();
+            using var db = new SquigglyContext();
+            foreach(var cq in db.cq_action)
+                Collections.CqAction.TryAdd(cq.id, cq);
+            sw.Stop();
+            FConsole.WriteLine($"Loaded {Collections.CqAction.Count} CqActions in {sw.ElapsedMilliseconds}ms");
+        }
+        public static void LoadCqTask()
+        {
+            var sw = Stopwatch.StartNew();
+            using var db = new SquigglyContext();
+            foreach(var cq in db.cq_task)
+                Collections.CqTask.TryAdd(cq.id, cq);
+            sw.Stop();
+            FConsole.WriteLine($"Loaded {Collections.CqTask.Count} CqTasks in {sw.ElapsedMilliseconds}ms");
+        }
         public static void LoadMaps()
         {
             var sw = Stopwatch.StartNew();

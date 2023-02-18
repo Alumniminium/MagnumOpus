@@ -53,14 +53,8 @@ namespace MagnumOpus.Simulation.Systems
             eff.Effects &= ~StatusEffect.Dead;
             eff.Effects &= ~StatusEffect.FrozenRemoveName;
 
-            var update = MsgUserAttrib.Create(ntt.NetId, (ulong)eff.Effects, MsgUserAttribType.StatusEffect);
-            var hltUp = MsgUserAttrib.Create(ntt.NetId, (ulong)hlt.Health, MsgUserAttribType.Health);
-            var bdyUp = MsgUserAttrib.Create(ntt.NetId, (ulong)bdy.Look, MsgUserAttribType.Look);
             var reply = MsgAction.Create(ntt.NetId, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
 
-            ntt.NetSync(ref hltUp);
-            ntt.NetSync(ref bdyUp);
-            ntt.NetSync(ref update);
             ntt.NetSync(ref reply);
 
             ntt.Set(ref pos);

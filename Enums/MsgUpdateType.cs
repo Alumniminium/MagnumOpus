@@ -35,7 +35,7 @@ namespace MagnumOpus.Enums
         HairStyle = 27,
         XpCircle = 28,
         LuckyTimeTimer = 29,
-        InvCPoints = 30,
+        CPsInventory = 30,
         XpTimer = 31,
         TrainingPoints = 32,
         Nobility = 81

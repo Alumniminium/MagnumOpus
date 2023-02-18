@@ -57,8 +57,8 @@ namespace MagnumOpus
             string TmpFile = Path.GetTempFileName();
             Cipher.GenerateKey(0x2537);
 
-            using (FileStream Reader = new ("CLIENT_FILES/itemtype.dat", FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (FileStream Writer = new (TmpFile, FileMode.Open, FileAccess.Write, FileShare.Read))
+            using (FileStream Reader = new("CLIENT_FILES/itemtype.dat", FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (FileStream Writer = new(TmpFile, FileMode.Open, FileAccess.Write, FileShare.Read))
             {
                 var Buffer = new byte[10240];
 
@@ -84,6 +84,9 @@ namespace MagnumOpus
             SquigglyDb.LoadPortals();
             SquigglyDb.LoadLevelExp();
             SquigglyDb.LoadItemBonus();
+            SquigglyDb.LoadCqAction();
+            SquigglyDb.LoadCqTask();
+            SquigglyDb.LoadCqNpc();
             SquigglyDb.Spawn();
             SquigglyDb.LoadNpcs();
 
@@ -95,20 +98,19 @@ namespace MagnumOpus
                 var linesArr = lines.Split('\r', '\n');
                 // FConsole.WriteLine(lines);
 
-                for(int i = 0; i < linesArr.Length; i++)
+                for (int i = 0; i < linesArr.Length; i++)
                 {
-                    foreach(var player in NttWorld.Players)
+                    foreach (var player in NttWorld.Players)
                     {
-                        if(i == 0)
+                        if (i == 0)
                         {
-                            var msg = MsgText.Create(player, linesArr[i], Enums.MsgTextType.MiniMap);
-                            player.NetSync(ref msg);
+                            var msgUp = MsgText.Create(player, linesArr[i], Enums.MsgTextType.MiniMap);
+                            player.NetSync(ref msgUp);
+                            continue;
                         }
-                        else
-                        {
-                            var msg = MsgText.Create(player, linesArr[i], Enums.MsgTextType.MiniMap2);
-                            player.NetSync(ref msg);
-                        }
+
+                        var msg = MsgText.Create(player, linesArr[i], Enums.MsgTextType.MiniMap2);
+                        player.NetSync(ref msg);
                     }
                 }
 
@@ -207,62 +209,57 @@ namespace MagnumOpus
                 var packet = net.RecvBuffer[..count];
                 net.GameCrypto.Decrypt(packet.Span);
 
-                unsafe
-                {
-                    byte[] pk;
-                    fixed (byte* ptr = packet.Span)
-                    {
-                        var size = *(ushort*)(ptr + 7);
-                        var junkSize = *(int*)(ptr + 11);
-                        var pkSize = *(int*)(ptr + 15 + junkSize);
-                        pk = new byte[pkSize];
+                var packetSpan = packet.Span;
 
-                        pk = new byte[pkSize];
-                        for (var i = 0; i < pkSize; i++)
-                            pk[i] = *(ptr + 19 + junkSize + i);
-                    }
+                var size = BitConverter.ToUInt16(packetSpan[7..]);
+                var junkSize = BitConverter.ToInt32(packetSpan[11..]);
+                var pkSize = BitConverter.ToInt32(packetSpan[(15 + junkSize)..]);
+                var pk = new byte[pkSize];
+                for (var i = 0; i < pkSize; i++)
+                    pk[i] = packetSpan[19 + junkSize + i];
 
-                    var pubkey = Encoding.ASCII.GetString(pk);
-                    net.DiffieHellman.ComputePrivateKey(pubkey);
-                    net.GameCrypto.GenerateKeys(net.DiffieHellman.GetPrivateKey());
-                    net.GameCrypto.SetIVs(net.ServerIV, net.ClientIV);
-                }
+                var pubkey = Encoding.ASCII.GetString(pk);
+                net.DiffieHellman.ComputePrivateKey(pubkey);
+                net.GameCrypto.GenerateKeys(net.DiffieHellman.GetPrivateKey());
+                net.GameCrypto.SetIVs(net.ServerIV, net.ClientIV);
 
                 new Thread(() => GameClientLoop(in ntt)).Start();
-                // GameClientLoop(in ntt);
             }
         }
-
         private static void GameClientLoop(in NTT ntt)
         {
             ref var net = ref ntt.Get<NetworkComponent>();
+            var buffer = net.RecvBuffer.Span;
+            var crypto = net.GameCrypto;
+
             while (true)
             {
                 try
                 {
-                    var count = net.Socket.Receive(net.RecvBuffer.Span[..2]);
-
+                    // Receive the packet size.
+                    var sizeBytes = buffer[..2];
+                    var count = net.Socket.Receive(sizeBytes);
                     if (count != 2)
                         throw new Exception("NO DIE");
 
-                    net.GameCrypto.Decrypt(net.RecvBuffer.Span[..count]);
-                    var size = BitConverter.ToUInt16(net.RecvBuffer.Span[..count]) + 8;
+                    // Decrypt the size bytes and compute the packet size.
+                    crypto.Decrypt(sizeBytes);
+                    var size = BitConverter.ToUInt16(sizeBytes) + 8;
 
+                    // Keep receiving until the entire packet is received.
+                    count = 2;
                     while (count < size)
                     {
-                        var received = net.Socket.Receive(net.RecvBuffer.Span[count..size]);
-                        count += received;
-
+                        var received = net.Socket.Receive(buffer[count..size]);
                         if (received == 0)
                             throw new Exception("NO DIE");
+
+                        count += received;
                     }
 
-                    var packet = net.RecvBuffer[..size];
-                    Span<byte> copy = new byte[size];
-                    packet.Span.CopyTo(copy);
-
-                    net.GameCrypto.Decrypt(copy[2..size]);
-                    PacketsIn.Add(in ntt, copy.ToArray());
+                    // Process the packet.
+                    crypto.Decrypt(buffer[2..size]);
+                    PacketsIn.Add(in ntt, buffer[..size].ToArray());
                 }
                 catch
                 {
@@ -273,7 +270,7 @@ namespace MagnumOpus
                     break;
                 }
             }
-            
+
             NttWorld.Destroy(in ntt);
         }
     }

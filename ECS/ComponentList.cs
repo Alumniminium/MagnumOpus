@@ -9,7 +9,7 @@ namespace MagnumOpus.ECS
             Array[owner.Id] = component;
             NttWorld.InformChangesFor(in owner);
         }
-        public static bool HasFor(in NTT owner) => Array[owner.Id].GetHashCode() == owner.Id;
+        public static bool HasFor(in NTT owner) => Array[owner.Id].GetHashCode() != 0;
         public static ref T Get(NTT owner) => ref Array[owner.Id];
         // called via reflection @ ReflectionHelper.Remove<T>()
         public static void Remove(NTT owner, bool notify)

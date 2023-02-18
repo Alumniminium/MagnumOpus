@@ -87,8 +87,6 @@ namespace MagnumOpus.Simulation.Systems
                         ntt.NetSync(ref remInv);
                         FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.NetId} sold {txc.ItemId} for {money} and now has {inv.Money:C}");
                     }
-                    var moneyMsg = MsgUserAttrib.Create(ntt.NetId, inv.Money, MsgUserAttribType.MoneyInventory);
-                    ntt.NetSync(ref moneyMsg);
                     break;
                 }
             }

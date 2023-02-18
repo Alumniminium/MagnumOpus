@@ -22,13 +22,13 @@ namespace MagnumOpus.SpacePartitioning
             ref readonly var pos = ref entity.Get<PositionComponent>();
             int hash = GetHash(pos.Position);
 
-            lock (_lock)
-            {
                 if (!Hashtbl.ContainsKey(hash))
                     Hashtbl[hash] = new List<NTT>();
                 else if (Hashtbl[hash].Contains(entity))
                     return;
 
+            lock (_lock)
+            {
                 Hashtbl[hash].Add(entity);
             }
         }
@@ -38,9 +38,9 @@ namespace MagnumOpus.SpacePartitioning
             ref readonly var pos = ref entity.Get<PositionComponent>();
             int hash = GetHash(pos.Position);
 
+                if (Hashtbl.TryGetValue(hash, out var bucket))
             lock (_lock)
             {
-                if (Hashtbl.TryGetValue(hash, out var bucket))
                     bucket.Remove(entity);
             }
         }

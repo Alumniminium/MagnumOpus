@@ -12,6 +12,16 @@ namespace MagnumOpus.Simulation.Systems
 
         public override void Update(in NTT ntt, ref DeathTagComponent dtc)
         {
+            if (ntt.Type == EntityType.Player || ntt.Type == EntityType.Npc || ntt.Type == EntityType.Monster)
+                EntityDeath(in ntt, ref dtc);
+            else if (ntt.Type == EntityType.Item)
+                ItemDeath(in ntt, ref dtc);
+            else if (ntt.Type == EntityType.Trap)
+                TrapDeath(in ntt, ref dtc);
+        }
+
+        public static void EntityDeath(in NTT ntt, ref DeathTagComponent dtc)
+        {
             if (dtc.Tick == NttWorld.Tick)
             {
                 ref var eff = ref ntt.Get<StatusEffectComponent>();
@@ -26,9 +36,6 @@ namespace MagnumOpus.Simulation.Systems
                         ghostLook = MsgSpawn.AddTransform(bdy.Look, 99);
                     else
                         ghostLook = MsgSpawn.AddTransform(bdy.Look, 98);
-
-                    var msgUpdate = MsgUserAttrib.Create(ntt.NetId, ghostLook, MsgUserAttribType.Look);
-                    ntt.NetSync(ref msgUpdate, true);
                 }
 
                 if (ntt.Has<CqActionComponent>())
@@ -79,44 +86,50 @@ namespace MagnumOpus.Simulation.Systems
                     }
                 }
 
-                if (ntt.Type != EntityType.Item)
-                {
-                    var effectsMsg = MsgUserAttrib.Create(ntt.NetId, (ulong)eff.Effects, MsgUserAttribType.StatusEffect);
-                    var deathMsg = MsgInteract.Create(in dtc.Killer, in ntt, MsgInteractType.Death, 0);
-                    ntt.NetSync(ref effectsMsg, true);
-                    ntt.NetSync(ref deathMsg, true);
-                }
-
                 dtc.Killer.Remove<AttackComponent>();
                 ntt.Remove<AttackComponent>();
                 ntt.Remove<BrainComponent>();
                 ntt.Remove<WalkComponent>();
                 ntt.Remove<JumpComponent>();
-            }
-            else if (dtc.Tick + NttWorld.TargetTps == NttWorld.Tick && ntt.Type == EntityType.Item)
-            {
-                var despawn = MsgFloorItem.Create(in ntt, MsgFloorItemType.Delete);
-                ntt.NetSync(ref despawn, true);
+
+                ref var vwp = ref ntt.Get<ViewportComponent>();
+                ref readonly var pos = ref ntt.Get<PositionComponent>();
+                if (Game.SpatialHashs.TryGetValue(pos.Map, out var hash))
+                    hash.GetVisibleEntities(ref vwp);
+                var deathMsg = MsgInteract.Create(in dtc.Killer, in ntt, MsgInteractType.Death, 0);
+                ntt.NetSync(ref deathMsg, true);
             }
             else if (dtc.Tick + NttWorld.TargetTps * 7 == NttWorld.Tick && ntt.Type == EntityType.Monster)
             {
                 ref var eff = ref ntt.Get<StatusEffectComponent>();
                 eff.Effects |= StatusEffect.Fade;
-
-                var update = MsgUserAttrib.Create(ntt.NetId, (ulong)eff.Effects, MsgUserAttribType.StatusEffect);
-                ntt.NetSync(ref update, true);
             }
             else if (dtc.Tick + NttWorld.TargetTps * 10 == NttWorld.Tick && ntt.Type == EntityType.Monster)
             {
-                var despwan = MsgAction.RemoveEntity(ntt.NetId);
-                ntt.NetSync(ref despwan, true);
+                ref readonly var pos = ref ntt.Get<PositionComponent>();
                 var ded = new DestroyEndOfFrameComponent(ntt.Id);
                 ntt.Set(ref ded);
-
-                ref readonly var pos = ref ntt.Get<PositionComponent>();
                 Game.SpatialHashs[pos.Map].Remove(in ntt);
-                // Game.Grids[pos.Map].Remove(in ntt);
             }
+        }
+
+        public static void ItemDeath(in NTT ntt, ref DeathTagComponent dtc)
+        {
+            if (dtc.Tick + NttWorld.TargetTps == NttWorld.Tick && ntt.Type == EntityType.Item)
+            {
+                ref readonly var pos = ref ntt.Get<PositionComponent>();
+                var despawn = MsgFloorItem.Create(in ntt, MsgFloorItemType.Delete);
+                ntt.NetSync(ref despawn, true);
+                var ded = new DestroyEndOfFrameComponent(ntt.Id);
+                ntt.Set(ref ded);
+                if (Game.SpatialHashs.TryGetValue(pos.Map, out var hash))
+                    hash.Remove(in ntt);
+            }
+        }
+
+        public static void TrapDeath(in NTT ntt, ref DeathTagComponent dtc)
+        {
+            
         }
     }
 }

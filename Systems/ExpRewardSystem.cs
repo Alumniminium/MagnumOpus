@@ -16,21 +16,29 @@ namespace MagnumOpus.Simulation.Systems
             if (lvl.Experience >= lvl.ExperienceToNextLevel)
             {
                 ref var hlt = ref ntt.Get<HealthComponent>();
+                var level = lvl.Level++;
+                var profession = ntt.Get<ProfessionComponent>().Profession;
                 lvl.Level++;
                 lvl.Experience = 0;
                 lvl.ExperienceToNextLevel = (uint)Collections.LevelExps.Values[lvl.Level - 1];
                 lvl.ChangedTick = NttWorld.Tick;
                 hlt.Health = hlt.MaxHealth;
 
-                var lvlUp = MsgUserAttrib.Create(ntt.NetId, lvl.Level, Enums.MsgUserAttribType.Level);
-                ntt.NetSync(ref lvlUp, false);
+                using var ctx = new SquigglyContext();
+                var allot = ctx.cq_point_allot.FirstOrDefault(x=> x.level == level && x.profession == ((long)profession / 10));
+                if (allot != null)
+                {
+                    ref var pnt = ref ntt.Get<AttributeComponent>();
+                    pnt.Agility = (ushort)allot.Speed;
+                    pnt.Strength = (ushort)allot.force;
+                    pnt.Vitality = (ushort)allot.health;
+                    pnt.Spirit = (ushort)allot.soul;
+                }
 
                 var lvlActionMsg = MsgAction.Create(ntt.NetId, 0, 0, 0, 0, Enums.MsgActionType.LevelUp);
                 ntt.NetSync(ref lvlActionMsg, true);
             }
 
-            var expUp = MsgUserAttrib.Create(ntt.NetId, lvl.Experience, Enums.MsgUserAttribType.Experience);
-            ntt.NetSync(ref expUp, false);
             ntt.Remove<ExpRewardComponent>();
         }
     }

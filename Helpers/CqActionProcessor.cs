@@ -12,23 +12,9 @@ namespace MagnumOpus.Helpers
 {
     public static class CqProcessor
     {
-        public static cq_npc GetNpc(int npcId)
-        {
-            using var ctx = new SquigglyContext();
-            return ctx.cq_npc.Find((long)npcId);
-        }
-
-        public static cq_task GetTask(long taskId)
-        {
-            using var ctx = new SquigglyContext();
-            return ctx.cq_task.Find(taskId);
-        }
-
-        public static cq_action GetAction(long actionId)
-        {
-            using var ctx = new SquigglyContext();
-            return ctx.cq_action.Find(actionId);
-        }
+        public static cq_npc GetNpc(int npcId) => Collections.CqNpc.TryGetValue(npcId, out var npc) ? npc : default;
+        public static cq_task GetTask(long taskId) => Collections.CqTask.TryGetValue(taskId, out var task) ? task : default;
+        public static cq_action GetAction(long actionId) => Collections.CqAction.TryGetValue(actionId, out var action) ? action : default;
     }
     public static class CqActionProcessor
     {
@@ -59,8 +45,6 @@ namespace MagnumOpus.Helpers
                         if(result >= 0)
                         {
                             x.Money = (uint)result;
-                            var pak = MsgUserAttrib.Create(ntt.NetId, x.Money, MsgUserAttribType.MoneyInventory);
-                            ntt.NetSync(ref pak);
                             return true;
                         }
                         return false;
@@ -91,21 +75,19 @@ namespace MagnumOpus.Helpers
             },
             { "profession", (ntt, targetVal, op) =>
                 {
-                    ref var x = ref ntt.Get<ClassComponent>();
+                    ref var x = ref ntt.Get<ProfessionComponent>();
                     if(AttrOpts.TryGetValue(op, out var func))
                     {
-                        var result = func((long)x.Class, targetVal);
+                        var result = func((long)x.Profession, targetVal);
                         if(result >= 0)
                         {
-                            x.Class = (ClasseName)result;
-                            var pak = MsgUserAttrib.Create(ntt.NetId, (byte)x.Class, MsgUserAttribType.Class);
-                            ntt.NetSync(ref pak);
+                            x.Profession = (ClasseName)result;
                             return true;
                         }
                         return false;
                     }
                     if(BooleanAttrOpts.TryGetValue(op, out var boolFunc))
-                        return boolFunc((long)x.Class, targetVal);
+                        return boolFunc((long)x.Profession, targetVal);
                     return false;
                 }
             },
@@ -118,8 +100,6 @@ namespace MagnumOpus.Helpers
                         if(result >= 0)
                         {
                             x.Level = (byte)result;
-                            var pak = MsgUserAttrib.Create(ntt.NetId, x.Level, MsgUserAttribType.Level);
-                            ntt.NetSync(ref pak);
                             return true;
                         }
                         return false;
@@ -138,8 +118,6 @@ namespace MagnumOpus.Helpers
                         if(result >= 0)
                         {
                             x.Health = (byte)result;
-                            var pak = MsgUserAttrib.Create(ntt.NetId, (ulong)x.Health, MsgUserAttribType.Health);
-                            ntt.NetSync(ref pak);
                             return true;
                         }
                         return false;
@@ -337,8 +315,6 @@ namespace MagnumOpus.Helpers
                         ref var head = ref ntt.Get<HeadComponent>();
                         var color = head.Hair / 100 * 100;
                         head.Hair = (ushort)(color + int.Parse(style));
-                        var msg = MsgUserAttrib.Create(ntt.NetId, head.Hair, MsgUserAttribType.HairStyle);
-                        ntt.NetSync(ref msg, true);
                         if (_trace)
                             FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> Color: {color}, Style: {style}) -> {head.Hair} -> {action.id_next}");
                         return action.id_next;

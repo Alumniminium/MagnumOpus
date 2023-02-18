@@ -6,6 +6,10 @@ namespace MagnumOpus.Squiggly
 {
     public static class Collections
     {
+        internal static ConcurrentDictionary<long,cq_action> CqAction = new();
+        internal static ConcurrentDictionary<long,cq_task> CqTask = new();
+        internal static ConcurrentDictionary<long,cq_npc> CqNpc = new();
+
         public static HashSet<CqPortal> CqPortal { get; set; } = new();
         public static HashSet<Dmap_Portals> DmapPortals { get; set; } = new();
         public static HashSet<cq_passway> CqPassway { get; set; } = new();

@@ -21,25 +21,22 @@ namespace MagnumOpus.Simulation.Systems
                 if (!Array.Exists(countdown, x => x == ticksLeft))
                     return;
 
-                string text = $"{ticksLeft / NttWorld.TargetTps} seconds left";
                 if (Trace)
-                    FConsole.WriteLine($"[{nameof(LifetimeSystem)}] {ntt.Id} -> {text}");
+                    FConsole.WriteLine($"[{nameof(LifetimeSystem)}] {ntt.Id} -> {ticksLeft / NttWorld.TargetTps} seconds left");
 
-                ref readonly var pos = ref ntt.Get<PositionComponent>();
+                ref var pos = ref ntt.Get<PositionComponent>();
+                pos.ChangedTick = NttWorld.Tick;
+
                 var eff = MsgName.Create((ushort)pos.Position.X, (ushort)pos.Position.Y, "downnumber" + (ticksLeft / NttWorld.TargetTps), MsgNameType.MapEffect);
-                // var eff = MsgName.Create(ntt.NetId,"mass",(byte)MsgNameType.RoleEffect);
                 ntt.NetSync(ref eff, true);
                 return;
             }
 
-            ref readonly var pos2 = ref ntt.Get<PositionComponent>();
-            var effect = MsgName.Create((ushort)pos2.Position.X, (ushort)pos2.Position.Y, "ballblast", MsgNameType.RoleEffect);
-            ntt.NetSync(ref effect, true);
             var dtc = new DeathTagComponent(ntt.Id, default);
             ntt.Set(ref dtc);
             ntt.Remove<LifeTimeComponent>();
             if (Trace)
-                FConsole.WriteLine($"[{nameof(LifetimeSystem)}] {ntt.Id} -> EXPIRED");
+                FConsole.WriteLine($"[{nameof(LifetimeSystem)}] {ntt.Id}|{ntt.NetId} -> EXPIRED");
         }
     }
 }

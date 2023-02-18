@@ -1,6 +1,7 @@
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Networking;
+using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Simulation.Systems
 {
@@ -55,19 +56,19 @@ namespace MagnumOpus.Simulation.Systems
                 NetworkHelper.FullSync(in ntt, in b);
                 NetworkHelper.FullSync(in b, in b);
 
-                // if(b.Has<JumpComponent>())
-                // {
-                //     ref readonly var jmp = ref b.Get<JumpComponent>();
-                //     var packet = MsgAction.CreateJump(in ntt, in jmp);
-                //     ntt.NetSync(ref packet, true);
-                // }
+                if(b.Has<JumpComponent>())
+                {
+                    ref readonly var jmp = ref b.Get<JumpComponent>();
+                    var packet = MsgAction.CreateJump(in b, in jmp);
+                    ntt.NetSync(ref packet, true);
+                }
 
-                // if(b.Has<WalkComponent>())
-                // {
-                //     ref readonly var wlk = ref b.Get<WalkComponent>();
-                //     var packet = MsgWalk.Create(ntt.NetId, wlk.Direction, wlk.IsRunning);
-                //     ntt.NetSync(ref packet, true);
-                // }
+                if(b.Has<WalkComponent>())
+                {
+                    ref readonly var wlk = ref b.Get<WalkComponent>();
+                    var packet = MsgWalk.Create(b.NetId, wlk.Direction, wlk.IsRunning);
+                    ntt.NetSync(ref packet, true);
+                }
             }
         }
     }
