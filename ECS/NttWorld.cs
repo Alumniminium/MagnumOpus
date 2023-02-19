@@ -2,11 +2,8 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime;
 using System.Runtime.CompilerServices;
-using MagnumOpus.Components;
-using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking;
-using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.ECS
 {
@@ -100,19 +97,6 @@ namespace MagnumOpus.ECS
         {
             lock (Entities)
             {
-                if(ntt.Has<ViewportComponent>())
-                {
-                    if(ntt.Type == EntityType.Player || ntt.Type == EntityType.Monster)
-                    {
-                        var despawn = MsgAction.RemoveEntity(ntt.NetId);
-                        ntt.NetSync(ref despawn, true);
-                    }
-                    else if (ntt.Type == EntityType.Item)
-                    {
-                        var delete = MsgFloorItem.Create(in ntt, MsgFloorItemType.Delete);
-                        ntt.NetSync(ref delete, true);
-                    }
-                }
                 AvailableArrayIndicies.Enqueue(ntt.Id);
                 Players.Remove(ntt);
                 PacketsOut.Remove(in ntt);
@@ -146,7 +130,6 @@ namespace MagnumOpus.ECS
                     UpdateNTTs();
                     Systems[i].BeginUpdate();
                 }
-                // UpdateNTTs();
                 DestroyNTTs();
 
                 if (TimeAcc >= 1)

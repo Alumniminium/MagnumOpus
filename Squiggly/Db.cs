@@ -15,6 +15,7 @@ namespace MagnumOpus.Squiggly
         {
             using var ctx = new SquigglyContext();
             var sw = Stopwatch.StartNew();
+            var names = new string[] { "Aide", "Msgr", "Messenger", "King", "WarGhost", "GameBird", "FlyingRooster", "BlueCooer", "Guard" };
             foreach (var spawn in ctx.cq_generator)
             {
                 var amount = spawn.maxnpc;
@@ -22,9 +23,17 @@ namespace MagnumOpus.Squiggly
                 var cqMob = ctx.cq_monstertype.FirstOrDefault(x=>x.id == spawn.npctype);
                 if(cqMob == null)
                     continue;
+                
+                if (names.Any(cqMob.name.Trim().Contains))
+                    amount = spawn.maxnpc;
+                if (names.Contains(cqMob.name.Trim()))
+                    amount = spawn.maxnpc;
 
-                // if (cqMob.lookface != 900 && cqMob.lookface != 910)
-                //     amount = (ushort)(amount * 4);
+                if (cqMob.name.Trim() == "HawKing")
+                    amount = (ushort)(amount * 2);
+
+                if (cqMob.id == 900 || cqMob.id == 910 || cqMob.id == 911)
+                    amount = 1;
 
                 for (var i = 0; i < amount; i++)
                 {

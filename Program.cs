@@ -41,7 +41,6 @@ namespace MagnumOpus
                 new TeamSystem(),
                 new ExpRewardSystem(),
                 new LifetimeSystem(),
-                new DeathSystem(),
                 new DropItemSystem(),
                 new DropMoneySystem(),
                 new PickupSystem(),
@@ -49,6 +48,7 @@ namespace MagnumOpus
                 new ReviveSystem(),
                 new ShopSystem(),
                 new EquipSystem(),
+                new DeathSystem(),
                 new DestroySystem(),
             };
 
@@ -96,7 +96,7 @@ namespace MagnumOpus
             {
                 var lines = PerformanceMetrics.Draw();
                 var linesArr = lines.Split('\r', '\n');
-                // FConsole.WriteLine(lines);
+                FConsole.WriteLine(lines);
 
                 for (int i = 0; i < linesArr.Length; i++)
                 {
@@ -133,9 +133,13 @@ namespace MagnumOpus
 
         private static void LoginServerLoop()
         {
+            var ready = false;
+            NttWorld.RegisterOnTick(() => { ready = true; });
             while (true)
             {
                 var client = LoginListener.AcceptTcpClient();
+                while(!ready);
+                
                 var player = NttWorld.CreateEntity(EntityType.Player);
                 var net = new NetworkComponent(in player, client.Client);
                 player.Set(ref net);
@@ -150,6 +154,7 @@ namespace MagnumOpus
                 var count = net.Socket.Receive(net.RecvBuffer.Span[..52]);
                 var packet = net.RecvBuffer[..count];
                 net.AuthCrypto.Decrypt(packet.Span, packet.Span);
+
                 LoginPacketHandler.Process(in player, in packet);
 
                 new Thread(() => LoginClientLoop(in player)).Start();

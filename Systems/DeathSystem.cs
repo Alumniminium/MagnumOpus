@@ -24,9 +24,16 @@ namespace MagnumOpus.Simulation.Systems
         {
             if (dtc.Tick == NttWorld.Tick)
             {
+                ref readonly var pos = ref ntt.Get<PositionComponent>();
+
+                var deathMsg = MsgInteract.Create(in dtc.Killer, in ntt, MsgInteractType.Death, 0);
+                ntt.NetSync(ref deathMsg, true);
+
+                if(!ntt.Has<StatusEffectComponent>())
+                    ntt.Set(new StatusEffectComponent(ntt.Id));
+
                 ref var eff = ref ntt.Get<StatusEffectComponent>();
-                eff.Effects |= StatusEffect.Dead;
-                eff.Effects |= StatusEffect.FrozenRemoveName;
+                eff.Effects |= StatusEffect.Dead | StatusEffect.FrozenRemoveName;
 
                 if (ntt.Type == EntityType.Player)
                 {
@@ -91,13 +98,6 @@ namespace MagnumOpus.Simulation.Systems
                 ntt.Remove<BrainComponent>();
                 ntt.Remove<WalkComponent>();
                 ntt.Remove<JumpComponent>();
-
-                ref var vwp = ref ntt.Get<ViewportComponent>();
-                ref readonly var pos = ref ntt.Get<PositionComponent>();
-                if (Game.SpatialHashs.TryGetValue(pos.Map, out var hash))
-                    hash.GetVisibleEntities(ref vwp);
-                var deathMsg = MsgInteract.Create(in dtc.Killer, in ntt, MsgInteractType.Death, 0);
-                ntt.NetSync(ref deathMsg, true);
             }
             else if (dtc.Tick + NttWorld.TargetTps * 7 == NttWorld.Tick && ntt.Type == EntityType.Monster)
             {

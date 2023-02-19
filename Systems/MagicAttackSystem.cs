@@ -12,7 +12,7 @@ namespace MagnumOpus.Simulation.Systems
         {
             foreach(var target in atk.Targets)
             {
-                var msg = MsgMagicEffect.Create(in ntt, in target, (int)atk.MagicType.Power, (ushort)atk.MagicType.MagicType, 0);
+                var msg = MsgMagicEffect.Create(in ntt, in target, (int)atk.MagicType.Power, (ushort)atk.MagicType.MagicType, (byte)atk.MagicType.Level);
                 ntt.NetSync(ref msg, true);
 
                 var dmg = new DamageComponent(in target, in ntt, (int)atk.MagicType.Power);
