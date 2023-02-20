@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 
 namespace MagnumOpus.ECS
@@ -6,7 +7,7 @@ namespace MagnumOpus.ECS
     {
         public string Name;
         public bool Trace = false;
-        internal readonly HashSet<NTT> _entities = new();
+        internal readonly ConcurrentDictionary<int, NTT> _entities = new();
         internal readonly List<NTT> _entitiesList = new();
         internal readonly Thread[] _threads;
         internal readonly AutoResetEvent[] _blocks;
@@ -88,13 +89,15 @@ namespace MagnumOpus.ECS
             var isMatch = MatchesFilter(in ntt);
             if (!isMatch)
             {
-                if (_entities.Remove(ntt))
-                    _entitiesList.Remove(ntt);
+                if (_entities.TryRemove(ntt.Id, out _))
+                    lock(_entitiesList)
+                        _entitiesList.Remove(ntt);
             }
             else
             {
-                if (_entities.Add(ntt))
-                    _entitiesList.Add(ntt);
+                if (_entities.TryAdd(ntt.Id, ntt))
+                    lock (_entitiesList)
+                        _entitiesList.Add(ntt);
             }
         }
     }

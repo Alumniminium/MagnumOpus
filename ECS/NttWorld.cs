@@ -7,6 +7,59 @@ using MagnumOpus.Networking;
 
 namespace MagnumOpus.ECS
 {
+    public class SystemNotifier
+    {
+        private readonly NttSystem[] _array;
+        private readonly int _threadCount;
+        private readonly Thread[] _threads;
+        private readonly AutoResetEvent[] _events;
+        private readonly AutoResetEvent _readyEvent;
+        private int _readyThreads;
+
+        public SystemNotifier(NttSystem[] array)
+        {
+            _array = array;
+            _threadCount = 1;
+            _threads = new Thread[_threadCount];
+            _events = new AutoResetEvent[_threadCount];
+            _readyEvent = new AutoResetEvent(false);
+            for (var i = 0; i < _threadCount; i++)
+            {
+                _events[i] = new AutoResetEvent(false);
+                _threads[i] = new Thread(WorkLoop);
+                _threads[i].Start(i);
+            }
+        }
+
+        public void Start()
+        {
+            Interlocked.Exchange(ref _readyThreads, 0);
+            for (var i = 0; i < _threadCount; i++)
+                _events[i].Set();
+            _readyEvent.WaitOne();
+        }
+
+        private void WorkLoop(object idx)
+        {
+            int id = (int)idx;
+            while (true)
+            {
+                Interlocked.Increment(ref _readyThreads);
+                if(_readyThreads == _threadCount)
+                    _readyEvent.Set();
+
+                _events[id].WaitOne();
+
+                while (NttWorld.ChangedThisTick.TryDequeue(out var entity))
+                {
+                    for (int i = 0; i < _array.Length; i++)
+                            _array[i].EntityChanged(in entity);
+                }
+
+                _readyEvent.Set();
+            }
+        }
+    }
     public static class NttWorld
     {
         public const int MaxEntities = 500_000;
@@ -27,6 +80,8 @@ namespace MagnumOpus.ECS
         private static float TimeAcc;
         private static float UpdateTimeAcc;
 
+        private static SystemNotifier SystemNotifier;
+
         private static Action? OnSecond;
         private static Action? OnTick;
 
@@ -42,7 +97,12 @@ namespace MagnumOpus.ECS
             PerformanceMetrics.RegisterSystem(nameof(NttWorld));
         }
 
-        public static void SetSystems(params NttSystem[] systems) => Systems = systems;
+        public static void SetSystems(params NttSystem[] systems)
+        {
+            Systems = systems;
+            SystemNotifier = new SystemNotifier(systems);
+        }
+
         public static void SetTPS(int fps)
         {
             TargetTps = fps;
@@ -104,10 +164,8 @@ namespace MagnumOpus.ECS
                 ntt.Recycle();
                 NetIdToEntityIndex.Remove(ntt.NetId);
                 Entities[ntt.Id] = default;
+                ChangedThisTick.Enqueue(ntt);
             }
-
-            for (int i = 0; i < Systems.Length; i++)
-                Systems[i].EntityChanged(in ntt);
         }
         public static void Update()
         {
@@ -130,7 +188,7 @@ namespace MagnumOpus.ECS
                     UpdateNTTs();
                     Systems[i].BeginUpdate();
                 }
-                DestroyNTTs();
+                UpdateNTTs();
 
                 if (TimeAcc >= 1)
                 {
@@ -162,11 +220,15 @@ namespace MagnumOpus.ECS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void UpdateNTTs()
         {
-            while (ChangedThisTick.TryDequeue(out var ntt))
-            {
-                for (int x = 0; x < Systems.Length; x++)
-                    Systems[x].EntityChanged(in ntt);
-            }
+            DestroyNTTs();
+            SystemNotifier.Start();
         }
+        // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        // private static void UpdateNTTs()
+        // {
+        //     for(int i = 0; i < Systems.Length; i++)
+        //         if(ChangedThisTick.TryDequeue(out var ntt))
+        //             Systems[i].EntityChanged(in ntt);
+        // }
     }
 }

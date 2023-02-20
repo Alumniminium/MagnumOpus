@@ -9,7 +9,7 @@ namespace MagnumOpus.SpacePartitioning
     {
         private readonly int cellSize;
         private readonly ConcurrentDictionary<int, List<NTT>> Hashtbl;
-        private readonly object _lock = new ();
+        private readonly object _lock = new();
 
         public SpatialHash(int cellSize)
         {
@@ -22,15 +22,11 @@ namespace MagnumOpus.SpacePartitioning
             ref readonly var pos = ref entity.Get<PositionComponent>();
             int hash = GetHash(pos.Position);
 
-                if (!Hashtbl.ContainsKey(hash))
-                    Hashtbl[hash] = new List<NTT>();
-                else if (Hashtbl[hash].Contains(entity))
-                    return;
+            if (!Hashtbl.ContainsKey(hash))
+                Hashtbl[hash] = new List<NTT>();
 
             lock (_lock)
-            {
                 Hashtbl[hash].Add(entity);
-            }
         }
 
         public void Remove(in NTT entity)
@@ -38,11 +34,9 @@ namespace MagnumOpus.SpacePartitioning
             ref readonly var pos = ref entity.Get<PositionComponent>();
             int hash = GetHash(pos.Position);
 
-                if (Hashtbl.TryGetValue(hash, out var bucket))
-            lock (_lock)
-            {
+            if (Hashtbl.TryGetValue(hash, out var bucket))
+                lock (_lock)
                     bucket.Remove(entity);
-            }
         }
 
         public void GetVisibleEntities(ref ViewportComponent vwp)
@@ -79,12 +73,11 @@ namespace MagnumOpus.SpacePartitioning
             }
         }
 
-
-
         private int GetHash(Vector2 position)
         {
-            int x = ((int)position.X) / cellSize;
-            int y = ((int)position.Y) / cellSize;
+            var scaled = position / cellSize;
+            int x = (int)scaled.X;
+            int y = (int)scaled.Y;
 
             return x * 73856093 ^ y * 19349663;
         }
