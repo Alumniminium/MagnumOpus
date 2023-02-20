@@ -8,10 +8,6 @@ namespace MagnumOpus.Enums
 {
     public enum PacketId : ushort
     {
-        MsgRemoteLogin = 1,
-        MsgRemoteText = 2,
-        MsgRemoteMaintenance = 3,
-        MsgRemoteHardware = 4,
         MsgRole = 1001,
         MsgText = 1004,
         MsgWalk = 1005,
@@ -23,7 +19,7 @@ namespace MagnumOpus.Enums
         MsgName = 1015,
         MsgUpdate = 1017,
         MsgFriend = 1019,
-        MsgInteraction = 1022,
+        MsgInteract = 1022,
         MsgTeam = 1023,
         MsgSockEm = 1027,
         MsgForge = 1028,
@@ -34,9 +30,10 @@ namespace MagnumOpus.Enums
         MsgTrade = 1056,
         MsgFloorItem = 1101,
         MsgStorage = 1102,
-        MsgSyndicate = 1107,
+        MsgMagicEffect = 1105,
+        MsgGuild = 1107,
         MsgNpc = 1109,
-        MsgSyndicateInfo = 1112,
+        MsgGuildInfo = 1112,
         MsgNpcSpawn = 2030,
         MsgDialog = 2031,
         MsgDialog2 = 2032,

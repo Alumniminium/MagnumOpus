@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Net.Sockets;
 using MagnumOpus.ECS;
 using MagnumOpus.Networking.Cryptography;
@@ -16,6 +17,8 @@ namespace MagnumOpus.Components
         public readonly DiffieHellman DiffieHellman = new ();
         public readonly Memory<byte> ClientIV = new byte[8];
         public readonly Memory<byte> ServerIV = new byte[8];
+        public readonly ConcurrentQueue<Memory<byte>> SendQueue = new();
+        public readonly ConcurrentQueue<Memory<byte>> RecvQueue = new();
         public string Username;
 
         public NetworkComponent(in NTT ntt, Socket socket)
@@ -30,9 +33,6 @@ namespace MagnumOpus.Components
             Random.Shared.NextBytes(ClientIV.Span);
             Random.Shared.NextBytes(ServerIV.Span);
         }
-        public override int GetHashCode()
-        {
-            return EntityId;
-        }
+        public override int GetHashCode() => EntityId;
     }
 }

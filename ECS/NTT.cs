@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using MagnumOpus.Components;
 using MagnumOpus.Networking;
 
@@ -26,7 +27,7 @@ namespace MagnumOpus.ECS
         public readonly bool Has<T, T2, T3, T4, T5>() where T : struct where T2 : struct where T3 : struct where T4 : struct where T5 : struct => Has<T, T2, T3, T4>() && Has<T5>();
         public readonly void Remove<T>() => ReflectionHelper.Remove<T>(in this);
         public readonly void Recycle() => ReflectionHelper.RecycleComponents(in this);
-        
+
         public readonly void NetSync<T>(ref T msg, bool broadcast = false) where T : unmanaged
         {
             if (broadcast && Has<ViewportComponent>())
@@ -37,15 +38,27 @@ namespace MagnumOpus.ECS
                 {
                     if (b.Type != EntityType.Player)
                         continue;
+                    if (!b.Has<NetworkComponent>())
+                        continue;
 
                     var packet = Co2Packet.Serialize(ref msg);
-                    PacketsOut.Add(in b, in packet);
+                    if (packet.Length == 0)
+                        Debugger.Break();
+                    ref var net = ref b.Get<NetworkComponent>();
+                    var copy = new byte[packet.Length];
+                    packet.CopyTo(copy);
+                    net.SendQueue.Enqueue(copy);
                 }
             }
             else if (Type == EntityType.Player)
             {
                 var packet = Co2Packet.Serialize(ref msg);
-                PacketsOut.Add(in this, in packet);
+                if (packet.Length == 0)
+                    Debugger.Break();
+                ref var net = ref Get<NetworkComponent>();
+                var copy = new byte[packet.Length];
+                packet.CopyTo(copy);
+                net.SendQueue.Enqueue(copy);
             }
         }
 

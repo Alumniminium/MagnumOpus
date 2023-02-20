@@ -23,6 +23,7 @@ namespace MagnumOpus
         {
             var systems = new List<NttSystem>
             {
+                new PacketsIn(),
                 new BasicAISystem(),
                 new GuardAISystem(),
                 new WalkSystem(),
@@ -50,6 +51,7 @@ namespace MagnumOpus
                 new EquipSystem(),
                 new DeathSystem(),
                 new DestroySystem(),
+                new PacketsOut(),
             };
 
             FConsole.WriteLine("[DATABASE] Loading...");
@@ -91,7 +93,7 @@ namespace MagnumOpus
             SquigglyDb.LoadNpcs();
 
             NttWorld.SetSystems(systems.ToArray());
-            NttWorld.SetTPS(30);
+            NttWorld.SetTPS(60);
             NttWorld.RegisterOnSecond(() =>
             {
                 var lines = PerformanceMetrics.Draw();
@@ -139,7 +141,7 @@ namespace MagnumOpus
             {
                 var client = LoginListener.AcceptTcpClient();
                 while(!ready);
-                
+
                 var player = NttWorld.CreateEntity(EntityType.Player);
                 var net = new NetworkComponent(in player, client.Client);
                 player.Set(ref net);
@@ -264,7 +266,7 @@ namespace MagnumOpus
 
                     // Process the packet.
                     crypto.Decrypt(buffer[2..size]);
-                    PacketsIn.Add(in ntt, buffer[..size].ToArray());
+                    net.RecvQueue.Enqueue(buffer[..size].ToArray());
                 }
                 catch
                 {

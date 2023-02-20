@@ -91,8 +91,6 @@ namespace MagnumOpus.ECS
             Entities = new NTT[MaxEntities];
             AvailableArrayIndicies = new(Enumerable.Range(1, MaxEntities - 1));
             Systems = Array.Empty<NttSystem>();
-            PerformanceMetrics.RegisterSystem(nameof(PacketsIn));
-            PerformanceMetrics.RegisterSystem(nameof(PacketsOut));
             PerformanceMetrics.RegisterSystem("SLEEP");
             PerformanceMetrics.RegisterSystem(nameof(NttWorld));
         }
@@ -159,8 +157,6 @@ namespace MagnumOpus.ECS
             {
                 AvailableArrayIndicies.Enqueue(ntt.Id);
                 Players.Remove(ntt);
-                PacketsOut.Remove(in ntt);
-                PacketsIn.Remove(in ntt);
                 ntt.Recycle();
                 NetIdToEntityIndex.Remove(ntt.NetId);
                 Entities[ntt.Id] = default;
@@ -175,13 +171,9 @@ namespace MagnumOpus.ECS
             Stopwatch.Restart();
             double last = Stopwatch.Elapsed.TotalMilliseconds;
 
-            PerformanceMetrics.AddSample(nameof(PacketsIn), Stopwatch.Elapsed.TotalMilliseconds - last);
-
             if (UpdateTimeAcc >= UpdateTime)
             {
                 UpdateTimeAcc -= UpdateTime;
-
-                PacketsIn.ProcessAll();
 
                 for (int i = 0; i < Systems.Length; i++)
                 {
@@ -200,8 +192,6 @@ namespace MagnumOpus.ECS
             }
 
             last = Stopwatch.Elapsed.TotalMilliseconds;
-            PacketsOut.SendAll();
-            PerformanceMetrics.AddSample(nameof(PacketsOut), Stopwatch.Elapsed.TotalMilliseconds - last);
             PerformanceMetrics.AddSample(nameof(NttWorld), Stopwatch.Elapsed.TotalMilliseconds);
 
             last = Stopwatch.Elapsed.TotalMilliseconds;
