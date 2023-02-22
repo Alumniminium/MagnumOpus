@@ -38,7 +38,7 @@ namespace MagnumOpus.Networking
         {
             var msgText = MsgText.Create(from, "ALLUSERS", text, channel);
 
-            foreach (var ntt in NttWorld.NTTs.Players)
+            foreach (var ntt in NttWorld.Players)
                 ntt.NetSync(ref msgText);
         }
     }

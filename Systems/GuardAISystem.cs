@@ -33,8 +33,10 @@ namespace MagnumOpus.Simulation.Systems
                 var closestDistance = int.MaxValue;
                 var closestEntity = default(NTT);
 
-                foreach (var b in vwp.EntitiesVisible)
+                
+                foreach (var kvp in vwp.EntitiesVisible)
                 {
+                    var b = kvp.Value;
                     if (b.Type != EntityType.Monster)
                         continue;
 

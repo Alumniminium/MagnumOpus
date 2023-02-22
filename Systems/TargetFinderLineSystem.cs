@@ -14,8 +14,10 @@ namespace MagnumOpus.Simulation.Systems
         {
             var tcc = new TargetCollectionComponent(ntt.Id, atk.MagicType);
 
-            foreach (var b in vwp.EntitiesVisible)
+
+            foreach (var kvp in vwp.EntitiesVisible)
             {
+                var b = kvp.Value;
                 ref readonly var bPos = ref b.Get<PositionComponent>();
 
                 if (b.Type == EntityType.Player && atk.MagicType.Crime != 0)
@@ -30,7 +32,7 @@ namespace MagnumOpus.Simulation.Systems
 
             var msgEffect = MsgMagicEffect.Create(in ntt, atk.X, atk.Y, (ushort)atk.MagicType.MagicType, (byte)atk.MagicType.Level);
             ntt.NetSync(ref msgEffect);
-            
+
             ntt.Set(ref tcc);
             ntt.Remove<LineTargetComponent>();
         }

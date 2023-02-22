@@ -14,7 +14,7 @@ namespace MagnumOpus.ECS
             IncludeFields = true,
         };
 
-        private static readonly T[] Array = new T[NttWorld.NTTs.MaxEntities];
+        private static readonly T[] Array = new T[NttWorld.MaxEntities];
 
         static ComponentList()
         {

@@ -100,7 +100,7 @@ namespace MagnumOpus.ECS
             sb.Append("GC: ");
             for (var i = 0; i < GC.MaxGeneration; i++)
                 sb.Append($"Gen{i}: {_genCollections[i]} ");
-            sb.AppendLine($"Entities: {NttWorld.NTTs.EntityCount}");
+            sb.AppendLine($"Entities: {NttWorld.EntityCount}");
 
             return sb.ToString();
         }

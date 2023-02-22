@@ -66,7 +66,7 @@ namespace MagnumOpus.SpacePartitioning
                             var distanceSquared = Vector2.DistanceSquared(pos.Position, new Vector2(cx, cy));
 
                             if (distanceSquared <= 324f)
-                                vwp.EntitiesVisible.Add(entity);
+                                vwp.EntitiesVisible.TryAdd(entity.Id, entity);
                         }
                     }
                 }

@@ -135,8 +135,10 @@ namespace MagnumOpus.Networking.Packets
         private static void GhostChat(in NTT ntt, ref MsgText mem)
         {
             ref readonly var vwp = ref ntt.Get<ViewportComponent>();
-            foreach (var entity in vwp.EntitiesVisible)
+
+            foreach (var kvp in vwp.EntitiesVisible)
             {
+                var entity = kvp.Value;
                 ref readonly var job = ref entity.Get<ProfessionComponent>();
 
                 switch (job.Profession)
@@ -156,9 +158,9 @@ namespace MagnumOpus.Networking.Packets
         private static void TalkChat(in NTT ntt, ref MsgText mem)
         {
             ref readonly var vwp = ref ntt.Get<ViewportComponent>();
-            foreach (var entity in vwp.EntitiesVisible)
-                if (entity != ntt)
-                    entity.NetSync(ref mem);
+            foreach (var kvp in vwp.EntitiesVisible)
+                if (kvp.Key != ntt.Id)
+                    kvp.Value.NetSync(ref mem);
 
             var txt = mem.Message();
             var command = txt.Replace("/", "").Split(' ')[0];

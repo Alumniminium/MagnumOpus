@@ -1,6 +1,8 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime;
 using System.Runtime.CompilerServices;
+using MagnumOpus.Helpers;
 
 namespace MagnumOpus.ECS
 {
@@ -9,7 +11,18 @@ namespace MagnumOpus.ECS
         public static int TargetTps { get; private set; } = 60;
         private static float UpdateTime => 1f / TargetTps;
 
-        public static readonly NttList NTTs = new();
+
+        public static readonly int MaxEntities = 500_000;
+        public static int EntityCount => MaxEntities - AvailableArrayIndicies.Count;
+
+        private static readonly NTT[] Entities;
+        private static readonly Dictionary<int, int> NetIdToEntityIndex = new();
+        private static readonly ConcurrentQueue<int> AvailableArrayIndicies;
+        public static readonly HashSet<NTT> Players = new();
+
+        private static readonly ConcurrentQueue<NTT> ToBeRemoved = new();
+        public static readonly ConcurrentQueue<NTT> ChangedThisTick = new();
+        
         private static NttSystem[] Systems;
         public static long Tick { get; private set; }
         private static long TickBeginTime;
@@ -23,6 +36,8 @@ namespace MagnumOpus.ECS
 
         static NttWorld()
         {
+            Entities = new NTT[MaxEntities];
+            AvailableArrayIndicies = new(Enumerable.Range(1, MaxEntities - 1));
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
             Systems = Array.Empty<NttSystem>();
             PerformanceMetrics.RegisterSystem(nameof(NttWorld));
@@ -42,20 +57,76 @@ namespace MagnumOpus.ECS
         public static void RegisterOnEndTick(Action action) => OnEndTick += action;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref NTT CreateEntity(EntityType type) => ref NTTs.CreateEntity(type);
+        public static ref NTT CreateEntity(EntityType type)
+        {
+            lock (Entities)
+            {
+                if (AvailableArrayIndicies.TryDequeue(out var arrayIndex))
+                {
+                    var netId = IdGenerator.Get(type);
+                    Entities[arrayIndex] = new NTT(arrayIndex, netId, type);
+                    NetIdToEntityIndex.Add(netId, arrayIndex);
+                    PrometheusPush.NTTCount.Inc();
+                    return ref Entities[arrayIndex];
+                }
+            }
+            throw new IndexOutOfRangeException("Failed to pop an array index");
+        }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref NTT CreateEntityWithNetId(EntityType type, int netId = 0) => ref NTTs.CreateEntityWithNetId(type, netId);
+        public static ref NTT CreateEntityWithNetId(EntityType type, int netId = 0)
+        {
+            lock (Entities)
+            {
+                if (AvailableArrayIndicies.TryDequeue(out var arrayIndex))
+                {
+                    Entities[arrayIndex] = new NTT(arrayIndex, netId, type);
+                    NetIdToEntityIndex.Add(netId, arrayIndex);
+                    PrometheusPush.NTTCount.Inc();
+                    return ref Entities[arrayIndex];
+                }
+            }
+            throw new IndexOutOfRangeException("Failed to pop an array index");
+        }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref NTT GetEntity(int nttId) => ref NTTs.GetEntity(nttId);
+        public static ref NTT GetEntity(int nttId) => ref Entities[nttId];
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref NTT GetEntityByNetId(int netId) => ref NTTs.GetEntityByNetId(netId);
+        public static ref NTT GetEntityByNetId(int netId)
+        {
+            if (!NetIdToEntityIndex.TryGetValue(netId, out var index))
+                return ref Entities[0];
+
+            return ref Entities[index];
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool EntityExists(int nttId) => NTTs.EntityExists(nttId);
+        public static bool EntityExists(int nttId) => Entities[nttId].Id == nttId;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void InformChangesFor(in NTT ntt) => NTTs.InformChangesFor(in ntt);
+        public static void InformChangesFor(in NTT ntt) => ChangedThisTick.Enqueue(ntt);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Destroy(in NTT ntt) => NTTs.Destroy(in ntt);
+        public static void Destroy(in NTT ntt) => ToBeRemoved.Enqueue(ntt);
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void DestroyInternal(in NTT ntt)
+        {
+            lock (Entities)
+            {
+                AvailableArrayIndicies.Enqueue(ntt.Id);
+                Players.Remove(ntt);
+                ntt.Recycle();
+                NetIdToEntityIndex.Remove(ntt.NetId);
+                Entities[ntt.Id] = default;
+                ChangedThisTick.Enqueue(ntt);
+            }
+            PrometheusPush.NTTCount.Dec();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void UpdateNTTs()
+        {
+            while (ToBeRemoved.TryDequeue(out var ntt))
+                DestroyInternal(in ntt);
+        }
         public static void Update()
         {
             var tickTime = Stopwatch.GetElapsedTime(TickBeginTime);
@@ -71,11 +142,11 @@ namespace MagnumOpus.ECS
 
                 for (int i = 0; i < Systems.Length; i++)
                 {
-                    NTTs.UpdateNTTs();
+                    UpdateNTTs();
                     SystemNotifier.Start();
                     Systems[i].BeginUpdate();
                 }
-                NTTs.UpdateNTTs();
+                UpdateNTTs();
                 SystemNotifier.Start();
                 OnEndTick?.Invoke();
                 Tick++;
@@ -89,7 +160,7 @@ namespace MagnumOpus.ECS
             }
 
             var tickDuration =  (float)Stopwatch.GetElapsedTime(TickBeginTime).TotalMilliseconds;
-            PrometheusPush.TickTime.Set(tickDuration);
+            PrometheusPush.TickTime.Observe(tickDuration);
             PerformanceMetrics.AddSample(nameof(NttWorld), tickDuration);
             var sleepTime = (int)Math.Max(0, -1 + (UpdateTime * 1000) - tickDuration);
             Thread.Sleep(sleepTime);

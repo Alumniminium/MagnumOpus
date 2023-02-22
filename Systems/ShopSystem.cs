@@ -68,6 +68,9 @@ namespace MagnumOpus.Simulation.Systems
                         ntt.NetSync(ref msg);
 
                         FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.NetId} bought {txc.ItemId} for {itemEntry.Price:C} and now has {inv.Money:C} left");
+                        PrometheusPush.ServerIncome.Inc(itemEntry.Price);
+                        PrometheusPush.ShopIncome.Inc(itemEntry.Price);
+                        PrometheusPush.ShopPurchases.Inc();
                     }
                     else
                     {
@@ -86,6 +89,10 @@ namespace MagnumOpus.Simulation.Systems
                         var remInv = MsgItem.Create(itemNtt.NetId, itemNtt.NetId, itemNtt.NetId, MsgItemType.RemoveInventory);
                         ntt.NetSync(ref remInv);
                         FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.NetId} sold {txc.ItemId} for {money} and now has {inv.Money:C}");
+
+                        PrometheusPush.ServerExpenses.Inc(money);
+                        PrometheusPush.ShopExpenses.Inc(money);
+                        PrometheusPush.ShopSales.Inc();
                     }
                     break;
                 }

@@ -43,7 +43,7 @@ namespace MagnumOpus.ECS
 
                 _events[id].WaitOne();
 
-                while (NttWorld.NTTs.ChangedThisTick.TryDequeue(out var entity))
+                while (NttWorld.ChangedThisTick.TryDequeue(out var entity))
                 {
                     for (int i = 0; i < _array.Length; i++)
                         _array[i].EntityChanged(in entity);

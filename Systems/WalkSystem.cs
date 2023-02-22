@@ -33,6 +33,7 @@ namespace MagnumOpus.Simulation.Systems
             //FConsole.WriteLine($"[{NttWorld.Tick}][{nameof(WalkSystem)}] (Thread {Environment.CurrentManagedThreadId}) {ntt.Id} -> {text}");
 
             ntt.Remove<WalkComponent>();
+            PrometheusPush.WalkCount.Inc();
         }
     }
 }

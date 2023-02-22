@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Drawing;
 using MagnumOpus.ECS;
 
@@ -9,8 +10,8 @@ namespace MagnumOpus.Components
         public readonly int EntityId;
         public long ChangedTick;
 
-        public readonly HashSet<NTT> EntitiesVisible = new();
-        public readonly HashSet<NTT> EntitiesVisibleLast=new ();
+        public readonly ConcurrentDictionary<int, NTT> EntitiesVisible = new();
+        public readonly ConcurrentDictionary<int, NTT> EntitiesVisibleLast=new ();
         public RectangleF Viewport;
 
         public ViewportComponent(int entityId, float viewDistance)

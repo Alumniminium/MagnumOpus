@@ -35,8 +35,10 @@ namespace MagnumOpus.Simulation.Systems
 
             if (brn.TargetId == 0)
             {
-                foreach (var b in vwp.EntitiesVisible)
+                
+                foreach (var kvp in vwp.EntitiesVisible)
                 {
+                    var b = kvp.Value;
                     if (b.Type != EntityType.Player)
                         continue;
 

@@ -105,7 +105,7 @@ namespace MagnumOpus
 
                 for (int i = 0; i < linesArr.Length; i++)
                 {
-                    foreach (var player in NttWorld.NTTs.Players)
+                    foreach (var player in NttWorld.Players)
                     {
                         if (i == 0)
                         {

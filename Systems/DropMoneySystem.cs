@@ -20,6 +20,10 @@ namespace MagnumOpus.Simulation.Systems
 
             inv.Money -= (uint)drc.Amount;
 
+            PrometheusPush.MoneyCount.Inc();
+            PrometheusPush.MoneyTotal.Inc(drc.Amount);
+            PrometheusPush.ServerExpenses.Inc(drc.Amount);
+
             ref var itemNtt = ref EntityFactory.MakeMoneyDrop(drc.Amount, ref pos, out var success);
             if (success)
             {

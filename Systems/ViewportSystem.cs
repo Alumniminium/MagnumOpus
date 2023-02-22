@@ -18,7 +18,7 @@ namespace MagnumOpus.Simulation.Systems
 
             vwp.EntitiesVisibleLast.Clear();
             foreach(var e in vwp.EntitiesVisible)
-                vwp.EntitiesVisibleLast.Add(e);
+                vwp.EntitiesVisibleLast.TryAdd(e.Key,e.Value);
 
             vwp.EntitiesVisible.Clear();
             
@@ -32,15 +32,17 @@ namespace MagnumOpus.Simulation.Systems
             if (ntt.Type != EntityType.Player)
                 return;
 
-            foreach (var b in vwp.EntitiesVisible)
-            {
+            
+                foreach (var kvp in vwp.EntitiesVisible)
+                {
+                    var b = kvp.Value;
                 if (b.Has<DeathTagComponent>())
                     continue;
 
                 if(b.Has<ViewportComponent>())
                 {
                     ref readonly var bvwp = ref b.Get<ViewportComponent>();
-                    bvwp.EntitiesVisible.Add(ntt);
+                    bvwp.EntitiesVisible.TryAdd(ntt.Id, ntt);
                 }
 
                 if(b.Has<BrainComponent>())
@@ -50,7 +52,7 @@ namespace MagnumOpus.Simulation.Systems
                         brn.State = Enums.BrainState.WakingUp;
                 }
 
-                if(vwp.EntitiesVisibleLast.Contains(b))
+                if(vwp.EntitiesVisibleLast.ContainsKey(b.Id))
                     continue;
 
                 NetworkHelper.FullSync(in ntt, in b);

@@ -107,7 +107,7 @@ namespace MagnumOpus.Networking.Packets
                         ntt.NetSync(ref reply);
                         FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {reply.X}, {reply.Y}");
 
-                        NttWorld.NTTs.Players.Add(ntt);
+                        NttWorld.Players.Add(ntt);
                         break;
                     }
                 case MsgActionType.LeaveBooth:

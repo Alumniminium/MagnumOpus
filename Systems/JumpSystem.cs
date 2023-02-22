@@ -41,6 +41,9 @@ namespace MagnumOpus.Simulation.Systems
                 bdy.Direction = direction;
                 var packet = MsgAction.CreateJump(in ntt, in jmp);
                 ntt.NetSync(ref packet, true);
+
+                PrometheusPush.JumpCount.Inc();
+                PrometheusPush.JumpDistance.Inc(distance);
             }
         }
     }

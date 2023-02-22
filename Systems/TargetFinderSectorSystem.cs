@@ -12,8 +12,10 @@ namespace MagnumOpus.Simulation.Systems
         public override void Update(in NTT ntt, ref SectorTargetComponent atk, ref PositionComponent pos, ref ViewportComponent vwp)
         {
             var tcc = new TargetCollectionComponent(ntt.Id, atk.MagicType);
-            foreach (var b in vwp.EntitiesVisible)
-            {
+            
+                foreach (var kvp in vwp.EntitiesVisible)
+                {
+                    var b = kvp.Value;
                 ref readonly var bPos = ref b.Get<PositionComponent>();
 
                 if (b.Type == EntityType.Player && atk.MagicType.Crime != 0)
