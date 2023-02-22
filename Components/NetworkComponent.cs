@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Text.Json.Serialization;
 using MagnumOpus.ECS;
@@ -17,8 +18,8 @@ namespace MagnumOpus.Components
         public readonly DiffieHellman DiffieHellman = new();
         public readonly Memory<byte> ClientIV = new byte[8];
         public readonly Memory<byte> ServerIV = new byte[8];
-        public readonly Queue<Memory<byte>> SendQueue = new();
-        public readonly Queue<Memory<byte>> RecvQueue = new();
+        public readonly ConcurrentQueue<Memory<byte>> SendQueue = new();
+        public readonly ConcurrentQueue<Memory<byte>> RecvQueue = new();
         public string Username;
 
         public NetworkComponent(in NTT ntt, Socket socket)

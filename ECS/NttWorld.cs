@@ -90,6 +90,7 @@ namespace MagnumOpus.ECS
             }
 
             var tickDuration =  (float)Stopwatch.GetElapsedTime(TickBeginTime).TotalMilliseconds;
+            PrometheusPush.TickTime.Set(tickDuration);
             PerformanceMetrics.AddSample(nameof(NttWorld), tickDuration);
             var sleepTime = (int)Math.Max(0, -1 + (UpdateTime * 1000) - tickDuration);
             Thread.Sleep(sleepTime);

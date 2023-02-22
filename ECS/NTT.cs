@@ -58,6 +58,8 @@ namespace MagnumOpus.ECS
                     ref var net = ref b.Get<NetworkComponent>();
                     var copy = new byte[packet.Length];
                     packet.CopyTo(copy);
+                    if(copy.Length < 4)
+                        continue;
                     net.SendQueue.Enqueue(copy);
                 }
             }
@@ -69,6 +71,8 @@ namespace MagnumOpus.ECS
                 ref var net = ref Get<NetworkComponent>();
                 var copy = new byte[packet.Length];
                 packet.CopyTo(copy);
+                    if(copy.Length < 4)
+                        return;
                 net.SendQueue.Enqueue(copy);
             }
         }
