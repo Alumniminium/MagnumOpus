@@ -2,7 +2,7 @@ using MagnumOpus.ECS;
 
 namespace MagnumOpus.Components
 {
-    [Component]
+    [Component][Save]
     public struct RebornComponent
     {
         public readonly int EntityId;

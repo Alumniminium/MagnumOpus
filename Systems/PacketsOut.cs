@@ -9,7 +9,8 @@ namespace MagnumOpus.Networking
 {
     public class PacketsOut : NttSystem<NetworkComponent>
     {
-        public PacketsOut() : base("Packets Out", threads: 2) { }
+        public static readonly Memory<byte> TqServer = Encoding.ASCII.GetBytes("TQServer");
+        public PacketsOut() : base("Packets Out", threads: 12) { }
 
         // private const int MAX_PACKET_SIZE = 1024 * 8;
         public override void Update(in NTT ntt, ref NetworkComponent net)
@@ -26,18 +27,17 @@ namespace MagnumOpus.Networking
 
                     if (net.UseGameCrypto)
                     {
-                        var resized = new byte[packet.Length + 8];
+                        Memory<byte> resized = new byte[packet.Length + 8];
                         packet.CopyTo(resized);
-                        var tqServer = Encoding.ASCII.GetBytes("TQServer");
-                        tqServer.CopyTo(resized, resized.Length - 8);
-                        net.GameCrypto.Encrypt(resized);
+                        TqServer.CopyTo(resized[^8..]);
+                        net.GameCrypto.Encrypt(resized.Span);
                         packet = resized;
                     }
                     else
                         net.AuthCrypto.Encrypt(packet.Span);
 
                     net.Socket.SendAsync(packet, SocketFlags.None, CancellationToken.None);
-                    // net.Socket.Send(packet.Span);
+                    // net.Socket.Send(pac-ket.Span);
                 }
             }
             catch

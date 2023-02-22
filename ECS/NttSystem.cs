@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using Prometheus;
 
 namespace MagnumOpus.ECS
 {
@@ -14,6 +15,9 @@ namespace MagnumOpus.ECS
         private readonly AutoResetEvent _allReady = new(false);
         internal volatile int _readyThreads = 0;
         private float _lastUpdateTime = float.MaxValue;
+
+        private readonly Gauge MetricsExporter;
+
 
 
         protected NttSystem(string name, int threads = 1)
@@ -32,26 +36,25 @@ namespace MagnumOpus.ECS
                 };
                 _threads[i].Start(i);
             }
+            MetricsExporter = Metrics.CreateGauge($"MAGNUMOPUS_ECS_SYSTEM_{Name.ToUpperInvariant().Replace(" ", "_")}", $"Tick time for {Name} in ms");
         }
 
         public void BeginUpdate()
         {
             var ts = Stopwatch.GetTimestamp();
-            if(_entities.Count == 0)
+            if (_entities.IsEmpty)
             {
-                _lastUpdateTime = (float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds;
-                PerformanceMetrics.AddSample(Name, _lastUpdateTime);
+                PerformanceMetrics.AddSample(Name, (float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
+                MetricsExporter.Set((float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
                 return;
             }
             _allReady.Reset();
             Interlocked.Exchange(ref _readyThreads, 0);
-
             for (int i = 0; i < _threads.Length; i++)
                 _blocks[i].Set();
-
             _allReady.WaitOne();
-            _lastUpdateTime = (float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds;
-            PerformanceMetrics.AddSample(Name, _lastUpdateTime);
+            PerformanceMetrics.AddSample(Name, (float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
+            MetricsExporter.Set((float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
         }
 
         public void ThreadLoop(object id)
@@ -90,7 +93,7 @@ namespace MagnumOpus.ECS
             if (!isMatch)
             {
                 if (_entities.TryRemove(ntt.Id, out _))
-                    lock(_entitiesList)
+                    lock (_entitiesList)
                         _entitiesList.Remove(ntt);
             }
             else

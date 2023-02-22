@@ -45,7 +45,7 @@ namespace MagnumOpus.Squiggly
                     var pos = new PositionComponent(obj.Id, new Vector2(spawn.bound_x, spawn.bound_y), spawn.mapid);
                     var bdy = new BodyComponent(obj.Id, prefab.lookface,(Direction)Random.Shared.Next(0, 9));
                     var hp = new HealthComponent(obj.Id, prefab.life, prefab.life);
-                    var ntc = new NameTagComponent(obj.Id, prefab.name);
+                    var ntc = new NameTagComponent(obj.Id, prefab.name.Trim());
                     var vwp = new ViewportComponent(obj.Id, 40f);
                     var inv = new InventoryComponent(obj.Id, 0, 0);
 
@@ -84,7 +84,7 @@ namespace MagnumOpus.Squiggly
                         if (!Collections.Maps.TryGetValue(pos.Map, out var map))
                             continue;
 
-                        Game.SpatialHashs[pos.Map] = new SpacePartitioning.SpatialHash(10);//new Grid(map.Width, map.Height, 10, 10);
+                        Game.SpatialHashs[pos.Map] = new SpatialHash(10);//new Grid(map.Width, map.Height, 10, 10);
                     }
                     Game.SpatialHashs[pos.Map].Add(in obj);
                     // if(!Game.Grids.TryGetValue(pos.Map, out var grid))

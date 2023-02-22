@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 
 namespace MagnumOpus.Components
 {
-    [Component]
+    [Component][Save]
     public struct ManaComponent
     {
         public readonly int EntityId;

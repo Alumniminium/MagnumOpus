@@ -3,7 +3,7 @@ using MagnumOpus.Enums;
 
 namespace MagnumOpus.Components
 {
-    [Component]
+    [Component][Save]
     public struct GuildComponent
     {
         public readonly int EntityId;
@@ -14,7 +14,7 @@ namespace MagnumOpus.Components
         public readonly GuildRanks Rank;
         public int Donation;
         public int Funds;
-        public NTT[] Members;
+        public NTT[] Members = Array.Empty<NTT>();
 
         public GuildComponent(int entityId, int guildId, int leaderId, string guildName, string guildTag, int donation, int funds, GuildRanks guildRank)
         {

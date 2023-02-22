@@ -7,14 +7,13 @@ namespace MagnumOpus.Components
     {
         public readonly int EntityId;
         public readonly NTT Npc;
-        public int[] Options;
+        public int[] Options = new int[16];
         public byte OptionCount;
 
         public CqTaskComponent(int entityId, int npcId)
         {
             EntityId = entityId;
             Npc = NttWorld.GetEntityByNetId(npcId);
-            Options = new int[16];
         }
         public override int GetHashCode() => EntityId;
     }

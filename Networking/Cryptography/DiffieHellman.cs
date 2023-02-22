@@ -34,7 +34,7 @@ namespace MagnumOpus.Networking.Cryptography
         }
 
         /// <summary>Computes the public key for sending to the client.</summary>
-        public void ComputePublicKeyAsync()
+        public void ComputePublicKey()
         {
             Modulus = BigInteger.ProbablePrime(256, new Random());
             PublicKey = Generator.ModPow(Modulus, PrimeRoot);

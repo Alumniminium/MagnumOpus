@@ -3,7 +3,7 @@ using MagnumOpus.ECS;
 
 namespace MagnumOpus.Components
 {
-    [Component]
+    [Component][Save]
     public struct ExpRewardComponent
     {
         public readonly int EntityId;

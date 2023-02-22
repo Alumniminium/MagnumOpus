@@ -4,7 +4,7 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Components
 {
-    [Component]
+    [Component][Save]
     public struct HeadComponent
     {
         public readonly int EntityId;

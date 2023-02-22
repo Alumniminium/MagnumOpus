@@ -8,7 +8,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class TargetFinderCircleSystem : NttSystem<CircleTargetComponent, ViewportComponent>
     {
-        public TargetFinderCircleSystem() : base("O Targets", threads: Environment.ProcessorCount) { }
+        public TargetFinderCircleSystem() : base("Radius Targets", threads: Environment.ProcessorCount) { }
 
         public override void Update(in NTT ntt, ref CircleTargetComponent atk, ref ViewportComponent vwp)
         {

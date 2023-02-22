@@ -4,13 +4,13 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Components
 {
-    [Component]
+    [Component][Save]
     public struct InventoryComponent
     {
         public readonly int EntityId;
         public long ChangedTick;
 
-        public NTT[] Items;
+        public NTT[] Items = new NTT[40];
 
         private uint money;
         public uint Money
@@ -46,7 +46,6 @@ namespace MagnumOpus.Components
             ChangedTick = NttWorld.Tick;
             Money = money;
             CPs = cps;
-            Items = new NTT[40];
         }
 
         public override int GetHashCode() => EntityId;

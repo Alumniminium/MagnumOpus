@@ -21,6 +21,8 @@ namespace MagnumOpus
 
         private static unsafe void Main()
         {
+            using var server = new Prometheus.MetricServer(port: 1234);
+            server.Start();
             var systems = new List<NttSystem>
             {
                 new PacketsIn(),
@@ -102,7 +104,7 @@ namespace MagnumOpus
 
                 for (int i = 0; i < linesArr.Length; i++)
                 {
-                    foreach (var player in NttWorld.Players)
+                    foreach (var player in NttWorld.NTTs.Players)
                     {
                         if (i == 0)
                         {
@@ -130,13 +132,25 @@ namespace MagnumOpus
             gameThread.Start();
 
             while (true)
+            {
+                if(Console.KeyAvailable)
+                {
+                    var input = Console.ReadKey();
+                    if (input.Key == ConsoleKey.S)
+                    {
+                        FConsole.WriteLine("[SERVER] Saving...");
+                        ReflectionHelper.SaveComponents("_STATE_FILES");
+                        FConsole.WriteLine("[SERVER] Saved.");
+                    }
+                }
                 NttWorld.Update();
+            }
         }
 
         private static void LoginServerLoop()
         {
             var ready = false;
-            NttWorld.RegisterOnTick(() => { ready = true; });
+            NttWorld.RegisterOnEndTick(() => { ready = true; });
             while (true)
             {
                 var client = LoginListener.AcceptTcpClient();
@@ -208,7 +222,7 @@ namespace MagnumOpus
                 net.Socket.Dispose();
                 net.Socket = client.Client;
 
-                net.DiffieHellman.ComputePublicKeyAsync();
+                net.DiffieHellman.ComputePublicKey();
                 var dhx = MsgDHX.Create(net.ClientIV, net.ServerIV, Networking.Cryptography.DiffieHellman.P, Networking.Cryptography.DiffieHellman.G, net.DiffieHellman.GetPublicKey());
                 ntt.NetSync(ref dhx);
 
@@ -236,7 +250,7 @@ namespace MagnumOpus
         private static void GameClientLoop(in NTT ntt)
         {
             ref var net = ref ntt.Get<NetworkComponent>();
-            var buffer = net.RecvBuffer.Span;
+            var buffer = net.RecvBuffer;
             var crypto = net.GameCrypto;
 
             while (true)
@@ -245,19 +259,19 @@ namespace MagnumOpus
                 {
                     // Receive the packet size.
                     var sizeBytes = buffer[..2];
-                    var count = net.Socket.Receive(sizeBytes);
+                    var count = net.Socket.Receive(sizeBytes.Span);
                     if (count != 2)
                         throw new Exception("NO DIE");
 
                     // Decrypt the size bytes and compute the packet size.
-                    crypto.Decrypt(sizeBytes);
-                    var size = BitConverter.ToUInt16(sizeBytes) + 8;
+                    crypto.Decrypt(sizeBytes.Span);
+                    var size = BitConverter.ToUInt16(sizeBytes.Span) + 8;
 
                     // Keep receiving until the entire packet is received.
                     count = 2;
                     while (count < size)
                     {
-                        var received = net.Socket.Receive(buffer[count..size]);
+                        var received = net.Socket.Receive(buffer.Span[count..size]);
                         if (received == 0)
                             throw new Exception("NO DIE");
 
@@ -265,8 +279,8 @@ namespace MagnumOpus
                     }
 
                     // Process the packet.
-                    crypto.Decrypt(buffer[2..size]);
-                    net.RecvQueue.Enqueue(buffer[..size].ToArray());
+                    crypto.Decrypt(buffer.Span[2..size]);
+                    net.RecvQueue.Enqueue(buffer[..size]);
                 }
                 catch
                 {

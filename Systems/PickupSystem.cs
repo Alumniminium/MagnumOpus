@@ -43,6 +43,8 @@ namespace MagnumOpus.Simulation.Systems
                 }
 
                 pic.Item.Remove<PositionComponent>();
+                pic.Item.Remove<LifeTimeComponent>();
+                pic.Item.Remove<DestroyEndOfFrameComponent>();
                 inv.Items[emptyIdx] = pic.Item;
 
 
