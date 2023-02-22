@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System.Diagnostics;
+using System.Net.Sockets;
 using System.Text;
 using Co2Core.Security.Cryptography;
 using HerstLib.IO;
@@ -83,19 +84,19 @@ namespace MagnumOpus
 
             FConsole.WriteLine($"{Collections.MagicType.Count} magic types loaded.");
             FConsole.WriteLine($"{Collections.ItemType.Count} item types loaded.");
-            SquigglyDb.LoadShopDat("CLIENT_FILES/Shop.dat");
-            SquigglyDb.LoadMaps();
-            SquigglyDb.LoadPortals();
-            SquigglyDb.LoadLevelExp();
-            SquigglyDb.LoadItemBonus();
-            SquigglyDb.LoadCqAction();
-            SquigglyDb.LoadCqTask();
-            SquigglyDb.LoadCqNpc();
-            SquigglyDb.Spawn();
-            SquigglyDb.LoadNpcs();
+            Db.LoadShopDat("CLIENT_FILES/Shop.dat");
+            Db.LoadMaps();
+            Db.LoadPortals();
+            Db.LoadLevelExp();
+            Db.LoadItemBonus();
+            Db.LoadCqAction();
+            Db.LoadCqTask();
+            Db.LoadCqNpc();
+            Db.Spawn();
+            Db.LoadNpcs();
 
             NttWorld.SetSystems(systems.ToArray());
-            NttWorld.SetTPS(60);
+            NttWorld.SetTPS(30);
             NttWorld.RegisterOnSecond(() =>
             {
                 var lines = PerformanceMetrics.Draw();
@@ -133,17 +134,25 @@ namespace MagnumOpus
 
             while (true)
             {
-                if(Console.KeyAvailable)
-                {
-                    var input = Console.ReadKey();
-                    if (input.Key == ConsoleKey.S)
-                    {
-                        FConsole.WriteLine("[SERVER] Saving...");
-                        ReflectionHelper.SaveComponents("_STATE_FILES");
-                        FConsole.WriteLine("[SERVER] Saved.");
-                    }
-                }
                 NttWorld.Update();
+
+                if (Debugger.IsAttached)
+                    continue;
+
+                if (!Console.KeyAvailable)
+                    continue;
+                
+                var input = Console.ReadKey();
+                if (input.Key == ConsoleKey.S)
+                {
+                    FConsole.WriteLine("[SERVER] Saving...");
+                    ReflectionHelper.SaveComponents("_STATE_FILES");
+                    FConsole.WriteLine("[SERVER] Saved.");
+                }
+                // if (input.Key == ConsoleKey.L)
+                // {
+                    
+                // }
             }
         }
 

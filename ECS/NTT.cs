@@ -56,11 +56,7 @@ namespace MagnumOpus.ECS
                     if (packet.Length == 0)
                         Debugger.Break();
                     ref var net = ref b.Get<NetworkComponent>();
-                    var copy = new byte[packet.Length];
-                    packet.CopyTo(copy);
-                    if(copy.Length < 4)
-                        continue;
-                    net.SendQueue.Enqueue(copy);
+                    net.SendQueue.Enqueue(packet);
                 }
             }
             else if (Type == EntityType.Player && Has<NetworkComponent>())
@@ -69,11 +65,7 @@ namespace MagnumOpus.ECS
                 if (packet.Length == 0)
                     Debugger.Break();
                 ref var net = ref Get<NetworkComponent>();
-                var copy = new byte[packet.Length];
-                packet.CopyTo(copy);
-                    if(copy.Length < 4)
-                        return;
-                net.SendQueue.Enqueue(copy);
+                net.SendQueue.Enqueue(packet);
             }
         }
 

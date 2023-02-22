@@ -25,7 +25,6 @@ namespace MagnumOpus.ECS
         {
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
             Systems = Array.Empty<NttSystem>();
-            PerformanceMetrics.RegisterSystem("SLEEP");
             PerformanceMetrics.RegisterSystem(nameof(NttWorld));
         }
 

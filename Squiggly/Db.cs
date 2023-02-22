@@ -9,7 +9,7 @@ using MagnumOpus.Squiggly.Models;
 
 namespace MagnumOpus.Squiggly
 {
-    public static partial class SquigglyDb
+    public static partial class Db
     {
         public static void Spawn()
         {
