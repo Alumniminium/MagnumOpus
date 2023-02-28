@@ -141,7 +141,7 @@ namespace MagnumOpus
 
                 if (!Console.KeyAvailable)
                     continue;
-                
+
                 var input = Console.ReadKey();
                 if (input.Key == ConsoleKey.S)
                 {
@@ -151,7 +151,7 @@ namespace MagnumOpus
                 }
                 // if (input.Key == ConsoleKey.L)
                 // {
-                    
+
                 // }
             }
         }
@@ -163,7 +163,7 @@ namespace MagnumOpus
             while (true)
             {
                 var client = LoginListener.AcceptTcpClient();
-                while(!ready);
+                while (!ready) ;
 
                 var player = NttWorld.CreateEntity(EntityType.Player);
                 var net = new NetworkComponent(in player, client.Client);
@@ -231,29 +231,37 @@ namespace MagnumOpus
                 net.Socket.Dispose();
                 net.Socket = client.Client;
 
-                net.DiffieHellman.ComputePublicKey();
-                var dhx = MsgDHX.Create(net.ClientIV, net.ServerIV, Networking.Cryptography.DiffieHellman.P, Networking.Cryptography.DiffieHellman.G, net.DiffieHellman.GetPublicKey());
-                ntt.NetSync(ref dhx);
+                try
+                {
+                    net.DiffieHellman.ComputePublicKey();
+                    var dhx = MsgDHX.Create(net.ClientIV, net.ServerIV, Networking.Cryptography.DiffieHellman.P, Networking.Cryptography.DiffieHellman.G, net.DiffieHellman.GetPublicKey());
+                    ntt.NetSync(ref dhx);
 
-                var count = net.Socket.Receive(net.RecvBuffer.Span);
-                var packet = net.RecvBuffer[..count];
-                net.GameCrypto.Decrypt(packet.Span);
+                    var count = net.Socket.Receive(net.RecvBuffer.Span);
+                    var packet = net.RecvBuffer[..count];
+                    net.GameCrypto.Decrypt(packet.Span);
 
-                var packetSpan = packet.Span;
+                    var packetSpan = packet.Span;
 
-                var size = BitConverter.ToUInt16(packetSpan[7..]);
-                var junkSize = BitConverter.ToInt32(packetSpan[11..]);
-                var pkSize = BitConverter.ToInt32(packetSpan[(15 + junkSize)..]);
-                var pk = new byte[pkSize];
-                for (var i = 0; i < pkSize; i++)
-                    pk[i] = packetSpan[19 + junkSize + i];
+                    var size = BitConverter.ToUInt16(packetSpan[7..]);
+                    var junkSize = BitConverter.ToInt32(packetSpan[11..]);
+                    var pkSize = BitConverter.ToInt32(packetSpan[(15 + junkSize)..]);
+                    var pk = new byte[pkSize];
+                    for (var i = 0; i < pkSize; i++)
+                        pk[i] = packetSpan[19 + junkSize + i];
 
-                var pubkey = Encoding.ASCII.GetString(pk);
-                net.DiffieHellman.ComputePrivateKey(pubkey);
-                net.GameCrypto.GenerateKeys(net.DiffieHellman.GetPrivateKey());
-                net.GameCrypto.SetIVs(net.ServerIV, net.ClientIV);
+                    var pubkey = Encoding.ASCII.GetString(pk);
+                    net.DiffieHellman.ComputePrivateKey(pubkey);
+                    net.GameCrypto.GenerateKeys(net.DiffieHellman.GetPrivateKey());
+                    net.GameCrypto.SetIVs(net.ServerIV, net.ClientIV);
 
-                new Thread(() => GameClientLoop(in ntt)).Start();
+                    new Thread(() => GameClientLoop(in ntt)).Start();
+                }
+                catch (Exception e)
+                {
+                    FConsole.WriteLine(e.Message);
+                    NttWorld.Destroy(in ntt);
+                }
             }
         }
         private static void GameClientLoop(in NTT ntt)

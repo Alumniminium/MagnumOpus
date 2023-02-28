@@ -115,10 +115,10 @@ namespace MagnumOpus.ECS
                 Players.Remove(ntt);
                 ntt.Recycle();
                 NetIdToEntityIndex.Remove(ntt.NetId);
-                Entities[ntt.Id] = default;
                 ChangedThisTick.Enqueue(ntt);
+                Entities[ntt.Id] = default;
             }
-            PrometheusPush.NTTCount.Dec();
+            PrometheusPush.NTTCount.Set(EntityCount);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -126,6 +126,7 @@ namespace MagnumOpus.ECS
         {
             while (ToBeRemoved.TryDequeue(out var ntt))
                 DestroyInternal(in ntt);
+            SystemNotifier.Start();
         }
         public static void Update()
         {
@@ -143,14 +144,12 @@ namespace MagnumOpus.ECS
                 for (int i = 0; i < Systems.Length; i++)
                 {
                     UpdateNTTs();
-                    SystemNotifier.Start();
                     Systems[i].BeginUpdate();
                 }
                 UpdateNTTs();
-                SystemNotifier.Start();
                 OnEndTick?.Invoke();
                 Tick++;
-                PrometheusPush.TickCount.IncTo(Tick);
+                PrometheusPush.TickCount.Inc();
             }
             
             if (TimeAcc >= 1)

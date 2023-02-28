@@ -47,7 +47,7 @@ namespace MagnumOpus.Squiggly
                     var hp = new HealthComponent(obj.Id, prefab.life, prefab.life);
                     var ntc = new NameTagComponent(obj.Id, prefab.name.Trim());
                     var vwp = new ViewportComponent(obj.Id, 40f);
-                    var inv = new InventoryComponent(obj.Id, 0, 0);
+                    var inv = new InventoryComponent(obj.Id, prefab.drop_money, 0);
 
                     if (prefab.action != 0)
                     {

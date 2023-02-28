@@ -12,14 +12,18 @@ namespace MagnumOpus.ECS
         public SystemNotifier(NttSystem[] array)
         {
             _array = array;
-            _threadCount = 1;
+            _threadCount = 2;
             _threads = new Thread[_threadCount];
             _events = new AutoResetEvent[_threadCount];
             _readyEvent = new AutoResetEvent(false);
             for (var i = 0; i < _threadCount; i++)
             {
                 _events[i] = new AutoResetEvent(false);
-                _threads[i] = new Thread(WorkLoop);
+                _threads[i] = new Thread(WorkLoop)
+                {
+                    IsBackground = true,
+                    Priority = ThreadPriority.Highest
+                };
                 _threads[i].Start(i);
             }
         }
@@ -27,7 +31,7 @@ namespace MagnumOpus.ECS
         public void Start()
         {
             Interlocked.Exchange(ref _readyThreads, 0);
-            for (var i = 0; i < _threadCount; i++)
+            for (var i = 0; i < _threadCount; i++)b
                 _events[i].Set();
             _readyEvent.WaitOne();
         }
@@ -44,10 +48,8 @@ namespace MagnumOpus.ECS
                 _events[id].WaitOne();
 
                 while (NttWorld.ChangedThisTick.TryDequeue(out var entity))
-                {
                     for (int i = 0; i < _array.Length; i++)
                         _array[i].EntityChanged(in entity);
-                }
 
                 _readyEvent.Set();
             }

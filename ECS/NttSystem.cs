@@ -14,9 +14,8 @@ namespace MagnumOpus.ECS
         internal readonly AutoResetEvent[] _blocks;
         private readonly AutoResetEvent _allReady = new(false);
         internal volatile int _readyThreads = 0;
-        private float _lastUpdateTime = float.MaxValue;
-
-        private readonly Gauge MetricsExporter;
+        private readonly Gauge TimeMetricsExporter;
+        private readonly Gauge NTTCountMetricsExporter;
 
 
 
@@ -36,7 +35,8 @@ namespace MagnumOpus.ECS
                 };
                 _threads[i].Start(i);
             }
-            MetricsExporter = Metrics.CreateGauge($"MAGNUMOPUS_ECS_SYSTEM_{Name.ToUpperInvariant().Replace(" ", "_")}", $"Tick time for {Name} in ms");
+            TimeMetricsExporter = Metrics.CreateGauge($"MAGNUMOPUS_ECS_SYSTEM_{Name.ToUpperInvariant().Replace(" ", "_")}", $"Tick time for {Name} in ms");
+            NTTCountMetricsExporter = Metrics.CreateGauge($"MAGNUMOPUS_ECS_SYSTEM_{Name.ToUpperInvariant().Replace(" ", "_")}_NTT_COUNT", $"NTT count for {Name}");
         }
 
         public void BeginUpdate()
@@ -45,7 +45,8 @@ namespace MagnumOpus.ECS
             if (_entities.IsEmpty)
             {
                 PerformanceMetrics.AddSample(Name, (float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
-                MetricsExporter.Set((float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
+                NTTCountMetricsExporter.Set(0);
+                TimeMetricsExporter.Set((float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
                 return;
             }
             _allReady.Reset();
@@ -54,7 +55,8 @@ namespace MagnumOpus.ECS
                 _blocks[i].Set();
             _allReady.WaitOne();
             PerformanceMetrics.AddSample(Name, (float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
-            MetricsExporter.Set((float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
+            TimeMetricsExporter.Set((float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
+            NTTCountMetricsExporter.Set(_entities.Count);
         }
 
         public void ThreadLoop(object id)
