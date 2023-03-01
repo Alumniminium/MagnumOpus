@@ -3,6 +3,7 @@ using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
+using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Simulation.Systems
 {
@@ -109,7 +110,7 @@ namespace MagnumOpus.Simulation.Systems
                 ref readonly var pos = ref ntt.Get<PositionComponent>();
                 var ded = new DestroyEndOfFrameComponent(ntt.Id);
                 ntt.Set(ref ded);
-                Game.SpatialHashs[pos.Map].Remove(in ntt);
+                Collections.SpatialHashs[pos.Map].Remove(in ntt);
             }
         }
 
@@ -122,7 +123,7 @@ namespace MagnumOpus.Simulation.Systems
                 ntt.NetSync(ref despawn, true);
                 var ded = new DestroyEndOfFrameComponent(ntt.Id);
                 ntt.Set(ref ded);
-                if (Game.SpatialHashs.TryGetValue(pos.Map, out var hash))
+                if (Collections.SpatialHashs.TryGetValue(pos.Map, out var hash))
                     hash.Remove(in ntt);
             }
         }

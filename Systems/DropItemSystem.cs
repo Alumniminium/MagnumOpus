@@ -4,6 +4,7 @@ using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
+using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Simulation.Systems
 {
@@ -24,7 +25,7 @@ namespace MagnumOpus.Simulation.Systems
             rdi.ItemNtt.Set(new LifeTimeComponent(rdi.ItemNtt.Id, TimeSpan.FromSeconds(30)));
             rdi.ItemNtt.Set(new ViewportComponent(rdi.ItemNtt.Id, 18f));
 
-            Game.SpatialHashs[pos.Map].Add(in rdi.ItemNtt);
+            Collections.SpatialHashs[pos.Map].Add(in rdi.ItemNtt);
 
             var msgRemoveInv = MsgItem.Create(rdi.ItemNtt.NetId, rdi.ItemNtt.NetId, rdi.ItemNtt.NetId, MsgItemType.RemoveInventory);
             var msgDropFloor = MsgFloorItem.Create(in rdi.ItemNtt, MsgFloorItemType.Create);

@@ -1,11 +1,14 @@
 using System.Collections.Concurrent;
 using Co2Core.IO;
+using MagnumOpus.SpacePartitioning;
 using MagnumOpus.Squiggly.Models;
 
 namespace MagnumOpus.Squiggly
 {
     public static class Collections
     {
+        internal static readonly Dictionary<int, SpatialHash> SpatialHashs = new();
+        
         internal static ConcurrentDictionary<long,cq_action> CqAction = new();
         internal static ConcurrentDictionary<long,cq_task> CqTask = new();
         internal static ConcurrentDictionary<long,cq_npc> CqNpc = new();

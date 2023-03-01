@@ -39,12 +39,6 @@ namespace MagnumOpus.ECS
 
         private static void GetSaveMethods()
         {
-            // var types = Assembly.GetExecutingAssembly()
-            //                 .GetTypes()
-            //                 .Select(t => new { t, aList = t.GetCustomAttributes(typeof(ComponentAttribute), true) })
-            //                 .Where(t1 => t1.aList.Length > 0)
-            //                 .Select(t1 => t1.t);
-
             var enumerable = Assembly.GetExecutingAssembly()
                         .GetTypes()
                         .Select(t => new { t, l = t.GetCustomAttributes(typeof(SaveAttribute), true) })

@@ -3,6 +3,7 @@ using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
+using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Simulation.Systems
 {
@@ -27,7 +28,7 @@ namespace MagnumOpus.Simulation.Systems
             ref var itemNtt = ref EntityFactory.MakeMoneyDrop(drc.Amount, ref pos, out var success);
             if (success)
             {
-                Game.SpatialHashs[pos.Map].Add(in itemNtt);
+                Collections.SpatialHashs[pos.Map].Add(in itemNtt);
                 var dropMsg = MsgFloorItem.Create(in itemNtt, Enums.MsgFloorItemType.Create);
                 ntt.NetSync(ref dropMsg, true);
             }

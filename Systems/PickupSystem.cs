@@ -4,6 +4,7 @@ using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Networking;
 using MagnumOpus.Networking.Packets;
+using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Simulation.Systems
 {
@@ -68,7 +69,7 @@ namespace MagnumOpus.Simulation.Systems
                 }
             }
 
-            Game.SpatialHashs[pos.Map].Remove(in pic.Item);
+            Collections.SpatialHashs[pos.Map].Remove(in pic.Item);
             // Game.Grids[pos.Map].Remove(in pic.Item);
 
             var delFloorMsg = MsgFloorItem.Create(in pic.Item, Enums.MsgFloorItemType.Delete);

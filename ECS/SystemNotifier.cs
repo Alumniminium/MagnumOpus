@@ -31,7 +31,7 @@ namespace MagnumOpus.ECS
         public void Start()
         {
             Interlocked.Exchange(ref _readyThreads, 0);
-            for (var i = 0; i < _threadCount; i++)b
+            for (var i = 0; i < _threadCount; i++)
                 _events[i].Set();
             _readyEvent.WaitOne();
         }

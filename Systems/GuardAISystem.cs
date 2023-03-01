@@ -3,6 +3,7 @@ using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
+using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Simulation.Systems
 {
@@ -28,7 +29,7 @@ namespace MagnumOpus.Simulation.Systems
             if (brn.State == BrainState.WakingUp)
             {
                 vwp.EntitiesVisible.Clear();
-                Game.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
+                Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
                 // Game.Grids[pos.Map].GetVisibleEntities(ref vwp);
                 var closestDistance = int.MaxValue;
                 var closestEntity = default(NTT);

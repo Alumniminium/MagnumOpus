@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Numerics;
+using Co2Core.Security.Cryptography;
 using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
@@ -20,10 +21,10 @@ namespace MagnumOpus.Squiggly
             {
                 var amount = spawn.maxnpc;
 
-                var cqMob = ctx.cq_monstertype.FirstOrDefault(x=>x.id == spawn.npctype);
-                if(cqMob == null)
+                var cqMob = ctx.cq_monstertype.FirstOrDefault(x => x.id == spawn.npctype);
+                if (cqMob == null)
                     continue;
-                
+
                 if (names.Any(cqMob.name.Trim().Contains))
                     amount = spawn.maxnpc;
                 if (names.Contains(cqMob.name.Trim()))
@@ -43,7 +44,7 @@ namespace MagnumOpus.Squiggly
                     var spw = new SpawnComponent(obj.Id, (int)spawn.id);
                     var cqm = new CqMonsterComponent(obj.Id, prefab.id);
                     var pos = new PositionComponent(obj.Id, new Vector2(spawn.bound_x, spawn.bound_y), spawn.mapid);
-                    var bdy = new BodyComponent(obj.Id, prefab.lookface,(Direction)Random.Shared.Next(0, 9));
+                    var bdy = new BodyComponent(obj.Id, prefab.lookface, (Direction)Random.Shared.Next(0, 9));
                     var hp = new HealthComponent(obj.Id, prefab.life, prefab.life);
                     var ntc = new NameTagComponent(obj.Id, prefab.name.Trim());
                     var vwp = new ViewportComponent(obj.Id, 40f);
@@ -79,14 +80,14 @@ namespace MagnumOpus.Squiggly
                     var brn = new BrainComponent(obj.Id);
                     obj.Set(ref brn);
 
-                    if (!Game.SpatialHashs.ContainsKey(pos.Map))
+                    if (!Collections.SpatialHashs.ContainsKey(pos.Map))
                     {
                         if (!Collections.Maps.TryGetValue(pos.Map, out var map))
                             continue;
 
-                        Game.SpatialHashs[pos.Map] = new SpatialHash(10);//new Grid(map.Width, map.Height, 10, 10);
+                        Collections.SpatialHashs[pos.Map] = new SpatialHash(10);//new Grid(map.Width, map.Height, 10, 10);
                     }
-                    Game.SpatialHashs[pos.Map].Add(in obj);
+                    Collections.SpatialHashs[pos.Map].Add(in obj);
                     // if(!Game.Grids.TryGetValue(pos.Map, out var grid))
                     // {
                     //     if (!Collections.Maps.TryGetValue(pos.Map, out var map))
@@ -104,7 +105,7 @@ namespace MagnumOpus.Squiggly
         {
             var sw = Stopwatch.StartNew();
             using var db = new SquigglyContext();
-            foreach(var cq in db.cq_npc)
+            foreach (var cq in db.cq_npc)
                 Collections.CqNpc.TryAdd(cq.id, cq);
             sw.Stop();
             FConsole.WriteLine($"Loaded {Collections.CqNpc.Count} CqNpcs in {sw.ElapsedMilliseconds}ms");
@@ -113,7 +114,7 @@ namespace MagnumOpus.Squiggly
         {
             var sw = Stopwatch.StartNew();
             using var db = new SquigglyContext();
-            foreach(var cq in db.cq_action)
+            foreach (var cq in db.cq_action)
                 Collections.CqAction.TryAdd(cq.id, cq);
             sw.Stop();
             FConsole.WriteLine($"Loaded {Collections.CqAction.Count} CqActions in {sw.ElapsedMilliseconds}ms");
@@ -122,7 +123,7 @@ namespace MagnumOpus.Squiggly
         {
             var sw = Stopwatch.StartNew();
             using var db = new SquigglyContext();
-            foreach(var cq in db.cq_task)
+            foreach (var cq in db.cq_task)
                 Collections.CqTask.TryAdd(cq.id, cq);
             sw.Stop();
             FConsole.WriteLine($"Loaded {Collections.CqTask.Count} CqTasks in {sw.ElapsedMilliseconds}ms");
@@ -145,10 +146,10 @@ namespace MagnumOpus.Squiggly
                         cqmap.Height, new Dictionary<ushort, CqPortal>()
                     );
                     Collections.Maps.Add((ushort)cqmap.id, map);
-                    if (!Game.SpatialHashs.TryGetValue((ushort)cqmap.id, out var _))
+                    if (!Collections.SpatialHashs.TryGetValue((ushort)cqmap.id, out var _))
                     {
                         var grid = new SpatialHash(10);//new Grid(cqmap.Width, cqmap.Height, 10, 10);
-                        Game.SpatialHashs.Add((ushort)cqmap.id, grid);
+                        Collections.SpatialHashs.Add((ushort)cqmap.id, grid);
                     }
                     // if(!Game.Grids.TryGetValue((ushort)cqmap.id, out var _))
                     // {
@@ -190,14 +191,14 @@ namespace MagnumOpus.Squiggly
                     ntt.Set(ref npcc);
                     ntt.Set(ref vwp);
 
-                    if (!Game.SpatialHashs.ContainsKey(pos.Map))
+                    if (!Collections.SpatialHashs.ContainsKey(pos.Map))
                     {
                         if (!Collections.Maps.TryGetValue(pos.Map, out var _))
                             continue;
-// 
-                        Game.SpatialHashs[pos.Map] = new SpatialHash(10);//new Grid(map.Width, map.Height, 10, 10);
+                        // 
+                        Collections.SpatialHashs[pos.Map] = new SpatialHash(10);//new Grid(map.Width, map.Height, 10, 10);
                     }
-                    Game.SpatialHashs[pos.Map].Add(in ntt);
+                    Collections.SpatialHashs[pos.Map].Add(in ntt);
                     // if(!Game.Grids.TryGetValue(pos.Map, out var grid))
                     // {
                     //     if (!Collections.Maps.TryGetValue(pos.Map, out var map))
@@ -294,6 +295,35 @@ namespace MagnumOpus.Squiggly
                 Collections.Shops.Add(shopId, shop);
             }
             FConsole.WriteLine($"{Collections.Shops.Count} shops with {Collections.Shops.Sum(x => x.Value.Items.Count)} total items loaded.");
+        }
+        public static unsafe void LoadDatFiles()
+        {
+            var Cipher = new COFAC();
+            string TmpFile = Path.GetTempFileName();
+            Cipher.GenerateKey(0x2537);
+
+            using (FileStream Reader = new("CLIENT_FILES/itemtype.dat", FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (FileStream Writer = new(TmpFile, FileMode.Open, FileAccess.Write, FileShare.Read))
+            {
+                var Buffer = new byte[10240];
+
+                var Length = Reader.Read(Buffer, 0, Buffer.Length);
+                while (Length > 0)
+                {
+                    fixed (byte* pBuffer = Buffer)
+                        Cipher.Decrypt(pBuffer, Length);
+                    Writer.Write(Buffer, 0, Length);
+
+                    Length = Reader.Read(Buffer, 0, Buffer.Length);
+                }
+            }
+
+            Collections.ItemType.LoadFromTxt(TmpFile);
+            File.Delete(TmpFile);
+            Collections.MagicType.LoadFromDat("CLIENT_FILES/MagicType.dat");
+
+            FConsole.WriteLine($"{Collections.MagicType.Count} magic types loaded.");
+            FConsole.WriteLine($"{Collections.ItemType.Count} item types loaded.");
         }
     }
 }

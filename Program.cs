@@ -1,25 +1,15 @@
 ﻿using System.Diagnostics;
-using System.Net.Sockets;
-using System.Text;
-using Co2Core.Security.Cryptography;
 using HerstLib.IO;
-using MagnumOpus.Components;
 using MagnumOpus.ECS;
-using MagnumOpus.Helpers;
 using MagnumOpus.Networking;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Simulation.Systems;
-using MagnumOpus.SpacePartitioning;
 using MagnumOpus.Squiggly;
 
 namespace MagnumOpus
 {
     public static class Game
     {
-        internal static readonly Dictionary<int, SpatialHash> SpatialHashs = new();
-        private static readonly TcpListener GameListener = new(System.Net.IPAddress.Any, 5816);
-        private static readonly TcpListener LoginListener = new(System.Net.IPAddress.Any, 9958);
-
         private static unsafe void Main()
         {
             using var server = new Prometheus.MetricServer(port: 1234);
@@ -58,32 +48,7 @@ namespace MagnumOpus
             };
 
             FConsole.WriteLine("[DATABASE] Loading...");
-            var Cipher = new COFAC();
-            string TmpFile = Path.GetTempFileName();
-            Cipher.GenerateKey(0x2537);
-
-            using (FileStream Reader = new("CLIENT_FILES/itemtype.dat", FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (FileStream Writer = new(TmpFile, FileMode.Open, FileAccess.Write, FileShare.Read))
-            {
-                var Buffer = new byte[10240];
-
-                var Length = Reader.Read(Buffer, 0, Buffer.Length);
-                while (Length > 0)
-                {
-                    fixed (byte* pBuffer = Buffer)
-                        Cipher.Decrypt(pBuffer, Length);
-                    Writer.Write(Buffer, 0, Length);
-
-                    Length = Reader.Read(Buffer, 0, Buffer.Length);
-                }
-            }
-
-            Collections.ItemType.LoadFromTxt(TmpFile);
-            File.Delete(TmpFile);
-            Collections.MagicType.LoadFromDat("CLIENT_FILES/MagicType.dat");
-
-            FConsole.WriteLine($"{Collections.MagicType.Count} magic types loaded.");
-            FConsole.WriteLine($"{Collections.ItemType.Count} item types loaded.");
+            Db.LoadDatFiles();
             Db.LoadShopDat("CLIENT_FILES/Shop.dat");
             Db.LoadMaps();
             Db.LoadPortals();
@@ -122,15 +87,8 @@ namespace MagnumOpus
                 PerformanceMetrics.Restart();
             });
 
-            FConsole.WriteLine($"[LOGIN] Listening on port {9958}...");
-            LoginListener.Start();
-            FConsole.WriteLine($"[GAME] Listening on port {5816}...");
-            GameListener.Start();
-
-            var loginThread = new Thread(LoginServerLoop) { IsBackground = true, Priority = ThreadPriority.Highest };
-            var gameThread = new Thread(GameServerLoop) { IsBackground = true, Priority = ThreadPriority.Highest };
-            loginThread.Start();
-            gameThread.Start();
+            LoginServer.Start();
+            GameServer.Start();
 
             while (true)
             {
@@ -149,167 +107,7 @@ namespace MagnumOpus
                     ReflectionHelper.SaveComponents("_STATE_FILES");
                     FConsole.WriteLine("[SERVER] Saved.");
                 }
-                // if (input.Key == ConsoleKey.L)
-                // {
-
-                // }
             }
-        }
-
-        private static void LoginServerLoop()
-        {
-            var ready = false;
-            NttWorld.RegisterOnEndTick(() => { ready = true; });
-            while (true)
-            {
-                var client = LoginListener.AcceptTcpClient();
-                while (!ready) ;
-
-                var player = NttWorld.CreateEntity(EntityType.Player);
-                var net = new NetworkComponent(in player, client.Client);
-                player.Set(ref net);
-
-                var ipendpoint = client.Client.RemoteEndPoint?.ToString();
-                if (ipendpoint == null)
-                    break;
-
-                IpRegistry.Register(player, ipendpoint.Split(':')[0]);
-                FConsole.WriteLine($"[LOGIN] Client connected: {client.Client.RemoteEndPoint}");
-
-                var count = net.Socket.Receive(net.RecvBuffer.Span[..52]);
-                var packet = net.RecvBuffer[..count];
-                net.AuthCrypto.Decrypt(packet.Span, packet.Span);
-
-                LoginPacketHandler.Process(in player, in packet);
-
-                new Thread(() => LoginClientLoop(in player)).Start();
-            }
-        }
-
-        private static void LoginClientLoop(in NTT player)
-        {
-            ref var net = ref player.Get<NetworkComponent>();
-            try
-            {
-                while (net.Socket.Connected)
-                {
-                    var count = net.Socket.Receive(net.RecvBuffer.Span);
-                    if (count == 0)
-                        break;
-                    var packet = net.RecvBuffer[..count];
-                    net.AuthCrypto.Decrypt(packet.Span, packet.Span);
-                    LoginPacketHandler.Process(in player, in packet);
-                }
-            }
-            catch
-            {
-                FConsole.WriteLine($"[LOGIN] Client disconnected");
-                net.Socket.Close();
-                net.Socket.Dispose();
-            }
-        }
-
-        private static void GameServerLoop()
-        {
-            while (true)
-            {
-                var client = GameListener.AcceptTcpClient();
-
-                FConsole.WriteLine($"[GAME] Client connected: {client.Client.RemoteEndPoint}");
-
-                var ipendpoint = client.Client.RemoteEndPoint?.ToString();
-                if (ipendpoint == null)
-                    break;
-
-                var (found, ntt) = IpRegistry.GetEntity(ipendpoint.Split(':')[0]);
-                if (!found)
-                    continue;
-
-                ref var net = ref ntt.Get<NetworkComponent>();
-                net.UseGameCrypto = true;
-                net.Socket.Close();
-                net.Socket.Dispose();
-                net.Socket = client.Client;
-
-                try
-                {
-                    net.DiffieHellman.ComputePublicKey();
-                    var dhx = MsgDHX.Create(net.ClientIV, net.ServerIV, Networking.Cryptography.DiffieHellman.P, Networking.Cryptography.DiffieHellman.G, net.DiffieHellman.GetPublicKey());
-                    ntt.NetSync(ref dhx);
-
-                    var count = net.Socket.Receive(net.RecvBuffer.Span);
-                    var packet = net.RecvBuffer[..count];
-                    net.GameCrypto.Decrypt(packet.Span);
-
-                    var packetSpan = packet.Span;
-
-                    var size = BitConverter.ToUInt16(packetSpan[7..]);
-                    var junkSize = BitConverter.ToInt32(packetSpan[11..]);
-                    var pkSize = BitConverter.ToInt32(packetSpan[(15 + junkSize)..]);
-                    var pk = new byte[pkSize];
-                    for (var i = 0; i < pkSize; i++)
-                        pk[i] = packetSpan[19 + junkSize + i];
-
-                    var pubkey = Encoding.ASCII.GetString(pk);
-                    net.DiffieHellman.ComputePrivateKey(pubkey);
-                    net.GameCrypto.GenerateKeys(net.DiffieHellman.GetPrivateKey());
-                    net.GameCrypto.SetIVs(net.ServerIV, net.ClientIV);
-
-                    new Thread(() => GameClientLoop(in ntt)).Start();
-                }
-                catch (Exception e)
-                {
-                    FConsole.WriteLine(e.Message);
-                    NttWorld.Destroy(in ntt);
-                }
-            }
-        }
-        private static void GameClientLoop(in NTT ntt)
-        {
-            ref var net = ref ntt.Get<NetworkComponent>();
-            var buffer = net.RecvBuffer;
-            var crypto = net.GameCrypto;
-
-            while (true)
-            {
-                try
-                {
-                    // Receive the packet size.
-                    var sizeBytes = buffer[..2];
-                    var count = net.Socket.Receive(sizeBytes.Span);
-                    if (count != 2)
-                        throw new Exception("NO DIE");
-
-                    // Decrypt the size bytes and compute the packet size.
-                    crypto.Decrypt(sizeBytes.Span);
-                    var size = BitConverter.ToUInt16(sizeBytes.Span) + 8;
-
-                    // Keep receiving until the entire packet is received.
-                    count = 2;
-                    while (count < size)
-                    {
-                        var received = net.Socket.Receive(buffer.Span[count..size]);
-                        if (received == 0)
-                            throw new Exception("NO DIE");
-
-                        count += received;
-                    }
-
-                    // Process the packet.
-                    crypto.Decrypt(buffer.Span[2..size]);
-                    net.RecvQueue.Enqueue(buffer[..size]);
-                }
-                catch
-                {
-                    FConsole.WriteLine($"[GAME] Client disconnected: {net.Username}");
-                    net.Socket?.Close();
-                    net.Socket?.Dispose();
-                    NttWorld.Destroy(in ntt);
-                    break;
-                }
-            }
-
-            NttWorld.Destroy(in ntt);
         }
     }
 }

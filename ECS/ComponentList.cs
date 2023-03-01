@@ -10,7 +10,6 @@ namespace MagnumOpus.ECS
         private static readonly JsonSerializerOptions SerializerOptions = new ()
         {
             WriteIndented = false,
-            IgnoreNullValues = true,
             IncludeFields = true,
         };
 

@@ -2,6 +2,7 @@ using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Networking;
 using MagnumOpus.Networking.Packets;
+using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Simulation.Systems
 {
@@ -22,9 +23,9 @@ namespace MagnumOpus.Simulation.Systems
 
             vwp.EntitiesVisible.Clear();
             
-            Game.SpatialHashs[pos.Map].Remove(in ntt);
-            Game.SpatialHashs[pos.Map].Add(in ntt);
-            Game.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
+            Collections.SpatialHashs[pos.Map].Remove(in ntt);
+            Collections.SpatialHashs[pos.Map].Add(in ntt);
+            Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
 
 
             // FConsole.WriteLine($"[{nameof(ViewportSystem)}] {ntt.Id} -> {vwp.EntitiesVisible.Count} entities visible");
