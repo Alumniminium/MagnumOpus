@@ -41,7 +41,11 @@ namespace MagnumOpus.Helpers
             ntt.Set(ref ltc);
             
             if(success == false)
+            {
+                var ded = new DestroyEndOfFrameComponent(ntt.Id);
+                ntt.Set(ref ded);
                 return ref ntt;
+            }
 
              var moneyInfo = new MoneyRewardComponent(ntt.Id, amount);
             ntt.Set(ref moneyInfo);

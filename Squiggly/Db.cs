@@ -110,6 +110,15 @@ namespace MagnumOpus.Squiggly
             sw.Stop();
             FConsole.WriteLine($"Loaded {Collections.CqNpc.Count} CqNpcs in {sw.ElapsedMilliseconds}ms");
         }
+        public static void LoadCqPointAllot()
+        {
+            var sw = Stopwatch.StartNew();
+            using var db = new SquigglyContext();
+            foreach (var cq in db.cq_point_allot)
+                Collections.CqPointAllot.Add(cq);
+            sw.Stop();
+            FConsole.WriteLine($"Loaded {Collections.CqPointAllot.Count} CqPointAllots in {sw.ElapsedMilliseconds}ms");
+        }
         public static void LoadCqAction()
         {
             var sw = Stopwatch.StartNew();

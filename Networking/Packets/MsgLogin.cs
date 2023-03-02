@@ -37,6 +37,7 @@ namespace MagnumOpus.Networking.Packets
             var msg = Co2Packet.Deserialze<MsgLogin>(packet);
             var language = msg.GetLanguage();
             FConsole.WriteLine($"[GAME] Client Version: {msg.ClientVersion}, Language: {language}");
+            PrometheusPush.LoginCount.Inc();
             ref readonly var net = ref ntt.Get<NetworkComponent>();
             var ntc = new NameTagComponent(ntt.Id, net.Username);
             var bdy = new BodyComponent(ntt.Id, (uint)(net.Username == "trbl" ? 2003 : 2002));
@@ -45,7 +46,7 @@ namespace MagnumOpus.Networking.Packets
             var vwp = new ViewportComponent(ntt.Id, 21);
             var pos = new PositionComponent(ntt.Id, new System.Numerics.Vector2(438,377), 1002);
             var eff = new StatusEffectComponent(ntt.Id);
-            var inv = new InventoryComponent(ntt.Id, 1000, 0);
+            var inv = new InventoryComponent(ntt.Id, 1000000, 0);
             var lvl = new LevelComponent(ntt.Id, 1);
             var hlt = new HealthComponent(ntt.Id, 330, 330);
             var mana = new ManaComponent(ntt.Id, 1000, 1000);

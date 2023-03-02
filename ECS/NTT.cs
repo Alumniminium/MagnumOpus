@@ -74,7 +74,7 @@ namespace MagnumOpus.ECS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => Id;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override bool Equals(object obj) => obj is NTT nttId && nttId.Id == Id;
+        public override bool Equals(object? obj) => obj is NTT nttId && nttId.Id == Id;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(in NTT a, in NTT b) => a.Id == b.Id;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

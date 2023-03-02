@@ -62,7 +62,7 @@ namespace MagnumOpus.Simulation.Systems
                     var dmg = new DamageComponent(in atk.Target, in ntt, damage);
                     atk.Target.Set(ref dmg);
 
-                    var atkPacket = MsgInteract.Create(in ntt, in atk.Target, MsgInteractType.Archer, damage);
+                    var atkPacket = MsgInteract.Create(in ntt, in atk.Target, MsgInteractType.Archer, damage/2);
                     ntt.NetSync(ref atkPacket, true);
                 }
                 else

@@ -81,7 +81,7 @@ namespace MagnumOpus.Simulation.Systems
                         inv.Money += money;
 
                         ref var itemNtt = ref NttWorld.GetEntityByNetId(txc.ItemId);
-                        var def = new DestroyEndOfFrameComponent();
+                        var def = new DestroyEndOfFrameComponent(itemNtt.Id);
                         itemNtt.Set(ref def);
 
                         inv.Items[i] = default;

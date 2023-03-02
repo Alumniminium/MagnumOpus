@@ -61,7 +61,7 @@ namespace MagnumOpus.Networking.Packets
 
             FConsole.WriteLine($"Task: {cq_task.id}, Next: {cq_task.id_next}, Fail: {cq_task.id_nextfail}");
 
-            cq_action action;
+            cq_action? action;
             var nextId = cq_task.id_next;
             var taskComponent = new CqTaskComponent(ntt.Id, npc.Id);
             ntt.Set(ref taskComponent);

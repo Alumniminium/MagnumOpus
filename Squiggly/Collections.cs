@@ -13,6 +13,7 @@ namespace MagnumOpus.Squiggly
         internal static ConcurrentDictionary<long,cq_task> CqTask = new();
         internal static ConcurrentDictionary<long,cq_npc> CqNpc = new();
 
+        public static List<cq_point_allot> CqPointAllot { get; set; } = new();
         public static HashSet<CqPortal> CqPortal { get; set; } = new();
         public static HashSet<Dmap_Portals> DmapPortals { get; set; } = new();
         public static HashSet<cq_passway> CqPassway { get; set; } = new();

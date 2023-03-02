@@ -59,8 +59,11 @@ namespace MagnumOpus.ECS
             NTTCountMetricsExporter.Set(_entities.Count);
         }
 
-        public void ThreadLoop(object id)
+        public void ThreadLoop(object? id)
         {
+            if(id == null)
+                throw new ArgumentNullException(nameof(id));
+
             int idx = (int)id;
             while (true)
             {

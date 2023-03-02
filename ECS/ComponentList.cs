@@ -23,7 +23,7 @@ namespace MagnumOpus.ECS
                 return;
             
             using var stream = File.OpenRead(filename);
-            Array = JsonSerializer.Deserialize<T[]>(stream);
+            Array = JsonSerializer.Deserialize<T[]>(stream) ?? new T[NttWorld.MaxEntities];
             var time = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
             FConsole.WriteLine($"Loaded {typeof(T).Name} in {time}ms");
         }

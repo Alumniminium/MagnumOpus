@@ -19,7 +19,7 @@ namespace MagnumOpus.Helpers
         public static bool RemoveNetIdFromInventory(in NTT ntt, int netId, bool destroy = false)
         {
             var item = GetInventoryItemByNetIdFrom(in ntt, netId);
-            var removed = RemoveNttFromInventory(in ntt, in item);
+            var removed = RemoveNttFromInventory(in ntt, in item, destroy);
             return removed;
         }        
         public static bool RemoveNttFromInventory(in NTT ntt, in NTT item, bool destroy = false)

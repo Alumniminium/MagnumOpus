@@ -57,6 +57,7 @@ namespace MagnumOpus
             Db.LoadCqAction();
             Db.LoadCqTask();
             Db.LoadCqNpc();
+            Db.LoadCqPointAllot();
             Db.Spawn();
             Db.LoadNpcs();
 

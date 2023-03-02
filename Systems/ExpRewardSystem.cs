@@ -16,16 +16,15 @@ namespace MagnumOpus.Simulation.Systems
             if (lvl.Experience >= lvl.ExperienceToNextLevel)
             {
                 ref var hlt = ref ntt.Get<HealthComponent>();
-                var level = lvl.Level++;
-                var profession = ntt.Get<ProfessionComponent>().Profession;
                 lvl.Level++;
+                var level = lvl.Level;
+                var profession = ntt.Get<ProfessionComponent>().Profession;
                 lvl.Experience = 0;
-                lvl.ExperienceToNextLevel = (uint)Collections.LevelExps.Values[lvl.Level - 1];
+                lvl.ExperienceToNextLevel = (uint)Collections.LevelExps.Values[lvl.Level-1];
                 lvl.ChangedTick = NttWorld.Tick;
                 hlt.Health = hlt.MaxHealth;
 
-                using var ctx = new SquigglyContext();
-                var allot = ctx.cq_point_allot.FirstOrDefault(x=> x.level == level && x.profession == ((long)profession / 10));
+                var allot = Collections.CqPointAllot.FirstOrDefault(x=> x.level == level && x.profession == ((long)profession / 10));
                 if (allot != null)
                 {
                     ref var pnt = ref ntt.Get<AttributeComponent>();

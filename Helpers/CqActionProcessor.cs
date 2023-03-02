@@ -12,9 +12,9 @@ namespace MagnumOpus.Helpers
 {
     public static class CqProcessor
     {
-        public static cq_npc GetNpc(int npcId) => Collections.CqNpc.TryGetValue(npcId, out var npc) ? npc : default;
-        public static cq_task GetTask(long taskId) => Collections.CqTask.TryGetValue(taskId, out var task) ? task : default;
-        public static cq_action GetAction(long actionId) => Collections.CqAction.TryGetValue(actionId, out var action) ? action : default;
+        public static cq_npc? GetNpc(int npcId) => Collections.CqNpc.TryGetValue(npcId, out var npc) ? npc : default;
+        public static cq_task? GetTask(long taskId) => Collections.CqTask.TryGetValue(taskId, out var task) ? task : default;
+        public static cq_action? GetAction(long actionId) => Collections.CqAction.TryGetValue(actionId, out var action) ? action : default;
     }
     public static class CqActionProcessor
     {
@@ -147,7 +147,7 @@ namespace MagnumOpus.Helpers
             }
         };
 
-        public static long Process(in NTT ntt, in NTT trigger, cq_action action)
+        public static long Process(in NTT ntt, in NTT trigger, cq_action? action)
         {
             if (action == null)
                 return 0;

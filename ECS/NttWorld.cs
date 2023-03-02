@@ -29,7 +29,7 @@ namespace MagnumOpus.ECS
         private static float TimeAcc;
         private static float UpdateTimeAcc;
 
-        private static SystemNotifier SystemNotifier;
+        private static SystemNotifier? SystemNotifier;
 
         private static Action? OnSecond;
         private static Action? OnEndTick;
@@ -67,6 +67,7 @@ namespace MagnumOpus.ECS
                     Entities[arrayIndex] = new NTT(arrayIndex, netId, type);
                     NetIdToEntityIndex.Add(netId, arrayIndex);
                     PrometheusPush.NTTCount.Inc();
+                    PrometheusPush.NTTCreations.Inc();
                     return ref Entities[arrayIndex];
                 }
             }
@@ -82,6 +83,7 @@ namespace MagnumOpus.ECS
                     Entities[arrayIndex] = new NTT(arrayIndex, netId, type);
                     NetIdToEntityIndex.Add(netId, arrayIndex);
                     PrometheusPush.NTTCount.Inc();
+                    PrometheusPush.NTTCreations.Inc();
                     return ref Entities[arrayIndex];
                 }
             }
@@ -119,6 +121,7 @@ namespace MagnumOpus.ECS
                 Entities[ntt.Id] = default;
             }
             PrometheusPush.NTTCount.Set(EntityCount);
+            PrometheusPush.NTTDestroys.Inc();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -126,7 +129,7 @@ namespace MagnumOpus.ECS
         {
             while (ToBeRemoved.TryDequeue(out var ntt))
                 DestroyInternal(in ntt);
-            SystemNotifier.Start();
+            SystemNotifier?.Start();
         }
         public static void Update()
         {

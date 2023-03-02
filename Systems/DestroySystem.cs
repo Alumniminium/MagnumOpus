@@ -9,6 +9,11 @@ namespace MagnumOpus.Simulation.Systems
     {
         public DestroySystem() : base("Destroy", threads: 2) { }
 
+        protected override bool MatchesFilter(in NTT nttId)
+        {
+            return base.MatchesFilter(nttId);
+        }
+
         public override void Update(in NTT ntt, ref DestroyEndOfFrameComponent def)
         {
             if(ntt.Has<ViewportComponent>())

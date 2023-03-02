@@ -17,8 +17,8 @@ namespace MagnumOpus.Simulation.Systems
                 EntityDeath(in ntt, ref dtc);
             else if (ntt.Type == EntityType.Item)
                 ItemDeath(in ntt, ref dtc);
-            else if (ntt.Type == EntityType.Trap)
-                TrapDeath(in ntt, ref dtc);
+            // else if (ntt.Type == EntityType.Trap)
+            //     TrapDeath(in ntt, ref dtc);
         }
 
         public static void EntityDeath(in NTT ntt, ref DeathTagComponent dtc)
@@ -75,6 +75,12 @@ namespace MagnumOpus.Simulation.Systems
                         {
                             var item = items[i];
                             ref var invItemNtt = ref EntityFactory.MakeDefaultItem(item.ID, out var success, default, 0, true);
+                            if(!success)
+                            {
+                                var ded = new DestroyEndOfFrameComponent(invItemNtt.Id);
+                                invItemNtt.Set(ref ded);
+                                continue;
+                            }
                             inv.Items[i] = invItemNtt;
                         }
                     }
@@ -128,9 +134,9 @@ namespace MagnumOpus.Simulation.Systems
             }
         }
 
-        public static void TrapDeath(in NTT ntt, ref DeathTagComponent dtc)
-        {
+        // public static void TrapDeath(in NTT ntt, ref DeathTagComponent dtc)
+        // {
             
-        }
+        // }
     }
 }
