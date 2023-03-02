@@ -13,30 +13,36 @@ namespace MagnumOpus.Simulation.Systems
         {
             lvl.Experience += (uint)rew.Experience;
 
-            if (lvl.Experience >= lvl.ExperienceToNextLevel)
+            if (lvl.Experience < lvl.ExperienceToNextLevel)
             {
-                ref var hlt = ref ntt.Get<HealthComponent>();
-                lvl.Level++;
-                var level = lvl.Level;
-                var profession = ntt.Get<ProfessionComponent>().Profession;
-                lvl.Experience = 0;
-                lvl.ExperienceToNextLevel = (uint)Collections.LevelExps.Values[lvl.Level-1];
-                lvl.ChangedTick = NttWorld.Tick;
-                hlt.Health = hlt.MaxHealth;
-
-                var allot = Collections.CqPointAllot.FirstOrDefault(x=> x.level == level && x.profession == ((long)profession / 10));
-                if (allot != null)
-                {
-                    ref var pnt = ref ntt.Get<AttributeComponent>();
-                    pnt.Agility = (ushort)allot.Speed;
-                    pnt.Strength = (ushort)allot.force;
-                    pnt.Vitality = (ushort)allot.health;
-                    pnt.Spirit = (ushort)allot.soul;
-                }
-
-                var lvlActionMsg = MsgAction.Create(ntt.NetId, 0, 0, 0, 0, Enums.MsgActionType.LevelUp);
-                ntt.NetSync(ref lvlActionMsg, true);
+                ntt.Remove<ExpRewardComponent>();
+                Logger.Debug("{ntt} gained {exp} exp, now at {current}/{next} (level: {lvl})", ntt, rew.Experience, lvl.Experience, lvl.ExperienceToNextLevel, lvl.Level);
+                return;
             }
+
+            ref var hlt = ref ntt.Get<HealthComponent>();
+            lvl.Level++;
+            var level = lvl.Level++;
+            var profession = ntt.Get<ProfessionComponent>().Profession;
+            lvl.Experience = 0;
+            lvl.ExperienceToNextLevel = (uint)Collections.LevelExps.Values[lvl.Level - 1];
+            lvl.ChangedTick = NttWorld.Tick;
+            hlt.Health = hlt.MaxHealth;
+
+            var allot = Collections.CqPointAllot.FirstOrDefault(x => x.level == level && x.profession == ((long)profession / 10));
+            if (allot != null)
+            {
+                ref var pnt = ref ntt.Get<AttributeComponent>();
+                pnt.Agility = (ushort)allot.Speed;
+                pnt.Strength = (ushort)allot.force;
+                pnt.Vitality = (ushort)allot.health;
+                pnt.Spirit = (ushort)allot.soul;
+            }
+
+            var lvlActionMsg = MsgAction.Create(ntt.NetId, 0, 0, 0, 0, Enums.MsgActionType.LevelUp);
+            ntt.NetSync(ref lvlActionMsg, true);
+
+            Logger.Debug("{ntt} gained {exp} exp and leveled to {lvl}, now at {current}/{next} (level: {lvl})", ntt, rew.Experience, lvl.Level, lvl.Experience, lvl.ExperienceToNextLevel, lvl.Level);
 
             ntt.Remove<ExpRewardComponent>();
         }

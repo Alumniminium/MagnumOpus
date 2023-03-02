@@ -26,8 +26,11 @@ namespace MagnumOpus.Simulation.Systems
                 if (b.Has<DeathTagComponent>())
                     continue;
 
-                if (CoMath.DdaLine(pos.Position, new Vector2(atk.X, atk.Y), atk.MagicType.Distance, bPos.Position))
-                    tcc.Targets.Add(b);
+                if (!CoMath.DdaLine(pos.Position, new Vector2(atk.X, atk.Y), atk.MagicType.Distance, bPos.Position))
+                    continue;
+                
+                tcc.Targets.Add(b);
+                Logger.Debug("{ntt} adding {b} to target list of {skill}:{level}", ntt, b, atk.MagicType.MagicType, atk.MagicType.Level);
             }
 
             var msgEffect = MsgMagicEffect.Create(in ntt, atk.X, atk.Y, (ushort)atk.MagicType.MagicType, (byte)atk.MagicType.Level);

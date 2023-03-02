@@ -52,6 +52,7 @@ namespace MagnumOpus.Simulation.Systems
 
                     closestDistance = distance;
                     closestEntity = b;
+                    Logger.Debug("{ntt} found {b} distance ", ntt, b, distance);
                 }
 
                 if (closestEntity.Id != 0)
@@ -104,6 +105,8 @@ namespace MagnumOpus.Simulation.Systems
 
                 var wlk = new WalkComponent(ntt.Id, dir, true);
                 ntt.Set(ref wlk);
+
+                Logger.Debug("{ntt} walking towards {target}", ntt, brn.TargetPosition);
             }
 
             if (brn.State == BrainState.Attacking)
@@ -111,6 +114,7 @@ namespace MagnumOpus.Simulation.Systems
                 ref readonly var _target = ref NttWorld.GetEntity(brn.TargetId);
                 var atk = new AttackComponent(ntt.Id, in _target, MsgInteractType.Physical);
                 ntt.Set(ref atk);
+                Logger.Debug("{ntt} attacking {target}", ntt, _target);
             }
 
             brn.State = BrainState.Sleeping;

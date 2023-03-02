@@ -24,17 +24,10 @@ namespace MagnumOpus.Simulation.Systems
             {
                 pos.Position = jmp.Position;
                 ntt.Remove<JumpComponent>();
+                Logger.Debug("Jump complete for {ntt}", ntt);
             }
             else
                 pos.Position = Vector2.Lerp(pos.Position, jmp.Position, 2 / jumpTime);
-            
-            // var eff = MsgFloorItem.Create((int)PixelWorld.Tick, (ushort)pos.Position.X, (ushort)pos.Position.Y, 12, MsgFloorItemType.DisplayEffect);
-            // var deff = MsgFloorItem.Create((int)PixelWorld.Tick-1, (ushort)pos.Position.X, (ushort)pos.Position.Y, 12, MsgFloorItemType.RemoveEffect);
-            // ntt.NetSync(ref eff, true);
-            // ntt.NetSync(ref deff, true);
-
-            // var text = $"{direction} -> {pos.Position}";
-            // var msgText = MsgText.Create(in ntt, text, MsgTextType.Talk);
 
             if (jmp.CreatedTick == NttWorld.Tick)
             {
@@ -44,6 +37,7 @@ namespace MagnumOpus.Simulation.Systems
 
                 PrometheusPush.JumpCount.Inc();
                 PrometheusPush.JumpDistance.Inc(distance);
+                Logger.Debug("Jump started for {ntt}", ntt);
             }
         }
     }

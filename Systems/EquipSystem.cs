@@ -26,6 +26,8 @@ namespace MagnumOpus.Simulation.Systems
                 ntt.NetSync(ref msg);
                 var remInv = MsgItem.Create(item.NetId, item.NetId, item.NetId, MsgItemType.RemoveInventory);
                 ntt.NetSync(ref remInv);
+
+                Logger.Debug("{ntt} equipped {item} to {slot}", ntt, item, change.Slot);
             }
             else
             {
@@ -35,6 +37,8 @@ namespace MagnumOpus.Simulation.Systems
 
                 var msgAddInv = MsgItemInformation.Create(in item);
                 ntt.NetSync(ref msgAddInv);
+
+                Logger.Debug("{ntt} unequipped {item} from {slot}", ntt, item, change.Slot);
             }
             ntt.Remove<RequestChangeEquipComponent>();
         }

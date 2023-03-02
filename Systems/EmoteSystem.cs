@@ -15,6 +15,8 @@ namespace MagnumOpus.Simulation.Systems
             if (emo.ChangedTick != NttWorld.Tick)
                 return;
 
+            Logger.Debug("{ntt} emote {emote}", ntt, emo.Emote);
+
             if(emo.Emote == Emote.Sit)
             {
                 var stamina = MsgUserAttrib.Create(ntt.NetId, 100, MsgUserAttribType.Stamina);

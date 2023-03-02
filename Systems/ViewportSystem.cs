@@ -18,55 +18,56 @@ namespace MagnumOpus.Simulation.Systems
             vwp.Viewport.Y = pos.Position.Y - vwp.Viewport.Height / 2;
 
             vwp.EntitiesVisibleLast.Clear();
-            foreach(var e in vwp.EntitiesVisible)
-                vwp.EntitiesVisibleLast.TryAdd(e.Key,e.Value);
+            foreach (var e in vwp.EntitiesVisible)
+                vwp.EntitiesVisibleLast.TryAdd(e.Key, e.Value);
 
             vwp.EntitiesVisible.Clear();
-            
+
             Collections.SpatialHashs[pos.Map].Remove(in ntt);
             Collections.SpatialHashs[pos.Map].Add(in ntt);
             Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
 
-
-            // FConsole.WriteLine($"[{nameof(ViewportSystem)}] {ntt.Id} -> {vwp.EntitiesVisible.Count} entities visible");
+            Logger.Debug("{ntt} has {visibleCount} visible entities", ntt, vwp.EntitiesVisible.Count);
 
             if (ntt.Type != EntityType.Player)
                 return;
 
-            
-                foreach (var kvp in vwp.EntitiesVisible)
-                {
-                    var b = kvp.Value;
+            foreach (var kvp in vwp.EntitiesVisible)
+            {
+                var b = kvp.Value;
                 if (b.Has<DeathTagComponent>())
                     continue;
 
-                if(b.Has<ViewportComponent>())
+                if (b.Has<ViewportComponent>())
                 {
                     ref readonly var bvwp = ref b.Get<ViewportComponent>();
                     bvwp.EntitiesVisible.TryAdd(ntt.Id, ntt);
                 }
 
-                if(b.Has<BrainComponent>())
+                if (b.Has<BrainComponent>())
                 {
                     ref var brn = ref b.Get<BrainComponent>();
-                    if(brn.State == Enums.BrainState.Idle)
+                    if (brn.State == Enums.BrainState.Idle)
+                    {
                         brn.State = Enums.BrainState.WakingUp;
+                        Logger.Debug("{ntt} is waking up '{b}' due to distance", ntt, b);
+                    }
                 }
 
-                if(vwp.EntitiesVisibleLast.ContainsKey(b.Id))
+                if (vwp.EntitiesVisibleLast.ContainsKey(b.Id))
                     continue;
 
                 NetworkHelper.FullSync(in ntt, in b);
                 NetworkHelper.FullSync(in b, in b);
 
-                if(b.Has<JumpComponent>())
+                if (b.Has<JumpComponent>())
                 {
                     ref readonly var jmp = ref b.Get<JumpComponent>();
                     var packet = MsgAction.CreateJump(in b, in jmp);
                     ntt.NetSync(ref packet, true);
                 }
 
-                if(b.Has<WalkComponent>())
+                if (b.Has<WalkComponent>())
                 {
                     ref readonly var wlk = ref b.Get<WalkComponent>();
                     var packet = MsgWalk.Create(b.NetId, wlk.Direction, wlk.IsRunning);

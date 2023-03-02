@@ -15,8 +15,7 @@ namespace MagnumOpus.Simulation.Systems
         {
             if (!InventoryHelper.RemoveNetIdFromInventory(in ntt, rdi.ItemNtt.NetId))
             {
-                if (Trace)
-                    FConsole.WriteLine($"[{nameof(DropItemSystem)}] {ntt.NetId} tried to drop an Item he does not have in his Inventory at {pos.Position} on map {pos.Map}.");
+                Logger.Debug("{ntt} tried to drop an Item he does not have in his Inventory at {pos}", ntt, pos.Position);
                 ntt.Remove<RequestDropItemComponent>();
                 return;
             }
@@ -31,12 +30,9 @@ namespace MagnumOpus.Simulation.Systems
             var msgDropFloor = MsgFloorItem.Create(in rdi.ItemNtt, MsgFloorItemType.Create);
             ntt.NetSync(ref msgRemoveInv);
             ntt.NetSync(ref msgDropFloor, true);
-
-            if (Trace)
-            {
-                ref readonly var item = ref rdi.ItemNtt.Get<ItemComponent>();
-                FConsole.WriteLine($"[{nameof(DropItemSystem)}] {ntt.NetId} dropped {item.Id} at {pos.Position} on map {pos.Map}.");
-            }
+                
+            ref readonly var item = ref rdi.ItemNtt.Get<ItemComponent>();
+            Logger.Debug("{ntt} dropped {item} at {pos}", ntt, item.Id, pos.Position);
             
             ntt.Remove<RequestDropItemComponent>();
         }

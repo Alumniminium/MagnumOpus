@@ -30,6 +30,7 @@ namespace MagnumOpus.Simulation.Systems
                     }
                 }
             NttWorld.Destroy(in ntt);
+            Logger.Debug("Destroyed {ntt}", ntt);
         }
     }
 }

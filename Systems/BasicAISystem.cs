@@ -21,8 +21,6 @@ namespace MagnumOpus.Simulation.Systems
             if (brn.State == BrainState.Sleeping)
             {
                 brn.SleepTicks--;
-                // FConsole.WriteLine($"[{NttWorld.Tick}][{Environment.CurrentManagedThreadId}] {brn.EntityId} Sleeping {brn.SleepTicks}");
-
                 if (brn.SleepTicks > 0)
                     return;
             }
@@ -31,7 +29,7 @@ namespace MagnumOpus.Simulation.Systems
             {
                 vwp.EntitiesVisible.Clear();
                 Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
-                // Game.Grids[pos.Map].GetVisibleEntities(ref vwp);
+                Logger.Debug("Waking up {ntt} with {visibleCount} visible entities", ntt, vwp.EntitiesVisible.Count);
             }
 
             if (brn.TargetId == 0)
@@ -79,6 +77,7 @@ namespace MagnumOpus.Simulation.Systems
             {
                 brn.TargetId = 0;
                 brn.State = BrainState.Idle;
+                Logger.Debug("{Entity} target {target} out of range", NttWorld.Tick, ntt, target);
                 return;
             }
 
@@ -93,12 +92,13 @@ namespace MagnumOpus.Simulation.Systems
 
                 var wlk = new WalkComponent(ntt.Id, dir, false);
                 ntt.Set(ref wlk);
-                // FConsole.WriteLine($"[{NttWorld.Tick}][{Environment.CurrentManagedThreadId}] {brn.EntityId} Walking {dir}");
+                Logger.Debug("{Entity} walking {dir} to {target}", NttWorld.Tick, ntt, (Direction)dir, target);
             }
             if (brn.State == BrainState.Attacking)
             {
                 var atk = new AttackComponent(ntt.Id, in target, MsgInteractType.Physical);
                 ntt.Set(ref atk);
+                Logger.Debug("{Entity} attacking {target}", NttWorld.Tick, ntt, target);
             }
 
             brn.State = BrainState.Sleeping;

@@ -33,18 +33,17 @@ namespace MagnumOpus.Simulation.Systems
                     pos.ChangedTick = NttWorld.Tick + 1;
                     pos.Position = new Vector2(rebornMap.portal0_x, rebornMap.portal0_y);
                     pos.Map = (ushort)rebornMap.id;
-                    FConsole.WriteLine($"[{nameof(ReviveSystem)}]: Revive at portal: {pos.Map}  x: {pos.Position.X} y: {pos.Position.Y}");
                 }
                 else
                 {
-                    FConsole.WriteLine($"[{nameof(ReviveSystem)}]: Reborn Map {pos.Map} not found");
+                    Logger.Debug("Reborn Map {0} not found", mapId);
                     pos.Map = 1002;
                     pos.Position = new Vector2(477, 380);
                 }
             }
             else
             {
-                FConsole.WriteLine($"[{nameof(ReviveSystem)}]: Map {pos.Map} not found");
+                Logger.Debug("Map {0} not found", pos.Map);
                 pos.Map = 1002;
                 pos.Position = new Vector2(477, 380);
             }
@@ -61,7 +60,7 @@ namespace MagnumOpus.Simulation.Systems
             ntt.Remove<ReviveComponent>();
             ntt.Remove<DeathTagComponent>();
 
-            FConsole.WriteLine($"[{nameof(ReviveSystem)}]: Revived {ntt.NetId} at {pos.Map} at {pos.Position.X}, {pos.Position.Y}");
+            Logger.Debug("Revived '{0}' at {1}, {2}, {3}", NttWorld.Tick, Name, ntt, pos.Map, pos.Position.X, pos.Position.Y);
         }
     }
 }

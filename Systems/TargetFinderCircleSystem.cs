@@ -38,6 +38,7 @@ namespace MagnumOpus.Simulation.Systems
                     continue;
 
                 tcc.Targets.Add(b);
+                Logger.Debug("{ntt} adding {b} to target list of {skill}:{level}", ntt, b, atk.MagicType.MagicType, atk.MagicType.Level);
             }
             ntt.Set(ref tcc);
             ntt.Remove<CircleTargetComponent>();

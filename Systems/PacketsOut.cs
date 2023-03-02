@@ -37,7 +37,6 @@ namespace MagnumOpus.Networking
                         net.AuthCrypto.Encrypt(packet.Span);
 
                     net.Socket.Send(packet.Span);
-                    // net.Socket.Send(pac-ket.Span);
                 }
             }
             catch

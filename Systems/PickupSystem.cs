@@ -39,7 +39,7 @@ namespace MagnumOpus.Simulation.Systems
                 if (emptyIdx == -1)
                 {
                     ntt.Remove<PickupRequestComponent>();
-                    FConsole.WriteLine($"[{nameof(PickupSystem)}]: {ntt.NetId} tried to pick up {pic.Item.NetId} but their inventory is full");
+                    Logger.Debug("{0} tried to pick up {1} but their inventory is full", ntt, pic.Item);
                     return;
                 }
 
@@ -75,7 +75,7 @@ namespace MagnumOpus.Simulation.Systems
             var delFloorMsg = MsgFloorItem.Create(in pic.Item, Enums.MsgFloorItemType.Delete);
             ntt.NetSync(ref delFloorMsg, true);
 
-            FConsole.WriteLine($"[{nameof(PickupSystem)}]: {ntt.NetId} picked up {pic.Item.NetId}");
+            Logger.Debug("{0} picked up {1}", ntt, pic.Item);
             ntt.Remove<PickupRequestComponent>();
         }
     }

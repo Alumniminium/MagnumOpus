@@ -67,7 +67,7 @@ namespace MagnumOpus
             {
                 var lines = PerformanceMetrics.Draw();
                 var linesArr = lines.Split('\r', '\n');
-                FConsole.WriteLine(lines);
+                // FConsole.WriteLine(lines);
 
                 for (int i = 0; i < linesArr.Length; i++)
                 {

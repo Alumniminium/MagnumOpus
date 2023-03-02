@@ -22,7 +22,7 @@ namespace MagnumOpus.Simulation.Systems
             ntt.NetSync(ref mapStatus);
 
             ntt.Remove<TeleportComponent>();
-            FConsole.WriteLine($"[{nameof(TeleportSystem)}]: Teleported {ntt.NetId} to {tpc.Map} at {tpc.X}, {tpc.Y}");
+            Logger.Debug("[{tick}] Teleported '{0}' to {1}, {2}, {3}", NttWorld.Tick, Name, ntt, tpc.Map, tpc.X, tpc.Y);
         }
     }
 }

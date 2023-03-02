@@ -18,12 +18,14 @@ namespace MagnumOpus.Simulation.Systems
                 hlt.Health = 0;
                 var dtc = new DeathTagComponent(ntt.Id, dmg.Attacker);
                 ntt.Set(ref dtc);
+                Logger.Information("{ntt} died after receiving {dmg} damage", ntt, dmg.Damage);
             }
 
             if(!dmg.Attacker.Has<ExpRewardComponent>())
             {
                 var expReward = new ExpRewardComponent(in dmg.Attacker, (ushort)actualDamage);
                 dmg.Attacker.Set(ref expReward);
+                Logger.Information("{attacker} received {exp} experience", dmg.Attacker, actualDamage);
             }
             else
             {

@@ -12,7 +12,7 @@ namespace MagnumOpus.Simulation.Systems
             if (rtc.RespawnTimeTick > NttWorld.Tick)
                 return;
 
-            
+            Logger.Debug("{ntt} respawning", ntt);
         }
     }
 }

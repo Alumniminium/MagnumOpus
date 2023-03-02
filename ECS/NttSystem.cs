@@ -1,11 +1,16 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 using Prometheus;
+using Serilog;
+using Serilog.Core;
+using Serilog.Sinks.Grafana.Loki;
 
 namespace MagnumOpus.ECS
 {
     public abstract class NttSystem
     {
+        public static long Tick => NttWorld.Tick;
         public string Name;
         public bool Trace = false;
         internal readonly ConcurrentDictionary<int, NTT> _entities = new();
@@ -17,10 +22,18 @@ namespace MagnumOpus.ECS
         private readonly Gauge TimeMetricsExporter;
         private readonly Gauge NTTCountMetricsExporter;
 
-
+        internal readonly Logger Logger;
 
         protected NttSystem(string name, int threads = 1)
         {
+            Logger = new LoggerConfiguration()
+                            .MinimumLevel.Debug()
+                            .Enrich.WithProperty("Tick", Tick)
+                            .Enrich.WithProperty("System", name)
+                            .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] [{Properties}] {Message}{NewLine}{Exception}")
+                            .WriteTo.GrafanaLoki("http://loki.her.st")
+                            .CreateLogger();
+
             Name = name;
             PerformanceMetrics.RegisterSystem(this);
             _threads = new Thread[threads];
@@ -61,7 +74,7 @@ namespace MagnumOpus.ECS
 
         public void ThreadLoop(object? id)
         {
-            if(id == null)
+            if (id == null)
                 throw new ArgumentNullException(nameof(id));
 
             int idx = (int)id;

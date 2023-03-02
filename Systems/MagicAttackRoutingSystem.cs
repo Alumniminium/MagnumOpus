@@ -13,12 +13,14 @@ namespace MagnumOpus.Simulation.Systems
             if (!sbc.Spells.TryGetValue((ushort)atk.SkillId, out var spell))
             {
                 ntt.Remove<MagicAttackRequestComponent>();
+                Logger.Debug("{ntt} tried to use skill {atk.SkillId} but doesn't have it", ntt, atk.SkillId);
                 return;
             }
 
             if (!Collections.MagicType.TryGetValue(atk.SkillId * 10 + spell.lvl, out var magicType))
             {
                 ntt.Remove<MagicAttackRequestComponent>();
+                Logger.Debug("{ntt} tried to use skill {atk.SkillId} but it doesn't exist", ntt, atk.SkillId);
                 return;
             }
 
