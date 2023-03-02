@@ -11,15 +11,15 @@ namespace MagnumOpus.Networking.Packets
         [FieldOffset(2)]
         public ushort Id;
         [FieldOffset(4)]
-        public uint ClientId;
+        public int ClientId;
         [FieldOffset(8)]
-        public uint AuthCode;
+        public int AuthCode;
         [FieldOffset(12)]
         public fixed byte ServerIP[16];
         [FieldOffset(28)]
         public ushort Port;
 
-        public static MsgAccountResponse Create(string serverIP, ushort port, uint key1, uint key2)
+        public static MsgAccountResponse Create(string serverIP, ushort port, int key1, int key2)
         {
             var packet = new MsgAccountResponse
             {

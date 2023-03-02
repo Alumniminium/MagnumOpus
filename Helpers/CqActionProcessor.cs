@@ -144,6 +144,28 @@ namespace MagnumOpus.Helpers
                         return boolFunc(x.Count, targetVal);
                     return false;
                 }
+            },
+            { "ep", (ntt, targetVal, op) =>
+                {
+                    // STAMINA
+
+                    
+                    // ref var x = ref ntt.Get<LevelComponent>();
+                    // if(AttrOpts.TryGetValue(op, out var func))
+                    // {
+                    //     var result = func(x.Experience, targetVal);
+                    //     if(result >= 0)
+                    //     {
+                    //         x.Experience = (byte)result;
+                    //         return true;
+                    //     }
+                    //     return false;
+                    // }
+                    // if(BooleanAttrOpts.TryGetValue(op, out var boolFunc))
+                    //     return boolFunc(x.Experience, targetVal);
+                    // return false;
+                    return true;
+                }
             }
         };
 

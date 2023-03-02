@@ -52,7 +52,7 @@ namespace MagnumOpus.Simulation.Systems
 
                     closestDistance = distance;
                     closestEntity = b;
-                    Logger.Debug("{ntt} found {b} distance ", ntt, b, distance);
+                    Logger.Debug("{ntt} found {b} distance {dist}", ntt, b, distance);
                 }
 
                 if (closestEntity.Id != 0)

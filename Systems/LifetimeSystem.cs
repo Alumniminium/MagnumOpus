@@ -21,7 +21,7 @@ namespace MagnumOpus.Simulation.Systems
                 if (!Array.Exists(countdown, x => x == ticksLeft))
                     return;
                 
-                Logger.Information("{ntt} -> {seconds} seconds left", nameof(LifetimeSystem), ntt.Id, ticksLeft / NttWorld.TargetTps);
+                Logger.Debug("{ntt} -> {seconds} seconds left", ntt, ticksLeft / NttWorld.TargetTps);
 
                 ref var pos = ref ntt.Get<PositionComponent>();
                 pos.ChangedTick = NttWorld.Tick;
@@ -34,7 +34,7 @@ namespace MagnumOpus.Simulation.Systems
             var dtc = new DeathTagComponent(ntt.Id, default);
             ntt.Set(ref dtc);
             ntt.Remove<LifeTimeComponent>();
-            Logger.Information("{ntt} -> EXPIRED", nameof(LifetimeSystem), ntt.Id);
+            Logger.Information("{ntt} -> EXPIRED", ntt);
         }
     }
 }
