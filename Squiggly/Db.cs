@@ -85,17 +85,9 @@ namespace MagnumOpus.Squiggly
                         if (!Collections.Maps.TryGetValue(pos.Map, out var map))
                             continue;
 
-                        Collections.SpatialHashs[pos.Map] = new SpatialHash(10);//new Grid(map.Width, map.Height, 10, 10);
+                        Collections.SpatialHashs[pos.Map] = new SpatialHash(10);
                     }
                     Collections.SpatialHashs[pos.Map].Add(in obj);
-                    // if(!Game.Grids.TryGetValue(pos.Map, out var grid))
-                    // {
-                    //     if (!Collections.Maps.TryGetValue(pos.Map, out var map))
-                    //         continue;
-
-                    //     grid = new Grid(map.Width, map.Height, 10, 10);
-                    //     Game.Grids[pos.Map] = grid;
-                    // }
                 }
             }
             sw.Stop();
@@ -157,14 +149,9 @@ namespace MagnumOpus.Squiggly
                     Collections.Maps.Add((ushort)cqmap.id, map);
                     if (!Collections.SpatialHashs.TryGetValue((ushort)cqmap.id, out var _))
                     {
-                        var grid = new SpatialHash(10);//new Grid(cqmap.Width, cqmap.Height, 10, 10);
+                        var grid = new SpatialHash(10);
                         Collections.SpatialHashs.Add((ushort)cqmap.id, grid);
                     }
-                    // if(!Game.Grids.TryGetValue((ushort)cqmap.id, out var _))
-                    // {
-                    //     var grid = new Grid(cqmap.Width, cqmap.Height, 10, 10);
-                    //     Game.Grids.Add((ushort)cqmap.id, grid);
-                    // }
                 }
                 foreach (var dportal in db.Dmap_Portals)
                 {
@@ -204,18 +191,9 @@ namespace MagnumOpus.Squiggly
                     {
                         if (!Collections.Maps.TryGetValue(pos.Map, out var _))
                             continue;
-                        // 
-                        Collections.SpatialHashs[pos.Map] = new SpatialHash(10);//new Grid(map.Width, map.Height, 10, 10);
+                        Collections.SpatialHashs[pos.Map] = new SpatialHash(10);
                     }
                     Collections.SpatialHashs[pos.Map].Add(in ntt);
-                    // if(!Game.Grids.TryGetValue(pos.Map, out var grid))
-                    // {
-                    //     if (!Collections.Maps.TryGetValue(pos.Map, out var map))
-                    //         continue;
-
-                    //     grid = new Grid(map.Width, map.Height, 10, 10);
-                    //     Game.Grids[pos.Map] = grid;
-                    // }
                 }
             }
             sw.Stop();
@@ -253,9 +231,7 @@ namespace MagnumOpus.Squiggly
                     Collections.DmapPortals.Add(portal);
                 }
                 foreach (var passway in db.cq_passway)
-                {
                     Collections.CqPassway.Add(passway);
-                }
             }
             sw.Stop();
             FConsole.WriteLine($"[SquigglyLite] Loaded {Collections.CqPortal.Count}\t Portals in {sw.Elapsed.TotalMilliseconds}ms");

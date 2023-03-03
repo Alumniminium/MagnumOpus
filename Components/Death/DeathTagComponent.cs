@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using MagnumOpus.ECS;
 
 namespace MagnumOpus.Components

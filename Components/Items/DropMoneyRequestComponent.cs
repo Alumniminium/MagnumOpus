@@ -2,7 +2,7 @@ using MagnumOpus.ECS;
 
 namespace MagnumOpus.Components
 {
-    [Component][Save]
+    [Component]
     public readonly struct RequestDropMoneyComponent
     {
         public readonly int EntityId;

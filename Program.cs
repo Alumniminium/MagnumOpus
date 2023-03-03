@@ -106,6 +106,7 @@ namespace MagnumOpus
                 {
                     FConsole.WriteLine("[SERVER] Saving...");
                     ReflectionHelper.SaveComponents("_STATE_FILES");
+                    NttWorld.Save("_STATE_FILES");
                     FConsole.WriteLine("[SERVER] Saved.");
                 }
             }

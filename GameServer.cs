@@ -119,12 +119,12 @@ namespace MagnumOpus
                     FConsole.WriteLine($"[GAME] Client disconnected: {net.Username}");
                     net.Socket?.Close();
                     net.Socket?.Dispose();
-                    NttWorld.Destroy(in ntt);
+                    // NttWorld.Destroy(in ntt);
                     break;
                 }
             }
 
-            NttWorld.Destroy(in ntt);
+            // NttWorld.Destroy(in ntt);
         }
     }
 }

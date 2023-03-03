@@ -3,7 +3,7 @@ using MagnumOpus.ECS;
 
 namespace MagnumOpus.Components
 {
-    [Component]
+    [Component][Save]
     public readonly struct GuardPositionComponent
     {
         public readonly int EntityId;

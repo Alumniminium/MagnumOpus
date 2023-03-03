@@ -2,6 +2,8 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
+using HerstLib.IO;
 using MagnumOpus.Helpers;
 
 namespace MagnumOpus.ECS
@@ -22,7 +24,7 @@ namespace MagnumOpus.ECS
 
         private static readonly ConcurrentQueue<NTT> ToBeRemoved = new();
         public static readonly ConcurrentQueue<NTT> ChangedThisTick = new();
-        
+
         private static NttSystem[] Systems;
         public static long Tick { get; private set; }
         private static long TickBeginTime;
@@ -36,11 +38,42 @@ namespace MagnumOpus.ECS
 
         static NttWorld()
         {
-            Entities = new NTT[MaxEntities];
-            AvailableArrayIndicies = new(Enumerable.Range(1, MaxEntities - 1));
+            var start = Stopwatch.GetTimestamp();
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
             Systems = Array.Empty<NttSystem>();
             PerformanceMetrics.RegisterSystem(nameof(NttWorld));
+
+            var filename = "_STATE_FILES/" + nameof(NttWorld) + ".json";
+            var filename2 = "_STATE_FILES/" + nameof(NttWorld) + "-tick.txt";
+            if (File.Exists(filename))
+            {
+                using var stream = File.OpenRead(filename);
+                Entities = JsonSerializer.Deserialize<NTT[]>(stream) ?? new NTT[MaxEntities];
+            }
+            else
+                Entities = new NTT[MaxEntities];
+            
+            if (File.Exists(filename2))
+                Tick = long.Parse(File.ReadAllText(filename2));
+            
+            AvailableArrayIndicies = new();
+
+            for (var i = 0; i < Entities.Length; i++)
+            {
+                var ntt = Entities[i];
+                if (ntt.Id == 0)
+                {
+                    AvailableArrayIndicies.Enqueue(i);
+                }
+                else
+                {
+                    ChangedThisTick.Enqueue(ntt);
+                    NetIdToEntityIndex.Add(ntt.NetId, ntt.Id);
+                }
+            }
+
+            var time = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
+            FConsole.WriteLine($"Loaded {nameof(NttWorld)} in {time}ms");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -154,18 +187,43 @@ namespace MagnumOpus.ECS
                 Tick++;
                 PrometheusPush.TickCount.Inc();
             }
-            
+
             if (TimeAcc >= 1)
             {
                 OnSecond?.Invoke();
                 TimeAcc = 0;
             }
 
-            var tickDuration =  (float)Stopwatch.GetElapsedTime(TickBeginTime).TotalMilliseconds;
+            var tickDuration = (float)Stopwatch.GetElapsedTime(TickBeginTime).TotalMilliseconds;
             PrometheusPush.TickTime.Observe(tickDuration);
             PerformanceMetrics.AddSample(nameof(NttWorld), tickDuration);
             var sleepTime = (int)Math.Max(0, -1 + (UpdateTime * 1000) - tickDuration);
             Thread.Sleep(sleepTime);
+        }
+
+
+        public static readonly JsonSerializerOptions SerializerOptions = new()
+        {
+            WriteIndented = false,
+            IncludeFields = true,
+            IgnoreReadOnlyFields = false,
+            IgnoreReadOnlyProperties = false,
+            IgnoreNullValues = false,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
+        };
+
+        public static void Save(string path)
+        {
+            var start = Stopwatch.GetTimestamp();
+            using var stream = File.OpenWrite(path + "/" + nameof(NttWorld) + ".json");
+            var filename2 = path+"/" + nameof(NttWorld) + "-tick.txt";
+            using var writer = new Utf8JsonWriter(stream);
+            JsonSerializer.Serialize(stream, Entities, SerializerOptions);
+            File.WriteAllText(filename2, $"{Tick}");
+
+            var time = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
+            FConsole.WriteLine($"Saved {nameof(NttWorld)} to {path} in {time}ms");
         }
     }
 }

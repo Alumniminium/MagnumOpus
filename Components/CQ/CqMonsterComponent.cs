@@ -1,5 +1,8 @@
+using MagnumOpus.ECS;
+
 namespace MagnumOpus.Components
 {
+    [Component][Save]
     public readonly struct CqMonsterComponent
     {
         public readonly int EntityId;

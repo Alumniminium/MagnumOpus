@@ -3,7 +3,7 @@ using MagnumOpus.Enums;
 
 namespace MagnumOpus.Components
 {
-    [Component][Save]
+    [Component]
     public readonly struct WalkComponent
     {
         public readonly int EntityId;
