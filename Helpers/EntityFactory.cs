@@ -7,17 +7,14 @@ namespace MagnumOpus.Helpers
 {
     public static class EntityFactory
     {
-        public static ref NTT MakeDefaultItem(int itemId, out bool success, Vector2 pos = default, int map = 0, bool randomDurability = false)
+        public static NTT? MakeDefaultItem(int itemId, Vector2 pos = default, int map = 0, bool randomDurability = false)
         {
-            ref var ntt = ref NttWorld.CreateEntity(EntityType.Item);
-
             if(Collections.ItemType.TryGetValue(itemId, out var itemType) == false)
-            {
-                success = false;
-                return ref ntt;
-            }
+                return null;
+            
             var durability = randomDurability ? (ushort)(1 + Random.Shared.NextSingle() * itemType.AmountLimit) : itemType.AmountLimit;
 
+            ref var ntt = ref NttWorld.CreateEntity(EntityType.Item);
             var itemInfo = new ItemComponent(ntt.Id, itemId, durability, itemType.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
             ntt.Set(ref itemInfo);
 
@@ -26,31 +23,25 @@ namespace MagnumOpus.Helpers
                 var posInfo = new PositionComponent(ntt.Id, pos, map);
                 ntt.Set(ref posInfo);
             }
-
-            success = true;
-            return ref ntt;
+            return ntt;
         }
 
-        public static ref NTT MakeMoneyDrop(int amount, ref PositionComponent pos, out bool success)
+        public static NTT? MakeMoneyDrop(int amount, ref PositionComponent pos)
         {
             var itemId = ItemHelper.GetItemIdFromMoney(amount);
-            ref var ntt = ref MakeDefaultItem(itemId, out success, pos.Position, pos.Map);
-            var ltc = new LifeTimeComponent(ntt.Id, TimeSpan.FromSeconds(30));
-            var vwp = new ViewportComponent(ntt.Id, 18f);
-            ntt.Set(ref vwp);
-            ntt.Set(ref ltc);
-            
-            if(success == false)
-            {
-                var ded = new DestroyEndOfFrameComponent(ntt.Id);
-                ntt.Set(ref ded);
-                return ref ntt;
-            }
+            var ntt = MakeDefaultItem(itemId, pos.Position, pos.Map);
+            if(ntt == null)
+                return null;
 
-             var moneyInfo = new MoneyRewardComponent(ntt.Id, amount);
-            ntt.Set(ref moneyInfo);
+            var ltc = new LifeTimeComponent(ntt.Value.Id, TimeSpan.FromSeconds(30));
+            var vwp = new ViewportComponent(ntt.Value.Id, 18f);
+            ntt.Value.Set(ref vwp);
+            ntt.Value.Set(ref ltc);
 
-            return ref ntt;
+             var moneyInfo = new MoneyRewardComponent(ntt.Value.Id, amount);
+            ntt.Value.Set(ref moneyInfo);
+
+            return ntt;
         }      
     }
 }

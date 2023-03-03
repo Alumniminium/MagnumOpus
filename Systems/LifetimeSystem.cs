@@ -34,7 +34,7 @@ namespace MagnumOpus.Simulation.Systems
             var dtc = new DeathTagComponent(ntt.Id, default);
             ntt.Set(ref dtc);
             ntt.Remove<LifeTimeComponent>();
-            Logger.Information("{ntt} -> EXPIRED", ntt);
+            Logger.Debug("{ntt} -> EXPIRED", ntt);
         }
     }
 }

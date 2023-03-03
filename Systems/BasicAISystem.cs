@@ -1,5 +1,4 @@
 using System.Numerics;
-using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -77,7 +76,7 @@ namespace MagnumOpus.Simulation.Systems
             {
                 brn.TargetId = 0;
                 brn.State = BrainState.Idle;
-                Logger.Debug("{Entity} target {target} out of range", NttWorld.Tick, ntt, target);
+                Logger.Debug("{Entity} target {target} out of range", ntt, target);
                 return;
             }
 
@@ -92,13 +91,13 @@ namespace MagnumOpus.Simulation.Systems
 
                 var wlk = new WalkComponent(ntt.Id, dir, false);
                 ntt.Set(ref wlk);
-                Logger.Debug("{Entity} walking {dir} to {target}", NttWorld.Tick, ntt, (Direction)dir, target);
+                Logger.Debug("{Entity} walking {dir} to {target}", ntt, (Direction)dir, target);
             }
             if (brn.State == BrainState.Attacking)
             {
                 var atk = new AttackComponent(ntt.Id, in target, MsgInteractType.Physical);
                 ntt.Set(ref atk);
-                Logger.Debug("{Entity} attacking {target}", NttWorld.Tick, ntt, target);
+                Logger.Debug("{Entity} attacking {target}", ntt, target);
             }
 
             brn.State = BrainState.Sleeping;

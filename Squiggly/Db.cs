@@ -5,6 +5,7 @@ using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using MagnumOpus.Helpers;
 using MagnumOpus.SpacePartitioning;
 using MagnumOpus.Squiggly.Models;
 
@@ -41,7 +42,7 @@ namespace MagnumOpus.Squiggly
                     var prefab = cqMob;
                     ref var obj = ref NttWorld.CreateEntity(EntityType.Monster);
 
-                    var spw = new SpawnComponent(obj.Id, (int)spawn.id);
+                    var spw = new SpawnComponent(obj.Id, spawn);
                     var cqm = new CqMonsterComponent(obj.Id, prefab.id);
                     var pos = new PositionComponent(obj.Id, new Vector2(spawn.bound_x, spawn.bound_y), spawn.mapid);
                     var bdy = new BodyComponent(obj.Id, prefab.lookface, (Direction)Random.Shared.Next(0, 9));
@@ -49,6 +50,39 @@ namespace MagnumOpus.Squiggly
                     var ntc = new NameTagComponent(obj.Id, prefab.name.Trim());
                     var vwp = new ViewportComponent(obj.Id, 40f);
                     var inv = new InventoryComponent(obj.Id, prefab.drop_money, 0);
+
+                    var items = ItemGenerator.GetDropItemsFor(cqm.CqMonsterId);
+                    for (int x = 0; x < items.Count; x++)
+                    {
+                        var item = items[x];
+                        bool found = false;
+
+                        for (int y = 0; y < inv.Items.Length; y++)
+                        {
+                            if (inv.Items[y].Id == 0)
+                                continue;
+
+                            ref var invItem = ref inv.Items[y].Get<ItemComponent>();
+                            if (invItem.Id == item.ID)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if (found)
+                            continue;
+
+                        var idx = Array.IndexOf(inv.Items, default);
+                        if (idx == -1)
+                            continue;
+
+                        var invItemNtt = EntityFactory.MakeDefaultItem(item.ID, default, 0, true);
+                        if (invItemNtt == null)
+                            continue;
+
+                        inv.Items[idx] = invItemNtt.Value;
+                    }
 
                     if (prefab.action != 0)
                     {

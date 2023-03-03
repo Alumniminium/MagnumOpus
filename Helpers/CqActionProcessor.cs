@@ -396,6 +396,9 @@ namespace MagnumOpus.Helpers
                     }
                 case TaskActionType.ACTION_MST_DROPITEM:
                     {
+                        if(ntt.Has<RequestDropItemComponent>())
+                            return action.id_nextfail;
+
                         var parameters = action.param.Trim().Split(' ');
                         var itemId = int.Parse(parameters[1]);
                         var itemExists = Collections.ItemType.TryGetValue(itemId, out var entry);
@@ -415,8 +418,11 @@ namespace MagnumOpus.Helpers
                         ref var inv = ref ntt.Get<InventoryComponent>();
                         var idx = Array.FindIndex(inv.Items, x => x.Id == 0);
                         if (idx == -1)
-                            return action.id_nextfail;
-
+                            {
+                                var ded = new DestroyEndOfFrameComponent(itemNtt.Id);
+                                itemNtt.Set(ref ded);
+                                return action.id_nextfail;
+                            }
                         inv.Items[idx] = itemNtt;
 
                         var drc = new RequestDropItemComponent(ntt.Id, in itemNtt);
@@ -493,6 +499,9 @@ namespace MagnumOpus.Helpers
                                 var msg = MsgItem.Create(ntt.NetId, inv.Items[i].NetId, inv.Items[i].NetId, MsgItemType.RemoveInventory);
                                 ntt.NetSync(ref msg);
                                 count++;
+
+                                var ded = new DestroyEndOfFrameComponent(inv.Items[i].Id);
+                                inv.Items[i].Set(ref ded);
                                 inv.Items[i] = default;
                             }
                             if (count >= chkCount)
@@ -560,6 +569,8 @@ namespace MagnumOpus.Helpers
                         {
                             var removeInv = MsgItem.Create(inv.Items[foundIdx].NetId, inv.Items[foundIdx].NetId, inv.Items[foundIdx].NetId, MsgItemType.RemoveInventory);
                             ntt.NetSync(ref removeInv);
+                            var ded = new DestroyEndOfFrameComponent(inv.Items[foundIdx].Id);
+                            inv.Items[foundIdx].Set(ref ded);
                             inv.Items[foundIdx] = default;
                             if (_trace)
                                 FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {itemId} -> {(foundIdx != -1 ? "Success" : "Fail")} -> {(foundIdx != -1 ? action.id_next : action.id_nextfail)}");
@@ -586,6 +597,8 @@ namespace MagnumOpus.Helpers
                         {
                             var removeInv = MsgItem.Create(inv.Items[foundIdx].NetId, inv.Items[foundIdx].NetId, inv.Items[foundIdx].NetId, MsgItemType.RemoveInventory);
                             ntt.NetSync(ref removeInv);
+                            var ded = new DestroyEndOfFrameComponent(inv.Items[foundIdx].Id);
+                            inv.Items[foundIdx].Set(ref ded);
                             inv.Items[foundIdx] = default;
                             if (_trace)
                                 FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {itemId} -> {(foundIdx != -1 ? "Success" : "Fail")} -> {(foundIdx != -1 ? action.id_next : action.id_nextfail)}");

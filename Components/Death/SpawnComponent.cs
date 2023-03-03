@@ -1,4 +1,5 @@
 using MagnumOpus.ECS;
+using MagnumOpus.Squiggly.Models;
 
 namespace MagnumOpus.Components
 {
@@ -6,12 +7,12 @@ namespace MagnumOpus.Components
     public readonly struct SpawnComponent
     {
         public readonly int EntityId;
-        public readonly int SpawnId;
+        public readonly cq_generator Spawn;
 
-        public SpawnComponent(int entityId, int spawnId)
+        public SpawnComponent(int entityId, cq_generator spawn)
         {
             EntityId = entityId;
-            SpawnId = spawnId;
+            Spawn = spawn;
         }
 
         public override int GetHashCode() => EntityId;

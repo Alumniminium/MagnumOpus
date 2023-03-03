@@ -33,7 +33,6 @@ namespace MagnumOpus.Simulation.Systems
             {
                 ref var hlt = ref ntt.Get<HealthComponent>();
                 hlt.Health = Math.Clamp(hlt.Health + entry.Life, 0, hlt.MaxHealth);
-                hlt.ChangedTick = NttWorld.Tick;
                 var def = new DestroyEndOfFrameComponent(use.ItemNetId);
                 item.Set(ref def);
                 var msg = MsgItem.Create(ntt.NetId, use.ItemNetId, use.ItemNetId, MsgItemType.RemoveInventory);

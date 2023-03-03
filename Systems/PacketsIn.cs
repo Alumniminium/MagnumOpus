@@ -28,6 +28,8 @@ namespace MagnumOpus.Networking
 
         public override void Update(in NTT ntt, ref NetworkComponent net)
         {
+            try
+            {
             while (net.RecvQueue.TryDequeue(out var packet))
             {
                 var packetType = (PacketId)BitConverter.ToUInt16(packet.Span[2..4]);
@@ -37,6 +39,11 @@ namespace MagnumOpus.Networking
                     handler.Invoke(ntt, packet);
                 else
                     Logger.Debug("Undefined PacketId: {packet} {dump}", packetType, packet.Dump());
+            }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error in PacketsIn");
             }
         }
     }

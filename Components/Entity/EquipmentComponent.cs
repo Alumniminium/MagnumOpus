@@ -29,14 +29,8 @@ namespace MagnumOpus.Components
         [JsonIgnore]
         public NTT Boots => Items[MsgItemPosition.Boots];
         
-        public Dictionary<MsgItemPosition, NTT> Items = new();
-
-        public EquipmentComponent(int entityId)
+        public Dictionary<MsgItemPosition, NTT> Items = new()
         {
-            EntityId = entityId;
-            ChangedTick = NttWorld.Tick;
-            Items = new Dictionary<MsgItemPosition, NTT>
-            {
                 { MsgItemPosition.Head, default },
                 { MsgItemPosition.Necklace, default },
                 { MsgItemPosition.Garment, default },
@@ -47,6 +41,11 @@ namespace MagnumOpus.Components
                 { MsgItemPosition.LeftWeapon, default },
                 { MsgItemPosition.Boots, default }
             };
+
+        public EquipmentComponent(int entityId)
+        {
+            EntityId = entityId;
+            ChangedTick = NttWorld.Tick;
         }
 
         public override int GetHashCode() => EntityId;

@@ -208,7 +208,7 @@ namespace MagnumOpus.ECS
             IncludeFields = true,
             IgnoreReadOnlyFields = false,
             IgnoreReadOnlyProperties = false,
-            IgnoreNullValues = false,
+            // IgnoreNullValues = false,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
         };

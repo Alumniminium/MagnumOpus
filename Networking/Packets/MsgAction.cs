@@ -195,6 +195,9 @@ namespace MagnumOpus.Networking.Packets
                             NetworkHelper.FullSync(in ntt, in ent);
                         else
                             ntt.NetSync(ref msg);
+
+                        ref readonly var vwp = ref ntt.Get<ViewportComponent>();
+                        vwp.EntitiesVisible.TryAdd(ent.Id, ent);
                         break;
                     }
                     case MsgActionType.QueryTeamMember:

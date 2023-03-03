@@ -30,7 +30,7 @@ namespace MagnumOpus.Simulation.Systems
                 var deathMsg = MsgInteract.Create(in dtc.Killer, in ntt, MsgInteractType.Death, 0);
                 ntt.NetSync(ref deathMsg, true);
 
-                if(!ntt.Has<StatusEffectComponent>())
+                if (!ntt.Has<StatusEffectComponent>())
                     ntt.Set(new StatusEffectComponent(ntt.Id));
 
                 ref var eff = ref ntt.Get<StatusEffectComponent>();
@@ -46,17 +46,17 @@ namespace MagnumOpus.Simulation.Systems
                         ghostLook = MsgSpawn.AddTransform(bdy.Look, 98);
                 }
 
-                if (ntt.Has<CqActionComponent>())
-                {
-                    ref readonly var cqc = ref ntt.Get<CqActionComponent>();
-                    long action = cqc.cq_Action;
-                    for (int i = 0; i < 32; i++)
-                    {
-                        if (action == 0)
-                            break;
-                        action = CqActionProcessor.Process(in ntt, in ntt, CqProcessor.GetAction(action));
-                    }
-                }
+                // if (ntt.Has<CqActionComponent>())
+                // {
+                //     ref readonly var cqc = ref ntt.Get<CqActionComponent>();
+                //     long action = cqc.cq_Action;
+                //     for (int i = 0; i < 32; i++)
+                //     {
+                //         if (action == 0)
+                //             break;
+                //         action = CqActionProcessor.Process(in ntt, in ntt, CqProcessor.GetAction(action));
+                //     }
+                // }
                 if (ntt.Has<InventoryComponent>())
                 {
                     ref var inv = ref ntt.Get<InventoryComponent>();
@@ -65,24 +65,6 @@ namespace MagnumOpus.Simulation.Systems
                     {
                         var drop = new RequestDropMoneyComponent(ntt.Id, Random.Shared.Next((int)inv.Money));
                         ntt.Set(ref drop);
-                    }
-
-                    if (ntt.Type == EntityType.Monster)
-                    {
-                        ref var cqm = ref ntt.Get<CqMonsterComponent>();
-                        var items = ItemGenerator.GetDropItemsFor(cqm.CqMonsterId);
-                        for (int i = 0; i < items.Count; i++)
-                        {
-                            var item = items[i];
-                            ref var invItemNtt = ref EntityFactory.MakeDefaultItem(item.ID, out var success, default, 0, true);
-                            if(!success)
-                            {
-                                var ded = new DestroyEndOfFrameComponent(invItemNtt.Id);
-                                invItemNtt.Set(ref ded);
-                                continue;
-                            }
-                            inv.Items[i] = invItemNtt;
-                        }
                     }
 
                     inv.Items = inv.Items.OrderByDescending(x => x.Id).ToArray();
@@ -114,9 +96,28 @@ namespace MagnumOpus.Simulation.Systems
             else if (dtc.Tick + NttWorld.TargetTps * 10 == NttWorld.Tick && ntt.Type == EntityType.Monster)
             {
                 ref readonly var pos = ref ntt.Get<PositionComponent>();
-                var ded = new DestroyEndOfFrameComponent(ntt.Id);
-                ntt.Set(ref ded);
+                ref readonly var spawn = ref ntt.Get<SpawnComponent>();
+                ref readonly var vwp = ref ntt.Get<ViewportComponent>();
+                
+                var despawn = MsgAction.RemoveEntity(ntt.NetId);
+                ntt.NetSync(ref despawn, true);
+                
+                foreach (var b in vwp.EntitiesVisible)
+                {
+                    if(!b.Value.Has<ViewportComponent>())
+                        continue;
+                    ref var bVwp = ref b.Value.Get<ViewportComponent>();
+                    bVwp.EntitiesVisible.Remove(ntt.Id, out _);
+                    bVwp.EntitiesVisibleLast.Remove(ntt.Id, out _);
+                }
+                vwp.EntitiesVisible.Clear();
+                vwp.EntitiesVisibleLast.Clear();
+
+                var respawn = new RespawnTagComponent(ntt.Id, spawn.Spawn.rest_secs);
+                ntt.Set(ref respawn);
                 Collections.SpatialHashs[pos.Map].Remove(in ntt);
+                ntt.Remove<PositionComponent>();
+                ntt.Remove<DeathTagComponent>();
             }
         }
 
@@ -131,12 +132,15 @@ namespace MagnumOpus.Simulation.Systems
                 ntt.Set(ref ded);
                 if (Collections.SpatialHashs.TryGetValue(pos.Map, out var hash))
                     hash.Remove(in ntt);
+
+                var delete = MsgFloorItem.Create(in ntt, MsgFloorItemType.Delete);
+                ntt.NetSync(ref delete, true);
             }
         }
 
         // public static void TrapDeath(in NTT ntt, ref DeathTagComponent dtc)
         // {
-            
+
         // }
     }
 }

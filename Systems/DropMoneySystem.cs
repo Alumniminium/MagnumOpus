@@ -1,4 +1,3 @@
-using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
@@ -26,11 +25,11 @@ namespace MagnumOpus.Simulation.Systems
             PrometheusPush.MoneyTotal.Inc(drc.Amount);
             PrometheusPush.ServerExpenses.Inc(drc.Amount);
 
-            ref var itemNtt = ref EntityFactory.MakeMoneyDrop(drc.Amount, ref pos, out var success);
-            if (success)
+            var itemNtt = EntityFactory.MakeMoneyDrop(drc.Amount, ref pos);
+            if (itemNtt != null)
             {
-                Collections.SpatialHashs[pos.Map].Add(in itemNtt);
-                var dropMsg = MsgFloorItem.Create(in itemNtt, Enums.MsgFloorItemType.Create);
+                Collections.SpatialHashs[pos.Map].Add(itemNtt.Value);
+                var dropMsg = MsgFloorItem.Create(itemNtt.Value, Enums.MsgFloorItemType.Create);
                 ntt.NetSync(ref dropMsg, true);
                 Logger.Debug("{ntt} dropped {amount} money at {pos}", ntt, drc.Amount, pos.Position);
             }
