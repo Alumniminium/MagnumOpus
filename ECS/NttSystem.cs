@@ -28,9 +28,8 @@ namespace MagnumOpus.ECS
         {
             Logger = new LoggerConfiguration()
                             .MinimumLevel.Debug()
-                            .Enrich.WithProperty("Tick", Tick)
                             .Enrich.WithProperty("System", name)
-                            .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] [{Properties}] {Message}{NewLine}{Exception}")
+                            .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss}[{Properties}] {Message}{NewLine}{Exception}")
                             .WriteTo.GrafanaLoki("http://loki.her.st")
                             .CreateLogger();
 

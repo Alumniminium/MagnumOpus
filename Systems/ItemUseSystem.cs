@@ -1,4 +1,3 @@
-using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -14,6 +13,7 @@ namespace MagnumOpus.Simulation.Systems
 
         public override void Update(in NTT ntt, ref InventoryComponent inv, ref RequestItemUseComponent use)
         {
+            bool destroy = false;
             ref var item = ref NttWorld.GetEntityByNetId(use.ItemNetId);
             ref var itemComp = ref item.Get<ItemComponent>();
 
@@ -33,21 +33,17 @@ namespace MagnumOpus.Simulation.Systems
             {
                 ref var hlt = ref ntt.Get<HealthComponent>();
                 hlt.Health = Math.Clamp(hlt.Health + entry.Life, 0, hlt.MaxHealth);
-                var def = new DestroyEndOfFrameComponent(use.ItemNetId);
-                item.Set(ref def);
-                var msg = MsgItem.Create(ntt.NetId, use.ItemNetId, use.ItemNetId, MsgItemType.RemoveInventory);
-                ntt.NetSync(ref msg);
+                destroy = true;
             }
             else if (entry.Mana > 0)
             {
                 ref var mna = ref ntt.Get<ManaComponent>();
                 mna.Mana = (ushort)Math.Clamp(mna.Mana + entry.Mana, 0, mna.MaxMana);
-                mna.ChangedTick = NttWorld.Tick;
-                var def = new DestroyEndOfFrameComponent(use.ItemNetId);
-                item.Set(ref def);
-                var msg = MsgItem.Create(ntt.NetId, use.ItemNetId, use.ItemNetId, MsgItemType.RemoveInventory);
-                ntt.NetSync(ref msg);
+                destroy = true;
             }
+
+            if(destroy)
+                InventoryHelper.RemoveNttFromInventory(in ntt, ref inv, in item, destroy: true, netSync: true);
 
             Logger.Debug("{0} used {1} ({2})", ntt, item, itemComp.Id);
             ntt.Remove<RequestItemUseComponent>();

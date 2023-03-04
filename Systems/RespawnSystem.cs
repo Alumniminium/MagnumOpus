@@ -44,33 +44,17 @@ namespace MagnumOpus.Simulation.Systems
             for (int x = 0; x < items.Count; x++)
             {
                 var item = items[x];
-                bool found = false;
 
-                for (int y = 0; y < inv.Items.Length; y++)
-                {
-                    if (inv.Items[y].Id == 0)
-                        continue;
-
-                    ref var invItem = ref inv.Items[y].Get<ItemComponent>();
-                    if (invItem.Id == item.ID)
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (found)
+                if (InventoryHelper.HasItemId(ref inv, item.ID))
                     continue;
-
-                var idx = Array.IndexOf(inv.Items, default);
-                if (idx == -1)
+                if (!InventoryHelper.HasFreeSpace(ref inv))
                     continue;
 
                 var invItemNtt = EntityFactory.MakeDefaultItem(item.ID, default, 0, true);
                 if (invItemNtt== null)
                     continue;
                 
-                inv.Items[idx] = invItemNtt.Value;
+                InventoryHelper.AddItem(in ntt, ref inv, invItemNtt.Value);
             }
 
             ntt.Remove<RespawnTagComponent>();

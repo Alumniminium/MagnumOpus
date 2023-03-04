@@ -19,7 +19,7 @@ namespace MagnumOpus
                 new PacketsIn(),
                 new MonsterRespawnSystem(),
                 new BasicAISystem(),
-                // new GuardAISystem(),
+                new GuardAISystem(),
                 new WalkSystem(),
                 new JumpSystem(),
                 new EmoteSystem(),

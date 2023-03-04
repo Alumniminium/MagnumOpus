@@ -31,22 +31,22 @@ namespace MagnumOpus.Simulation.Systems
 
             if (!shopEntry.Items.Contains(itemId) && txc.Buy)
             {
-                ntt.Remove<RequestShopItemTransactionComponent>();
                 FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.NetId} tried to {(txc.Buy ? "buy" : "sell")} {itemId} but it doesn't exist in the shop {txc.ShopId}");
+                ntt.Remove<RequestShopItemTransactionComponent>();
                 return;
             }
 
             if (!Collections.ItemType.TryGetValue(itemId, out var itemEntry))
             {
-                ntt.Remove<RequestShopItemTransactionComponent>();
                 FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.NetId} tried to {(txc.Buy ? "buy" : "sell")} {itemId} but it doesn't exist in ItemType.dat");
+                ntt.Remove<RequestShopItemTransactionComponent>();
                 return;
             }
 
             if (inv.Money < itemEntry.Price && txc.Buy)
             {
-                ntt.Remove<RequestShopItemTransactionComponent>();
                 FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.NetId} tried to buy {itemId} with {inv.Money:C} but it costs {itemEntry.Price:C}");
+                ntt.Remove<RequestShopItemTransactionComponent>();
                 return;
             }
 

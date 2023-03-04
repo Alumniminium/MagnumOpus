@@ -46,17 +46,17 @@ namespace MagnumOpus.Simulation.Systems
                         ghostLook = MsgSpawn.AddTransform(bdy.Look, 98);
                 }
 
-                // if (ntt.Has<CqActionComponent>())
-                // {
-                //     ref readonly var cqc = ref ntt.Get<CqActionComponent>();
-                //     long action = cqc.cq_Action;
-                //     for (int i = 0; i < 32; i++)
-                //     {
-                //         if (action == 0)
-                //             break;
-                //         action = CqActionProcessor.Process(in ntt, in ntt, CqProcessor.GetAction(action));
-                //     }
-                // }
+                if (ntt.Has<CqActionComponent>())
+                {
+                    ref readonly var cqc = ref ntt.Get<CqActionComponent>();
+                    long action = cqc.cq_Action;
+                    for (int i = 0; i < 32; i++)
+                    {
+                        if (action == 0)
+                            break;
+                        action = CqActionProcessor.Process(in ntt, in ntt, CqProcessor.GetAction(action));
+                    }
+                }
                 if (ntt.Has<InventoryComponent>())
                 {
                     ref var inv = ref ntt.Get<InventoryComponent>();
@@ -67,7 +67,7 @@ namespace MagnumOpus.Simulation.Systems
                         ntt.Set(ref drop);
                     }
 
-                    inv.Items = inv.Items.OrderByDescending(x => x.Id).ToArray();
+                    InventoryHelper.SortById(in ntt, ref inv);
                     var itemCount = inv.Items.Where(x => x.Id != 0).Count();
                     for (int i = 0; i < itemCount; i++)
                     {

@@ -122,18 +122,10 @@ namespace MagnumOpus.Networking.Packets
                 case MsgActionType.SendItems:
                     {
                         FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId}");
-                        ref readonly var inv = ref ntt.Get<InventoryComponent>();
+                        ref var inv = ref ntt.Get<InventoryComponent>();
 
-                        foreach (var item in inv.Items)
-                        {
-                            ref readonly var itemComp = ref item.Get<ItemComponent>();
-                            var reply = MsgItem.Create(item.NetId, itemComp.Id, itemComp.Id, MsgItemType.Buy);
-                            var reply2 = MsgItemInformation.Create(in item);
-                            ntt.NetSync(ref reply);
-                            ntt.NetSync(ref reply2);
-                        }
+                        InventoryHelper.SortById(in ntt, ref inv, netSync: true);
                         ntt.NetSync(ref msg);
-
                         break;
                     }
                 case MsgActionType.SendSpells:

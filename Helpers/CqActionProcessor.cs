@@ -396,7 +396,7 @@ namespace MagnumOpus.Helpers
                     }
                 case TaskActionType.ACTION_MST_DROPITEM:
                     {
-                        if(ntt.Has<RequestDropItemComponent>())
+                        if (ntt.Has<RequestDropItemComponent>())
                             return action.id_nextfail;
 
                         var parameters = action.param.Trim().Split(' ');
@@ -409,21 +409,21 @@ namespace MagnumOpus.Helpers
                         if (!itemExists)
                             return action.id_nextfail;
 
+                        ref var inv = ref ntt.Get<InventoryComponent>();
+
+                        if (!InventoryHelper.HasFreeSpace(ref inv))
+                            return action.id_nextfail;
+
+                        if (InventoryHelper.CountItemId(ref inv, itemId) > 0)
+                            return action.id_nextfail;
+
                         ref var itemNtt = ref NttWorld.CreateEntity(EntityType.Item);
 
                         var dura = (ushort)Random.Shared.Next(0, entry.AmountLimit);
                         var itemComp = new ItemComponent(itemNtt.Id, itemId, dura, entry.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
                         itemNtt.Set(ref itemComp);
 
-                        ref var inv = ref ntt.Get<InventoryComponent>();
-                        var idx = Array.FindIndex(inv.Items, x => x.Id == 0);
-                        if (idx == -1)
-                            {
-                                var ded = new DestroyEndOfFrameComponent(itemNtt.Id);
-                                itemNtt.Set(ref ded);
-                                return action.id_nextfail;
-                            }
-                        inv.Items[idx] = itemNtt;
+                        InventoryHelper.AddItem(in ntt, ref inv, in itemNtt);
 
                         var drc = new RequestDropItemComponent(ntt.Id, in itemNtt);
                         ntt.Set(ref drc);
@@ -440,18 +440,8 @@ namespace MagnumOpus.Helpers
                     }
                 case TaskActionType.ACTION_ITEM_CHECK:
                     {
-                        ref readonly var inv = ref ntt.Get<InventoryComponent>();
-                        bool found = false;
-                        for (int i = 0; i < inv.Items.Length; i++)
-                        {
-                            ref readonly var item = ref inv.Items[i].Get<ItemComponent>();
-                            if (item.Id != action.data)
-                                continue;
-
-                            found = true;
-                            break;
-                        }
-
+                        ref var inv = ref ntt.Get<InventoryComponent>();
+                        bool found = InventoryHelper.CountItemId(ref inv, action.data) > 0;
                         if (_trace)
                             FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {action.data} -> {(found ? "Found/Success" : "NotFound/Fail")} -> {(found ? action.id_next : action.id_nextfail)}");
 
@@ -514,97 +504,62 @@ namespace MagnumOpus.Helpers
                     }
                 case TaskActionType.ACTION_ITEM_LEAVESPACE:
                     {
-                        ref readonly var inv = ref ntt.Get<InventoryComponent>();
+                        ref var inv = ref ntt.Get<InventoryComponent>();
                         var chkCount = action.data;
-                        var count = 0;
-
-                        for (int i = 0; i < inv.Items.Length; i++)
-                        {
-                            if (inv.Items[i].NetId == 0)
-                                count++;
-                        }
+                        var success = InventoryHelper.HasFreeSpace(ref inv, chkCount);
 
                         if (_trace)
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {chkCount} -> {(count >= chkCount ? "Success" : "Fail")} -> {(count >= chkCount ? action.id_next : action.id_nextfail)}");
-                        return count >= chkCount ? action.id_next : action.id_nextfail;
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {chkCount} -> {(success ? "Success" : "Fail")} -> {(success ? action.id_next : action.id_nextfail)}");
+                        return success ? action.id_next : action.id_nextfail;
                     }
                 case TaskActionType.ACTION_ITEM_ADD:
                     {
-                        ref readonly var inv = ref ntt.Get<InventoryComponent>();
                         var itemId = action.data;
                         var itemFound = Collections.ItemType.TryGetValue(itemId, out var itemType);
-
-                        var idx = Array.IndexOf(inv.Items, default);
-                        if (_trace)
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {itemId} -> {(idx != -1 && itemFound ? "Success" : "Fail")} -> {(idx != -1 && itemFound ? action.id_next : action.id_nextfail)}");
-
-                        if (idx != -1)
+                        if (!itemFound)
                         {
-                            ref var itemNtt = ref NttWorld.CreateEntity(EntityType.Item);
-                            var item = new ItemComponent(itemNtt.Id, itemId, itemType.Amount, itemType.AmountLimit, 0, 0, 0, 0, 0, 0, RebornItemEffect.None, 0);
-                            itemNtt.Set(ref item);
-                            inv.Items[idx] = itemNtt;
-                            var msg = MsgItemInformation.Create(in itemNtt, MsgItemInfoAction.AddItem, MsgItemPosition.Inventory);
-                            ntt.NetSync(ref msg);
+                            if (_trace)
+                                FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {itemId} -> Fail -> {action.id_nextfail}");
+                            return action.id_nextfail;
                         }
 
-                        return idx != -1 ? action.id_next : action.id_nextfail;
+                        ref var inv = ref ntt.Get<InventoryComponent>();
+
+                        if (!InventoryHelper.HasFreeSpace(ref inv))
+                        {
+                            if (_trace)
+                                FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {itemId} -> Fail -> {action.id_nextfail}");
+                            return action.id_nextfail;
+                        }
+
+                        ref var itemNtt = ref NttWorld.CreateEntity(EntityType.Item);
+                        var item = new ItemComponent(itemNtt.Id, itemId, itemType.Amount, itemType.AmountLimit, 0, 0, 0, 0, 0, 0, RebornItemEffect.None, 0);
+                        itemNtt.Set(ref item);
+                        InventoryHelper.AddItem(in ntt, ref inv, in itemNtt, netSync: true);
+
+                        return action.id_next;
                     }
                 case TaskActionType.ACTION_ITEM_DEL:
                     {
-                        ref readonly var inv = ref ntt.Get<InventoryComponent>();
+                        ref var inv = ref ntt.Get<InventoryComponent>();
                         var itemId = trigger.Id;
-                        var foundIdx = -1;
 
-                        for (int i = 0; i < inv.Items.Length; i++)
-                        {
-                            if (inv.Items[i].Id != itemId)
-                                continue;
+                        if (!InventoryHelper.HasItemId(ref inv, itemId))
+                            return action.id_nextfail;
 
-                            foundIdx = i;
-                            break;
-                        }
-
-                        if (foundIdx != -1)
-                        {
-                            var removeInv = MsgItem.Create(inv.Items[foundIdx].NetId, inv.Items[foundIdx].NetId, inv.Items[foundIdx].NetId, MsgItemType.RemoveInventory);
-                            ntt.NetSync(ref removeInv);
-                            var ded = new DestroyEndOfFrameComponent(inv.Items[foundIdx].Id);
-                            inv.Items[foundIdx].Set(ref ded);
-                            inv.Items[foundIdx] = default;
-                            if (_trace)
-                                FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {itemId} -> {(foundIdx != -1 ? "Success" : "Fail")} -> {(foundIdx != -1 ? action.id_next : action.id_nextfail)}");
-                        }
-
-                        return foundIdx != -1 ? action.id_next : action.id_nextfail;
+                        InventoryHelper.RemoveItemId(ref inv, itemId, destroy: true);
+                        return action.id_next;
                     }
                 case TaskActionType.ACTION_ITEM_DELTHIS:
                     {
-                        ref readonly var inv = ref ntt.Get<InventoryComponent>();
+                        ref var inv = ref ntt.Get<InventoryComponent>();
                         var itemId = trigger.Id;
-                        var foundIdx = -1;
 
-                        for (int i = 0; i < inv.Items.Length; i++)
-                        {
-                            if (inv.Items[i].Id != itemId)
-                                continue;
+                        if (!InventoryHelper.HasItemId(ref inv, itemId))
+                            return action.id_nextfail;
 
-                            foundIdx = i;
-                            break;
-                        }
-
-                        if (foundIdx != -1)
-                        {
-                            var removeInv = MsgItem.Create(inv.Items[foundIdx].NetId, inv.Items[foundIdx].NetId, inv.Items[foundIdx].NetId, MsgItemType.RemoveInventory);
-                            ntt.NetSync(ref removeInv);
-                            var ded = new DestroyEndOfFrameComponent(inv.Items[foundIdx].Id);
-                            inv.Items[foundIdx].Set(ref ded);
-                            inv.Items[foundIdx] = default;
-                            if (_trace)
-                                FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {itemId} -> {(foundIdx != -1 ? "Success" : "Fail")} -> {(foundIdx != -1 ? action.id_next : action.id_nextfail)}");
-                        }
-
-                        return foundIdx != -1 ? action.id_next : action.id_nextfail;
+                        InventoryHelper.RemoveItemId(ref inv, itemId, destroy: true);
+                        return action.id_next;
                     }
                 case TaskActionType.ACTION_CHKTIME:
                     {

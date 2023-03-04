@@ -2,6 +2,7 @@ using System.Net.Security;
 using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
+using MagnumOpus.Helpers;
 using MagnumOpus.Networking;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Squiggly;
@@ -33,45 +34,22 @@ namespace MagnumOpus.Simulation.Systems
             }
             else
             {
-
-                var emptyIdx = Array.IndexOf(inv.Items, default);
-
-                if (emptyIdx == -1)
+                if(!InventoryHelper.HasFreeSpace(ref inv))
                 {
                     ntt.Remove<PickupRequestComponent>();
-                    Logger.Debug("{0} tried to pick up {1} but their inventory is full", ntt, pic.Item);
                     return;
                 }
 
                 pic.Item.Remove<PositionComponent>();
                 pic.Item.Remove<LifeTimeComponent>();
                 pic.Item.Remove<DestroyEndOfFrameComponent>();
-                inv.Items[emptyIdx] = pic.Item;
 
-
-                inv.Items = inv.Items.OrderByDescending(x => x.Get<ItemComponent>().Id).ToArray();
-
-                for (var i = 0; i < inv.Items.Length; i++)
-                {
-                    if (inv.Items[i].Id != 0)
-                    {
-                        var rmMsg = MsgItem.Create(inv.Items[i].NetId, inv.Items[i].NetId, inv.Items[i].NetId, Enums.MsgItemType.RemoveInventory);
-                        ntt.NetSync(ref rmMsg);
-                    }
-                }
-                for (var i = 0; i < inv.Items.Length; i++)
-                {
-                    if (inv.Items[i].Id != 0)
-                    {
-                        var addMsg = MsgItemInformation.Create(in inv.Items[i]);
-                        ntt.NetSync(ref addMsg);
-                    }
-                }
+                InventoryHelper.AddItem(in ntt, ref inv, in pic.Item);
+                InventoryHelper.SortById(in ntt, ref inv, netSync: true);
             }
 
             Collections.SpatialHashs[pos.Map].Remove(in pic.Item);
-            // Game.Grids[pos.Map].Remove(in pic.Item);
-
+            
             var delFloorMsg = MsgFloorItem.Create(in pic.Item, Enums.MsgFloorItemType.Delete);
             ntt.NetSync(ref delFloorMsg, true);
 

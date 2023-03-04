@@ -13,7 +13,7 @@ namespace MagnumOpus.Simulation.Systems
         public DropItemSystem() : base("Drop Item", threads: 2) { Trace = true; }
         public override void Update(in NTT ntt, ref PositionComponent pos, ref RequestDropItemComponent rdi, ref InventoryComponent inv)
         {
-            if (!InventoryHelper.RemoveNetIdFromInventory(in ntt, rdi.ItemNtt.NetId))
+            if (!InventoryHelper.RemoveNetIdFromInventory(in ntt, ref inv, rdi.ItemNtt.NetId, netSync: true))
             {
                 Logger.Debug("{ntt} tried to drop an Item he does not have in his Inventory at {pos}", ntt, pos.Position);
                 ntt.Remove<RequestDropItemComponent>();
@@ -26,9 +26,7 @@ namespace MagnumOpus.Simulation.Systems
 
             Collections.SpatialHashs[pos.Map].Add(in rdi.ItemNtt);
 
-            var msgRemoveInv = MsgItem.Create(rdi.ItemNtt.NetId, rdi.ItemNtt.NetId, rdi.ItemNtt.NetId, MsgItemType.RemoveInventory);
             var msgDropFloor = MsgFloorItem.Create(in rdi.ItemNtt, MsgFloorItemType.Create);
-            ntt.NetSync(ref msgRemoveInv);
             ntt.NetSync(ref msgDropFloor, true);
                 
             ref readonly var item = ref rdi.ItemNtt.Get<ItemComponent>();
