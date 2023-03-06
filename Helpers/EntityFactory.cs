@@ -14,7 +14,7 @@ namespace MagnumOpus.Helpers
             
             var durability = randomDurability ? (ushort)(1 + Random.Shared.NextSingle() * itemType.AmountLimit) : itemType.AmountLimit;
 
-            ref var ntt = ref NttWorld.CreateEntity(EntityType.Item);
+            ref var ntt = ref NttWorld.CreateEntity(EntityType.InvItem);
             var itemInfo = new ItemComponent(ntt.Id, itemId, durability, itemType.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
             ntt.Set(ref itemInfo);
 

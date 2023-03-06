@@ -10,7 +10,7 @@ namespace MagnumOpus.Networking
     {
         public static readonly Dictionary<PacketId, Action<NTT, Memory<byte>>> PacketHandlers = new();
 
-        public PacketsIn() : base("PacketsIn", threads: 1)
+        public PacketsIn(bool log) : base("PacketsIn", threads: 1, log)
         {
             foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
             {

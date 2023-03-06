@@ -7,7 +7,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class EmoteSystem : NttSystem<EmoteComponent, BodyComponent>
     {
-        public EmoteSystem() : base("Emote", threads: 2) { }
+        public EmoteSystem(bool log = false) : base("Emote", threads: 2, log) { }
         protected override bool MatchesFilter(in NTT ntt) => ntt.Type != EntityType.Item && base.MatchesFilter(in ntt);
 
         public override void Update(in NTT ntt, ref EmoteComponent emo, ref BodyComponent bdt)
@@ -19,7 +19,7 @@ namespace MagnumOpus.Simulation.Systems
 
             if(emo.Emote == Emote.Sit)
             {
-                var stamina = MsgUserAttrib.Create(ntt.NetId, 100, MsgUserAttribType.Stamina);
+                var stamina = MsgUserAttrib.Create(ntt.NetId, 150, MsgUserAttribType.Stamina);
                 ntt.NetSync(ref stamina);
             }
 

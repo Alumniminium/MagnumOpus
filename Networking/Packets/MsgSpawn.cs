@@ -73,6 +73,24 @@ namespace MagnumOpus.Networking.Packets
                 else
                     look = AddTransform(bdy.Look, 98);
             }
+
+            var head =0;
+            var armor = 0;
+            var mainHand = 0;
+            var offHand =0;
+
+            if(eqc.EntityId == ntt.Id)
+            {
+                eqc.Items.TryGetValue(MsgItemPosition.Head, out var headItem);
+                head = headItem.Get<ItemComponent>().Id;
+                eqc.Items.TryGetValue(MsgItemPosition.Armor, out var armorItem);
+                armor = armorItem.Get<ItemComponent>().Id;
+                eqc.Items.TryGetValue(MsgItemPosition.RightWeapon, out var mainHandItem);
+                mainHand = mainHandItem.Get<ItemComponent>().Id;
+                eqc.Items.TryGetValue(MsgItemPosition.LeftWeapon, out var offHandItem);
+                offHand = offHandItem.Get<ItemComponent>().Id;
+            }
+
             
             var msg = new MsgSpawn
             {
@@ -82,10 +100,10 @@ namespace MagnumOpus.Networking.Packets
                 Look = look,
                 StatusEffects = ntt.Get<StatusEffectComponent>().Effects,
                 GuildRank = gld.Rank,
-                Head = eqc.Head.Get<ItemComponent>().Id,
-                Armor = eqc.Armor.Get<ItemComponent>().Id,
-                MainHand = eqc.MainHand.Get<ItemComponent>().Id,
-                OffHand = eqc.OffHand.Get<ItemComponent>().Id,
+                Head = head,
+                Armor = armor,
+                MainHand = mainHand,
+                OffHand = offHand,
                 CurrentHp = (ushort)ntt.Get<HealthComponent>().Health,
                 Level = ntt.Get<LevelComponent>().Level,
                 X = (ushort)pos.Position.X,

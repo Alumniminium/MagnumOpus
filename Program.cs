@@ -16,13 +16,13 @@ namespace MagnumOpus
             server.Start();
             var systems = new List<NttSystem>
             {
-                new PacketsIn(),
-                new MonsterRespawnSystem(),
+                new PacketsIn(true),
+                new MonsterRespawnSystem(true),
                 new BasicAISystem(),
                 new GuardAISystem(),
                 new WalkSystem(),
-                new JumpSystem(),
-                new EmoteSystem(),
+                new JumpSystem(true),
+                new EmoteSystem(true),
                 new PortalSystem(),
                 new TeleportSystem(),
                 new ViewportSystem(),
@@ -45,7 +45,7 @@ namespace MagnumOpus
                 new EquipSystem(),
                 new DeathSystem(),
                 new DestroySystem(),
-                new PacketsOut(),
+                new PacketsOut(false),
             };
 
             FConsole.WriteLine("[DATABASE] Loading...");
@@ -59,34 +59,34 @@ namespace MagnumOpus
             Db.LoadCqTask();
             Db.LoadCqNpc();
             Db.LoadCqPointAllot();
-            Db.Spawn();
+            Db.LoadSpawners();
             Db.LoadNpcs();
 
             NttWorld.SetSystems(systems.ToArray());
             NttWorld.SetTPS(30);
             NttWorld.RegisterOnSecond(() =>
             {
-                var lines = PerformanceMetrics.Draw();
-                var linesArr = lines.Split('\r', '\n');
+                // var lines = PerformanceMetrics.Draw();
+                // var linesArr = lines.Split('\r', '\n');
                 // FConsole.WriteLine(lines);
 
-                for (int i = 0; i < linesArr.Length; i++)
-                {
-                    foreach (var player in NttWorld.Players)
-                    {
-                        if (i == 0)
-                        {
-                            var msgUp = MsgText.Create(player, linesArr[i], Enums.MsgTextType.MiniMap);
-                            player.NetSync(ref msgUp);
-                            continue;
-                        }
+                // for (int i = 0; i < linesArr.Length; i++)
+                // {
+                //     foreach (var player in NttWorld.Players)
+                //     {
+                //         if (i == 0)
+                //         {
+                //             var msgUp = MsgText.Create(player, linesArr[i], Enums.MsgTextType.MiniMap);
+                //             player.NetSync(ref msgUp);
+                //             continue;
+                //         }
 
-                        var msg = MsgText.Create(player, linesArr[i], Enums.MsgTextType.MiniMap2);
-                        player.NetSync(ref msg);
-                    }
-                }
+                //         var msg = MsgText.Create(player, linesArr[i], Enums.MsgTextType.MiniMap2);
+                //         player.NetSync(ref msg);
+                //     }
+                // }
 
-                PerformanceMetrics.Restart();
+                // PerformanceMetrics.Restart();
             });
 
             LoginServer.Start();

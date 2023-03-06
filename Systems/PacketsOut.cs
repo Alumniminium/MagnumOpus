@@ -4,13 +4,14 @@ using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using MagnumOpus.Helpers;
 
 namespace MagnumOpus.Networking
 {
     public class PacketsOut : NttSystem<NetworkComponent>
     {
         public static readonly Memory<byte> TqServer = Encoding.ASCII.GetBytes("TQServer");
-        public PacketsOut() : base("Packets Out", threads: 12) { }
+        public PacketsOut(bool log = false) : base("Packets Out", threads: 12, log) { }
 
         // private const int MAX_PACKET_SIZE = 1024 * 8;
         public override void Update(in NTT ntt, ref NetworkComponent net)
@@ -22,8 +23,9 @@ namespace MagnumOpus.Networking
                     if(packet.Length < 4)
                         continue;
 
-                    // var id = BitConverter.ToInt16(packet.Span[2..4]);
-                    // FConsole.WriteLine($"Sending {(PacketId)id} {id} (Size: {packet.Length}) to {ntt.Id}...");
+                    var id = BitConverter.ToInt16(packet.Span[2..4]);
+                    Logger.Debug(packet.Dump());
+                    Logger.Debug("Sending {id}/{id} (Size: {Length}) to {ntt}...", ((PacketId)id).ToString(), id, packet.Length, ntt);
 
                     if (net.UseGameCrypto)
                     {

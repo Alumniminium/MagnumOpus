@@ -13,8 +13,7 @@ namespace MagnumOpus.ECS
         public static int TargetTps { get; private set; } = 60;
         private static float UpdateTime => 1f / TargetTps;
 
-
-        public static readonly int MaxEntities = 250_000;
+        public static readonly int MaxEntities = 500_000;
         public static int EntityCount => MaxEntities - AvailableArrayIndicies.Count;
 
         private static readonly NTT[] Entities;

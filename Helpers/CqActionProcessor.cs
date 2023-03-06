@@ -3,7 +3,6 @@ using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Networking;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Squiggly;
 using MagnumOpus.Squiggly.Models;
@@ -164,7 +163,9 @@ namespace MagnumOpus.Helpers
                     // if(BooleanAttrOpts.TryGetValue(op, out var boolFunc))
                     //     return boolFunc(x.Experience, targetVal);
                     // return false;
-                    return true;
+                    if(op=="+=")
+                        return true;
+                    return false;
                 }
             }
         };
@@ -559,6 +560,7 @@ namespace MagnumOpus.Helpers
                             return action.id_nextfail;
 
                         InventoryHelper.RemoveItemId(ref inv, itemId, destroy: true);
+
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_CHKTIME:
@@ -600,6 +602,20 @@ namespace MagnumOpus.Helpers
 
                             return isNow ? action.id_next : action.id_nextfail;
                         }
+                    }
+                    case TaskActionType.ACTION_MAP_FIREWORKS:
+                    {
+                        /*
+                            When Using Fireworks in the Market (only one of the three)
+
+                            [FAIL] Unknown task type: ACTION_MAP_FIREWORKS
+                            | - Task:     601552
+                            | - Param:    
+                            | - Data:     0
+                            | - Next:     601553
+                            | - Fail:     0
+                        */
+                        goto default;
                     }
                 default:
                     FConsole.WriteLine($"[FAIL] Unknown task type: {taskType}");

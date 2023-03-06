@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Numerics;
 using HerstLib.IO;
 using MagnumOpus.Enums;
@@ -6,12 +7,19 @@ namespace MagnumOpus.Helpers
 {
     public static class CoMath
     {
+        public static Vector2 GetRandomPointInRect(in Rectangle rect)
+        {
+            int randX = Random.Shared.Next(rect.X, rect.X + rect.Width + 1);
+            int randY = Random.Shared.Next(rect.Y, rect.Y + rect.Height + 1);
+            return new Vector2(randX, randY);
+        }
+
         public static bool InRange(Vector2 start, Vector2 end, double range)
         {
             var deltaX = end.X - start.X;
             var deltaY = end.Y - start.Y;
             var distance = deltaX * deltaX + deltaY * deltaY;
-            return distance <= range*range;
+            return distance <= range * range;
         }
         public static Direction GetDirection(Vector2 end, Vector2 start) => (Direction)(GetRawDirection(end, start) % 8);
         public static byte GetRawDirection(Vector2 end, Vector2 start)
@@ -155,15 +163,15 @@ namespace MagnumOpus.Helpers
         }
 
         public static bool InSector(Vector2 pos, Vector2 click, Vector2 check, float widthRadians)
-            {
-                double aimRad = GetRadian(pos, click);
-                double checkRad = GetRadian(pos, check);
+        {
+            double aimRad = GetRadian(pos, click);
+            double checkRad = GetRadian(pos, check);
 
-                if (aimRad - widthRadians / 2 < checkRad)
-                    if (aimRad + widthRadians / 2 > checkRad)
-                        return true;
-                return false;
-            }
+            if (aimRad - widthRadians / 2 < checkRad)
+                if (aimRad + widthRadians / 2 > checkRad)
+                    return true;
+            return false;
+        }
 
         public static bool DdaLine(Vector2 start, Vector2 end, uint range, Vector2 target)
         {
@@ -185,7 +193,7 @@ namespace MagnumOpus.Helpers
         {
             if (x0 == x1 && y0 == y1)
                 return false;
-                
+
             var dx = x1 - x0;
             var dy = y1 - y0;
             var absDx = Math.Abs(dx);

@@ -72,7 +72,10 @@ namespace MagnumOpus.Simulation.Systems
                     for (int i = 0; i < itemCount; i++)
                     {
                         if (Random.Shared.NextSingle() >= 0.1f)
-                            continue;
+                            {
+                                inv.Items[i].Set(new DestroyEndOfFrameComponent(ntt.Id));
+                                continue;
+                            }
 
                         ref var itemComp = ref inv.Items[i].Get<ItemComponent>();
                         if (itemComp.Id == 0)
@@ -96,8 +99,12 @@ namespace MagnumOpus.Simulation.Systems
             else if (dtc.Tick + NttWorld.TargetTps * 10 == NttWorld.Tick && ntt.Type == EntityType.Monster)
             {
                 ref readonly var pos = ref ntt.Get<PositionComponent>();
-                ref readonly var spawn = ref ntt.Get<SpawnComponent>();
+                ref readonly var spawn = ref ntt.Get<FromSpawnerComponent>();
                 ref readonly var vwp = ref ntt.Get<ViewportComponent>();
+
+                ref readonly var spawner = ref NttWorld.GetEntity(spawn.SpawnerId);
+                ref var spc=  ref spawner.Get<SpawnerComponent>();
+                spc.Count--;
                 
                 var despawn = MsgAction.RemoveEntity(ntt.NetId);
                 ntt.NetSync(ref despawn, true);
@@ -113,11 +120,10 @@ namespace MagnumOpus.Simulation.Systems
                 vwp.EntitiesVisible.Clear();
                 vwp.EntitiesVisibleLast.Clear();
 
-                var respawn = new RespawnTagComponent(ntt.Id, spawn.Spawn.rest_secs);
-                ntt.Set(ref respawn);
                 Collections.SpatialHashs[pos.Map].Remove(in ntt);
                 ntt.Remove<PositionComponent>();
                 ntt.Remove<DeathTagComponent>();
+                ntt.Set(new DestroyEndOfFrameComponent(ntt.Id));
             }
         }
 

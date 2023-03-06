@@ -24,5 +24,6 @@ namespace MagnumOpus.Squiggly
         public static MagicType MagicType { get; set; } = new();
         public static Dictionary<int, ShopDatEntry> Shops { get; set; } = new();
         public static ConcurrentDictionary<int, List<ItemType.Entry>> Drops { get;set; } = new ();
+        public static Dictionary<int, cq_monstertype> CqMonsterType { get; set; } = new ();
     }
 }

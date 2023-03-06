@@ -14,9 +14,9 @@ namespace MagnumOpus.Squiggly.Models
         public ushort rest_secs { get; set; }
         public ushort max_per_gen { get; set; }
         public int npctype { get; set; }
-        public ushort timer_begin { get; set; }
-        public ushort timer_end { get; set; }
-        public ushort born_x { get; set; }
-        public ushort born_y { get; set; }
+        // public ushort timer_begin { get; set; }
+        // public ushort timer_end { get; set; }
+        // public ushort born_x { get; set; }
+        // public ushort born_y { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Drawing;
 using System.Numerics;
 using Co2Core.Security.Cryptography;
 using HerstLib.IO;
@@ -6,6 +7,7 @@ using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
+using MagnumOpus.Networking.Packets;
 using MagnumOpus.SpacePartitioning;
 using MagnumOpus.Squiggly.Models;
 
@@ -13,119 +15,43 @@ namespace MagnumOpus.Squiggly
 {
     public static partial class Db
     {
-        public static void Spawn()
+        public static void LoadSpawners()
         {
             using var ctx = new SquigglyContext();
-            var sw = Stopwatch.StartNew();
-            var names = new string[] { "Aide", "Msgr", "Messenger", "King", "WarGhost", "GameBird", "FlyingRooster", "BlueCooer", "Guard" };
-            foreach (var spawn in ctx.cq_generator)
+
+            foreach(var cq_monstertype in ctx.cq_monstertype)
+                Collections.CqMonsterType.TryAdd(cq_monstertype.id, cq_monstertype);
+
+            foreach(var cq_spawn in ctx.cq_generator)
             {
-                var amount = spawn.maxnpc;
+                var spawnMin = new Vector2(cq_spawn.bound_x, cq_spawn.bound_y);
+                var spawnMax = new Vector2(cq_spawn.bound_x + cq_spawn.bound_cx, cq_spawn.bound_y + cq_spawn.bound_cy);
+                var width = spawnMax.X - spawnMin.X;
+                var height = spawnMax.Y - spawnMin.Y;
+                var center = new Vector2(spawnMin.X + (width / 2), spawnMin.Y + (height / 2));
+                var rectangle = new Rectangle((int)spawnMin.X, (int)spawnMin.Y, (int)width, (int)height);
 
-                var cqMob = ctx.cq_monstertype.FirstOrDefault(x => x.id == spawn.npctype);
-                if (cqMob == null)
-                    continue;
+                ref var ntt = ref NttWorld.CreateEntity(EntityType.Other);
+                
+                var pos = new PositionComponent(ntt.Id, center, cq_spawn.mapid);
+                ntt.Set(ref pos);
 
-                if (names.Any(cqMob.name.Trim().Contains))
-                    amount = spawn.maxnpc;
-                if (names.Contains(cqMob.name.Trim()))
-                    amount = spawn.maxnpc;
+                var spawner = new SpawnerComponent(in ntt,cq_spawn.id, in rectangle, cq_spawn.npctype, cq_spawn.maxnpc, cq_spawn.rest_secs, cq_spawn.max_per_gen);
+                ntt.Set(ref spawner);
 
-                if (cqMob.name.Trim() == "HawKing")
-                    amount = (ushort)(amount * 2);
+                var body = new BodyComponent(ntt.Id);
+                ntt.Set(ref body);
 
-                if (cqMob.id == 900 || cqMob.id == 910 || cqMob.id == 911)
-                    amount = 1;
+                var ntc = new NameTagComponent(ntt.Id, $"Spwnr {cq_spawn.id}");
+                ntt.Set(ref ntc);
 
-                for (var i = 0; i < amount; i++)
-                {
-                    var prefab = cqMob;
-                    ref var obj = ref NttWorld.CreateEntity(EntityType.Monster);
+                var vwp = new ViewportComponent(ntt.Id, 18f);
+                ntt.Set(ref vwp);
 
-                    var spw = new SpawnComponent(obj.Id, spawn);
-                    var cqm = new CqMonsterComponent(obj.Id, prefab.id);
-                    var pos = new PositionComponent(obj.Id, new Vector2(spawn.bound_x, spawn.bound_y), spawn.mapid);
-                    var bdy = new BodyComponent(obj.Id, prefab.lookface, (Direction)Random.Shared.Next(0, 9));
-                    var hp = new HealthComponent(obj.Id, prefab.life, prefab.life);
-                    var ntc = new NameTagComponent(obj.Id, prefab.name.Trim());
-                    var vwp = new ViewportComponent(obj.Id, 40f);
-                    var inv = new InventoryComponent(obj.Id, prefab.drop_money, 0);
-
-                    var items = ItemGenerator.GetDropItemsFor(cqm.CqMonsterId);
-                    for (int x = 0; x < items.Count; x++)
-                    {
-                        var item = items[x];
-                        bool found = false;
-
-                        for (int y = 0; y < inv.Items.Length; y++)
-                        {
-                            if (inv.Items[y].Id == 0)
-                                continue;
-
-                            ref var invItem = ref inv.Items[y].Get<ItemComponent>();
-                            if (invItem.Id == item.ID)
-                            {
-                                found = true;
-                                break;
-                            }
-                        }
-
-                        if (found)
-                            continue;
-
-                        var idx = Array.IndexOf(inv.Items, default);
-                        if (idx == -1)
-                            continue;
-
-                        var invItemNtt = EntityFactory.MakeDefaultItem(item.ID, default, 0, true);
-                        if (invItemNtt == null)
-                            continue;
-
-                        inv.Items[idx] = invItemNtt.Value;
-                    }
-
-                    if (prefab.action != 0)
-                    {
-                        var cq = new CqActionComponent(obj.Id, prefab.action);
-                        obj.Set(ref cq);
-                    }
-
-                    pos.Position.X = (ushort)Random.Shared.Next(spawn.bound_x - 10, spawn.bound_x + spawn.bound_cx + 10);
-                    pos.Position.Y = (ushort)Random.Shared.Next(spawn.bound_y - 10, spawn.bound_y + spawn.bound_cy + 10);
-
-                    if (prefab.lookface == 900 || prefab.lookface == 910)
-                    {
-                        pos.Position = new Vector2(spawn.bound_x, spawn.bound_y);
-                        var grd = new GuardPositionComponent(obj.Id, pos.Position);
-                        obj.Set(ref grd);
-                    }
-
-                    vwp.Viewport.X = pos.Position.X;
-                    vwp.Viewport.Y = pos.Position.Y;
-                    obj.Set(ref spw);
-                    obj.Set(ref pos);
-                    obj.Set(ref bdy);
-                    obj.Set(ref hp);
-                    obj.Set(ref ntc);
-                    obj.Set(ref vwp);
-                    obj.Set(ref inv);
-                    obj.Set(ref cqm);
-
-                    var brn = new BrainComponent(obj.Id);
-                    obj.Set(ref brn);
-
-                    if (!Collections.SpatialHashs.ContainsKey(pos.Map))
-                    {
-                        if (!Collections.Maps.TryGetValue(pos.Map, out var map))
-                            continue;
-
-                        Collections.SpatialHashs[pos.Map] = new SpatialHash(10);
-                    }
-                    Collections.SpatialHashs[pos.Map].Add(in obj);
-                }
+                Collections.SpatialHashs[cq_spawn.mapid].Add(in ntt);
             }
-            sw.Stop();
         }
+
 
         public static void LoadCqNpc()
         {

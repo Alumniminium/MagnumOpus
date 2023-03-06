@@ -24,14 +24,26 @@ namespace MagnumOpus.ECS
 
         internal readonly Logger Logger;
 
-        protected NttSystem(string name, int threads = 1)
+        protected NttSystem(string name, int threads = 1, bool log = false)
         {
-            Logger = new LoggerConfiguration()
-                            .MinimumLevel.Debug()
-                            .Enrich.WithProperty("System", name)
-                            .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss}[{Properties}] {Message}{NewLine}{Exception}")
-                            .WriteTo.GrafanaLoki("http://loki.her.st")
-                            .CreateLogger();
+            if (log)
+            {
+                Logger = new LoggerConfiguration()
+                                .MinimumLevel.Debug()
+                                .Enrich.WithProperty("System", name)
+                                .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss}[{Properties}] {Message}{NewLine}{Exception}")
+                                .WriteTo.GrafanaLoki("http://loki.her.st")
+                                .CreateLogger();
+            }
+            else
+            {
+                Logger = new LoggerConfiguration()
+                                .MinimumLevel.Information()
+                                .Enrich.WithProperty("System", name)
+                                .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss}[{Properties}] {Message}{NewLine}{Exception}")
+                                .WriteTo.GrafanaLoki("http://loki.her.st")
+                                .CreateLogger();
+            }
 
             Name = name;
             PerformanceMetrics.RegisterSystem(this);
@@ -88,7 +100,7 @@ namespace MagnumOpus.ECS
                 int start = 0;
                 int amount = _entitiesList.Count;
 
-                if (_entitiesList.Count >= _threads.Length)
+                if (_entitiesList.Count > _threads.Length * 2)
                 {
                     int chunkSize = _entitiesList.Count / _threads.Length;
                     int remaining = _entitiesList.Count % _threads.Length;
@@ -123,7 +135,7 @@ namespace MagnumOpus.ECS
     }
     public abstract class NttSystem<T> : NttSystem where T : struct
     {
-        protected NttSystem(string name, int threads = 1) : base(name, threads) { }
+        protected NttSystem(string name, int threads = 1, bool log = false) : base(name, threads, log) { }
         protected override bool MatchesFilter(in NTT nttId) => nttId.Has<T>() && base.MatchesFilter(in nttId);
 
         protected override void Update(int start, int end)
@@ -139,7 +151,7 @@ namespace MagnumOpus.ECS
     }
     public abstract class NttSystem<T, T2> : NttSystem where T : struct where T2 : struct
     {
-        protected NttSystem(string name, int threads = 1) : base(name, threads) { }
+        protected NttSystem(string name, int threads = 1, bool log = false) : base(name, threads, log) { }
         protected override bool MatchesFilter(in NTT nttId) => nttId.Has<T, T2>() && base.MatchesFilter(in nttId);
 
         protected override void Update(int start, int end)
@@ -156,7 +168,7 @@ namespace MagnumOpus.ECS
     }
     public abstract class NttSystem<T, T2, T3> : NttSystem where T : struct where T2 : struct where T3 : struct
     {
-        protected NttSystem(string name, int threads = 1) : base(name, threads) { }
+        protected NttSystem(string name, int threads = 1, bool log = false) : base(name, threads, log) { }
         protected override bool MatchesFilter(in NTT nttId) => nttId.Has<T, T2, T3>() && base.MatchesFilter(in nttId);
 
         protected override void Update(int start, int end)
@@ -174,7 +186,7 @@ namespace MagnumOpus.ECS
     }
     public abstract class NttSystem<T, T2, T3, T4> : NttSystem where T : struct where T2 : struct where T3 : struct where T4 : struct
     {
-        protected NttSystem(string name, int threads = 1) : base(name, threads) { }
+        protected NttSystem(string name, int threads = 1, bool log = false) : base(name, threads, log) { }
         protected override bool MatchesFilter(in NTT nttId) => nttId.Has<T, T2, T3, T4>() && base.MatchesFilter(in nttId);
 
         protected override void Update(int start, int end)
@@ -193,7 +205,7 @@ namespace MagnumOpus.ECS
     }
     public abstract class NttSystem<T, T2, T3, T4, T5> : NttSystem where T : struct where T2 : struct where T3 : struct where T4 : struct where T5 : struct
     {
-        protected NttSystem(string name, int threads = 1) : base(name, threads) { }
+        protected NttSystem(string name, int threads = 1, bool log = false) : base(name, threads, log) { }
         protected override bool MatchesFilter(in NTT nttId) => nttId.Has<T, T2, T3, T4, T5>() && base.MatchesFilter(in nttId);
 
         protected override void Update(int start, int end)
