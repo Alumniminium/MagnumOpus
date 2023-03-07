@@ -99,7 +99,7 @@ namespace MagnumOpus.Simulation.Systems
 
                 if (!Collections.SpatialHashs.ContainsKey(pos.Map))
                     Collections.SpatialHashs[pos.Map] = new SpatialHash(10);
-                Collections.SpatialHashs[pos.Map].Add(in mob);
+                Collections.SpatialHashs[pos.Map].Add(in mob, ref pos);
                 pos.ChangedTick = NttWorld.Tick;
 
                 spc.Count++;

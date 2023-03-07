@@ -93,24 +93,7 @@ namespace MagnumOpus
             GameServer.Start();
 
             while (true)
-            {
                 NttWorld.Update();
-
-                if (Debugger.IsAttached)
-                    continue;
-
-                if (!Console.KeyAvailable)
-                    continue;
-
-                var input = Console.ReadKey();
-                if (input.Key == ConsoleKey.S)
-                {
-                    FConsole.WriteLine("[SERVER] Saving...");
-                    ReflectionHelper.SaveComponents("_STATE_FILES");
-                    NttWorld.Save("_STATE_FILES");
-                    FConsole.WriteLine("[SERVER] Saved.");
-                }
-            }
         }
     }
 }

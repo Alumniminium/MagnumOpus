@@ -49,7 +49,7 @@ namespace MagnumOpus.ECS
             }
 
             Name = name;
-            PerformanceMetrics.RegisterSystem(this);
+            // PerformanceMetrics.RegisterSystem(this);
             _threads = new Thread[threads];
             _blocks = new AutoResetEvent[threads];
             for (var i = 0; i < threads; i++)
@@ -71,7 +71,7 @@ namespace MagnumOpus.ECS
             var ts = Stopwatch.GetTimestamp();
             if (_entities.IsEmpty)
             {
-                PerformanceMetrics.AddSample(Name, (float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
+                // PerformanceMetrics.AddSample(Name, (float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
                 NTTCountMetricsExporter.Set(0);
                 TimeMetricsExporter.Set((float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
                 return;
@@ -81,7 +81,7 @@ namespace MagnumOpus.ECS
             for (int i = 0; i < _threads.Length; i++)
                 _blocks[i].Set();
             _allReady.WaitOne();
-            PerformanceMetrics.AddSample(Name, (float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
+            // PerformanceMetrics.AddSample(Name, (float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
             TimeMetricsExporter.Set((float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
             NTTCountMetricsExporter.Set(_entities.Count);
         }

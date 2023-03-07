@@ -11,8 +11,10 @@ namespace MagnumOpus.Simulation.Systems
         public ViewportSystem() : base("Viewport", threads: Environment.ProcessorCount) { }
         public override void Update(in NTT ntt, ref PositionComponent pos, ref ViewportComponent vwp)
         {
-            if (pos.ChangedTick != NttWorld.Tick)
+            if (!vwp.Dirty)
                 return;
+
+            vwp.Dirty = false;
 
             vwp.Viewport.X = pos.Position.X - vwp.Viewport.Width / 2;
             vwp.Viewport.Y = pos.Position.Y - vwp.Viewport.Height / 2;
@@ -22,9 +24,7 @@ namespace MagnumOpus.Simulation.Systems
                 vwp.EntitiesVisibleLast.TryAdd(e.Key, e.Value);
 
             vwp.EntitiesVisible.Clear();
-
-            Collections.SpatialHashs[pos.Map].Remove(in ntt);
-            Collections.SpatialHashs[pos.Map].Add(in ntt);
+            Collections.SpatialHashs[pos.Map].Move(in ntt, ref pos);
             Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
 
             if (Trace) 
@@ -45,6 +45,9 @@ namespace MagnumOpus.Simulation.Systems
                     bvwp.EntitiesVisible.TryAdd(ntt.Id, ntt);
                 }
 
+                if (vwp.EntitiesVisibleLast.ContainsKey(b.Id))
+                    continue;
+
                 if (b.Has<BrainComponent>())
                 {
                     ref var brn = ref b.Get<BrainComponent>();
@@ -56,25 +59,22 @@ namespace MagnumOpus.Simulation.Systems
                     }
                 }
 
-                if (vwp.EntitiesVisibleLast.ContainsKey(b.Id))
-                    continue;
-
                 NetworkHelper.FullSync(in ntt, in b);
                 NetworkHelper.FullSync(in b, in b);
 
-                if (b.Has<JumpComponent>())
-                {
-                    ref readonly var jmp = ref b.Get<JumpComponent>();
-                    var packet = MsgAction.CreateJump(in b, in jmp);
-                    ntt.NetSync(ref packet, true);
-                }
+                // if (b.Has<JumpComponent>())
+                // {
+                //     ref readonly var jmp = ref b.Get<JumpComponent>();
+                //     var packet = MsgAction.CreateJump(in b, in jmp);
+                //     ntt.NetSync(ref packet, true);
+                // }
 
-                if (b.Has<WalkComponent>())
-                {
-                    ref readonly var wlk = ref b.Get<WalkComponent>();
-                    var packet = MsgWalk.Create(b.NetId, wlk.Direction, wlk.IsRunning);
-                    ntt.NetSync(ref packet, true);
-                }
+                // if (b.Has<WalkComponent>())
+                // {
+                //     ref readonly var wlk = ref b.Get<WalkComponent>();
+                //     var packet = MsgWalk.Create(b.NetId, wlk.Direction, wlk.IsRunning);
+                //     ntt.NetSync(ref packet, true);
+                // }
             }
         }
     }

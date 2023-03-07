@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 
@@ -17,9 +18,9 @@ namespace MagnumOpus.SpacePartitioning
             Hashtbl = new ConcurrentDictionary<int, List<NTT>>();
         }
 
-        public void Add(in NTT entity)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Add(in NTT entity, ref PositionComponent pos)
         {
-            ref readonly var pos = ref entity.Get<PositionComponent>();
             int hash = GetHash(pos.Position);
 
             if (!Hashtbl.ContainsKey(hash))
@@ -29,9 +30,9 @@ namespace MagnumOpus.SpacePartitioning
                 Hashtbl[hash].Add(entity);
         }
 
-        public void Remove(in NTT entity)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Remove(in NTT entity, ref PositionComponent pos)
         {
-            ref readonly var pos = ref entity.Get<PositionComponent>();
             int hash = GetHash(pos.Position);
 
             if (Hashtbl.TryGetValue(hash, out var bucket))
@@ -39,6 +40,14 @@ namespace MagnumOpus.SpacePartitioning
                     bucket.Remove(entity);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Move(in NTT ntt, ref PositionComponent pos)
+        {
+            Remove(in ntt, ref pos);
+            Add(in ntt, ref pos);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void GetVisibleEntities(ref ViewportComponent vwp)
         {
             var cx = vwp.Viewport.X + vwp.Viewport.Width / 2;
@@ -73,6 +82,7 @@ namespace MagnumOpus.SpacePartitioning
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int GetHash(Vector2 position)
         {
             var scaled = position / cellSize;

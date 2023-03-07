@@ -98,7 +98,7 @@ namespace MagnumOpus.Simulation.Systems
             }
             else if (dtc.Tick + NttWorld.TargetTps * 10 == NttWorld.Tick && ntt.Type == EntityType.Monster)
             {
-                ref readonly var pos = ref ntt.Get<PositionComponent>();
+                ref var pos = ref ntt.Get<PositionComponent>();
                 ref readonly var spawn = ref ntt.Get<FromSpawnerComponent>();
                 ref readonly var vwp = ref ntt.Get<ViewportComponent>();
 
@@ -120,7 +120,7 @@ namespace MagnumOpus.Simulation.Systems
                 vwp.EntitiesVisible.Clear();
                 vwp.EntitiesVisibleLast.Clear();
 
-                Collections.SpatialHashs[pos.Map].Remove(in ntt);
+                Collections.SpatialHashs[pos.Map].Remove(in ntt, ref pos);
                 ntt.Remove<PositionComponent>();
                 ntt.Remove<DeathTagComponent>();
                 ntt.Set(new DestroyEndOfFrameComponent(ntt.Id));
@@ -131,13 +131,13 @@ namespace MagnumOpus.Simulation.Systems
         {
             if (dtc.Tick + NttWorld.TargetTps == NttWorld.Tick && ntt.Type == EntityType.Item)
             {
-                ref readonly var pos = ref ntt.Get<PositionComponent>();
+                ref var pos = ref ntt.Get<PositionComponent>();
                 var despawn = MsgFloorItem.Create(in ntt, MsgFloorItemType.Delete);
                 ntt.NetSync(ref despawn, true);
                 var ded = new DestroyEndOfFrameComponent(ntt.Id);
                 ntt.Set(ref ded);
                 if (Collections.SpatialHashs.TryGetValue(pos.Map, out var hash))
-                    hash.Remove(in ntt);
+                    hash.Remove(in ntt, ref pos);
 
                 var delete = MsgFloorItem.Create(in ntt, MsgFloorItemType.Delete);
                 ntt.NetSync(ref delete, true);

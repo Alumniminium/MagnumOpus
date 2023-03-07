@@ -46,7 +46,7 @@ namespace MagnumOpus.Squiggly
                 var vwp = new ViewportComponent(ntt.Id, 18f);
                 ntt.Set(ref vwp);
 
-                Collections.SpatialHashs[cq_spawn.mapid].Add(in ntt);
+                Collections.SpatialHashs[cq_spawn.mapid].Add(in ntt, ref pos);
             }
         }
 
@@ -151,7 +151,7 @@ namespace MagnumOpus.Squiggly
                             continue;
                         Collections.SpatialHashs[pos.Map] = new SpatialHash(10);
                     }
-                    Collections.SpatialHashs[pos.Map].Add(in ntt);
+                    Collections.SpatialHashs[pos.Map].Add(in ntt, ref pos);
                 }
             }
             sw.Stop();

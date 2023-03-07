@@ -16,6 +16,12 @@ namespace MagnumOpus.Simulation.Systems
             pos.ChangedTick = NttWorld.Tick;
             bdy.ChangedTick = NttWorld.Tick;
 
+            if (ntt.Has<ViewportComponent>())
+            {
+                ref var vpc = ref ntt.Get<ViewportComponent>();
+                vpc.Dirty = true;
+            }
+
             var direction = CoMath.GetDirection(new Vector2(jmp.Position.X, jmp.Position.Y), pos.Position);
             var distance  = (int)Vector2.Distance(new Vector2(jmp.Position.X, jmp.Position.Y), pos.Position);
             var jumpTime  = NttWorld.TargetTps * CoMath.GetJumpTime(distance);

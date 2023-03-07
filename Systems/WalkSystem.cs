@@ -17,6 +17,12 @@ namespace MagnumOpus.Simulation.Systems
             bdy.ChangedTick = NttWorld.Tick;
             pos.ChangedTick = NttWorld.Tick;
 
+            if(ntt.Has<ViewportComponent>())
+            {
+                ref var vpc = ref ntt.Get<ViewportComponent>();
+                vpc.Dirty = true;
+            }
+
             bdy.Direction = wlk.Direction;
             pos.Position += Constants.DeltaPos[(int)wlk.Direction];
 

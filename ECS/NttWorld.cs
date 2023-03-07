@@ -37,42 +37,14 @@ namespace MagnumOpus.ECS
 
         static NttWorld()
         {
-            var start = Stopwatch.GetTimestamp();
-            // GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
+            GCSettings.LatencyMode = GCLatencyMode.Interactive;
             Systems = Array.Empty<NttSystem>();
-            PerformanceMetrics.RegisterSystem(nameof(NttWorld));
-
-            var filename = "_STATE_FILES/" + nameof(NttWorld) + ".json";
-            var filename2 = "_STATE_FILES/" + nameof(NttWorld) + "-tick.txt";
-            if (File.Exists(filename))
-            {
-                using var stream = File.OpenRead(filename);
-                Entities = JsonSerializer.Deserialize<NTT[]>(stream) ?? new NTT[MaxEntities];
-            }
-            else
-                Entities = new NTT[MaxEntities];
-            
-            if (File.Exists(filename2))
-                Tick = long.Parse(File.ReadAllText(filename2));
-            
+            // PerformanceMetrics.RegisterSystem(nameof(NttWorld));
+            Entities = new NTT[MaxEntities];
             AvailableArrayIndicies = new();
 
             for (var i = 0; i < Entities.Length; i++)
-            {
-                var ntt = Entities[i];
-                if (ntt.Id == 0)
-                {
-                    AvailableArrayIndicies.Enqueue(i);
-                }
-                else
-                {
-                    ChangedThisTick.Enqueue(ntt);
-                    NetIdToEntityIndex.Add(ntt.NetId, ntt.Id);
-                }
-            }
-
-            var time = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
-            FConsole.WriteLine($"Loaded {nameof(NttWorld)} in {time}ms");
+                AvailableArrayIndicies.Enqueue(i);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -195,34 +167,9 @@ namespace MagnumOpus.ECS
 
             var tickDuration = (float)Stopwatch.GetElapsedTime(TickBeginTime).TotalMilliseconds;
             PrometheusPush.TickTime.Observe(tickDuration);
-            PerformanceMetrics.AddSample(nameof(NttWorld), tickDuration);
+            // PerformanceMetrics.AddSample(nameof(NttWorld), tickDuration);
             var sleepTime = (int)Math.Max(0, -1 + (UpdateTime * 1000) - tickDuration);
             Thread.Sleep(sleepTime);
-        }
-
-
-        public static readonly JsonSerializerOptions SerializerOptions = new()
-        {
-            WriteIndented = false,
-            IncludeFields = true,
-            IgnoreReadOnlyFields = false,
-            IgnoreReadOnlyProperties = false,
-            // IgnoreNullValues = false,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
-        };
-
-        public static void Save(string path)
-        {
-            var start = Stopwatch.GetTimestamp();
-            using var stream = File.OpenWrite(path + "/" + nameof(NttWorld) + ".json");
-            var filename2 = path+"/" + nameof(NttWorld) + "-tick.txt";
-            using var writer = new Utf8JsonWriter(stream);
-            JsonSerializer.Serialize(stream, Entities, SerializerOptions);
-            File.WriteAllText(filename2, $"{Tick}");
-
-            var time = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
-            FConsole.WriteLine($"Saved {nameof(NttWorld)} to {path} in {time}ms");
         }
     }
 }

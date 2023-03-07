@@ -1,0 +1,27 @@
+{
+    "RoslynExtensionsOptions": {
+        "enableAnalyzersSupport": true,
+        "analyzersOptions": {
+            "openFilesOnly": true
+        }
+    },
+    "CSharpFormattingOptions": {
+        "NewLinesForBracesInTypes": true,
+        "NewLinesForBracesInMethods": true,
+        "NewLinesForBracesInProperties": true,
+        "NewLinesForBracesInAnonymousMethods": true,
+        "NewLinesForBracesInControlBlocks": true,
+        "NewLinesForBracesInLambdaExpressionBody": true,
+        "NewLinesForBracesInAccessors": true
+    },
+    "FormattingOptions": {
+        "EndOfFileInsertion": true,
+        "EnsureNewLineAtEndOfFile": true,
+        "IndentationSize": 4,
+        "TabSize": 4,
+        "NewLine": "\n"
+    },
+    "Telemetry": {
+        "enableTelemetry": false
+    }
+}
