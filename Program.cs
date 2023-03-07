@@ -16,13 +16,13 @@ namespace MagnumOpus
             server.Start();
             var systems = new List<NttSystem>
             {
-                new PacketsIn(true),
-                new MonsterRespawnSystem(true),
+                new PacketsIn(),
+                new MonsterRespawnSystem(),
                 new BasicAISystem(),
                 new GuardAISystem(),
                 new WalkSystem(),
-                new JumpSystem(true),
-                new EmoteSystem(true),
+                new JumpSystem(),
+                new EmoteSystem(),
                 new PortalSystem(),
                 new TeleportSystem(),
                 new ViewportSystem(),
@@ -45,7 +45,7 @@ namespace MagnumOpus
                 new EquipSystem(),
                 new DeathSystem(),
                 new DestroySystem(),
-                new PacketsOut(false),
+                new PacketsOut(),
             };
 
             FConsole.WriteLine("[DATABASE] Loading...");

@@ -6,21 +6,23 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class MagicAttackRoutingSystem : NttSystem<MagicAttackRequestComponent, SpellBookComponent, PositionComponent>
     {
-        public MagicAttackRoutingSystem() : base("Attack Router", threads: Environment.ProcessorCount) { }
+        public MagicAttackRoutingSystem() : base("Attack Router", threads: 2) { }
 
         public override void Update(in NTT ntt, ref MagicAttackRequestComponent atk, ref SpellBookComponent sbc, ref PositionComponent pos)
         {
             if (!sbc.Spells.TryGetValue((ushort)atk.SkillId, out var spell))
             {
                 ntt.Remove<MagicAttackRequestComponent>();
-                Logger.Debug("{ntt} tried to use skill {atk.SkillId} but doesn't have it", ntt, atk.SkillId);
+                if (Trace) 
+                    Logger.Debug("{ntt} tried to use skill {atk.SkillId} but doesn't have it", ntt, atk.SkillId);
                 return;
             }
 
             if (!Collections.MagicType.TryGetValue(atk.SkillId * 10 + spell.lvl, out var magicType))
             {
                 ntt.Remove<MagicAttackRequestComponent>();
-                Logger.Debug("{ntt} tried to use skill {atk.SkillId} but it doesn't exist", ntt, atk.SkillId);
+                if (Trace) 
+                    Logger.Debug("{ntt} tried to use skill {atk.SkillId} but it doesn't exist", ntt, atk.SkillId);
                 return;
             }
 

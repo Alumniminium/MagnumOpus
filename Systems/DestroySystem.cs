@@ -9,11 +9,6 @@ namespace MagnumOpus.Simulation.Systems
     {
         public DestroySystem() : base("Destroy", threads: 2) { }
 
-        protected override bool MatchesFilter(in NTT nttId)
-        {
-            return base.MatchesFilter(nttId);
-        }
-
         public override void Update(in NTT ntt, ref DestroyEndOfFrameComponent def)
         {
             if(ntt.Has<ViewportComponent>())
@@ -30,7 +25,8 @@ namespace MagnumOpus.Simulation.Systems
                     }
                 }
             NttWorld.Destroy(in ntt);
-            Logger.Debug("Destroyed {ntt}", ntt);
+            if (Trace) 
+                Logger.Debug("Destroyed {ntt}", ntt);
         }
     }
 }

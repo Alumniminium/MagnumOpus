@@ -38,7 +38,7 @@ namespace MagnumOpus.ECS
         static NttWorld()
         {
             var start = Stopwatch.GetTimestamp();
-            GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
+            // GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
             Systems = Array.Empty<NttSystem>();
             PerformanceMetrics.RegisterSystem(nameof(NttWorld));
 

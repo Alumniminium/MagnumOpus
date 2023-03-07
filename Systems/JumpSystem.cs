@@ -8,7 +8,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class JumpSystem : NttSystem<PositionComponent, JumpComponent, BodyComponent>
     {
-        public JumpSystem(bool log=false) : base("Jump", threads: 2,log) { }
+        public JumpSystem() : base("Jump", threads: 2) { }
         protected override bool MatchesFilter(in NTT ntt) => ntt.Type != EntityType.Item && base.MatchesFilter(in ntt);
 
         public override void Update(in NTT ntt, ref PositionComponent pos, ref JumpComponent jmp, ref BodyComponent bdy)
@@ -24,7 +24,8 @@ namespace MagnumOpus.Simulation.Systems
             {
                 pos.Position = jmp.Position;
                 ntt.Remove<JumpComponent>();
-                Logger.Debug("Jump complete for {ntt}", ntt);
+                if (Trace) 
+                    Logger.Debug("Jump complete for {ntt}", ntt);
             }
             else
                 pos.Position = Vector2.Lerp(pos.Position, jmp.Position, 2 / jumpTime);
@@ -37,7 +38,8 @@ namespace MagnumOpus.Simulation.Systems
 
                 PrometheusPush.JumpCount.Inc();
                 PrometheusPush.JumpDistance.Inc(distance);
-                Logger.Debug("Jump started for {ntt}", ntt);
+                if (Trace) 
+                    Logger.Debug("Jump started for {ntt}", ntt);
             }
         }
     }

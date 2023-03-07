@@ -10,7 +10,7 @@ namespace MagnumOpus.Simulation.Systems
     public sealed class LifetimeSystem : NttSystem<LifeTimeComponent>
     {
         private static readonly uint[] countdown = new uint[] { 5, 4, 3, 2, 1 }.Select(sec => (uint)NttWorld.TargetTps * sec).ToArray();
-        public LifetimeSystem() : base("Lifetime", threads: 4) { Trace = true; }
+        public LifetimeSystem() : base("Lifetime", threads: 2) { Trace = false; }
 
         public override void Update(in NTT ntt, ref LifeTimeComponent ltc)
         {
@@ -21,7 +21,8 @@ namespace MagnumOpus.Simulation.Systems
                 if (!Array.Exists(countdown, x => x == ticksLeft))
                     return;
                 
-                Logger.Debug("{ntt} -> {seconds} seconds left", ntt, ticksLeft / NttWorld.TargetTps);
+                if (Trace) 
+                    Logger.Debug("{ntt} -> {seconds} seconds left", ntt, ticksLeft / NttWorld.TargetTps);
 
                 ref var pos = ref ntt.Get<PositionComponent>();
                 pos.ChangedTick = NttWorld.Tick;
@@ -34,7 +35,8 @@ namespace MagnumOpus.Simulation.Systems
             var dtc = new DeathTagComponent(ntt.Id, default);
             ntt.Set(ref dtc);
             ntt.Remove<LifeTimeComponent>();
-            Logger.Debug("{ntt} -> EXPIRED", ntt);
+            if (Trace) 
+                Logger.Debug("{ntt} -> EXPIRED", ntt);
         }
     }
 }

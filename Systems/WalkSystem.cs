@@ -10,7 +10,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class WalkSystem : NttSystem<PositionComponent, WalkComponent, BodyComponent>
     {
-        public WalkSystem() : base("Walk", threads: 6) { Trace = true; }
+        public WalkSystem() : base("Walk", threads: 2) { Trace = false; }
 
         public override void Update(in NTT ntt, ref PositionComponent pos, ref WalkComponent wlk, ref BodyComponent bdy)
         {
@@ -23,9 +23,12 @@ namespace MagnumOpus.Simulation.Systems
             var pkt = MsgWalk.Create(ntt.NetId, (byte)wlk.Direction, wlk.IsRunning);
             ntt.NetSync(ref pkt, true);
 
-            var text = $"Map: {pos.Map} -> {wlk.Direction} -> {pos.Position}";
-            NetworkHelper.SendMsgTo(in ntt, text, MsgTextType.TopLeft);
-            Logger.Debug("{ntt} walking {text}", ntt, text);
+            if (Trace) 
+            {
+                var text = $"Map: {pos.Map} -> {wlk.Direction} -> {pos.Position}";
+                NetworkHelper.SendMsgTo(in ntt, text, MsgTextType.TopLeft);
+                Logger.Debug("{ntt} walking {text}", ntt, text);
+            }
             PrometheusPush.WalkCount.Inc();
 
             ntt.Remove<WalkComponent>();

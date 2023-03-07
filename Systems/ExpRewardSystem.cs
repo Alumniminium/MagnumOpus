@@ -16,7 +16,8 @@ namespace MagnumOpus.Simulation.Systems
             if (lvl.Experience < lvl.ExperienceToNextLevel)
             {
                 ntt.Remove<ExpRewardComponent>();
-                Logger.Debug("{ntt} gained {exp} exp, now at {current}/{next} (level: {lvl})", ntt, rew.Experience, lvl.Experience, lvl.ExperienceToNextLevel, lvl.Level);
+                if (Trace)
+                    Logger.Debug("{ntt} gained {exp} exp, now at {current}/{next} (level: {lvl})", ntt, rew.Experience, lvl.Experience, lvl.ExperienceToNextLevel, lvl.Level);
                 return;
             }
 
@@ -42,7 +43,8 @@ namespace MagnumOpus.Simulation.Systems
             var lvlActionMsg = MsgAction.Create(ntt.NetId, 0, 0, 0, 0, Enums.MsgActionType.LevelUp);
             ntt.NetSync(ref lvlActionMsg, true);
 
-            Logger.Debug("{ntt} gained {exp} exp and leveled to {lvl}, now at {current}/{next} (level: {lvl})", ntt, rew.Experience, lvl.Level, lvl.Experience, lvl.ExperienceToNextLevel, lvl.Level);
+            if (Trace)
+                Logger.Debug("{ntt} gained {exp} exp and leveled to {lvl}, now at {current}/{next} (level: {lvl})", ntt, rew.Experience, lvl.Level, lvl.Experience, lvl.ExperienceToNextLevel, lvl.Level);
 
             ntt.Remove<ExpRewardComponent>();
         }

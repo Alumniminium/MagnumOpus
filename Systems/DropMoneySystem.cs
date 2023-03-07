@@ -15,7 +15,8 @@ namespace MagnumOpus.Simulation.Systems
             if (inv.Money < drc.Amount)
             {
                 ntt.Remove<RequestDropMoneyComponent>();
-                Logger.Debug("{ntt} tried to drop {amount} money, but only has {money}", ntt, drc.Amount, inv.Money);
+                if (Trace) 
+                    Logger.Debug("{ntt} tried to drop {amount} money, but only has {money}", ntt, drc.Amount, inv.Money);
                 return;
             }
 
@@ -31,10 +32,12 @@ namespace MagnumOpus.Simulation.Systems
                 Collections.SpatialHashs[pos.Map].Add(itemNtt.Value);
                 var dropMsg = MsgFloorItem.Create(itemNtt.Value, Enums.MsgFloorItemType.Create);
                 ntt.NetSync(ref dropMsg, true);
-                Logger.Debug("{ntt} dropped {amount} money at {pos}", ntt, drc.Amount, pos.Position);
+                if (Trace) 
+                    Logger.Debug("{ntt} dropped {amount} money at {pos}", ntt, drc.Amount, pos.Position);
             }
             else
-                Logger.Debug("Failed to create money drop for {ntt}. Amount: {Amount}, Position: {pos}, Map: {Map}", ntt, drc.Amount, pos.Position, pos.Map);
+                if (Trace) 
+                    Logger.Debug("Failed to create money drop for {ntt}. Amount: {Amount}, Position: {pos}, Map: {Map}", ntt, drc.Amount, pos.Position, pos.Map);
 
             ntt.Remove<RequestDropMoneyComponent>();
         }

@@ -27,7 +27,8 @@ namespace MagnumOpus.Simulation.Systems
             Collections.SpatialHashs[pos.Map].Add(in ntt);
             Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
 
-            Logger.Debug("{ntt} has {visibleCount} visible entities", ntt, vwp.EntitiesVisible.Count);
+            if (Trace) 
+                Logger.Debug("{ntt} has {visibleCount} visible entities", ntt, vwp.EntitiesVisible.Count);
 
             if (ntt.Type != EntityType.Player)
                 return;
@@ -50,7 +51,8 @@ namespace MagnumOpus.Simulation.Systems
                     if (brn.State == Enums.BrainState.Idle)
                     {
                         brn.State = Enums.BrainState.WakingUp;
-                        Logger.Debug("{ntt} is waking up '{b}' due to distance", ntt, b);
+                        if (Trace)
+                            Logger.Debug("{ntt} is waking up '{b}' due to distance", ntt, b);
                     }
                 }
 

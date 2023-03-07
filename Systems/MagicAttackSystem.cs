@@ -6,7 +6,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class MagicAttackSystem : NttSystem<TargetCollectionComponent>
     {
-        public MagicAttackSystem() : base("Magic Attack", threads: Environment.ProcessorCount) { }
+        public MagicAttackSystem() : base("Magic Attack", threads: 2) { }
 
         public override void Update(in NTT ntt, ref TargetCollectionComponent atk)
         {
@@ -18,7 +18,8 @@ namespace MagnumOpus.Simulation.Systems
                 var dmg = new DamageComponent(in target, in ntt, (int)atk.MagicType.Power);
                 target.Set(ref dmg);
 
-                Logger.Debug("{ntt} attacking {target} with {skill}:{level}", ntt, target, atk.MagicType.MagicType, atk.MagicType.Level);
+                if (Trace)  
+                    Logger.Debug("{ntt} attacking {target} with {skill}:{level}", ntt, target, atk.MagicType.MagicType, atk.MagicType.Level);
             }
             ntt.Remove<TargetCollectionComponent>();
         }

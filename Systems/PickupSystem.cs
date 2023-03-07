@@ -53,7 +53,8 @@ namespace MagnumOpus.Simulation.Systems
             var delFloorMsg = MsgFloorItem.Create(in pic.Item, Enums.MsgFloorItemType.Delete);
             ntt.NetSync(ref delFloorMsg, true);
 
-            Logger.Debug("{0} picked up {1}", ntt, pic.Item);
+            if (Trace) 
+                Logger.Debug("{0} picked up {1}", ntt, pic.Item);
             ntt.Remove<PickupRequestComponent>();
         }
     }

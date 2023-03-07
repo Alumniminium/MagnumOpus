@@ -11,7 +11,7 @@ namespace MagnumOpus.Networking
     public class PacketsOut : NttSystem<NetworkComponent>
     {
         public static readonly Memory<byte> TqServer = Encoding.ASCII.GetBytes("TQServer");
-        public PacketsOut(bool log = false) : base("Packets Out", threads: 12, log) { }
+        public PacketsOut() : base("Packets Out", threads: 2) { }
 
         // private const int MAX_PACKET_SIZE = 1024 * 8;
         public override void Update(in NTT ntt, ref NetworkComponent net)
@@ -24,9 +24,11 @@ namespace MagnumOpus.Networking
                         continue;
 
                     var id = BitConverter.ToInt16(packet.Span[2..4]);
-                    Logger.Debug(packet.Dump());
-                    Logger.Debug("Sending {id}/{id} (Size: {Length}) to {ntt}...", ((PacketId)id).ToString(), id, packet.Length, ntt);
-
+                    if (Trace) 
+                    {
+                        Logger.Debug(packet.Dump());
+                        Logger.Debug("Sending {id}/{id} (Size: {Length}) to {ntt}...", ((PacketId)id).ToString(), id, packet.Length, ntt);
+                    }
                     if (net.UseGameCrypto)
                     {
                         Memory<byte> resized = new byte[packet.Length + 8];

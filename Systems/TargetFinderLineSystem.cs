@@ -8,7 +8,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class TargetFinderLineSystem : NttSystem<LineTargetComponent, PositionComponent, ViewportComponent>
     {
-        public TargetFinderLineSystem() : base("Linear Targets", threads: Environment.ProcessorCount) { }
+        public TargetFinderLineSystem() : base("Linear Targets", threads: 2) { }
 
         public override void Update(in NTT ntt, ref LineTargetComponent atk, ref PositionComponent pos, ref ViewportComponent vwp)
         {
@@ -30,7 +30,8 @@ namespace MagnumOpus.Simulation.Systems
                     continue;
                 
                 tcc.Targets.Add(b);
-                Logger.Debug("{ntt} adding {b} to target list of {skill}:{level}", ntt, b, atk.MagicType.MagicType, atk.MagicType.Level);
+                if (Trace)
+                    Logger.Debug("{ntt} adding {b} to target list of {skill}:{level}", ntt, b, atk.MagicType.MagicType, atk.MagicType.Level);
             }
 
             var msgEffect = MsgMagicEffect.Create(in ntt, atk.X, atk.Y, (ushort)atk.MagicType.MagicType, (byte)atk.MagicType.Level);

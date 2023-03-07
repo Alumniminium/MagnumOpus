@@ -29,7 +29,8 @@ namespace MagnumOpus.Simulation.Systems
                 var msg = MsgItem.Create(item.NetId, 0, (int)change.Slot, MsgItemType.SetEquipPosition);
                 ntt.NetSync(ref msg);
 
-                Logger.Debug("{ntt} equipped {item} to {slot}", ntt, item, change.Slot);
+                if (Trace) 
+                    Logger.Debug("{ntt} equipped {item} to {slot}", ntt, item, change.Slot);
             }
             else
             {
@@ -42,7 +43,8 @@ namespace MagnumOpus.Simulation.Systems
                 
                 eq.Items[change.Slot] = default;
                 InventoryHelper.AddItem(in ntt, ref inv, in item, true);
-                Logger.Debug("{ntt} unequipped {item} from {slot}", ntt, item, change.Slot);
+                if (Trace)
+                    Logger.Debug("{ntt} unequipped {item} from {slot}", ntt, item, change.Slot);
             }
             ntt.Remove<RequestChangeEquipComponent>();
         }

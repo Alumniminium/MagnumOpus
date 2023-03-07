@@ -8,7 +8,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class TargetFinderSectorSystem : NttSystem<SectorTargetComponent, PositionComponent, ViewportComponent>
     {
-        public TargetFinderSectorSystem() : base("Sector Targets", threads: Environment.ProcessorCount) { }
+        public TargetFinderSectorSystem() : base("Sector Targets", threads: 2) { }
 
         public override void Update(in NTT ntt, ref SectorTargetComponent atk, ref PositionComponent pos, ref ViewportComponent vwp)
         {
@@ -29,7 +29,8 @@ namespace MagnumOpus.Simulation.Systems
                     continue;
                 
                 tcc.Targets.Add(b);
-                Logger.Debug("{ntt} adding {b} to target list of {skill}:{level}", ntt, b, atk.MagicType.MagicType, atk.MagicType.Level);
+                if (Trace)
+                    Logger.Debug("{ntt} adding {b} to target list of {skill}:{level}", ntt, b, atk.MagicType.MagicType, atk.MagicType.Level);
 
             }
             ntt.Set(ref tcc);

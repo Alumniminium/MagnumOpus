@@ -84,20 +84,21 @@ namespace MagnumOpus.Networking.Packets
         [PacketHandler(PacketId.MsgAction)]
         public static void Process(NTT ntt, Memory<byte> memory)
         {
+            var _trace = false;
             var msg = Co2Packet.Deserialze<MsgAction>(in memory);
 
             switch (msg.Type)
             {
                 case MsgActionType.Revive:
                     {
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId}");
                         var rev = new ReviveComponent(ntt.Id, 1);
                         ntt.Set(ref rev);
                         break;
                     }
                 case MsgActionType.SendLocation:
                     {
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.X}, {msg.Y}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.X}, {msg.Y}");
                         ref var pos = ref ntt.Get<PositionComponent>();
                         ref var vwp = ref ntt.Get<ViewportComponent>();
                         vwp.EntitiesVisible.Clear();
@@ -105,7 +106,7 @@ namespace MagnumOpus.Networking.Packets
                         pos.ChangedTick = NttWorld.Tick;
                         var reply = Create(ntt.NetId, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
                         ntt.NetSync(ref reply);
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {reply.X}, {reply.Y}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {reply.X}, {reply.Y}");
 
                         NttWorld.Players.Add(ntt);
                         break;
@@ -115,13 +116,13 @@ namespace MagnumOpus.Networking.Packets
                 case MsgActionType.SendAssociates:
                 case MsgActionType.SendProficiencies:
                     {
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId}");
                         ntt.NetSync(ref msg);
                         break;
                     }
                 case MsgActionType.SendItems:
                     {
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId}");
                         ref var inv = ref ntt.Get<InventoryComponent>();
 
                         InventoryHelper.SortById(in ntt, ref inv, netSync: true);
@@ -130,7 +131,7 @@ namespace MagnumOpus.Networking.Packets
                     }
                 case MsgActionType.SendSpells:
                     {
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId}");
                         ref readonly var sbc = ref ntt.Get<SpellBookComponent>();
                         foreach (var spell in sbc.Spells)
                         {
@@ -142,7 +143,7 @@ namespace MagnumOpus.Networking.Packets
                     }
                 case MsgActionType.ChangeFace:
                     {
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId}");
                         ref var head = ref ntt.Get<HeadComponent>();
                         head.FaceId = (ushort)msg.Param;
                         ntt.NetSync(ref msg, true);
@@ -150,7 +151,7 @@ namespace MagnumOpus.Networking.Packets
                     }
                 case MsgActionType.ChangeFacing:
                     {
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.Direction}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.Direction}");
                         ref var bdy = ref ntt.Get<BodyComponent>();
                         bdy.Direction = msg.Direction;
                         ntt.NetSync(ref msg, true);
@@ -158,14 +159,14 @@ namespace MagnumOpus.Networking.Packets
                     }
                 case MsgActionType.ChangeAction:
                     {
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.Param}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.Param}");
                         var emo = new EmoteComponent(ntt.Id, (Emote)msg.Param);
                         ntt.Set(ref emo);
                         break;
                     }
                 case MsgActionType.Jump:
                     {
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.JumpX}, {msg.JumpY}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.JumpX}, {msg.JumpY}");
                         var jmp = new JumpComponent(ntt.Id, msg.JumpX, msg.JumpY);
                         var emo = new EmoteComponent(ntt.Id, Emote.Stand);
                         ntt.Set(ref jmp);
@@ -174,14 +175,14 @@ namespace MagnumOpus.Networking.Packets
                     }
                 case MsgActionType.EnterPortalChangeMap:
                     {
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.Param}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.Param}");
                         var tpc = new PortalComponent(ntt.Id, msg.X, msg.Y);
                         ntt.Set(ref tpc);
                         break;
                     }
                 case MsgActionType.QueryEntity:
                     {
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.Param}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.Param}");
                         ref readonly var ent = ref NttWorld.GetEntityByNetId(msg.Param);
                         if (ent.Id != 0)
                             NetworkHelper.FullSync(in ntt, in ent);
@@ -194,7 +195,7 @@ namespace MagnumOpus.Networking.Packets
                     }
                     case MsgActionType.QueryTeamMember:
                     {
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.Param}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.Param}");
                         ref readonly var ent = ref NttWorld.GetEntityByNetId(msg.Param);
                         if(ent.Id != 0)
                         {
@@ -208,7 +209,7 @@ namespace MagnumOpus.Networking.Packets
                     }
                 case MsgActionType.TeleportReply:
                     {
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.JumpX}, {msg.JumpY}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.JumpX}, {msg.JumpY}");
                         ref var pos = ref ntt.Get<PositionComponent>();
                         pos.Position = new Vector2(msg.JumpX, msg.JumpY);
                         pos.ChangedTick = NttWorld.Tick;
@@ -217,14 +218,14 @@ namespace MagnumOpus.Networking.Packets
                     }
                 case MsgActionType.GuardJump:
                     {
-                        FConsole.WriteLine($"[GAME] {msg.Type} : {ntt.NetId} -> {msg.JumpX}, {msg.JumpY}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type} : {ntt.NetId} -> {msg.JumpX}, {msg.JumpY}");
                         ntt.NetSync(ref msg);
                         break;
                     }
                 default:
                     {
-                        FConsole.WriteLine($"[GAME] Unhandled MsgActionType: {(int)msg.Type}/{msg.Type}");
-                        FConsole.WriteLine(memory.Dump());
+                        if (_trace) FConsole.WriteLine($"[GAME] Unhandled MsgActionType: {(int)msg.Type}/{msg.Type}");
+                        if (_trace) FConsole.WriteLine(memory.Dump());
                         break;
                     }
             }

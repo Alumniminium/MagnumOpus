@@ -19,7 +19,8 @@ namespace MagnumOpus.Simulation.Systems
 
             if (!Collections.ItemType.TryGetValue(itemComp.Id, out var entry))
             {
-                Logger.Error("Item {item} not found in ItemType", item);
+                if(Trace)
+                    Logger.Error("Item {item} not found in ItemType", item);
                 ntt.Remove<RequestItemUseComponent>();
                 return;
             }
@@ -45,7 +46,8 @@ namespace MagnumOpus.Simulation.Systems
             if(destroy)
                 InventoryHelper.RemoveNttFromInventory(in ntt, ref inv, in item, destroy: true, netSync: true);
 
-            Logger.Debug("{0} used {1} ({2})", ntt, item, itemComp.Id);
+            if (Trace) 
+                Logger.Debug("{0} used {1} ({2})", ntt, item, itemComp.Id);
             ntt.Remove<RequestItemUseComponent>();
         }
     }

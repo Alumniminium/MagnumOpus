@@ -10,7 +10,7 @@ namespace MagnumOpus.Networking
     {
         public static readonly Dictionary<PacketId, Action<NTT, Memory<byte>>> PacketHandlers = new();
 
-        public PacketsIn(bool log) : base("PacketsIn", threads: 1, log)
+        public PacketsIn() : base("PacketsIn", threads: 1)
         {
             foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
             {
@@ -33,11 +33,12 @@ namespace MagnumOpus.Networking
             while (net.RecvQueue.TryDequeue(out var packet))
             {
                 var packetType = (PacketId)BitConverter.ToUInt16(packet.Span[2..4]);
-                Logger.Debug("Received {packet} from {ntt}", packetType, ntt);
+                if (Trace) 
+                    Logger.Debug("Received {packet} from {ntt}", packetType, ntt);
 
                 if (PacketHandlers.TryGetValue(packetType, out var handler))
                     handler.Invoke(ntt, packet);
-                else
+                else if (Trace)
                     Logger.Debug("Undefined PacketId: {packet} {dump}", packetType, packet.Dump());
             }
             }

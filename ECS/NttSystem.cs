@@ -26,13 +26,15 @@ namespace MagnumOpus.ECS
 
         protected NttSystem(string name, int threads = 1, bool log = false)
         {
+            Trace = log;
             if (log)
             {
                 Logger = new LoggerConfiguration()
                                 .MinimumLevel.Debug()
                                 .Enrich.WithProperty("System", name)
                                 .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss}[{Properties}] {Message}{NewLine}{Exception}")
-                                .WriteTo.GrafanaLoki("http://loki.her.st")
+                                // .WriteTo.GrafanaLoki("http://loki.her.st")
+                                .WriteTo.File($"{DateTime.UtcNow:dd-MM-yyyy}.log")
                                 .CreateLogger();
             }
             else
@@ -41,7 +43,8 @@ namespace MagnumOpus.ECS
                                 .MinimumLevel.Information()
                                 .Enrich.WithProperty("System", name)
                                 .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss}[{Properties}] {Message}{NewLine}{Exception}")
-                                .WriteTo.GrafanaLoki("http://loki.her.st")
+                                // .WriteTo.GrafanaLoki("http://loki.her.st")
+                                .WriteTo.File($"{DateTime.UtcNow:dd-MM-yyyy}.log")
                                 .CreateLogger();
             }
 

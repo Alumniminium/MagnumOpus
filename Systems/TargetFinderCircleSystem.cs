@@ -8,7 +8,7 @@ namespace MagnumOpus.Simulation.Systems
 {
     public sealed class TargetFinderCircleSystem : NttSystem<CircleTargetComponent, ViewportComponent>
     {
-        public TargetFinderCircleSystem() : base("Radius Targets", threads: Environment.ProcessorCount) { }
+        public TargetFinderCircleSystem() : base("Radius Targets", threads: 2) { }
 
         public override void Update(in NTT ntt, ref CircleTargetComponent atk, ref ViewportComponent vwp)
         {
@@ -38,7 +38,8 @@ namespace MagnumOpus.Simulation.Systems
                     continue;
 
                 tcc.Targets.Add(b);
-                Logger.Debug("{ntt} adding {b} to target list of {skill}:{level}", ntt, b, atk.MagicType.MagicType, atk.MagicType.Level);
+                if (Trace)
+                    Logger.Debug("{ntt} adding {b} to target list of {skill}:{level}", ntt, b, atk.MagicType.MagicType, atk.MagicType.Level);
             }
             ntt.Set(ref tcc);
             ntt.Remove<CircleTargetComponent>();

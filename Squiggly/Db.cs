@@ -28,7 +28,7 @@ namespace MagnumOpus.Squiggly
                 var spawnMax = new Vector2(cq_spawn.bound_x + cq_spawn.bound_cx, cq_spawn.bound_y + cq_spawn.bound_cy);
                 var width = spawnMax.X - spawnMin.X;
                 var height = spawnMax.Y - spawnMin.Y;
-                var center = new Vector2(spawnMin.X + (width / 2), spawnMin.Y + (height / 2));
+                var center = new Vector2((int)spawnMin.X + (width / 2), (int)spawnMin.Y + (height / 2));
                 var rectangle = new Rectangle((int)spawnMin.X, (int)spawnMin.Y, (int)width, (int)height);
 
                 ref var ntt = ref NttWorld.CreateEntity(EntityType.Other);

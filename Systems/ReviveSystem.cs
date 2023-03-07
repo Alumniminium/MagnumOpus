@@ -36,14 +36,16 @@ namespace MagnumOpus.Simulation.Systems
                 }
                 else
                 {
-                    Logger.Debug("Reborn Map {0} not found", mapId);
+                    if (Trace) 
+                        Logger.Debug("Reborn Map {0} not found", mapId);
                     pos.Map = 1002;
                     pos.Position = new Vector2(477, 380);
                 }
             }
             else
             {
-                Logger.Debug("Map {0} not found", pos.Map);
+                if (Trace) 
+                    Logger.Debug("Map {0} not found", pos.Map);
                 pos.Map = 1002;
                 pos.Position = new Vector2(477, 380);
             }
@@ -60,7 +62,8 @@ namespace MagnumOpus.Simulation.Systems
             ntt.Remove<ReviveComponent>();
             ntt.Remove<DeathTagComponent>();
 
-            Logger.Debug("Revived '{0}' at {1}, {2}, {3}", NttWorld.Tick, Name, ntt, pos.Map, pos.Position.X, pos.Position.Y);
+            if (Trace) 
+                Logger.Debug("Revived '{0}' at {1}, {2}, {3}", NttWorld.Tick, Name, ntt, pos.Map, pos.Position.X, pos.Position.Y);
         }
     }
 }

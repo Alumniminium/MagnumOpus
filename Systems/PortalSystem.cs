@@ -19,7 +19,8 @@ namespace MagnumOpus.Simulation.Systems
             var entry = Collections.DmapPortals.FirstOrDefault(p => p.MapId == mapId && Math.Abs(p.X - x) < 5 && Math.Abs(p.Y - y) < 5);
             if (entry == null)
             {
-                Logger.Debug("No Dmap Portal found at {0}, {1} on map {2}", ptc.X, ptc.Y, mapId);
+                if (Trace) 
+                    Logger.Debug("No Dmap Portal found at {0}, {1} on map {2}", ptc.X, ptc.Y, mapId);
                 ntt.Remove<PortalComponent>();
 
                 var backupTpc = new TeleportComponent(ntt.Id, 477, 380, 1002);
@@ -30,7 +31,8 @@ namespace MagnumOpus.Simulation.Systems
             var passway = Collections.CqPassway.FirstOrDefault(x => x.mapid == mapId && x.passway_idx == entry.PortalId);
             if (passway == null)
             {
-                Logger.Debug("No Passway found for {0} on map {1}", entry.PortalId, mapId);
+                if (Trace) 
+                    Logger.Debug("No Passway found for {0} on map {1}", entry.PortalId, mapId);
                 ntt.Remove<PortalComponent>();
                 
                 var backupTpc = new TeleportComponent(ntt.Id, 477, 380, 1002);
@@ -41,7 +43,8 @@ namespace MagnumOpus.Simulation.Systems
             var exit = Collections.CqPortal.FirstOrDefault(x => x.MapId == passway.passway_mapid && x.IdX == passway.passway_mapportal);
             if (exit == null)
             {
-                Logger.Debug("No Exit Portal for {0} on map {1}", passway.passway_mapid, passway.passway_mapportal);
+                if (Trace) 
+                    Logger.Debug("No Exit Portal for {0} on map {1}", passway.passway_mapid, passway.passway_mapportal);
                 ntt.Remove<PortalComponent>();
 
                 var backupTpc = new TeleportComponent(ntt.Id, 477, 380, 1002);
@@ -52,7 +55,8 @@ namespace MagnumOpus.Simulation.Systems
             var tpc = new TeleportComponent(ntt.Id, (ushort)exit.X, (ushort)exit.Y, (ushort)exit.MapId);
             ntt.Set(ref tpc);
 
-            Logger.Debug("Teleporting {0} to {1} at {2}, {3}", ntt.NetId, exit.MapId, exit.X, exit.Y);
+            if (Trace) 
+                Logger.Debug("Teleporting {0} to {1} at {2}, {3}", ntt.NetId, exit.MapId, exit.X, exit.Y);
 
             ntt.Remove<PortalComponent>();
         }
