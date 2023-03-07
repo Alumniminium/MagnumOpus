@@ -95,7 +95,7 @@ namespace MagnumOpus.Helpers
                     ref var x = ref ntt.Get<LevelComponent>();
                     if(AttrOpts.TryGetValue(op, out var func))
                     {
-                        var result = func((long)x.Level, targetVal);
+                        var result = func(x.Level, targetVal);
                         if(result >= 0)
                         {
                             x.Level = (byte)result;
@@ -104,7 +104,7 @@ namespace MagnumOpus.Helpers
                         return false;
                     }
                     if(BooleanAttrOpts.TryGetValue(op, out var boolFunc))
-                        return boolFunc((long)x.Level, targetVal);
+                        return boolFunc(x.Level, targetVal);
                     return false;
                 }
             },
@@ -200,7 +200,7 @@ namespace MagnumOpus.Helpers
                         var text = action.param.Trim().Split(' ')[0];
                         var optionId = int.Parse(action.param.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries)[1]);
                         var optionPacket = MsgTaskDialog.Create(in tac.Npc, tac.OptionCount, MsgTaskDialogAction.Link, text);
-                        tac.Options[tac.OptionCount] = (int)optionId;
+                        tac.Options[tac.OptionCount] = optionId;
                         ntt.NetSync(ref optionPacket);
                         FConsole.WriteLine(text);
                         return action.id_next;
@@ -212,7 +212,7 @@ namespace MagnumOpus.Helpers
                         var text = action.param.Trim().Split(' ')[2];
                         var optionId = int.Parse(action.param.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries)[1]);
                         var optionPacket = MsgTaskDialog.Create(in tac.Npc, tac.OptionCount, MsgTaskDialogAction.Edit, text);
-                        tac.Options[tac.OptionCount] = (int)optionId;
+                        tac.Options[tac.OptionCount] = optionId;
                         ntt.NetSync(ref optionPacket);
                         FConsole.WriteLine(text);
                         return action.id_next;

@@ -33,7 +33,7 @@ namespace MagnumOpus.Networking.Packets
                 Action = action
             };
 
-            packet.Unknown[0] = (byte)1;
+            packet.Unknown[0] = 1;
             packet.Unknown[1] = (byte)text.Length;
             for (int i = 0; i < text.Length; i++)
                 packet.Unknown[2 + i] = (byte)text[i];

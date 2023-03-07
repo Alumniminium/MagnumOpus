@@ -1,6 +1,6 @@
 using System.Text;
-using Co2Core.IO;
 using HerstLib.IO;
+using Co2Core.IO;
 using MagnumOpus.Components;
 using MagnumOpus.Enums;
 using MagnumOpus.Squiggly;
@@ -12,7 +12,7 @@ namespace MagnumOpus.Helpers
     {
         public static bool IsBroken(ref ItemComponent item) => item.CurrentDurability == 0;
         public static bool IsNeverDropWhenDead(ref ItemComponent item) => /*item.Monopoly == 3 || item..Monopoly == 3 || item..Monopoly == 9 || */ item.Plus > 5;
-        public static int GetLevel(ref ItemComponent item) => (int)(item.Id % 1000 / 10);
+        public static int GetLevel(ref ItemComponent item) => item.Id % 1000 / 10;
         public static int GetLevel(int nType) => nType % 1000 / 10;
         public static ref ItemComponent SetLevel(ref ItemComponent item, int level)
         {
