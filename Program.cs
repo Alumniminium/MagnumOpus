@@ -2,7 +2,6 @@
 using HerstLib.IO;
 using MagnumOpus.ECS;
 using MagnumOpus.Networking;
-using MagnumOpus.Networking.Packets;
 using MagnumOpus.Simulation.Systems;
 using MagnumOpus.Squiggly;
 
