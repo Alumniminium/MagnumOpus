@@ -59,6 +59,9 @@ namespace MagnumOpus.Networking.Packets
                 case MsgFloorItemType.Pick:
                 {
                     ref readonly var item = ref NttWorld.GetEntityByNetId(msg.UniqueId);
+                    if (item == default)
+                        return;
+                        
                     var pic = new PickupRequestComponent(ntt.Id, in item);
                     ntt.Set(ref pic);
 

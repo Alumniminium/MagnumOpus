@@ -22,12 +22,11 @@ namespace MagnumOpus.Simulation.Systems
                 if(oldEq != default)
                     InventoryHelper.AddItem(in ntt, ref inv, in oldEq, netSync: true);
                 
-                InventoryHelper.RemoveNttFromInventory(in ntt, ref inv, in item, netSync: true);
-
                 eq.Items[change.Slot] = item;
 
-                var msg = MsgItem.Create(item.NetId, 0, (int)change.Slot, MsgItemType.SetEquipPosition);
+                var msg = MsgItem.Create(item.NetId, item.NetId, (int)change.Slot, MsgItemType.SetEquipPosition);
                 ntt.NetSync(ref msg);
+                InventoryHelper.RemoveNttFromInventory(in ntt, ref inv, in item, netSync: true);
 
                 if (Trace) 
                     Logger.Debug("{ntt} equipped {item} to {slot}", ntt, item, change.Slot);

@@ -263,12 +263,32 @@ namespace MagnumOpus.Squiggly
                 }
             }
 
+            using (FileStream Reader = new("CLIENT_FILES/Monster.dat", FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (FileStream Writer = new("CLIENT_FILES/Monster.txt", FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write))
+            {
+                var Buffer = new byte[10240];
+
+                var Length = Reader.Read(Buffer, 0, Buffer.Length);
+                while (Length > 0)
+                {
+                    fixed (byte* pBuffer = Buffer)
+                        Cipher.Decrypt(pBuffer, Length);
+                    Writer.Write(Buffer, 0, Length);
+
+                    Length = Reader.Read(Buffer, 0, Buffer.Length);
+                }
+            }
+
+
+
             Collections.ItemType.LoadFromTxt(TmpFile);
             File.Delete(TmpFile);
             Collections.MagicType.LoadFromDat("CLIENT_FILES/MagicType.dat");
 
             FConsole.WriteLine($"{Collections.MagicType.Count} magic types loaded.");
             FConsole.WriteLine($"{Collections.ItemType.Count} item types loaded.");
+
+
         }
     }
 }

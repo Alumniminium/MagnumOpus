@@ -1,3 +1,4 @@
+using System.Numerics;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -78,7 +79,7 @@ namespace MagnumOpus.Simulation.Systems
 
                 if (prefab.lookface == 900 || prefab.lookface == 910)
                 {
-                    var grd = new GuardPositionComponent(mob.Id, mpos.Position);
+                    var grd = new GuardPositionComponent(mob.Id, new Vector2(spc.SpawnArea.X, spc.SpawnArea.Y));
                     mob.Set(ref grd);
                 }
 
