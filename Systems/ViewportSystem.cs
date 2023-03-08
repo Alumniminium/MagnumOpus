@@ -45,9 +45,6 @@ namespace MagnumOpus.Simulation.Systems
                     bvwp.EntitiesVisible.TryAdd(ntt.Id, ntt);
                 }
 
-                if (vwp.EntitiesVisibleLast.ContainsKey(b.Id))
-                    continue;
-
                 if (b.Has<BrainComponent>())
                 {
                     ref var brn = ref b.Get<BrainComponent>();
@@ -58,6 +55,9 @@ namespace MagnumOpus.Simulation.Systems
                             Logger.Debug("{ntt} is waking up '{b}' due to distance", ntt, b);
                     }
                 }
+                
+                if (vwp.EntitiesVisibleLast.ContainsKey(b.Id))
+                    continue;
 
                 NetworkHelper.FullSync(in ntt, in b);
                 NetworkHelper.FullSync(in b, in b);

@@ -19,13 +19,13 @@ namespace MagnumOpus.ECS
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly void Set<T>(ref T component) where T : struct => ComponentList<T>.AddFor(in this, ref component);
+        public readonly void Set<T>(ref T component) where T : struct => SparseComponentStorage<T>.AddFor(in this, ref component);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly void Set<T>(T component) where T : struct => ComponentList<T>.AddFor(in this, ref component);
+        public readonly void Set<T>(T component) where T : struct => SparseComponentStorage<T>.AddFor(in this, ref component);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly ref T Get<T>() where T : struct => ref ComponentList<T>.Get(this);
+        public readonly ref T Get<T>() where T : struct => ref SparseComponentStorage<T>.Get(in this);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool Has<T>() where T : struct => ComponentList<T>.HasFor(in this);
+        public readonly bool Has<T>() where T : struct => SparseComponentStorage<T>.HasFor(in this);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly bool Has<T, T2>() where T : struct where T2 : struct => Has<T>() && Has<T2>();
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

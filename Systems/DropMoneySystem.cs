@@ -35,9 +35,8 @@ namespace MagnumOpus.Simulation.Systems
                 if (Trace) 
                     Logger.Debug("{ntt} dropped {amount} money at {pos}", ntt, drc.Amount, pos.Position);
             }
-            else
-                if (Trace) 
-                    Logger.Debug("Failed to create money drop for {ntt}. Amount: {Amount}, Position: {pos}, Map: {Map}", ntt, drc.Amount, pos.Position, pos.Map);
+            else if (Trace) 
+                Logger.Debug("Failed to create money drop for {ntt}. Amount: {Amount}, Position: {pos}, Map: {Map}", ntt, drc.Amount, pos.Position, pos.Map);
 
             ntt.Remove<RequestDropMoneyComponent>();
         }

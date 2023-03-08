@@ -37,7 +37,7 @@ namespace MagnumOpus.ECS
 
         static NttWorld()
         {
-            GCSettings.LatencyMode = GCLatencyMode.Interactive;
+            GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
             Systems = Array.Empty<NttSystem>();
             // PerformanceMetrics.RegisterSystem(nameof(NttWorld));
             Entities = new NTT[MaxEntities];
@@ -142,7 +142,6 @@ namespace MagnumOpus.ECS
             var dt = MathF.Min(1f / TargetTps, (float)tickTime.TotalSeconds);
             TimeAcc += dt;
             UpdateTimeAcc += dt;
-            var ts = Stopwatch.GetTimestamp();
 
             if (UpdateTimeAcc >= UpdateTime)
             {
@@ -154,20 +153,20 @@ namespace MagnumOpus.ECS
                     Systems[i].BeginUpdate();
                 }
                 UpdateNTTs();
+                
                 OnEndTick?.Invoke();
                 Tick++;
                 PrometheusPush.TickCount.Inc();
-            }
 
-            if (TimeAcc >= 1)
-            {
+                if (TimeAcc < 1)
+                    return;
+                
                 OnSecond?.Invoke();
                 TimeAcc = 0;
             }
 
             var tickDuration = (float)Stopwatch.GetElapsedTime(TickBeginTime).TotalMilliseconds;
             PrometheusPush.TickTime.Observe(tickDuration);
-            // PerformanceMetrics.AddSample(nameof(NttWorld), tickDuration);
             var sleepTime = (int)Math.Max(0, -1 + (UpdateTime * 1000) - tickDuration);
             Thread.Sleep(sleepTime);
         }

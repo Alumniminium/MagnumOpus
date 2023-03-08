@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 
@@ -66,16 +67,18 @@ namespace MagnumOpus.SpacePartitioning
 
                     if (!Hashtbl.TryGetValue(hash, out var entities))
                         continue;
-
-                    lock (_lock)
+                    
+                    lock(_lock)
                     {
-                        foreach (var entity in entities)
+                        var span = CollectionsMarshal.AsSpan(entities);
+                        for (int i = 0; i < entities.Count; i++)
                         {
-                            ref readonly var pos = ref entity.Get<PositionComponent>();
-                            var distanceSquared = Vector2.DistanceSquared(pos.Position, new Vector2(cx, cy));
+                            ref readonly var ntt = ref span[i];
+                            ref readonly var pos = ref ntt.Get<PositionComponent>();
+                            var distanceSquared = Vector2.DistanceSquared(pos.Position, new Vector2(cx, cy));   
 
                             if (distanceSquared <= 324f)
-                                vwp.EntitiesVisible.TryAdd(entity.Id, entity);
+                                vwp.EntitiesVisible.TryAdd(ntt.Id, ntt);
                         }
                     }
                 }

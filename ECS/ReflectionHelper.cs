@@ -24,7 +24,7 @@ namespace MagnumOpus.ECS
                             .Select(t1 => t1.t);
 
             var enumerable = types as Type[] ?? types.ToArray();
-            var methods = enumerable.Select(ct => (Action<NTT, bool>)typeof(ComponentList<>).MakeGenericType(ct).GetMethod("Remove")!.CreateDelegate(typeof(Action<NTT, bool>)));
+            var methods = enumerable.Select(ct => (Action<NTT, bool>)typeof(SparseComponentStorage<>).MakeGenericType(ct).GetMethod("Remove")!.CreateDelegate(typeof(Action<NTT, bool>)));
 
             RemoveMethodCache.AddRange(methods);
             var componentTypes = new List<Type>(enumerable);
@@ -46,7 +46,7 @@ namespace MagnumOpus.ECS
                         .Select(t => t.t)
                         .ToList();
 
-            var methods = enumerable.Select(ct => (Action<string>)typeof(ComponentList<>).MakeGenericType(ct).GetMethod("Save")!.CreateDelegate(typeof(Action<string>)));
+            var methods = enumerable.Select(ct => (Action<string>)typeof(SparseComponentStorage<>).MakeGenericType(ct).GetMethod("Save")!.CreateDelegate(typeof(Action<string>)));
 
             SaveMethodCache.AddRange(methods);
             var componentTypes = new List<Type>(enumerable);

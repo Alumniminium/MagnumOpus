@@ -85,6 +85,7 @@ namespace MagnumOpus.Simulation.Systems
 
                 vwp.Viewport.X = mpos.Position.X;
                 vwp.Viewport.Y = mpos.Position.Y;
+                vwp.Dirty=true;
                 mob.Set(ref mpos);
                 mob.Set(ref bdy);
                 mob.Set(ref hp);
