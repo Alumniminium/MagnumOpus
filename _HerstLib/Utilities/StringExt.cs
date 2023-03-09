@@ -1,13 +1,11 @@
-using System;
-
-namespace HerstLib.Utilities
+namespace MagnumOpus._HerstLib.Utilities
 {
     public static class StringExt
     {
         public static string CenterString(string txt, int length)
         {
             var delta = MathF.Abs(txt.Length - length);
-            for (int i = 0; i < delta; i++)
+            for (var i = 0; i < delta; i++)
                 if (i % 2 == 0)
                     txt = " " + txt;
                 else

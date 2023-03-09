@@ -1,7 +1,6 @@
-using System.Reflection;
 using MagnumOpus.Enums;
 
-namespace MagnumOpus.Squiggly
+namespace MagnumOpus.Squiggly.Models
 {
     public readonly struct CqMap
     {
@@ -28,16 +27,16 @@ namespace MagnumOpus.Squiggly
 
         public override string ToString()
         {
-            string portalsString = string.Join(", ", Portals.Select(p => $"Id: {p.Value.Id}"));
-            string respawnString = $"X: {RespawnLocation.Item1}, Y: {RespawnLocation.Item2}, Z: {RespawnLocation.Item3}";
+            var portalsString = string.Join(", ", Portals.Select(p => $"Id: {p.Value.Id}"));
+            var respawnString = $"X: {RespawnLocation.Item1}, Y: {RespawnLocation.Item2}, Z: {RespawnLocation.Item3}";
 
             return $"Map:" + Environment.NewLine +
-                $"  Id: {Id}" +Environment.NewLine +
-                $"  MapDocId: {MapDocId}" +Environment.NewLine +
-                $"  Name: {Name}" +Environment.NewLine +
-                $"  RespawnLocation: {respawnString}" +Environment.NewLine +
-                $"  Width: {Width}" +Environment.NewLine +
-                $"  Height: {Height}" +Environment.NewLine +
+                $"  Id: {Id}" + Environment.NewLine +
+                $"  MapDocId: {MapDocId}" + Environment.NewLine +
+                $"  Name: {Name}" + Environment.NewLine +
+                $"  RespawnLocation: {respawnString}" + Environment.NewLine +
+                $"  Width: {Width}" + Environment.NewLine +
+                $"  Height: {Height}" + Environment.NewLine +
                 $"  Portals: {portalsString}";
         }
     }

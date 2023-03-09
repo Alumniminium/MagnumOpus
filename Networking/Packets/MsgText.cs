@@ -1,7 +1,9 @@
 using System.Runtime.InteropServices;
 using System.Text;
 using HerstLib.IO;
-using MagnumOpus.Components;
+using MagnumOpus.Components.Death;
+using MagnumOpus.Components.Entity;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
@@ -125,6 +127,52 @@ namespace MagnumOpus.Networking.Packets
                 case MsgTextType.Talk:
                     TalkChat(in ntt, ref msg);
                     break;
+                case MsgTextType.Whisper:
+                    break;
+                case MsgTextType.Action:
+                    break;
+                case MsgTextType.Team:
+                    break;
+                case MsgTextType.Guild:
+                    break;
+                case MsgTextType.TopLeft:
+                    break;
+                case MsgTextType.Spouse:
+                    break;
+                case MsgTextType.Friend:
+                    break;
+                case MsgTextType.Broadcast:
+                    break;
+                case MsgTextType.Center:
+                    break;
+                case MsgTextType.Service:
+                    break;
+                case MsgTextType.Dialog:
+                    break;
+                case MsgTextType.LoginInformation:
+                    break;
+                case MsgTextType.VendorHawk:
+                    break;
+                case MsgTextType.Webpage:
+                    break;
+                case MsgTextType.MiniMap:
+                    break;
+                case MsgTextType.MiniMap2:
+                    break;
+                case MsgTextType.FriendsOfflineMessage:
+                    break;
+                case MsgTextType.GuildBulletin:
+                    break;
+                case MsgTextType.TradeBoard:
+                    break;
+                case MsgTextType.FriendBoard:
+                    break;
+                case MsgTextType.TeamBoard:
+                    break;
+                case MsgTextType.GuildBoard:
+                    break;
+                case MsgTextType.OthersBoard:
+                    break;
                 default:
                     FConsole.WriteLine("Unknown ChatType: " + msg.Channel);
                     FConsole.WriteLine(memory.Dump());
@@ -151,6 +199,57 @@ namespace MagnumOpus.Networking.Packets
                             entity.NetSync(ref mem);
                             break;
                         }
+
+                    case ClasseName.InternTrojan:
+                        break;
+                    case ClasseName.Trojan:
+                        break;
+                    case ClasseName.VeteranTrojan:
+                        break;
+                    case ClasseName.TigerTrojan:
+                        break;
+                    case ClasseName.DragonTrojan:
+                        break;
+                    case ClasseName.TrojanMaster:
+                        break;
+                    case ClasseName.InternWarrior:
+                        break;
+                    case ClasseName.Warrior:
+                        break;
+                    case ClasseName.BrassWarrior:
+                        break;
+                    case ClasseName.SilverWarrior:
+                        break;
+                    case ClasseName.GoldWarrior:
+                        break;
+                    case ClasseName.WarriorMaster:
+                        break;
+                    case ClasseName.InternArcher:
+                        break;
+                    case ClasseName.Archer:
+                        break;
+                    case ClasseName.EagleArcher:
+                        break;
+                    case ClasseName.TigerArcher:
+                        break;
+                    case ClasseName.DragonArcher:
+                        break;
+                    case ClasseName.ArcherMaster:
+                        break;
+                    case ClasseName.InternTaoist:
+                        break;
+                    case ClasseName.Taoist:
+                        break;
+                    case ClasseName.FireTaoist:
+                        break;
+                    case ClasseName.FireWizard:
+                        break;
+                    case ClasseName.FireMaster:
+                        break;
+                    case ClasseName.FireSaint:
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -181,8 +280,10 @@ namespace MagnumOpus.Networking.Packets
                     ntt.Set(ref rev);
                     break;
                 case "eff":
-                    var eff = MsgName.Create(ntt.NetId, args[0], (byte)MsgNameType.RoleEffect);
+                    var eff = MsgName.Create(ntt.Id, args[0], (byte)MsgNameType.RoleEffect);
                     ntt.NetSync(ref eff, true);
+                    break;
+                default:
                     break;
             }
         }

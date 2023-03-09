@@ -1,9 +1,9 @@
-using MagnumOpus.Components;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
 
-namespace MagnumOpus.Simulation.Systems
+namespace MagnumOpus.Systems
 {
     public sealed class EmoteSystem : NttSystem<EmoteComponent, BodyComponent>
     {
@@ -15,16 +15,16 @@ namespace MagnumOpus.Simulation.Systems
             if (emo.ChangedTick != NttWorld.Tick)
                 return;
 
-            if (Trace) 
+            if (IsLogging)
                 Logger.Debug("{ntt} emote {emote}", ntt, emo.Emote);
 
-            if(emo.Emote == Emote.Sit)
+            if (emo.Emote == Emote.Sit)
             {
-                var stamina = MsgUserAttrib.Create(ntt.NetId, 150, MsgUserAttribType.Stamina);
+                var stamina = MsgUserAttrib.Create(ntt.Id, 150, MsgUserAttribType.Stamina);
                 ntt.NetSync(ref stamina);
             }
 
-            var msg = MsgAction.Create(ntt.NetId, (int)emo.Emote, 0,0, bdt.Direction, MsgActionType.ChangeAction);
+            var msg = MsgAction.Create(ntt.Id, (int)emo.Emote, 0, 0, bdt.Direction, MsgActionType.ChangeAction);
             ntt.NetSync(ref msg, true);
         }
     }

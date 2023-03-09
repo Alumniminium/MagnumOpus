@@ -1,8 +1,9 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Entity
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public readonly struct PkPointComponent
     {
         public readonly int EntityId;

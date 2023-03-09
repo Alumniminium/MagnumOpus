@@ -1,24 +1,16 @@
-using System.Collections.Generic;
-using System.IO;
-
-namespace HerstLib.IO
+namespace MagnumOpus._HerstLib.IO
 {
     public class IniFile
     {
         private readonly Dictionary<string, Dictionary<string, string>> _iniFile = new();
         private readonly string _path = "";
 
-        public IniFile(string path)
-        {
-            if (File.Exists(path))
-                _path = path;
-            else throw new FileNotFoundException();
-        }
+        public IniFile(string path) => _path = File.Exists(path) ? path : throw new FileNotFoundException();
 
         public void Load()
         {
             using var reader = new StreamReader(File.OpenRead(_path));
-            string curHeader = "";
+            var curHeader = "";
             while (!reader.EndOfStream)
             {
                 var curLine = reader.ReadLine();
@@ -36,26 +28,22 @@ namespace HerstLib.IO
                     var kvp = curLine.Split("=", 2);
                     if (string.IsNullOrEmpty(kvp[0]) || string.IsNullOrEmpty(kvp[1]))
                         continue;
-                    _iniFile[curHeader].TryAdd(kvp[0], kvp[1]);
+                    _ = _iniFile[curHeader].TryAdd(kvp[0], kvp[1]);
                 }
             }
         }
         public IReadOnlyDictionary<string, Dictionary<string, string>> GetDictionary() => _iniFile;
-        public string GetValue(string header, string key, object default_value)
+        public string GetValue(string header, string key, object defaultValue)
         {
-            if (!_iniFile.ContainsKey(header))
-                return (string)default_value;
-            
-            if (_iniFile[header].TryGetValue(key, out var value))
-                return value;
-            
-            return (string)default_value;
+            return !_iniFile.ContainsKey(header)
+                ? (string)defaultValue
+                : _iniFile[header].TryGetValue(key, out var value) ? value : (string)defaultValue;
         }
 
         public void SetValue(string value, string header, string key)
         {
             if (!_iniFile.ContainsKey(header))
-                _iniFile.Add(header, new ());
+                _iniFile.Add(header, new());
 
             _iniFile[header][key] = value;
         }
@@ -68,7 +56,7 @@ namespace HerstLib.IO
                 writer.WriteLine(kvp.Key);
                 foreach (var kvp2 in kvp.Value)
                     writer.WriteLine(kvp2.Key + "=" + kvp2.Value);
-                
+
                 writer.WriteLine();
             }
         }

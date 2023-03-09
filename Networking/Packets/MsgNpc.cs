@@ -1,4 +1,3 @@
-using System.Buffers;
 using System.Runtime.InteropServices;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -22,7 +21,7 @@ namespace MagnumOpus.Networking.Packets
             {
                 Size = (ushort)sizeof(MsgNpc),
                 Id = 2031,
-                UniqId = target.NetId,
+                UniqId = target.Id,
                 Param = param,
                 Action = action,
                 Type = 26

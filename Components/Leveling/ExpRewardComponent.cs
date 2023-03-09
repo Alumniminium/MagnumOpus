@@ -1,9 +1,9 @@
-using System.Linq.Expressions;
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Leveling
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public struct ExpRewardComponent
     {
         public readonly int EntityId;

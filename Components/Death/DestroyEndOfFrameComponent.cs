@@ -1,8 +1,9 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Death
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public readonly struct DestroyEndOfFrameComponent
     {
         public readonly int EntityId;

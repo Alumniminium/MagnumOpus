@@ -1,11 +1,9 @@
-using System.Buffers;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using HerstLib.IO;
-using MagnumOpus.Components;
+using MagnumOpus.Components.Attack;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Helpers;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -37,7 +35,7 @@ namespace MagnumOpus.Networking.Packets
                 RawDirection = direction,
                 Type = running ? (byte)1 : (byte)0,
                 IDK = (ushort)NttWorld.Tick,
-            }; 
+            };
             return msg;
         }
         public static MsgWalk Create(int uniqueId, Direction direction, bool running)
@@ -50,7 +48,7 @@ namespace MagnumOpus.Networking.Packets
                 Direction = direction,
                 Type = running ? (byte)1 : (byte)0,
                 IDK = (ushort)NttWorld.Tick,
-            }; 
+            };
             return msg;
         }
 
@@ -58,15 +56,15 @@ namespace MagnumOpus.Networking.Packets
         public static void Process(NTT ntt, Memory<byte> memory)
         {
             var msg = Co2Packet.Deserialze<MsgWalk>(memory);
-            if (ntt.NetId != msg.UniqueId)
-                FConsole.WriteLine($"[{nameof(MsgWalk)}] UID Mismatch! Packet: {msg.UniqueId}, ntt: {ntt.NetId}");
+            if (ntt.Id != msg.UniqueId)
+                FConsole.WriteLine($"[{nameof(MsgWalk)}] UID Mismatch! Packet: {msg.UniqueId}, ntt: {ntt.Id}");
 
             if (ntt.Has<WalkComponent>())
             {
                 ref var pos = ref ntt.Get<PositionComponent>();
                 pos.ChangedTick = NttWorld.Tick;
-                var kickback = MsgAction.Create(ntt.NetId, 0, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.South, MsgActionType.Kickback);
-                ntt.NetSync(ref kickback,true);
+                var kickback = MsgAction.Create(ntt.Id, 0, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.South, MsgActionType.Kickback);
+                ntt.NetSync(ref kickback, true);
                 return;
             }
 

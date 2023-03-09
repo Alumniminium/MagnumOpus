@@ -1,7 +1,8 @@
-using System.Buffers;
 using System.Runtime.InteropServices;
 using MagnumOpus.ECS;
 using MagnumOpus.Components;
+using MagnumOpus.Components.Location;
+using MagnumOpus.Components.CQ;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -30,7 +31,7 @@ namespace MagnumOpus.Networking.Packets
             {
                 Size = (ushort)sizeof(MsgDynNpcSpawn),
                 Id = 1109,
-                UniqueId = ntt.NetId,
+                UniqueId = ntt.Id,
                 CurrentHp = (ushort)hlt.Health,
                 MaximumHp = (ushort)hlt.MaxHealth,
                 X = (short)pos.Position.X,

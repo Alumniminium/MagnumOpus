@@ -1,7 +1,7 @@
-using System.Buffers;
 using System.Runtime.InteropServices;
 using MagnumOpus.ECS;
-using MagnumOpus.Components;
+using MagnumOpus.Components.Location;
+using MagnumOpus.Components.CQ;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -23,12 +23,12 @@ namespace MagnumOpus.Networking.Packets
             ref readonly var bdy = ref ntt.Get<BodyComponent>();
             ref readonly var npc = ref ntt.Get<NpcComponent>();
             ref readonly var pos = ref ntt.Get<PositionComponent>();
-            
+
             var packet = new MsgNpcSpawn
             {
                 Size = (ushort)sizeof(MsgNpcSpawn),
                 Id = 2030,
-                UniqueId = ntt.NetId,
+                UniqueId = ntt.Id,
                 Look = (ushort)bdy.Look,
                 X = (ushort)pos.Position.X,
                 Y = (ushort)pos.Position.Y,

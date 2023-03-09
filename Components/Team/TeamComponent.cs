@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Team
 {
     [Component]
     public struct TeamComponent

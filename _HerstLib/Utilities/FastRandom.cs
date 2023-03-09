@@ -1,12 +1,10 @@
-using System;
-
-namespace HerstLib.Utilities
+namespace MagnumOpus._HerstLib.Utilities
 {
     public class FastRandom
     {
-        const double REAL_INT_DOUBLE = 1 / (int.MaxValue + 1d), REAL_UINT_DOUBLE = 1 / (uint.MaxValue + 1d);
-        const float REAL_INT_FLOAT = 1 / (int.MaxValue + 1f);
-        const uint Y = 842502087, Z = 3579807591, W = 273326509;
+        private const double REAL_INT_DOUBLE = 1 / (int.MaxValue + 1d), REAL_UINT_DOUBLE = 1 / (uint.MaxValue + 1d);
+        private const float REAL_INT_FLOAT = 1 / (int.MaxValue + 1f);
+        private const uint Y = 842502087, Z = 3579807591, W = 273326509;
 
         public int Seed
         {
@@ -18,8 +16,8 @@ namespace HerstLib.Utilities
             }
         }
 
-        int _seed;
-        uint _x, _y, _z, _w, _bitBuffer, _bitMask;
+        private int _seed;
+        private uint _x, _y, _z, _w, _bitBuffer, _bitMask;
 
         public FastRandom() { Seed = Environment.TickCount; }
         public FastRandom(int seed) { Seed = seed; }
@@ -38,48 +36,46 @@ namespace HerstLib.Utilities
         /// <summary>Returns a random <see cref="int"/> in the range of 0 (inclusive) to <see cref="int.MaxValue"/> (exlusive)</summary>
         public int Next()
         {
-            var t = _x ^ (_x << 11);
+            var t = _x ^ _x << 11;
             _x = _y;
             _y = _z;
             _z = _w;
-            _w = _w ^ (_w >> 19) ^ (t ^ (t >> 8));
+            _w = _w ^ _w >> 19 ^ t ^ t >> 8;
             var rtn = _w & 0x7FFFFFFF;
-            if (rtn == 0x7FFFFFFF)
-                return Next();
-            return (int)rtn;
+            return rtn == 0x7FFFFFFF ? Next() : (int)rtn;
         }
 
         /// <summary>Returns a random <see cref="int"/> in the range of 0 (inclusive) to <paramref name="max"/> (exlusive)</summary>
         public int Next(int max)
         {
-            var t = _x ^ (_x << 11);
+            var t = _x ^ _x << 11;
             _x = _y;
             _y = _z;
             _z = _w;
-            return (int)(REAL_INT_DOUBLE * (int)(0x7FFFFFFF & (_w = _w ^ (_w >> 19) ^ t ^ (t >> 8))) * max);
+            return (int)(REAL_INT_DOUBLE * (int)(0x7FFFFFFF & (_w = _w ^ _w >> 19 ^ t ^ t >> 8)) * max);
         }
 
         /// <summary>Returns a random <see cref="int"/> in the range of <paramref name="min"/> (inclusive) to <paramref name="max"/> (exclusive)</summary>
         public int Next(int min, int max)
         {
-            var t = _x ^ (_x << 11);
+            var t = _x ^ _x << 11;
             _x = _y;
             _y = _z;
             _z = _w;
-            int range = max - min;
-            if (range < 0)
-                return min + (int)(REAL_UINT_DOUBLE * (_w = _w ^ (_w >> 19) ^ t ^ (t >> 8)) * (max - (long)min));
-            return min + (int)(REAL_INT_DOUBLE * (int)(0x7FFFFFFF & (_w = _w ^ (_w >> 19) ^ t ^ (t >> 8))) * range);
+            var range = max - min;
+            return range < 0
+                ? min + (int)(REAL_UINT_DOUBLE * (_w = _w ^ _w >> 19 ^ t ^ t >> 8) * (max - (long)min))
+                : min + (int)(REAL_INT_DOUBLE * (int)(0x7FFFFFFF & (_w = _w ^ _w >> 19 ^ t ^ t >> 8)) * range);
         }
 
         /// <summary>Returns a random <see cref="double"/> in the range of 0 (inclusive) to 1 (exclusive)</summary>
         public double NextDouble()
         {
-            var t = _x ^ (_x << 11);
+            var t = _x ^ _x << 11;
             _x = _y;
             _y = _z;
             _z = _w;
-            return REAL_INT_DOUBLE * (int)(0x7FFFFFFF & (_w = _w ^ (_w >> 19) ^ t ^ (t >> 8)));
+            return REAL_INT_DOUBLE * (int)(0x7FFFFFFF & (_w = _w ^ _w >> 19 ^ t ^ t >> 8));
         }
 
         /// <summary>Fills the provided byte array with random bytes</summary>
@@ -91,13 +87,13 @@ namespace HerstLib.Utilities
                 w = _w;
             var i = 0;
             uint t;
-            for (int bound = buffer.Length - 3; i < bound;)
+            for (var bound = buffer.Length - 3; i < bound;)
             {
-                t = x ^ (x << 11);
+                t = x ^ x << 11;
                 x = y;
                 y = z;
                 z = w;
-                w = w ^ (w >> 19) ^ t ^ (t >> 8);
+                w = w ^ w >> 19 ^ t ^ t >> 8;
                 buffer[i++] = (byte)w;
                 buffer[i++] = (byte)(w >> 8);
                 buffer[i++] = (byte)(w >> 16);
@@ -105,11 +101,11 @@ namespace HerstLib.Utilities
             }
             if (i < buffer.Length)
             {
-                t = x ^ (x << 11);
+                t = x ^ x << 11;
                 x = y;
                 y = z;
                 z = w;
-                w = w ^ (w >> 19) ^ t ^ (t >> 8);
+                w = w ^ w >> 19 ^ t ^ t >> 8;
                 buffer[i++] = (byte)w;
                 if (i < buffer.Length)
                 {
@@ -131,77 +127,77 @@ namespace HerstLib.Utilities
         /// <summary>Returns a random <see cref="double"/> in the range of 0 (inclusive) to <paramref name="max"/> (exclusive)</summary>
         public double NextDouble(double max)
         {
-            var t = _x ^ (_x << 11);
+            var t = _x ^ _x << 11;
             _x = _y;
             _y = _z;
             _z = _w;
-            return REAL_INT_DOUBLE * ((int)(0x7FFFFFFF & (_w = _w ^ (_w >> 19) ^ t ^ (t >> 8))) * max);
+            return REAL_INT_DOUBLE * ((int)(0x7FFFFFFF & (_w = _w ^ _w >> 19 ^ t ^ t >> 8)) * max);
         }
 
         /// <summary>Returns a random <see cref="double"/> in the range of <paramref name="min"/> (inclusive) to <paramref name="max"/> (exclusive)</summary>
         public double NextDouble(double min, double max)
         {
-            var t = _x ^ (_x << 11);
+            var t = _x ^ _x << 11;
             _x = _y;
             _y = _z;
             _z = _w;
             var range = max - min;
-            if (range < 0)
-                return min + (REAL_UINT_DOUBLE * ((int)(_w = _w ^ (_w >> 19) ^ t ^ (t >> 8)) * (max - (long)min)));
-            return min + (REAL_INT_DOUBLE * ((int)(0x7FFFFFFF & (_w = _w ^ (_w >> 19) ^ t ^ (t >> 8))) * range));
+            return range < 0
+                ? min + REAL_UINT_DOUBLE * ((int)(_w = _w ^ _w >> 19 ^ t ^ t >> 8) * (max - (long)min))
+                : min + REAL_INT_DOUBLE * ((int)(0x7FFFFFFF & (_w = _w ^ _w >> 19 ^ t ^ t >> 8)) * range);
         }
 
         /// <summary>Returns a random <see cref="float"/> in the range of 0 (inclusive) to 1 (exclusive)</summary>
         public float NextFloat()
         {
-            var t = _x ^ (_x << 11);
+            var t = _x ^ _x << 11;
             _x = _y;
             _y = _z;
             _z = _w;
-            return REAL_INT_FLOAT * (int)(0x7FFFFFFF & (_w = _w ^ (_w >> 19) ^ t ^ (t >> 8)));
+            return REAL_INT_FLOAT * (int)(0x7FFFFFFF & (_w = _w ^ _w >> 19 ^ t ^ t >> 8));
         }
 
         /// <summary>Returns a random <see cref="float"/> in the range of 0 (inclusive) to <paramref name="max"/> (exclusive)</summary>
         public float NextFloat(float max)
         {
-            var t = _x ^ (_x << 11);
+            var t = _x ^ _x << 11;
             _x = _y;
             _y = _z;
             _z = _w;
-            return REAL_INT_FLOAT * ((int)(0x7FFFFFFF & (_w = _w ^ (_w >> 19) ^ t ^ (t >> 8))) * max);
+            return REAL_INT_FLOAT * ((int)(0x7FFFFFFF & (_w = _w ^ _w >> 19 ^ t ^ t >> 8)) * max);
         }
 
         /// <summary>Returns a random <see cref="float"/> in the range of <paramref name="min"/> (inclusive) to <paramref name="max"/> (exclusive)</summary>
         public float NextFloat(float min, float max)
         {
-            var t = _x ^ (_x << 11);
+            var t = _x ^ _x << 11;
             _x = _y;
             _y = _z;
             _z = _w;
             var range = max - min;
-            if (range < 0)
-                return min + (REAL_INT_FLOAT * (int)(_w = _w ^ (_w >> 19) ^ t ^ (t >> 8)) * (max - (long)min));
-            return min + ((REAL_INT_FLOAT * (int)(0x7FFFFFFF & (_w = _w ^ (_w >> 19) ^ t ^ (t >> 8))) * range));
+            return range < 0
+                ? min + REAL_INT_FLOAT * (int)(_w = _w ^ _w >> 19 ^ t ^ t >> 8) * (max - (long)min)
+                : min + REAL_INT_FLOAT * (int)(0x7FFFFFFF & (_w = _w ^ _w >> 19 ^ t ^ t >> 8)) * range;
         }
 
         /// <summary>Returns a random <see cref="uint"/> in the range of -<see cref="uint.MinValue"/> (inclusive) to <see cref="uint.MaxValue"/> (inclusive)</summary>
         public uint NextUInt()
         {
-            var t = _x ^ (_x << 11);
+            var t = _x ^ _x << 11;
             _x = _y;
             _y = _z;
             _z = _w;
-            return _w = _w ^ (_w >> 19) ^ t ^ (t >> 8);
+            return _w = _w ^ _w >> 19 ^ t ^ t >> 8;
         }
 
         /// <summary>Returns a random <see cref="int"/> in the range of 0 (inclusive) to <see cref="int.MaxValue"/> (inclusive)</summary>
         public int NextInt()
         {
-            var t = _x ^ (_x << 11);
+            var t = _x ^ _x << 11;
             _x = _y;
             _y = _z;
             _z = _w;
-            return (int)(0x7FFFFFFF & (_w = _w ^ (_w >> 19) ^ t ^ (t >> 8)));
+            return (int)(0x7FFFFFFF & (_w = _w ^ _w >> 19 ^ t ^ t >> 8));
         }
 
         /// <summary>Returns a random <see cref="bool"/></summary>
@@ -209,11 +205,11 @@ namespace HerstLib.Utilities
         {
             if (_bitMask == 1)
             {
-                var t = _x ^ (_x << 11);
+                var t = _x ^ _x << 11;
                 _x = _y;
                 _y = _z;
                 _z = _w;
-                _bitBuffer = _w = _w ^ (_w >> 19) ^ t ^ (t >> 8);
+                _bitBuffer = _w = _w ^ _w >> 19 ^ t ^ t >> 8;
                 _bitMask = 0x80000000;
                 return (_bitBuffer & _bitMask) == 0;
             }
@@ -223,11 +219,11 @@ namespace HerstLib.Utilities
         /// <summary>Returns a random value from <paramref name="values"/></summary>
         public T NextValue<T>(params T[] values)
         {
-            var t = _x ^ (_x << 11);
+            var t = _x ^ _x << 11;
             _x = _y;
             _y = _z;
             _z = _w;
-            return values[(int)(REAL_INT_DOUBLE * (int)(0x7FFFFFFF & (_w = _w ^ (_w >> 19) ^ t ^ (t >> 8))) * values.Length)];
+            return values[(int)(REAL_INT_DOUBLE * (int)(0x7FFFFFFF & (_w = _w ^ _w >> 19 ^ t ^ t >> 8)) * values.Length)];
         }
     }
 }

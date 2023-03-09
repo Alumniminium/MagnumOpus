@@ -1,8 +1,7 @@
-using System.Buffers;
 using System.Runtime.InteropServices;
-using System.Text;
 using HerstLib.IO;
 using MagnumOpus.Components;
+using MagnumOpus.Components.Items;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
@@ -59,7 +58,7 @@ namespace MagnumOpus.Networking.Packets
                     }
                 case MsgItemType.RemoveInventory:
                     {
-                        ref readonly var itemNtt = ref NttWorld.GetEntityByNetId(msg.UnqiueId);
+                        ref readonly var itemNtt = ref NttWorld.GetEntity(msg.UnqiueId);
                         var drc = new RequestDropItemComponent(ntt.Id, in itemNtt);
                         ntt.Set(ref drc);
 
@@ -71,7 +70,7 @@ namespace MagnumOpus.Networking.Packets
                     {
                         var itemNttId = msg.UnqiueId;
                         var slot = msg.Param;
-                        ref readonly var itemNtt = ref NttWorld.GetEntityByNetId(itemNttId);
+                        ref readonly var itemNtt = ref NttWorld.GetEntity(itemNttId);
                         ref var item = ref itemNtt.Get<ItemComponent>();
 
                         var isArrow = ItemHelper.IsArrow(ref item);
@@ -102,6 +101,41 @@ namespace MagnumOpus.Networking.Packets
                         ntt.NetSync(ref msg);
                         break;
                     }
+
+                case MsgItemType.SetEquipPosition:
+                    break;
+                case MsgItemType.ShowWarehouseMoney:
+                    break;
+                case MsgItemType.DepositWarehouseMoney:
+                    break;
+                case MsgItemType.WithdrawWarehouseMoney:
+                    break;
+                case MsgItemType.Repair:
+                    break;
+                case MsgItemType.UpdateDurability:
+                    break;
+                case MsgItemType.RemoveEquipment:
+                    break;
+                case MsgItemType.UpgradeDragonball:
+                    break;
+                case MsgItemType.UpgradeMeteor:
+                    break;
+                case MsgItemType.ShowVendingList:
+                    break;
+                case MsgItemType.AddVendingItem:
+                    break;
+                case MsgItemType.RemoveVendingItem:
+                    break;
+                case MsgItemType.BuyVendingItem:
+                    break;
+                case MsgItemType.UpdateArrowCount:
+                    break;
+                case MsgItemType.ParticleEffect:
+                    break;
+                case MsgItemType.Enchant:
+                    break;
+                case MsgItemType.BoothAddCp:
+                    break;
                 default:
                     FConsole.WriteLine($"Unhandled MsgItem type: {msg.Type}");
                     FConsole.WriteLine(memory.Dump());

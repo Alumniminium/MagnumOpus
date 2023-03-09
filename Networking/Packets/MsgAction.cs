@@ -1,7 +1,12 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
 using HerstLib.IO;
-using MagnumOpus.Components;
+using MagnumOpus.Components.Death;
+using MagnumOpus.Components.Entity;
+using MagnumOpus.Components.Floor;
+using MagnumOpus.Components.Items;
+using MagnumOpus.Components.Location;
+using MagnumOpus.Components.Team;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
@@ -72,7 +77,7 @@ namespace MagnumOpus.Networking.Packets
                 Size = (ushort)sizeof(MsgAction),
                 Id = 1010,
                 Timestamp = (int)NttWorld.Tick,
-                UniqueId = ntt.NetId,
+                UniqueId = ntt.Id,
                 JumpX = (ushort)jmp.Position.X,
                 JumpY = (ushort)jmp.Position.Y,
                 Direction = 0,
@@ -91,22 +96,22 @@ namespace MagnumOpus.Networking.Packets
             {
                 case MsgActionType.Revive:
                     {
-                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id}");
                         var rev = new ReviveComponent(ntt.Id, 1);
                         ntt.Set(ref rev);
                         break;
                     }
                 case MsgActionType.SendLocation:
                     {
-                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.X}, {msg.Y}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.X}, {msg.Y}");
                         ref var pos = ref ntt.Get<PositionComponent>();
                         ref var vwp = ref ntt.Get<ViewportComponent>();
                         vwp.EntitiesVisible.Clear();
                         vwp.EntitiesVisibleLast.Clear();
                         pos.ChangedTick = NttWorld.Tick;
-                        var reply = Create(ntt.NetId, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
+                        var reply = Create(ntt.Id, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
                         ntt.NetSync(ref reply);
-                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {reply.X}, {reply.Y}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {reply.X}, {reply.Y}");
 
                         NttWorld.Players.Add(ntt);
                         break;
@@ -116,13 +121,13 @@ namespace MagnumOpus.Networking.Packets
                 case MsgActionType.SendAssociates:
                 case MsgActionType.SendProficiencies:
                     {
-                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id}");
                         ntt.NetSync(ref msg);
                         break;
                     }
                 case MsgActionType.SendItems:
                     {
-                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id}");
                         ref var inv = ref ntt.Get<InventoryComponent>();
 
                         InventoryHelper.SortById(in ntt, ref inv, netSync: true);
@@ -131,7 +136,7 @@ namespace MagnumOpus.Networking.Packets
                     }
                 case MsgActionType.SendSpells:
                     {
-                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id}");
                         ref readonly var sbc = ref ntt.Get<SpellBookComponent>();
                         foreach (var spell in sbc.Spells)
                         {
@@ -143,7 +148,7 @@ namespace MagnumOpus.Networking.Packets
                     }
                 case MsgActionType.ChangeFace:
                     {
-                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id}");
                         ref var head = ref ntt.Get<HeadComponent>();
                         head.FaceId = (ushort)msg.Param;
                         ntt.NetSync(ref msg, true);
@@ -151,7 +156,7 @@ namespace MagnumOpus.Networking.Packets
                     }
                 case MsgActionType.ChangeFacing:
                     {
-                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.Direction}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.Direction}");
                         ref var bdy = ref ntt.Get<BodyComponent>();
                         bdy.Direction = msg.Direction;
                         ntt.NetSync(ref msg, true);
@@ -159,14 +164,14 @@ namespace MagnumOpus.Networking.Packets
                     }
                 case MsgActionType.ChangeAction:
                     {
-                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.Param}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.Param}");
                         var emo = new EmoteComponent(ntt.Id, (Emote)msg.Param);
                         ntt.Set(ref emo);
                         break;
                     }
                 case MsgActionType.Jump:
                     {
-                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.JumpX}, {msg.JumpY}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.JumpX}, {msg.JumpY}");
                         var jmp = new JumpComponent(ntt.Id, msg.JumpX, msg.JumpY);
                         var emo = new EmoteComponent(ntt.Id, Emote.Stand);
                         ntt.Set(ref jmp);
@@ -175,15 +180,15 @@ namespace MagnumOpus.Networking.Packets
                     }
                 case MsgActionType.EnterPortalChangeMap:
                     {
-                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.Param}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.Param}");
                         var tpc = new PortalComponent(ntt.Id, msg.X, msg.Y);
                         ntt.Set(ref tpc);
                         break;
                     }
                 case MsgActionType.QueryEntity:
                     {
-                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.Param}");
-                        ref readonly var ent = ref NttWorld.GetEntityByNetId(msg.Param);
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.Param}");
+                        ref readonly var ent = ref NttWorld.GetEntity(msg.Param);
                         if (ent.Id != 0)
                             NetworkHelper.FullSync(in ntt, in ent);
                         else
@@ -193,23 +198,23 @@ namespace MagnumOpus.Networking.Packets
                         vwp.EntitiesVisible.TryAdd(ent.Id, ent);
                         break;
                     }
-                    case MsgActionType.QueryTeamMember:
+                case MsgActionType.QueryTeamMember:
                     {
-                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.Param}");
-                        ref readonly var ent = ref NttWorld.GetEntityByNetId(msg.Param);
-                        if(ent.Id != 0)
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.Param}");
+                        ref readonly var ent = ref NttWorld.GetEntity(msg.Param);
+                        if (ent.Id != 0)
                         {
                             ref readonly var team = ref ent.Get<TeamComponent>();
                             ref readonly var pos = ref ent.Get<PositionComponent>();
 
-                            var leaderPos = MsgAction.Create(ntt.NetId, ntt.NetId, (ushort)pos.Position.X, (ushort)pos.Position.Y, 0, MsgActionType.QueryTeamMember);
+                            var leaderPos = Create(ntt.Id, ntt.Id, (ushort)pos.Position.X, (ushort)pos.Position.Y, 0, MsgActionType.QueryTeamMember);
                             ntt.NetSync(ref leaderPos);
                         }
                         break;
                     }
                 case MsgActionType.TeleportReply:
                     {
-                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.NetId} -> {msg.JumpX}, {msg.JumpY}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.JumpX}, {msg.JumpY}");
                         ref var pos = ref ntt.Get<PositionComponent>();
                         pos.Position = new Vector2(msg.JumpX, msg.JumpY);
                         pos.ChangedTick = NttWorld.Tick;
@@ -218,7 +223,7 @@ namespace MagnumOpus.Networking.Packets
                     }
                 case MsgActionType.GuardJump:
                     {
-                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type} : {ntt.NetId} -> {msg.JumpX}, {msg.JumpY}");
+                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type} : {ntt.Id} -> {msg.JumpX}, {msg.JumpY}");
                         ntt.NetSync(ref msg);
                         break;
                     }

@@ -1,8 +1,9 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Items
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public readonly struct MoneyRewardComponent
     {
         public readonly int EntityId;

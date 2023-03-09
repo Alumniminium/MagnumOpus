@@ -1,4 +1,3 @@
-using System.Buffers;
 using System.Runtime.InteropServices;
 using MagnumOpus.Enums;
 
@@ -37,7 +36,7 @@ namespace MagnumOpus.Networking.Packets
                 Count = 1,
                 Length = (byte)param.Length
             };
-                for (byte i = 0; i < (byte)param.Length; i++)
+            for (byte i = 0; i < (byte)param.Length; i++)
                 msg.Params[i] = (byte)param[i];
             return msg;
         }
@@ -54,7 +53,7 @@ namespace MagnumOpus.Networking.Packets
                 Count = 1,
                 Length = (byte)param.Length
             };
-                for (byte i = 0; i < (byte)param.Length; i++)
+            for (byte i = 0; i < (byte)param.Length; i++)
                 msg.Params[i] = (byte)param[i];
             return msg;
         }

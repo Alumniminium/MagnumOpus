@@ -1,6 +1,5 @@
-using System.Buffers;
 using System.Runtime.InteropServices;
-using MagnumOpus.Components;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 
 namespace MagnumOpus.Networking.Packets
@@ -22,7 +21,7 @@ namespace MagnumOpus.Networking.Packets
         // public static IEnumerable<byte[]> Create(in PixelEntity attacker, IEnumerable<(in PixelEntity, int)> targetEnumerable)
         // {
         //     ref readonly var bdy = ref attacker.Get<PhysicsComponent>();
-            
+
         //     const int maxTargets = 60;
         //     var targets = targetEnumerable.ToDictionary(pair => pair.Item1, pair => pair.Item2);
         //     var packetCount = (int)Math.Max(1, Math.Ceiling((float)targets.Count / maxTargets));
@@ -63,7 +62,7 @@ namespace MagnumOpus.Networking.Packets
             {
                 Size = 28,
                 Id = 1105,
-                UniqId = attacker.NetId,
+                UniqId = attacker.Id,
                 X = (ushort)target.Get<PositionComponent>().Position.X,
                 Y = (ushort)target.Get<PositionComponent>().Position.Y,
                 Type = skillId,
@@ -72,19 +71,20 @@ namespace MagnumOpus.Networking.Packets
             };
             unsafe
             {
-                msg.Targets[0] = target.NetId;
+                msg.Targets[0] = target.Id;
                 msg.Targets[1] = damage;
                 msg.Targets[2] = 0;
             }
 
             return msg;
-        }public static MsgMagicEffect Create(in NTT attacker, ushort x, ushort y, ushort skillId, byte skillLevel)
+        }
+        public static MsgMagicEffect Create(in NTT attacker, ushort x, ushort y, ushort skillId, byte skillLevel)
         {
             var msg = new MsgMagicEffect()
             {
                 Size = 28,
                 Id = 1105,
-                UniqId = attacker.NetId,
+                UniqId = attacker.Id,
                 X = x,
                 Y = y,
                 Type = skillId,

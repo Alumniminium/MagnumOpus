@@ -1,7 +1,11 @@
-using System.Buffers;
 using System.Runtime.InteropServices;
-using System.Text;
 using MagnumOpus.Components;
+using MagnumOpus.Components.Death;
+using MagnumOpus.Components.Entity;
+using MagnumOpus.Components.Guild;
+using MagnumOpus.Components.Items;
+using MagnumOpus.Components.Leveling;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 
@@ -51,6 +55,7 @@ namespace MagnumOpus.Networking.Packets
                 EntityType.Item => throw new NotImplementedException(),
                 EntityType.Trap => throw new NotImplementedException(),
                 EntityType.Other => throw new NotImplementedException(),
+                EntityType.InvItem => throw new NotImplementedException(),
                 _ => throw new NotImplementedException()
             };
         }
@@ -65,38 +70,35 @@ namespace MagnumOpus.Networking.Packets
             ref readonly var pos = ref ntt.Get<PositionComponent>();
 
             var look = bdy.Look;
-            look = (uint)(hed.FaceId * 10_000 + bdy.Look);
+            look = (uint)((hed.FaceId * 10_000) + bdy.Look);
             if (ntt.Has<DeathTagComponent>())
             {
-                if (bdy.Look % 10000 == 2001 || bdy.Look % 10000 == 2002)
-                    look = AddTransform(bdy.Look,99);
-                else
-                    look = AddTransform(bdy.Look, 98);
+                look = bdy.Look % 10000 is 2001 or 2002 ? AddTransform(bdy.Look, 99) : AddTransform(bdy.Look, 98);
             }
 
-            var head =0;
+            var head = 0;
             var armor = 0;
             var mainHand = 0;
-            var offHand =0;
+            var offHand = 0;
 
-            if(eqc.EntityId == ntt.Id)
+            if (eqc.EntityId == ntt.Id)
             {
-                eqc.Items.TryGetValue(MsgItemPosition.Head, out var headItem);
+                _ = eqc.Items.TryGetValue(MsgItemPosition.Head, out var headItem);
                 head = headItem.Get<ItemComponent>().Id;
-                eqc.Items.TryGetValue(MsgItemPosition.Armor, out var armorItem);
+                _ = eqc.Items.TryGetValue(MsgItemPosition.Armor, out var armorItem);
                 armor = armorItem.Get<ItemComponent>().Id;
-                eqc.Items.TryGetValue(MsgItemPosition.RightWeapon, out var mainHandItem);
+                _ = eqc.Items.TryGetValue(MsgItemPosition.RightWeapon, out var mainHandItem);
                 mainHand = mainHandItem.Get<ItemComponent>().Id;
-                eqc.Items.TryGetValue(MsgItemPosition.LeftWeapon, out var offHandItem);
+                _ = eqc.Items.TryGetValue(MsgItemPosition.LeftWeapon, out var offHandItem);
                 offHand = offHandItem.Get<ItemComponent>().Id;
             }
 
-            
+
             var msg = new MsgSpawn
             {
                 Size = (ushort)sizeof(MsgSpawn),
                 Id = 1014,
-                UniqueId = ntt.NetId,
+                UniqueId = ntt.Id,
                 Look = look,
                 StatusEffects = ntt.Get<StatusEffectComponent>().Effects,
                 GuildRank = gld.Rank,
@@ -132,14 +134,14 @@ namespace MagnumOpus.Networking.Packets
             ref readonly var pos = ref ntt.Get<PositionComponent>();
             ref readonly var eff = ref ntt.Get<StatusEffectComponent>();
 
-            if(string.IsNullOrEmpty(ntc.Name))
+            if (string.IsNullOrEmpty(ntc.Name))
                 ntc.Name = "";
 
             var msg = new MsgSpawn
             {
                 Size = (ushort)sizeof(MsgSpawn),
                 Id = 1014,
-                UniqueId = ntt.NetId,
+                UniqueId = ntt.Id,
                 Look = bdy.Look,
                 StatusEffects = eff.Effects,
                 CurrentHp = (ushort)hlt.Health,
@@ -156,8 +158,8 @@ namespace MagnumOpus.Networking.Packets
 
             return msg;
         }
-        
-        public static uint AddTransform(uint look, long transformId) => (uint)(transformId * 10000000L + look % 10000000L);
+
+        public static uint AddTransform(uint look, long transformId) => (uint)((transformId * 10000000L) + (look % 10000000L));
         public static uint DelTransform(uint look) => look % 10000000;
     }
 }

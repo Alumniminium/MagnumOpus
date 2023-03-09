@@ -2,9 +2,10 @@ using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Location
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public struct BodyComponent
     {
         public readonly int EntityId;
@@ -14,14 +15,14 @@ namespace MagnumOpus.Components
         private uint look;
         public uint Look
         {
-            get => look; 
+            get => look;
             set
             {
                 look = value;
                 ChangedTick = NttWorld.Tick;
-                ref readonly var entity = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(entity.NetId, look, MsgUserAttribType.Look);
-                entity.NetSync(ref packet, true);
+                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
+                var packet = MsgUserAttrib.Create(ntt.Id, look, MsgUserAttribType.Look);
+                ntt.NetSync(ref packet, true);
             }
         }
 

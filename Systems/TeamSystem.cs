@@ -1,11 +1,14 @@
 using HerstLib.IO;
-using MagnumOpus.Components;
+using MagnumOpus.Components.Entity;
+using MagnumOpus.Components.Leveling;
+using MagnumOpus.Components.Location;
+using MagnumOpus.Components.Team;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Networking;
+using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
 
-namespace MagnumOpus.Simulation.Systems
+namespace MagnumOpus.Systems
 {
     public sealed class TeamSystem : NttSystem<TeamComponent>
     {
@@ -13,7 +16,7 @@ namespace MagnumOpus.Simulation.Systems
 
         public override void Update(in NTT ntt, ref TeamComponent team)
         {
-            if(team.CreatedTick == NttWorld.Tick)
+            if (team.CreatedTick == NttWorld.Tick)
             {
                 var msg = MsgTeam.CreateTeam(in ntt);
                 var msgJoin = MsgTeamUpdate.JoinLeave(in ntt, MsgTeamMemberAction.AddMember);
@@ -25,12 +28,12 @@ namespace MagnumOpus.Simulation.Systems
             if (ntt.Id == team.Leader.Id)
             {
                 ref readonly var pos = ref ntt.Get<PositionComponent>();
-                if(pos.ChangedTick == NttWorld.Tick)
+                if (pos.ChangedTick == NttWorld.Tick)
                 {
-                    var leaderPos = MsgAction.Create(ntt.NetId, ntt.NetId, (ushort)pos.Position.X, (ushort)pos.Position.Y, 0, MsgActionType.QueryTeamLeaderPos);
+                    var leaderPos = MsgAction.Create(ntt.Id, ntt.Id, (ushort)pos.Position.X, (ushort)pos.Position.Y, 0, MsgActionType.QueryTeamLeaderPos);
 
                     // member 0 is the leader
-                    for(int i = 1; i < team.MemberCount+1; i++)
+                    for (var i = 1; i < team.MemberCount + 1; i++)
                     {
                         var member = team.Members[i];
                         if (member.Id == ntt.Id)
@@ -39,7 +42,7 @@ namespace MagnumOpus.Simulation.Systems
                         member.NetSync(ref leaderPos);
                     }
 
-                    var leaderMoveMsg = $"[{nameof(TeamSystem)}] {ntt.NetId} moved to {pos.Position}";
+                    var leaderMoveMsg = $"[{nameof(TeamSystem)}] {ntt.Id} moved to {pos.Position}";
                     NetworkHelper.SendMsgTo(in ntt, leaderMoveMsg, MsgTextType.TopLeft);
                     FConsole.WriteLine(leaderMoveMsg);
                 }
@@ -53,10 +56,10 @@ namespace MagnumOpus.Simulation.Systems
 
                 var sharedExp = rew.Experience / team.MemberCount;
 
-                if(sharedExp > lvl.Level * 300)  // TQ exp cap
+                if (sharedExp > lvl.Level * 300)  // TQ exp cap
                     sharedExp = lvl.Level * 300; // 
 
-                for (int i = 0; i < team.MemberCount; i++)
+                for (var i = 0; i < team.MemberCount; i++)
                 {
                     var member = team.Members[i];
 
@@ -65,11 +68,11 @@ namespace MagnumOpus.Simulation.Systems
 
                     ref readonly var pro = ref member.Get<ProfessionComponent>();
                     ref readonly var mrg = ref member.Get<MarriageComponent>();
-                        
+
                     if ((int)pro.Profession is > 132 and < 136) // Water Taoiust
                         sharedExp *= 2;                    // Bonus Exp
 
-                    if(mrg.EntityId == member.Id)   // 
+                    if (mrg.EntityId == member.Id)   // 
                         if (mrg.SpouseId == ntt.Id) // Marriage bonus
                             sharedExp *= 2;         // 
 

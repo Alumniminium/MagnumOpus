@@ -1,12 +1,13 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Entity
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public struct NameTagComponent
     {
         public readonly int EntityId;
-        public string Name = String.Empty;
+        public string Name = string.Empty;
 
         public NameTagComponent(int entityId, string name)
         {

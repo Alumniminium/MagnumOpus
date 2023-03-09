@@ -12,7 +12,7 @@ namespace MagnumOpus.Squiggly
         public readonly int RespawnDelay;
         public readonly int Amount;
 
-        public CqSpawnGenerator(int mapId, int mobId,int maxAmount, int xstart, int ystart, int xend, int yend, int respawnDelay, int amount)
+        public CqSpawnGenerator(int mapId, int mobId, int maxAmount, int xstart, int ystart, int xend, int yend, int respawnDelay, int amount)
         {
             MapId = mapId;
             MobId = mobId;

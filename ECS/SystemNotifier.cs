@@ -33,9 +33,8 @@ namespace MagnumOpus.ECS
                 while (NttWorld.ChangedThisTick.TryDequeue(out var entity))
                 {
                     PrometheusPush.NTTChanges.Inc();
-                    for (int i = 0; i < _array.Length; i++){
+                    for (var i = 0; i < _array.Length; i++)
                         _array[i].EntityChanged(in entity);
-                    }
                 }
             }
         }

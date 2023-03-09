@@ -1,9 +1,9 @@
 using MagnumOpus.ECS;
-using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 
 namespace MagnumOpus.Components
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public struct ManaComponent
     {
         public readonly int EntityId;

@@ -1,11 +1,17 @@
-using MagnumOpus.Components;
+using MagnumOpus.Components.AI;
+using MagnumOpus.Components.Attack;
+using MagnumOpus.Components.CQ;
+using MagnumOpus.Components.Death;
+using MagnumOpus.Components.Entity;
+using MagnumOpus.Components.Items;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Squiggly;
 
-namespace MagnumOpus.Simulation.Systems
+namespace MagnumOpus.Systems
 {
     public sealed class DeathSystem : NttSystem<DeathTagComponent>
     {
@@ -13,7 +19,7 @@ namespace MagnumOpus.Simulation.Systems
 
         public override void Update(in NTT ntt, ref DeathTagComponent dtc)
         {
-            if (ntt.Type == EntityType.Player || ntt.Type == EntityType.Npc || ntt.Type == EntityType.Monster)
+            if (ntt.Type is EntityType.Player or EntityType.Npc or EntityType.Monster)
                 EntityDeath(in ntt, ref dtc);
             else if (ntt.Type == EntityType.Item)
                 ItemDeath(in ntt, ref dtc);
@@ -39,18 +45,14 @@ namespace MagnumOpus.Simulation.Systems
                 if (ntt.Type == EntityType.Player)
                 {
                     ref var bdy = ref ntt.Get<BodyComponent>();
-                    uint ghostLook = 0;
-                    if (bdy.Look % 10000 == 2001 || bdy.Look % 10000 == 2002)
-                        ghostLook = MsgSpawn.AddTransform(bdy.Look, 99);
-                    else
-                        ghostLook = MsgSpawn.AddTransform(bdy.Look, 98);
+                    var ghostLook = bdy.Look % 10000 is 2001 or 2002 ? MsgSpawn.AddTransform(bdy.Look, 99) : MsgSpawn.AddTransform(bdy.Look, 98);
                 }
 
                 if (ntt.Has<CqActionComponent>())
                 {
                     ref readonly var cqc = ref ntt.Get<CqActionComponent>();
-                    long action = cqc.cq_Action;
-                    for (int i = 0; i < 32; i++)
+                    var action = cqc.cq_Action;
+                    for (var i = 0; i < 32; i++)
                     {
                         if (action == 0)
                             break;
@@ -69,13 +71,13 @@ namespace MagnumOpus.Simulation.Systems
 
                     InventoryHelper.SortById(in ntt, ref inv);
                     var itemCount = inv.Items.Where(x => x.Id != 0).Count();
-                    for (int i = 0; i < itemCount; i++)
+                    for (var i = 0; i < itemCount; i++)
                     {
                         if (Random.Shared.NextSingle() >= 0.1f)
-                            {
-                                inv.Items[i].Set(new DestroyEndOfFrameComponent(ntt.Id));
-                                continue;
-                            }
+                        {
+                            inv.Items[i].Set(new DestroyEndOfFrameComponent(ntt.Id));
+                            continue;
+                        }
 
                         ref var itemComp = ref inv.Items[i].Get<ItemComponent>();
                         if (itemComp.Id == 0)
@@ -91,31 +93,31 @@ namespace MagnumOpus.Simulation.Systems
                 ntt.Remove<WalkComponent>();
                 ntt.Remove<JumpComponent>();
             }
-            else if (dtc.Tick + NttWorld.TargetTps * 7 == NttWorld.Tick && ntt.Type == EntityType.Monster)
+            else if (dtc.Tick + (NttWorld.TargetTps * 7) == NttWorld.Tick && ntt.Type == EntityType.Monster)
             {
                 ref var eff = ref ntt.Get<StatusEffectComponent>();
                 eff.Effects |= StatusEffect.Fade;
             }
-            else if (dtc.Tick + NttWorld.TargetTps * 10 == NttWorld.Tick && ntt.Type == EntityType.Monster)
+            else if (dtc.Tick + (NttWorld.TargetTps * 10) == NttWorld.Tick && ntt.Type == EntityType.Monster)
             {
                 ref var pos = ref ntt.Get<PositionComponent>();
                 ref readonly var spawn = ref ntt.Get<FromSpawnerComponent>();
                 ref readonly var vwp = ref ntt.Get<ViewportComponent>();
 
                 ref readonly var spawner = ref NttWorld.GetEntity(spawn.SpawnerId);
-                ref var spc=  ref spawner.Get<SpawnerComponent>();
+                ref var spc = ref spawner.Get<SpawnerComponent>();
                 spc.Count--;
-                
-                var despawn = MsgAction.RemoveEntity(ntt.NetId);
+
+                var despawn = MsgAction.RemoveEntity(ntt.Id);
                 ntt.NetSync(ref despawn, true);
-                
+
                 foreach (var b in vwp.EntitiesVisible)
                 {
-                    if(!b.Value.Has<ViewportComponent>())
+                    if (!b.Value.Has<ViewportComponent>())
                         continue;
                     ref var bVwp = ref b.Value.Get<ViewportComponent>();
-                    bVwp.EntitiesVisible.Remove(ntt.Id, out _);
-                    bVwp.EntitiesVisibleLast.Remove(ntt.Id, out _);
+                    _ = bVwp.EntitiesVisible.Remove(ntt.Id, out _);
+                    _ = bVwp.EntitiesVisibleLast.Remove(ntt.Id, out _);
                 }
                 vwp.EntitiesVisible.Clear();
                 vwp.EntitiesVisibleLast.Clear();

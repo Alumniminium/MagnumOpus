@@ -1,10 +1,9 @@
-using System.Buffers;
 using System.Runtime.InteropServices;
 using MagnumOpus.Enums;
 
 namespace MagnumOpus.Networking.Packets
 {
-    [StructLayout(LayoutKind.Explicit, Pack = 1 )]
+    [StructLayout(LayoutKind.Explicit, Pack = 1)]
     public unsafe struct MsgItemInfoEx
     {
         [FieldOffset(0)]

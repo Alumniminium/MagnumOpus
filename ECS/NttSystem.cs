@@ -1,10 +1,9 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using Microsoft.Extensions.Logging;
+using System.Runtime.InteropServices;
 using Prometheus;
 using Serilog;
 using Serilog.Core;
-using Serilog.Sinks.Grafana.Loki;
 
 namespace MagnumOpus.ECS
 {
@@ -12,58 +11,33 @@ namespace MagnumOpus.ECS
     {
         public static long Tick => NttWorld.Tick;
         public string Name;
-        public bool Trace = false;
+        public bool IsLogging;
+        public int ThreadCount;
         internal readonly ConcurrentDictionary<int, NTT> _entities = new();
         internal readonly List<NTT> _entitiesList = new();
-        internal readonly Thread[] _threads;
-        internal readonly AutoResetEvent[] _blocks;
-        private readonly AutoResetEvent _allReady = new(false);
-        internal volatile int _readyThreads = 0;
         private readonly Gauge TimeMetricsExporter;
         private readonly Gauge NTTCountMetricsExporter;
-
         internal readonly Logger Logger;
 
         protected NttSystem(string name, int threads = 1, bool log = false)
         {
-            Trace = log;
-            if (log)
-            {
-                Logger = new LoggerConfiguration()
-                                .MinimumLevel.Debug()
-                                .Enrich.WithProperty("System", name)
-                                .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss}[{Properties}] {Message}{NewLine}{Exception}")
-                                // .WriteTo.GrafanaLoki("http://loki.her.st")
-                                .WriteTo.File($"{DateTime.UtcNow:dd-MM-yyyy}.log")
-                                .CreateLogger();
-            }
-            else
-            {
-                Logger = new LoggerConfiguration()
-                                .MinimumLevel.Information()
-                                .Enrich.WithProperty("System", name)
-                                .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss}[{Properties}] {Message}{NewLine}{Exception}")
-                                // .WriteTo.GrafanaLoki("http://loki.her.st")
-                                .WriteTo.File($"{DateTime.UtcNow:dd-MM-yyyy}.log")
-                                .CreateLogger();
-            }
-
+            ThreadCount = threads;
+            IsLogging = log;
             Name = name;
-            // PerformanceMetrics.RegisterSystem(this);
-            _threads = new Thread[threads];
-            _blocks = new AutoResetEvent[threads];
-            for (var i = 0; i < threads; i++)
-            {
-                _blocks[i] = new AutoResetEvent(false);
-                _threads[i] = new Thread(ThreadLoop)
-                {
-                    IsBackground = true,
-                    Priority = ThreadPriority.Highest
-                };
-                _threads[i].Start(i);
-            }
             TimeMetricsExporter = Metrics.CreateGauge($"MAGNUMOPUS_ECS_SYSTEM_{Name.ToUpperInvariant().Replace(" ", "_")}", $"Tick time for {Name} in ms");
             NTTCountMetricsExporter = Metrics.CreateGauge($"MAGNUMOPUS_ECS_SYSTEM_{Name.ToUpperInvariant().Replace(" ", "_")}_NTT_COUNT", $"NTT count for {Name}");
+
+            var logCfg = new LoggerConfiguration()
+                                .Enrich.WithProperty("System", name)
+                                .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss}[{Properties}] {Message}{NewLine}{Exception}")
+                                // .WriteTo.GrafanaLoki("http://loki.her.st")
+                                .WriteTo.File($"{DateTime.UtcNow:dd-MM-yyyy}.log");
+            if (IsLogging)
+                _ = logCfg.MinimumLevel.Debug();
+            else
+                _ = logCfg.MinimumLevel.Information();
+
+            Logger = logCfg.CreateLogger();
         }
 
         public void BeginUpdate()
@@ -71,62 +45,43 @@ namespace MagnumOpus.ECS
             var ts = Stopwatch.GetTimestamp();
             if (_entities.IsEmpty)
             {
-                // PerformanceMetrics.AddSample(Name, (float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
                 NTTCountMetricsExporter.Set(0);
                 TimeMetricsExporter.Set((float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
                 return;
             }
-            _allReady.Reset();
-            Interlocked.Exchange(ref _readyThreads, 0);
-            for (int i = 0; i < _threads.Length; i++)
-                _blocks[i].Set();
-            _allReady.WaitOne();
-            // PerformanceMetrics.AddSample(Name, (float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
-            TimeMetricsExporter.Set((float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
+            ThreadedWorker.Run(EndUpdate, ThreadCount);
             NTTCountMetricsExporter.Set(_entities.Count);
+            TimeMetricsExporter.Set((float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
         }
 
-        public void ThreadLoop(object? id)
+        public void EndUpdate(int idx)
         {
-            if (id == null)
-                throw new ArgumentNullException(nameof(id));
+            var start = 0;
+            var amount = _entitiesList.Count;
 
-            int idx = (int)id;
-            while (true)
+            if (amount > Environment.ProcessorCount * 2)
             {
-                Interlocked.Increment(ref _readyThreads);
-                if (_readyThreads >= _threads.Length)
-                    _allReady.Set();
-
-                _blocks[idx].WaitOne();
-
-                int start = 0;
-                int amount = _entitiesList.Count;
-
-                if (_entitiesList.Count > _threads.Length * 2)
-                {
-                    int chunkSize = _entitiesList.Count / _threads.Length;
-                    int remaining = _entitiesList.Count % _threads.Length;
-                    start = chunkSize * idx + Math.Min(idx, remaining);
-                    amount = chunkSize + (idx < remaining ? 1 : 0);
-                }
-                else if (idx != 0)
-                    continue;
-
-                Update(start, start + amount);
+                var chunkSize = amount / Environment.ProcessorCount;
+                var remaining = amount % Environment.ProcessorCount;
+                start = (chunkSize * idx) + Math.Min(idx, remaining);
+                amount = chunkSize + (idx < remaining ? 1 : 0);
             }
+            else if (idx != 0)
+                return;
+
+            Update(start, amount);
         }
 
-        protected abstract void Update(int start, int end);
+        protected abstract void Update(int start, int amount);
         protected virtual bool MatchesFilter(in NTT nttId) => nttId.Id != 0;
-        internal void EntityChanged(in NTT ntt)
+        public void EntityChanged(in NTT ntt)
         {
             var isMatch = MatchesFilter(in ntt);
             if (!isMatch)
             {
                 if (_entities.TryRemove(ntt.Id, out _))
                     lock (_entitiesList)
-                        _entitiesList.Remove(ntt);
+                        _ = _entitiesList.Remove(ntt);
             }
             else
             {
@@ -141,11 +96,12 @@ namespace MagnumOpus.ECS
         protected NttSystem(string name, int threads = 1, bool log = false) : base(name, threads, log) { }
         protected override bool MatchesFilter(in NTT nttId) => nttId.Has<T>() && base.MatchesFilter(in nttId);
 
-        protected override void Update(int start, int end)
+        protected override void Update(int start, int amount)
         {
-            for (int i = start; i < Math.Min(end, _entitiesList.Count); i++)
+            var span = CollectionsMarshal.AsSpan(_entitiesList).Slice(start, amount);
+            for (var i = 0; i < span.Length; i++)
             {
-                NTT ntt = _entitiesList[i];
+                ref readonly var ntt = ref span[i];
                 ref var c1 = ref ntt.Get<T>();
                 Update(in ntt, ref c1);
             }
@@ -157,11 +113,12 @@ namespace MagnumOpus.ECS
         protected NttSystem(string name, int threads = 1, bool log = false) : base(name, threads, log) { }
         protected override bool MatchesFilter(in NTT nttId) => nttId.Has<T, T2>() && base.MatchesFilter(in nttId);
 
-        protected override void Update(int start, int end)
+        protected override void Update(int start, int amount)
         {
-            for (int i = start; i < Math.Min(end, _entitiesList.Count); i++)
+            var span = CollectionsMarshal.AsSpan(_entitiesList).Slice(start, amount);
+            for (var i = 0; i < span.Length; i++)
             {
-                NTT ntt = _entitiesList[i];
+                ref readonly var ntt = ref span[i];
                 ref var c1 = ref ntt.Get<T>();
                 ref var c2 = ref ntt.Get<T2>();
                 Update(in ntt, ref c1, ref c2);
@@ -174,11 +131,12 @@ namespace MagnumOpus.ECS
         protected NttSystem(string name, int threads = 1, bool log = false) : base(name, threads, log) { }
         protected override bool MatchesFilter(in NTT nttId) => nttId.Has<T, T2, T3>() && base.MatchesFilter(in nttId);
 
-        protected override void Update(int start, int end)
+        protected override void Update(int start, int amount)
         {
-            for (int i = start; i < Math.Min(end, _entitiesList.Count); i++)
+            var span = CollectionsMarshal.AsSpan(_entitiesList).Slice(start, amount);
+            for (var i = 0; i < span.Length; i++)
             {
-                NTT ntt = _entitiesList[i];
+                ref readonly var ntt = ref span[i];
                 ref var c1 = ref ntt.Get<T>();
                 ref var c2 = ref ntt.Get<T2>();
                 ref var c3 = ref ntt.Get<T3>();
@@ -192,11 +150,12 @@ namespace MagnumOpus.ECS
         protected NttSystem(string name, int threads = 1, bool log = false) : base(name, threads, log) { }
         protected override bool MatchesFilter(in NTT nttId) => nttId.Has<T, T2, T3, T4>() && base.MatchesFilter(in nttId);
 
-        protected override void Update(int start, int end)
+        protected override void Update(int start, int amount)
         {
-            for (int i = start; i < Math.Min(end, _entitiesList.Count); i++)
+            var span = CollectionsMarshal.AsSpan(_entitiesList).Slice(start, amount);
+            for (var i = 0; i < span.Length; i++)
             {
-                NTT ntt = _entitiesList[i];
+                ref readonly var ntt = ref span[i];
                 ref var c1 = ref ntt.Get<T>();
                 ref var c2 = ref ntt.Get<T2>();
                 ref var c3 = ref ntt.Get<T3>();
@@ -211,11 +170,12 @@ namespace MagnumOpus.ECS
         protected NttSystem(string name, int threads = 1, bool log = false) : base(name, threads, log) { }
         protected override bool MatchesFilter(in NTT nttId) => nttId.Has<T, T2, T3, T4, T5>() && base.MatchesFilter(in nttId);
 
-        protected override void Update(int start, int end)
+        protected override void Update(int start, int amount)
         {
-            for (int i = start; i < Math.Min(end, _entitiesList.Count); i++)
+            var span = CollectionsMarshal.AsSpan(_entitiesList).Slice(start, amount);
+            for (var i = 0; i < span.Length; i++)
             {
-                NTT ntt = _entitiesList[i];
+                ref readonly var ntt = ref span[i];
                 ref var c1 = ref ntt.Get<T>();
                 ref var c2 = ref ntt.Get<T2>();
                 ref var c3 = ref ntt.Get<T3>();

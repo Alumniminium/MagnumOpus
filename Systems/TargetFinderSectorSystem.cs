@@ -1,10 +1,13 @@
 using System.Numerics;
-using System.Text;
 using MagnumOpus.Components;
+using MagnumOpus.Components.Attack;
+using MagnumOpus.Components.Death;
+using MagnumOpus.Components.Entity;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 
-namespace MagnumOpus.Simulation.Systems
+namespace MagnumOpus.Systems
 {
     public sealed class TargetFinderSectorSystem : NttSystem<SectorTargetComponent, PositionComponent, ViewportComponent>
     {
@@ -13,8 +16,8 @@ namespace MagnumOpus.Simulation.Systems
         public override void Update(in NTT ntt, ref SectorTargetComponent atk, ref PositionComponent pos, ref ViewportComponent vwp)
         {
             var tcc = new TargetCollectionComponent(ntt.Id, atk.MagicType);
-            
-                foreach (var kvp in vwp.EntitiesVisible)
+
+            foreach (var kvp in vwp.EntitiesVisible)
             {
                 var b = kvp.Value;
                 ref readonly var bPos = ref b.Get<PositionComponent>();
@@ -27,9 +30,9 @@ namespace MagnumOpus.Simulation.Systems
 
                 if (!CoMath.InSector(pos.Position, new Vector2(atk.X, atk.Y), bPos.Position, atk.MagicType.Range * 10 * MathF.PI / 180))
                     continue;
-                
+
                 tcc.Targets.Add(b);
-                if (Trace)
+                if (IsLogging)
                     Logger.Debug("{ntt} adding {b} to target list of {skill}:{level}", ntt, b, atk.MagicType.MagicType, atk.MagicType.Level);
 
             }

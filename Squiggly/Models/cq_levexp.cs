@@ -2,8 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MagnumOpus.Squiggly.Models
 {
-    #pragma warning disable CS8618
-    #pragma warning disable IDE1006
+#pragma warning disable CS8618
+#pragma warning disable IDE1006
     public class cq_levexp
     {
         [Key]

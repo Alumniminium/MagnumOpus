@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
-namespace HerstLib.Drawing
+namespace MagnumOpus._HerstLib.Drawing
 {
     public class AsciiBarChart
     {
@@ -23,37 +20,37 @@ namespace HerstLib.Drawing
             var maxLabelLength = lables.Max(x => x.Length);
             var maxBarheight = height - maxLabelLength - 1;
 
-            for (int i = 0; i < values.Length; i++)
+            for (var i = 0; i < values.Length; i++)
                 values[i] = (long)Math.Round((double)values[i] / max * maxBarheight);
 
-            for (int i = maxBarheight; i > 0; i--)
+            for (var i = maxBarheight; i > 0; i--)
             {
                 var legend = (long)(i != maxBarheight ? (float)max / maxBarheight * i : max);
                 var strLegend = FormatNumber(legend) + "┫";
 
                 if (i == 1)
-                    sb.Append(strLegend.PadLeft(5));
+                    _ = sb.Append(strLegend.PadLeft(5));
                 else if (i % 4 == 0 && i != maxBarheight)
-                    sb.Append(strLegend.PadLeft(5));
+                    _ = sb.Append(strLegend.PadLeft(5));
                 else if (i == maxBarheight)
-                    sb.Append(strLegend.PadLeft(5));
+                    _ = sb.Append(strLegend.PadLeft(5));
                 else
-                    sb.Append("┫".PadLeft(5));
+                    _ = sb.Append("┫".PadLeft(5));
 
                 for (long j = 0; j < Data.Keys.Count; j++)
-                    sb.Append(values[j] >= i ? " ███ " : "     ");
-                sb.AppendLine();
+                    _ = sb.Append(values[j] >= i ? " ███ " : "     ");
+                _ = sb.AppendLine();
             }
-            sb.Append("┗".PadLeft(5));
+            _ = sb.Append("┗".PadLeft(5));
             foreach (var label in lables)
-                sb.Append("━━╋━━");
-            sb.AppendLine();
-            for (int i = 0; i < maxLabelLength; i++)
+                _ = sb.Append("━━╋━━");
+            _ = sb.AppendLine();
+            for (var i = 0; i < maxLabelLength; i++)
             {
-                sb.Append("     ");
+                _ = sb.Append("     ");
                 foreach (var label in lables)
-                    sb.Append(label.Length > i ? $"  {label[i]}  " : "    ");
-                sb.AppendLine();
+                    _ = sb.Append(label.Length > i ? $"  {label[i]}  " : "    ");
+                _ = sb.AppendLine();
             }
 
             return sb.ToString().Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
@@ -73,27 +70,27 @@ namespace HerstLib.Drawing
             for (long i = 0; i < values.Length; i++)
                 values[i] = (long)Math.Round((double)values[i] / max * maxBarWidth);
 
-            for (int i = 0; i < Data.Keys.Count; i++)
+            for (var i = 0; i < Data.Keys.Count; i++)
             {
                 var legend = rawvalues[i];
-                string strLegend = FormatNumber(legend);
+                var strLegend = FormatNumber(legend);
                 if (compact)
-                    sb.Append($"{$"{(labels[i] + ':').PadRight(maxLabelLength + 1)} {strLegend,4}".PadRight(1)}");
+                    _ = sb.Append($"{$"{(labels[i] + ':').PadRight(maxLabelLength + 1)} {strLegend,4}".PadRight(1)}");
                 else
-                    sb.Append($"{i.ToString().PadRight(Data.Keys.Count.ToString().Length)}");
+                    _ = sb.Append($"{i.ToString().PadRight(Data.Keys.Count.ToString().Length)}");
 
-                sb.Append(' ');
-                sb.Append("┣".PadRight((int)values[i], '━'));
-                sb.AppendLine();
+                _ = sb.Append(' ');
+                _ = sb.Append("┣".PadRight((int)values[i], '━'));
+                _ = sb.AppendLine();
             }
             if (!compact)
             {
-                sb.AppendLine();
-                for (int i = 0; i < labels.Length; i++)
+                _ = sb.AppendLine();
+                for (var i = 0; i < labels.Length; i++)
                 {
                     var legend = rawvalues[i];
                     var strLegend = FormatNumber(legend);
-                    sb.AppendLine($"{i.ToString().PadRight(2)} {(labels[i] + ':').PadRight(maxLabelLength + 1)} {rawvalues[i]}");
+                    _ = sb.AppendLine($"{i.ToString().PadRight(2)} {(labels[i] + ':').PadRight(maxLabelLength + 1)} {rawvalues[i]}");
                 }
             }
 

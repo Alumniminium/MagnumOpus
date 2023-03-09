@@ -1,9 +1,9 @@
-using System.Buffers;
 using System.Runtime.InteropServices;
 using MagnumOpus.Components;
+using MagnumOpus.Components.Items;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using Microsoft.VisualStudio.TextTemplating;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -26,7 +26,7 @@ namespace MagnumOpus.Networking.Packets
             {
                 Size = (ushort)sizeof(MsgFloorItem),
                 Id = (ushort)PacketId.MsgFloorItem,
-                UniqueId = item.NetId,
+                UniqueId = item.Id,
                 X = (ushort)pos.Position.X,
                 Y = (ushort)pos.Position.Y,
                 ItemId = itemComponent.Id,
@@ -57,17 +57,32 @@ namespace MagnumOpus.Networking.Packets
             switch (msg.MsgFloorItemType)
             {
                 case MsgFloorItemType.Pick:
-                {
-                    ref readonly var item = ref NttWorld.GetEntityByNetId(msg.UniqueId);
-                    if (item == default)
-                        return;
-                        
-                    var pic = new PickupRequestComponent(ntt.Id, in item);
-                    ntt.Set(ref pic);
+                    {
+                        ref readonly var item = ref NttWorld.GetEntity(msg.UniqueId);
+                        if (item == default)
+                            return;
 
-                    ntt.NetSync(ref msg, true);
+                        var pic = new PickupRequestComponent(ntt.Id, in item);
+                        ntt.Set(ref pic);
+
+                        ntt.NetSync(ref msg, true);
+                        break;
+                    }
+
+                case MsgFloorItemType.None:
                     break;
-                }
+                case MsgFloorItemType.Create:
+                    break;
+                case MsgFloorItemType.Delete:
+                    break;
+                case MsgFloorItemType.DisplayEffect:
+                    break;
+                case MsgFloorItemType.SynchroTrap:
+                    break;
+                case MsgFloorItemType.RemoveEffect:
+                    break;
+                default:
+                    break;
             }
         }
     }

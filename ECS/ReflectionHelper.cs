@@ -5,8 +5,8 @@ namespace MagnumOpus.ECS
     public static class ReflectionHelper
     {
         private static readonly List<Action<NTT, bool>> RemoveMethodCache = new();
-        private static readonly Dictionary<Type, Action<NTT, bool>> RemoveCache = new();        
-        
+        private static readonly Dictionary<Type, Action<NTT, bool>> RemoveCache = new();
+
         private static readonly List<Action<string>> SaveMethodCache = new();
         private static readonly Dictionary<Type, Action<string>> SaveCache = new();
         static ReflectionHelper()
@@ -57,7 +57,7 @@ namespace MagnumOpus.ECS
                 var method = SaveMethodCache[i];
                 SaveCache.Add(type, method);
             }
-        }   
+        }
 
         public static void Remove<T>(in NTT ntt)
         {

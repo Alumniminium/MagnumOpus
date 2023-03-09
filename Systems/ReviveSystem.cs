@@ -1,12 +1,15 @@
 using System.Numerics;
 using HerstLib.IO;
 using MagnumOpus.Components;
+using MagnumOpus.Components.Death;
+using MagnumOpus.Components.Entity;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Squiggly;
 
-namespace MagnumOpus.Simulation.Systems
+namespace MagnumOpus.Systems
 {
     public sealed class ReviveSystem : NttSystem<ReviveComponent, HealthComponent, PositionComponent, BodyComponent, StatusEffectComponent>
     {
@@ -36,7 +39,7 @@ namespace MagnumOpus.Simulation.Systems
                 }
                 else
                 {
-                    if (Trace) 
+                    if (IsLogging)
                         Logger.Debug("Reborn Map {0} not found", mapId);
                     pos.Map = 1002;
                     pos.Position = new Vector2(477, 380);
@@ -44,7 +47,7 @@ namespace MagnumOpus.Simulation.Systems
             }
             else
             {
-                if (Trace) 
+                if (IsLogging)
                     Logger.Debug("Map {0} not found", pos.Map);
                 pos.Map = 1002;
                 pos.Position = new Vector2(477, 380);
@@ -54,7 +57,7 @@ namespace MagnumOpus.Simulation.Systems
             eff.Effects &= ~StatusEffect.Dead;
             eff.Effects &= ~StatusEffect.FrozenRemoveName;
 
-            var reply = MsgAction.Create(ntt.NetId, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
+            var reply = MsgAction.Create(ntt.Id, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
 
             ntt.NetSync(ref reply);
 
@@ -62,7 +65,7 @@ namespace MagnumOpus.Simulation.Systems
             ntt.Remove<ReviveComponent>();
             ntt.Remove<DeathTagComponent>();
 
-            if (Trace) 
+            if (IsLogging)
                 Logger.Debug("Revived '{0}' at {1}, {2}, {3}", NttWorld.Tick, Name, ntt, pos.Map, pos.Position.X, pos.Position.Y);
         }
     }

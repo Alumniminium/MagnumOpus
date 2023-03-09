@@ -1,7 +1,7 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Attack
 {
     [Component]
     public struct AttackComponent
@@ -20,5 +20,5 @@ namespace MagnumOpus.Components
 
         public override int GetHashCode() => EntityId;
     }
-    
+
 }

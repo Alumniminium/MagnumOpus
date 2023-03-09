@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
-using MagnumOpus.Components;
+using MagnumOpus.Components.Team;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 
@@ -20,7 +20,7 @@ namespace MagnumOpus.Networking.Packets
                 Size = (ushort)sizeof(MsgTeam),
                 Id = 1023,
                 Mode = action,
-                TargetUniqueId = ntt.NetId
+                TargetUniqueId = ntt.Id
             };
             return msg;
         }
@@ -38,7 +38,7 @@ namespace MagnumOpus.Networking.Packets
             switch (msg.Mode)
             {
                 case MsgTeamAction.Create:
-                    if(ntt.Has<TeamComponent>()) 
+                    if (ntt.Has<TeamComponent>())
                         return;
                     var tc = new TeamComponent(in ntt);
                     ntt.Set(ref tc);
@@ -49,7 +49,7 @@ namespace MagnumOpus.Networking.Packets
                 case MsgTeamAction.Kick:
                     break;
                 case MsgTeamAction.Invite:
-                    var target = NttWorld.GetEntityByNetId(msg.TargetUniqueId);
+                    var target = NttWorld.GetEntity(msg.TargetUniqueId);
                     if (target != default)
                     {
                         var pkt = Invite(in ntt);
@@ -57,7 +57,7 @@ namespace MagnumOpus.Networking.Packets
                     }
                     break;
                 case MsgTeamAction.AcceptInvite:
-                    var leader = NttWorld.GetEntityByNetId(msg.TargetUniqueId);
+                    var leader = NttWorld.GetEntity(msg.TargetUniqueId);
                     if (leader != default)
                     {
                         ref var team = ref leader.Get<TeamComponent>();
@@ -66,7 +66,7 @@ namespace MagnumOpus.Networking.Packets
                             team.Members[team.MemberCount] = ntt;
                             team.MemberCount++;
 
-                            for(int i = 0; i < team.MemberCount; i++)
+                            for (var i = 0; i < team.MemberCount; i++)
                             {
                                 var member = team.Members[i];
                                 var memberMsg = MsgTeamUpdate.JoinLeave(in member, MsgTeamMemberAction.AddMember);
@@ -77,6 +77,24 @@ namespace MagnumOpus.Networking.Packets
                     }
                     break;
                 case MsgTeamAction.LeaveTeam:
+                    break;
+                case MsgTeamAction.RequestJoin:
+                    break;
+                case MsgTeamAction.AcceptJoin:
+                    break;
+                case MsgTeamAction.ForbidNewMembers:
+                    break;
+                case MsgTeamAction.AllowNewMembers:
+                    break;
+                case MsgTeamAction.ForbidMoney:
+                    break;
+                case MsgTeamAction.AllowMoney:
+                    break;
+                case MsgTeamAction.ForbidItems:
+                    break;
+                case MsgTeamAction.AllowItems:
+                    break;
+                default:
                     break;
             }
         }

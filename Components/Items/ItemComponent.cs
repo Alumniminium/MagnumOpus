@@ -1,9 +1,10 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Items
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public struct ItemComponent
     {
         public readonly int EntityId;
@@ -44,7 +45,7 @@ namespace MagnumOpus.Components
             CustomTextId = customTextId;
             StackAmount = stackAmount;
         }
-        
+
 
         public override int GetHashCode()
         {

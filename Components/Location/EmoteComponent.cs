@@ -1,9 +1,10 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Location
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public readonly struct EmoteComponent
     {
         public readonly int EntityId;
@@ -16,7 +17,7 @@ namespace MagnumOpus.Components
             Emote = emote;
             ChangedTick = NttWorld.Tick;
         }
-        
+
         public override int GetHashCode() => EntityId;
     }
 }

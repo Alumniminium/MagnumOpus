@@ -1,8 +1,9 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Death
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public readonly struct RespawnTagComponent
     {
         public readonly int EntityId;
@@ -13,7 +14,7 @@ namespace MagnumOpus.Components
             EntityId = entityId;
             RespawnTimeTick = NttWorld.Tick + NttWorld.TargetTps * respawnTimeDelaySeconds;
         }
-        
+
         public override int GetHashCode() => EntityId;
     }
 }

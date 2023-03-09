@@ -1,10 +1,12 @@
-using MagnumOpus.Components;
+using MagnumOpus.Components.AI;
+using MagnumOpus.Components.Death;
+using MagnumOpus.Components.Entity;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
-using MagnumOpus.Networking;
-using MagnumOpus.Networking.Packets;
+using MagnumOpus.Helpers;
 using MagnumOpus.Squiggly;
 
-namespace MagnumOpus.Simulation.Systems
+namespace MagnumOpus.Systems
 {
     public sealed class ViewportSystem : NttSystem<PositionComponent, ViewportComponent>
     {
@@ -16,18 +18,18 @@ namespace MagnumOpus.Simulation.Systems
 
             vwp.Dirty = false;
 
-            vwp.Viewport.X = pos.Position.X - vwp.Viewport.Width / 2;
-            vwp.Viewport.Y = pos.Position.Y - vwp.Viewport.Height / 2;
+            vwp.Viewport.X = pos.Position.X - (vwp.Viewport.Width / 2);
+            vwp.Viewport.Y = pos.Position.Y - (vwp.Viewport.Height / 2);
 
             vwp.EntitiesVisibleLast.Clear();
             foreach (var e in vwp.EntitiesVisible)
-                vwp.EntitiesVisibleLast.TryAdd(e.Key, e.Value);
+                _ = vwp.EntitiesVisibleLast.TryAdd(e.Key, e.Value);
 
             vwp.EntitiesVisible.Clear();
             Collections.SpatialHashs[pos.Map].Move(in ntt, ref pos);
             Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
 
-            if (Trace) 
+            if (IsLogging)
                 Logger.Debug("{ntt} has {visibleCount} visible entities", ntt, vwp.EntitiesVisible.Count);
 
             if (ntt.Type != EntityType.Player)
@@ -42,7 +44,7 @@ namespace MagnumOpus.Simulation.Systems
                 if (b.Has<ViewportComponent>())
                 {
                     ref readonly var bvwp = ref b.Get<ViewportComponent>();
-                    bvwp.EntitiesVisible.TryAdd(ntt.Id, ntt);
+                    _ = bvwp.EntitiesVisible.TryAdd(ntt.Id, ntt);
                 }
 
                 if (b.Has<BrainComponent>())
@@ -51,11 +53,11 @@ namespace MagnumOpus.Simulation.Systems
                     if (brn.State == Enums.BrainState.Idle)
                     {
                         brn.State = Enums.BrainState.WakingUp;
-                        if (Trace)
+                        if (IsLogging)
                             Logger.Debug("{ntt} is waking up '{b}' due to distance", ntt, b);
                     }
                 }
-                
+
                 if (vwp.EntitiesVisibleLast.ContainsKey(b.Id))
                     continue;
 
@@ -72,7 +74,7 @@ namespace MagnumOpus.Simulation.Systems
                 // if (b.Has<WalkComponent>())
                 // {
                 //     ref readonly var wlk = ref b.Get<WalkComponent>();
-                //     var packet = MsgWalk.Create(b.NetId, wlk.Direction, wlk.IsRunning);
+                //     var packet = MsgWalk.Create(b.Id, wlk.Direction, wlk.IsRunning);
                 //     ntt.NetSync(ref packet, true);
                 // }
             }

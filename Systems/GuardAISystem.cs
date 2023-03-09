@@ -1,11 +1,16 @@
 using System.Numerics;
 using MagnumOpus.Components;
+using MagnumOpus.Components.AI;
+using MagnumOpus.Components.Attack;
+using MagnumOpus.Components.Death;
+using MagnumOpus.Components.Entity;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Squiggly;
 
-namespace MagnumOpus.Simulation.Systems
+namespace MagnumOpus.Systems
 {
     public sealed class GuardAISystem : NttSystem<PositionComponent, ViewportComponent, GuardPositionComponent, BrainComponent>
     {
@@ -33,7 +38,6 @@ namespace MagnumOpus.Simulation.Systems
                 var closestDistance = int.MaxValue;
                 var closestEntity = default(NTT);
 
-                
                 foreach (var kvp in vwp.EntitiesVisible)
                 {
                     var b = kvp.Value;
@@ -51,7 +55,7 @@ namespace MagnumOpus.Simulation.Systems
 
                     closestDistance = distance;
                     closestEntity = b;
-                    if (Trace)
+                    if (IsLogging)
                         Logger.Debug("{ntt} found {b} distance {dist}", ntt, b, distance);
                 }
 
@@ -85,7 +89,7 @@ namespace MagnumOpus.Simulation.Systems
                 }
 
                 ref readonly var target = ref NttWorld.GetEntity(brn.TargetId);
-                if(target.Has<DeathTagComponent>() || target.Type != EntityType.Monster)
+                if (target.Has<DeathTagComponent>() || target.Type != EntityType.Monster)
                 {
                     brn.TargetId = 0;
                     return;
@@ -93,10 +97,7 @@ namespace MagnumOpus.Simulation.Systems
 
                 var distance = (int)Vector2.Distance(pos.Position, brn.TargetPosition);
 
-                if (distance > 1)
-                    brn.State = BrainState.Approaching;
-                else
-                    brn.State = BrainState.Attacking;
+                brn.State = distance > 1 ? BrainState.Approaching : BrainState.Attacking;
             }
 
             if (brn.State == BrainState.Approaching)
@@ -106,7 +107,7 @@ namespace MagnumOpus.Simulation.Systems
                 var wlk = new WalkComponent(ntt.Id, dir, true);
                 ntt.Set(ref wlk);
 
-                if (Trace)
+                if (IsLogging)
                     Logger.Debug("{ntt} walking towards {target}", ntt, brn.TargetPosition);
             }
 
@@ -115,7 +116,7 @@ namespace MagnumOpus.Simulation.Systems
                 ref readonly var _target = ref NttWorld.GetEntity(brn.TargetId);
                 var atk = new AttackComponent(ntt.Id, in _target, MsgInteractType.Physical);
                 ntt.Set(ref atk);
-                if (Trace)
+                if (IsLogging)
                     Logger.Debug("{ntt} attacking {target}", ntt, _target);
             }
 

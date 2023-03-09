@@ -2,9 +2,10 @@ using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Entity
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public struct AttributeComponent
     {
         public readonly int EntityId;
@@ -22,57 +23,57 @@ namespace MagnumOpus.Components
             {
                 strength = value;
                 ChangedTick = NttWorld.Tick;
-                ref readonly var entity = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(entity.NetId, value, MsgUserAttribType.Strength);
-                entity.NetSync(ref packet, true);
+                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
+                var packet = MsgUserAttrib.Create(ntt.Id, value, MsgUserAttribType.Strength);
+                ntt.NetSync(ref packet, true);
             }
         }
         public ushort Agility
         {
-            get => agility; 
+            get => agility;
             set
             {
                 agility = value;
                 ChangedTick = NttWorld.Tick;
-                ref readonly var entity = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(entity.NetId, value, MsgUserAttribType.Agility);
-                entity.NetSync(ref packet, true);
+                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
+                var packet = MsgUserAttrib.Create(ntt.Id, value, MsgUserAttribType.Agility);
+                ntt.NetSync(ref packet, true);
             }
         }
         public ushort Vitality
         {
-            get => vitality; 
+            get => vitality;
             set
             {
                 vitality = value;
                 ChangedTick = NttWorld.Tick;
-                ref readonly var entity = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(entity.NetId, value, MsgUserAttribType.Vitality);
-                entity.NetSync(ref packet, true);
+                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
+                var packet = MsgUserAttrib.Create(ntt.Id, value, MsgUserAttribType.Vitality);
+                ntt.NetSync(ref packet, true);
             }
         }
         public ushort Spirit
         {
-            get => spirit; 
+            get => spirit;
             set
             {
                 spirit = value;
                 ChangedTick = NttWorld.Tick;
-                ref readonly var entity = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(entity.NetId, value, MsgUserAttribType.Spirit);
-                entity.NetSync(ref packet, true);
+                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
+                var packet = MsgUserAttrib.Create(ntt.Id, value, MsgUserAttribType.Spirit);
+                ntt.NetSync(ref packet, true);
             }
         }
         public ushort Statpoints
         {
-            get => statpoints; 
+            get => statpoints;
             set
             {
                 statpoints = value;
                 ChangedTick = NttWorld.Tick;
-                ref readonly var entity = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(entity.NetId, value, MsgUserAttribType.StatPoints);
-                entity.NetSync(ref packet, true);
+                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
+                var packet = MsgUserAttrib.Create(ntt.Id, value, MsgUserAttribType.StatPoints);
+                ntt.NetSync(ref packet, true);
             }
         }
 

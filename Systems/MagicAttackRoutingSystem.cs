@@ -1,8 +1,11 @@
 using MagnumOpus.Components;
+using MagnumOpus.Components.Attack;
+using MagnumOpus.Components.Entity;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Squiggly;
 
-namespace MagnumOpus.Simulation.Systems
+namespace MagnumOpus.Systems
 {
     public sealed class MagicAttackRoutingSystem : NttSystem<MagicAttackRequestComponent, SpellBookComponent, PositionComponent>
     {
@@ -13,7 +16,7 @@ namespace MagnumOpus.Simulation.Systems
             if (!sbc.Spells.TryGetValue((ushort)atk.SkillId, out var spell))
             {
                 ntt.Remove<MagicAttackRequestComponent>();
-                if (Trace) 
+                if (IsLogging)
                     Logger.Debug("{ntt} tried to use skill {atk.SkillId} but doesn't have it", ntt, atk.SkillId);
                 return;
             }
@@ -21,7 +24,7 @@ namespace MagnumOpus.Simulation.Systems
             if (!Collections.MagicType.TryGetValue(atk.SkillId * 10 + spell.lvl, out var magicType))
             {
                 ntt.Remove<MagicAttackRequestComponent>();
-                if (Trace) 
+                if (IsLogging)
                     Logger.Debug("{ntt} tried to use skill {atk.SkillId} but it doesn't exist", ntt, atk.SkillId);
                 return;
             }
@@ -30,7 +33,7 @@ namespace MagnumOpus.Simulation.Systems
             {
                 case 2: // heal self
                     var tcc = new TargetCollectionComponent(ntt.Id, magicType);
-                    var target = NttWorld.GetEntityByNetId(atk.TargetId);
+                    var target = NttWorld.GetEntity(atk.TargetId);
                     tcc.Targets.Add(target);
                     ntt.Set(ref tcc);
                     break;

@@ -1,10 +1,11 @@
 using System.Numerics;
-using MagnumOpus.Components;
+using MagnumOpus.Components.Entity;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
 
-namespace MagnumOpus.Simulation.Systems
+namespace MagnumOpus.Systems
 {
     public sealed class JumpSystem : NttSystem<PositionComponent, JumpComponent, BodyComponent>
     {
@@ -20,14 +21,14 @@ namespace MagnumOpus.Simulation.Systems
             vpc.Dirty = true;
 
             var direction = CoMath.GetDirection(new Vector2(jmp.Position.X, jmp.Position.Y), pos.Position);
-            var distance  = (int)Vector2.Distance(new Vector2(jmp.Position.X, jmp.Position.Y), pos.Position);
-            var jumpTime  = NttWorld.TargetTps * CoMath.GetJumpTime(distance);
-            
+            var distance = (int)Vector2.Distance(new Vector2(jmp.Position.X, jmp.Position.Y), pos.Position);
+            var jumpTime = NttWorld.TargetTps * CoMath.GetJumpTime(distance);
+
             if (jmp.CreatedTick + jumpTime < NttWorld.Tick)
             {
                 pos.Position = jmp.Position;
                 ntt.Remove<JumpComponent>();
-                if (Trace) 
+                if (IsLogging)
                     Logger.Debug("Jump complete for {ntt}", ntt);
             }
             else
@@ -41,7 +42,7 @@ namespace MagnumOpus.Simulation.Systems
 
                 PrometheusPush.JumpCount.Inc();
                 PrometheusPush.JumpDistance.Inc(distance);
-                if (Trace) 
+                if (IsLogging)
                     Logger.Debug("Jump started for {ntt}", ntt);
             }
         }

@@ -1,8 +1,8 @@
-using System.Buffers;
 using System.Runtime.InteropServices;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Components;
+using MagnumOpus.Components.Guild;
+using MagnumOpus.Components.Entity;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -19,7 +19,7 @@ namespace MagnumOpus.Networking.Packets
         {
             ref readonly var gld = ref member.Get<GuildComponent>();
             ref readonly var ntc = ref member.Get<NameTagComponent>();
-            
+
             var packet = new MsgSynMemberInfo
             {
                 Size = (ushort)sizeof(MsgSynMemberInfo),

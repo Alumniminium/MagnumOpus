@@ -8,6 +8,11 @@ using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.SpacePartitioning;
 using MagnumOpus.Squiggly.Models;
+using MagnumOpus.Components.Death;
+using MagnumOpus.Components.Location;
+using MagnumOpus.Components.Entity;
+using MagnumOpus._HerstLib.IO;
+using MagnumOpus.Components.CQ;
 
 namespace MagnumOpus.Squiggly
 {
@@ -17,10 +22,10 @@ namespace MagnumOpus.Squiggly
         {
             using var ctx = new SquigglyContext();
 
-            foreach(var cq_monstertype in ctx.cq_monstertype)
-                Collections.CqMonsterType.TryAdd(cq_monstertype.id, cq_monstertype);
+            foreach (var cq_monstertype in ctx.cq_monstertype)
+                _ = Collections.CqMonsterType.TryAdd(cq_monstertype.id, cq_monstertype);
 
-            foreach(var cq_spawn in ctx.cq_generator)
+            foreach (var cq_spawn in ctx.cq_generator)
             {
                 var spawnMin = new Vector2(cq_spawn.bound_x, cq_spawn.bound_y);
                 var spawnMax = new Vector2(cq_spawn.bound_x + cq_spawn.bound_cx, cq_spawn.bound_y + cq_spawn.bound_cy);
@@ -30,11 +35,11 @@ namespace MagnumOpus.Squiggly
                 var rectangle = new Rectangle((int)spawnMin.X, (int)spawnMin.Y, (int)width, (int)height);
 
                 ref var ntt = ref NttWorld.CreateEntity(EntityType.Other);
-                
+
                 var pos = new PositionComponent(ntt.Id, center, cq_spawn.mapid);
                 ntt.Set(ref pos);
 
-                var spawner = new SpawnerComponent(in ntt,cq_spawn.id, in rectangle, cq_spawn.npctype, cq_spawn.maxnpc, cq_spawn.rest_secs, cq_spawn.max_per_gen);
+                var spawner = new SpawnerComponent(in ntt, cq_spawn.id, in rectangle, cq_spawn.npctype, cq_spawn.maxnpc, cq_spawn.rest_secs, cq_spawn.max_per_gen);
                 ntt.Set(ref spawner);
 
                 var body = new BodyComponent(ntt.Id);
@@ -56,7 +61,7 @@ namespace MagnumOpus.Squiggly
             var sw = Stopwatch.StartNew();
             using var db = new SquigglyContext();
             foreach (var cq in db.cq_npc)
-                Collections.CqNpc.TryAdd(cq.id, cq);
+                _ = Collections.CqNpc.TryAdd(cq.id, cq);
             sw.Stop();
             FConsole.WriteLine($"Loaded {Collections.CqNpc.Count} CqNpcs in {sw.ElapsedMilliseconds}ms");
         }
@@ -74,7 +79,7 @@ namespace MagnumOpus.Squiggly
             var sw = Stopwatch.StartNew();
             using var db = new SquigglyContext();
             foreach (var cq in db.cq_action)
-                Collections.CqAction.TryAdd(cq.id, cq);
+                _ = Collections.CqAction.TryAdd(cq.id, cq);
             sw.Stop();
             FConsole.WriteLine($"Loaded {Collections.CqAction.Count} CqActions in {sw.ElapsedMilliseconds}ms");
         }
@@ -83,7 +88,7 @@ namespace MagnumOpus.Squiggly
             var sw = Stopwatch.StartNew();
             using var db = new SquigglyContext();
             foreach (var cq in db.cq_task)
-                Collections.CqTask.TryAdd(cq.id, cq);
+                _ = Collections.CqTask.TryAdd(cq.id, cq);
             sw.Stop();
             FConsole.WriteLine($"Loaded {Collections.CqTask.Count} CqTasks in {sw.ElapsedMilliseconds}ms");
         }
@@ -174,7 +179,7 @@ namespace MagnumOpus.Squiggly
                 foreach (var cqPortal in db.cq_portal.AsQueryable())
                 {
                     var portal = new CqPortal(cqPortal.mapid, cqPortal.portal_x, cqPortal.portal_y, cqPortal.id, cqPortal.portal_idx);
-                    Collections.CqPortal.Add(portal);
+                    _ = Collections.CqPortal.Add(portal);
                 }
                 foreach (var dmapPortal in db.Dmap_Portals.AsQueryable())
                 {
@@ -186,10 +191,10 @@ namespace MagnumOpus.Squiggly
                         X = dmapPortal.X,
                         Y = dmapPortal.Y,
                     };
-                    Collections.DmapPortals.Add(portal);
+                    _ = Collections.DmapPortals.Add(portal);
                 }
                 foreach (var passway in db.cq_passway)
-                    Collections.CqPassway.Add(passway);
+                    _ = Collections.CqPassway.Add(passway);
             }
             sw.Stop();
             FConsole.WriteLine($"[SquigglyLite] Loaded {Collections.CqPortal.Count}\t Portals in {sw.Elapsed.TotalMilliseconds}ms");
@@ -228,7 +233,7 @@ namespace MagnumOpus.Squiggly
                 var count = int.Parse(headerKvp.Value["ItemAmount"]);
 
                 var items = new List<int>();
-                for (int i = 0; i < count; i++)
+                for (var i = 0; i < count; i++)
                 {
                     var item = int.Parse(headerKvp.Value[$"Item{i}"]);
                     items.Add(item);
@@ -242,7 +247,7 @@ namespace MagnumOpus.Squiggly
         public static unsafe void LoadDatFiles()
         {
             var Cipher = new COFAC();
-            string TmpFile = Path.GetTempFileName();
+            var TmpFile = Path.GetTempFileName();
             Cipher.GenerateKey(0x2537);
 
             using (FileStream Reader = new("CLIENT_FILES/itemtype.dat", FileMode.Open, FileAccess.Read, FileShare.Read))

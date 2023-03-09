@@ -2,9 +2,10 @@ using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Items
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public struct InventoryComponent
     {
         public readonly int EntityId;
@@ -15,28 +16,28 @@ namespace MagnumOpus.Components
         private uint money;
         public uint Money
         {
-            get => money; 
+            get => money;
             set
             {
                 money = value;
                 ChangedTick = NttWorld.Tick;
-                ref readonly var entity = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(entity.NetId, money, MsgUserAttribType.MoneyInventory);
-                entity.NetSync(ref packet, true);
+                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
+                var packet = MsgUserAttrib.Create(ntt.Id, money, MsgUserAttribType.MoneyInventory);
+                ntt.NetSync(ref packet, true);
             }
         }
 
         private uint cps;
         public uint CPs
         {
-            get => cps; 
+            get => cps;
             set
             {
                 cps = value;
                 ChangedTick = NttWorld.Tick;
-                ref readonly var entity = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(entity.NetId, cps, MsgUserAttribType.CPsInventory);
-                entity.NetSync(ref packet, true);
+                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
+                var packet = MsgUserAttrib.Create(ntt.Id, cps, MsgUserAttribType.CPsInventory);
+                ntt.NetSync(ref packet, true);
             }
         }
 

@@ -1,9 +1,8 @@
-using System.Buffers;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Components;
+using MagnumOpus.Components.Location;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -30,7 +29,7 @@ namespace MagnumOpus.Networking.Packets
                 Size = (ushort)sizeof(MsgColor),
                 Id = 1010,
                 Timestamp = Environment.TickCount,
-                UniqueId = ntt.NetId,
+                UniqueId = ntt.Id,
                 X = (ushort)pos.Position.X,
                 Y = (ushort)pos.Position.Y,
                 Direction = bdy.Direction,
@@ -49,7 +48,7 @@ namespace MagnumOpus.Networking.Packets
                 Size = (ushort)sizeof(MsgColor),
                 Id = 1010,
                 Timestamp = Environment.TickCount,
-                UniqueId = ntt.NetId,
+                UniqueId = ntt.Id,
                 X = (ushort)pos.Position.X,
                 Y = (ushort)pos.Position.Y,
                 Direction = bdy.Direction,

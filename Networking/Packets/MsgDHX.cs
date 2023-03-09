@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -32,7 +31,7 @@ namespace MagnumOpus.Networking.Packets
         public fixed byte Generator[2];
         [FieldOffset(223)]
         public uint PublicKeyLen;
-        [FieldOffset(227)]  
+        [FieldOffset(227)]
         public fixed byte PublicKey[128];
 
         public static MsgDHX Create(in Memory<byte> civ, Memory<byte> siv, string p, string g, string pubkey)

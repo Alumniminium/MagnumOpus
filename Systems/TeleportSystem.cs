@@ -1,10 +1,9 @@
 using System.Numerics;
-using HerstLib.IO;
-using MagnumOpus.Components;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Networking.Packets;
 
-namespace MagnumOpus.Simulation.Systems
+namespace MagnumOpus.Systems
 {
     public sealed class TeleportSystem : NttSystem<TeleportComponent, PositionComponent>
     {
@@ -16,13 +15,13 @@ namespace MagnumOpus.Simulation.Systems
             pos.Map = tpc.Map;
             pos.ChangedTick = NttWorld.Tick;
 
-            var tpP = MsgAction.Create(ntt.NetId, tpc.Map, tpc.X, tpc.Y, Enums.Direction.South, Enums.MsgActionType.SendLocation);
+            var tpP = MsgAction.Create(ntt.Id, tpc.Map, tpc.X, tpc.Y, Enums.Direction.South, Enums.MsgActionType.SendLocation);
             ntt.NetSync(ref tpP);
             var mapStatus = MsgMapStatus.Create(tpc.Map, (uint)Enums.MapFlags.None);
             ntt.NetSync(ref mapStatus);
 
             ntt.Remove<TeleportComponent>();
-            if (Trace) 
+            if (IsLogging)
                 Logger.Debug("[{tick}] Teleported '{0}' to {1}, {2}, {3}", NttWorld.Tick, Name, ntt, tpc.Map, tpc.X, tpc.Y);
         }
     }

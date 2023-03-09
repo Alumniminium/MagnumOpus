@@ -1,18 +1,16 @@
-using System.IO;
-
-namespace HerstLib.Hardware
+namespace MagnumOpus._HerstLib.Hardware
 {
     public class Battery
     {
         private static string path = "/sys/class/power_supply/BAT0/";
 
         public static float CapacityPercent { get; private set; }
-        public static float ChargeFull_mAh { get; private set; }
-        public static float ChargeFullDesign_mAh { get; private set; }
-        public static float ChargeNow_mAh { get; private set; }
-        public static float Voltage_V { get; private set; }
-        public static float MinVoltage_V { get; private set; }
-        public static float Current_mAh { get; private set; }
+        public static float ChargeFullMAh { get; private set; }
+        public static float ChargeFullDesignMAh { get; private set; }
+        public static float ChargeNowMAh { get; private set; }
+        public static float VoltageV { get; private set; }
+        public static float MinVoltageV { get; private set; }
+        public static float CurrentMAh { get; private set; }
         public static int CycleCount { get; private set; }
         public static string? Status { get; private set; }
         public static string? Type { get; private set; }
@@ -23,9 +21,9 @@ namespace HerstLib.Hardware
         public static string? CapacityLevel { get; private set; }
 
         private static float GetCapacity() => float.Parse(File.ReadAllText(path + "capacity"));
-        private static float GetChargeNow() => float.Parse(File.ReadAllText(path + "charge_now"))/1000;
-        private static float GetChargeFull() => float.Parse(File.ReadAllText(path + "charge_full"))/1000;
-        private static float GetChargeFullDesign() => float.Parse(File.ReadAllText(path + "charge_full_design"))/1000;
+        private static float GetChargeNow() => float.Parse(File.ReadAllText(path + "charge_now")) / 1000;
+        private static float GetChargeFull() => float.Parse(File.ReadAllText(path + "charge_full")) / 1000;
+        private static float GetChargeFullDesign() => float.Parse(File.ReadAllText(path + "charge_full_design")) / 1000;
         private static float GetVoltage() => float.Parse(File.ReadAllText(path + "voltage_now")) / 1000000;
         private static float GetMinVoltage() => float.Parse(File.ReadAllText(path + "voltage_min_design")) / 1000000;
         private static float GetCurrent() => float.Parse(File.ReadAllText(path + "current_now")) / 1000000;
@@ -41,14 +39,14 @@ namespace HerstLib.Hardware
         public static void Scan(string batteryPath = "/sys/class/power_supply/BAT0/")
         {
             path = batteryPath;
-            
+
             CapacityPercent = GetCapacity();
-            ChargeFull_mAh = GetChargeFull();
-            ChargeFullDesign_mAh = GetChargeFullDesign();
-            Voltage_V = GetVoltage();
-            MinVoltage_V = GetMinVoltage();
-            Current_mAh = GetCurrent();
-            ChargeNow_mAh = GetChargeNow();
+            ChargeFullMAh = GetChargeFull();
+            ChargeFullDesignMAh = GetChargeFullDesign();
+            VoltageV = GetVoltage();
+            MinVoltageV = GetMinVoltage();
+            CurrentMAh = GetCurrent();
+            ChargeNowMAh = GetChargeNow();
             Status = GetStatus();
             Type = GetBatteryType();
             Model = GetModel();

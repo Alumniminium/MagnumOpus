@@ -4,7 +4,8 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Components
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public struct HealthComponent
     {
         public readonly int EntityId;
@@ -16,9 +17,9 @@ namespace MagnumOpus.Components
             get => health; set
             {
                 health = value;
-                ref readonly var entity = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(entity.NetId, (uint)health, MsgUserAttribType.Health);
-                entity.NetSync(ref packet, true);
+                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
+                var packet = MsgUserAttrib.Create(ntt.Id, (uint)health, MsgUserAttribType.Health);
+                ntt.NetSync(ref packet, true);
             }
         }
         public int MaxHealth
@@ -26,9 +27,9 @@ namespace MagnumOpus.Components
             get => maxHealth; set
             {
                 maxHealth = value;
-                ref readonly var entity = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(entity.NetId, (uint)maxHealth, MsgUserAttribType.MaxHealth);
-                entity.NetSync(ref packet, true);
+                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
+                var packet = MsgUserAttrib.Create(ntt.Id, (uint)maxHealth, MsgUserAttribType.MaxHealth);
+                ntt.NetSync(ref packet, true);
             }
         }
 

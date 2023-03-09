@@ -1,9 +1,9 @@
-using System.Buffers;
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Location
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public readonly struct TeleportComponent
     {
         public readonly int EntityId;

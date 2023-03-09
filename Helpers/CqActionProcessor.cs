@@ -1,6 +1,12 @@
 using System.Globalization;
 using HerstLib.IO;
 using MagnumOpus.Components;
+using MagnumOpus.Components.CQ;
+using MagnumOpus.Components.Death;
+using MagnumOpus.Components.Entity;
+using MagnumOpus.Components.Items;
+using MagnumOpus.Components.Leveling;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
@@ -17,7 +23,7 @@ namespace MagnumOpus.Helpers
     }
     public static class CqActionProcessor
     {
-        private static readonly bool _trace = false;
+        private static readonly bool Trace = false;
 
         private static readonly Dictionary<string, Func<long, long, long>> AttrOpts = new()
         {
@@ -48,11 +54,7 @@ namespace MagnumOpus.Helpers
                         }
                         return false;
                     }
-                    if(BooleanAttrOpts.TryGetValue(op, out var boolFunc))
-                        return boolFunc(x.Money, targetVal);
-
-                    return false;
-                }
+                    return BooleanAttrOpts.TryGetValue(op, out var boolFunc) && boolFunc(x.Money, targetVal); }
             },
             { "virtue", (ntt, targetVal, op) =>
                 {
@@ -67,10 +69,7 @@ namespace MagnumOpus.Helpers
                         }
                         return false;
                     }
-                    if(BooleanAttrOpts.TryGetValue(op, out var boolFunc))
-                        return boolFunc(x.Points, targetVal);
-                    return false;
-                }
+                    return BooleanAttrOpts.TryGetValue(op, out var boolFunc) && boolFunc(x.Points, targetVal); }
             },
             { "profession", (ntt, targetVal, op) =>
                 {
@@ -85,10 +84,7 @@ namespace MagnumOpus.Helpers
                         }
                         return false;
                     }
-                    if(BooleanAttrOpts.TryGetValue(op, out var boolFunc))
-                        return boolFunc((long)x.Profession, targetVal);
-                    return false;
-                }
+                    return BooleanAttrOpts.TryGetValue(op, out var boolFunc) && boolFunc((long)x.Profession, targetVal); }
             },
             { "level", (ntt, targetVal, op) =>
                 {
@@ -103,10 +99,7 @@ namespace MagnumOpus.Helpers
                         }
                         return false;
                     }
-                    if(BooleanAttrOpts.TryGetValue(op, out var boolFunc))
-                        return boolFunc(x.Level, targetVal);
-                    return false;
-                }
+                    return BooleanAttrOpts.TryGetValue(op, out var boolFunc) && boolFunc(x.Level, targetVal); }
             },
             { "life", (ntt, targetVal, op) =>
                 {
@@ -121,10 +114,7 @@ namespace MagnumOpus.Helpers
                         }
                         return false;
                     }
-                    if(BooleanAttrOpts.TryGetValue(op, out var boolFunc))
-                        return boolFunc(x.Health, targetVal);
-                    return false;
-                }
+                    return BooleanAttrOpts.TryGetValue(op, out var boolFunc) && boolFunc(x.Health, targetVal); }
             },
             { "metempsychosis", (ntt, targetVal, op) =>
                 {
@@ -139,10 +129,7 @@ namespace MagnumOpus.Helpers
                         }
                         return false;
                     }
-                    if(BooleanAttrOpts.TryGetValue(op, out var boolFunc))
-                        return boolFunc(x.Count, targetVal);
-                    return false;
-                }
+                    return BooleanAttrOpts.TryGetValue(op, out var boolFunc) && boolFunc(x.Count, targetVal); }
             },
             { "ep", (ntt, targetVal, op) =>
                 {
@@ -163,10 +150,7 @@ namespace MagnumOpus.Helpers
                     // if(BooleanAttrOpts.TryGetValue(op, out var boolFunc))
                     //     return boolFunc(x.Experience, targetVal);
                     // return false;
-                    if(op=="+=")
-                        return true;
-                    return false;
-                }
+                    return op=="+="; }
             }
         };
 
@@ -243,13 +227,13 @@ namespace MagnumOpus.Helpers
 
                         if (!AttrVals.TryGetValue(attribute, out var func))
                         {
-                            if (_trace)
-                                FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> Unknown attribute {attribute} -> {action.id_nextfail}");
+                            if (Trace)
+                                FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> Unknown attribute {attribute} -> {action.id_nextfail}");
                             return action.id_nextfail;
                         }
                         var result = func(ntt, targetVal, operation);
-                        if (_trace)
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> if ({attribute} {operation} {targetVal}) -> {result} -> {(result ? action.id_next : action.id_nextfail)}");
+                        if (Trace)
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> if ({attribute} {operation} {targetVal}) -> {result} -> {(result ? action.id_next : action.id_nextfail)}");
                         return result ? action.id_next : action.id_nextfail;
                     }
                 case TaskActionType.ACTION_USER_CHGMAP:
@@ -259,8 +243,8 @@ namespace MagnumOpus.Helpers
                         var x = int.Parse(parameters[1]);
                         var y = int.Parse(parameters[2]);
 
-                        if (_trace)
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {x},{y},{mapId} -> {action.id_next}");
+                        if (Trace)
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {x},{y},{mapId} -> {action.id_next}");
 
                         var tpc = new TeleportComponent(ntt.Id, (ushort)x, (ushort)y, (ushort)mapId);
                         ntt.Set(ref tpc);
@@ -269,8 +253,8 @@ namespace MagnumOpus.Helpers
                 case TaskActionType.ACTION_USER_CHGMAPRECORD:
                     {
                         ref readonly var rpc = ref ntt.Get<RecordPointComponent>();
-                        if (_trace)
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {rpc.X},{rpc.Y},{rpc.Map} {(rpc.EntityId != 0 ? action.id_next : action.id_nextfail)}");
+                        if (Trace)
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {rpc.X},{rpc.Y},{rpc.Map} {(rpc.EntityId != 0 ? action.id_next : action.id_nextfail)}");
 
                         if (rpc.EntityId != 0)
                         {
@@ -284,8 +268,8 @@ namespace MagnumOpus.Helpers
                     {
                         ref readonly var pkc = ref ntt.Get<PkPointComponent>();
                         var wanted = pkc.Points >= 100;
-                        if (_trace)
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {wanted} -> {(wanted ? action.id_next : action.id_nextfail)}");
+                        if (Trace)
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {wanted} -> {(wanted ? action.id_next : action.id_nextfail)}");
                         return wanted ? action.id_next : action.id_nextfail;
                     }
                 case TaskActionType.ACTION_USER_RECORDPOINT:
@@ -298,8 +282,8 @@ namespace MagnumOpus.Helpers
                         var rpc = new RecordPointComponent(ntt.Id, x, y, map);
                         ntt.Set(ref rpc);
 
-                        if (_trace)
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {x},{y},{map} -> {action.id_next}");
+                        if (Trace)
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {x},{y},{map} -> {action.id_next}");
 
                         return action.id_next;
                     }
@@ -312,14 +296,12 @@ namespace MagnumOpus.Helpers
                         ref var sbc = ref ntt.Get<SpellBookComponent>();
                         var checkResult = sbc.Spells.ContainsKey(skillId);
 
-                        if (_trace)
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {op} {skillId} -> {(op == "check" ? checkResult : !checkResult)} -> {(op == "check" ? (checkResult ? action.id_next : action.id_nextfail) : (!checkResult ? action.id_next : action.id_nextfail))}");
+                        if (Trace)
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {op} {skillId} -> {(op == "check" ? checkResult : !checkResult)} -> {(op == "check" ? (checkResult ? action.id_next : action.id_nextfail) : (!checkResult ? action.id_next : action.id_nextfail))}");
 
                         if (op == "check")
                         {
-                            if (checkResult)
-                                return action.id_next;
-                            return action.id_nextfail;
+                            return checkResult ? action.id_next : action.id_nextfail;
                         }
                         else if (op == "learn" && !checkResult)
                         {
@@ -338,28 +320,28 @@ namespace MagnumOpus.Helpers
                         ref var head = ref ntt.Get<HeadComponent>();
                         var color = head.Hair / 100 * 100;
                         head.Hair = (ushort)(color + int.Parse(style));
-                        if (_trace)
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> Color: {color}, Style: {style}) -> {head.Hair} -> {action.id_next}");
+                        if (Trace)
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> Color: {color}, Style: {style}) -> {head.Hair} -> {action.id_next}");
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_USER_MEDIAPLAY:
                     {
                         var parameters = action.param.Trim().Split(' ');
                         var media = parameters[1];
-                        var msg = MsgName.Create(ntt.NetId, media, (byte)MsgNameType.Sound);
+                        var msg = MsgName.Create(ntt.Id, media, (byte)MsgNameType.Sound);
                         ntt.NetSync(ref msg);
-                        if (_trace)
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {media} -> {action.id_next}");
+                        if (Trace)
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {media} -> {action.id_next}");
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_USER_EFFECT:
                     {
                         var parameters = action.param.Trim().Split(' ');
                         var effect = parameters[1];
-                        var msg = MsgName.Create(ntt.NetId, effect, (byte)MsgNameType.RoleEffect);
+                        var msg = MsgName.Create(ntt.Id, effect, (byte)MsgNameType.RoleEffect);
                         ntt.NetSync(ref msg, true);
-                        if (_trace)
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {effect} -> {action.id_next}");
+                        if (Trace)
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {effect} -> {action.id_next}");
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_RAND:
@@ -371,13 +353,10 @@ namespace MagnumOpus.Helpers
                         var chance = a / (float)b;
                         var result = Random.Shared.NextSingle();
 
-                        if (_trace)
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {a}/{b} -> {chance * 100}% -> {result * 100}% -> {(result < chance ? "Success" : "Fail")} -> {(result < chance ? action.id_next : action.id_nextfail)}");
+                        if (Trace)
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {a}/{b} -> {chance * 100}% -> {result * 100}% -> {(result < chance ? "Success" : "Fail")} -> {(result < chance ? action.id_next : action.id_nextfail)}");
 
-                        if (result < chance)
-                            return action.id_next;
-
-                        return action.id_nextfail;
+                        return result < chance ? action.id_next : action.id_nextfail;
                     }
                 case TaskActionType.ACTION_RANDACTION:
                     {
@@ -385,14 +364,14 @@ namespace MagnumOpus.Helpers
                         var idx = Random.Shared.Next(0, 8);
                         var next = long.Parse(parameters[idx]);
 
-                        if (_trace)
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {action.param.Trim()} -> Random Dice: {idx} -> {next}");
+                        if (Trace)
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {action.param.Trim()} -> Random Dice: {idx} -> {next}");
                         return next;
                     }
                 case TaskActionType.ACTION_MAP_MOVENPC:
                     {
-                        if (_trace)
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> NOT CODED YET -> {action.id_next}");
+                        if (Trace)
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> NOT CODED YET -> {action.id_next}");
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_MST_DROPITEM:
@@ -404,8 +383,8 @@ namespace MagnumOpus.Helpers
                         var itemId = int.Parse(parameters[1]);
                         var itemExists = Collections.ItemType.TryGetValue(itemId, out var entry);
 
-                        if (_trace)
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {itemId} -> {(itemExists ? "Exists" : "Fail")} -> {(itemExists ? action.id_next : action.id_nextfail)}");
+                        if (Trace)
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {itemId} -> {(itemExists ? "Exists" : "Fail")} -> {(itemExists ? action.id_next : action.id_nextfail)}");
 
                         if (!itemExists)
                             return action.id_nextfail;
@@ -424,7 +403,7 @@ namespace MagnumOpus.Helpers
                         var itemComp = new ItemComponent(itemNtt.Id, itemId, dura, entry.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
                         itemNtt.Set(ref itemComp);
 
-                        InventoryHelper.AddItem(in ntt, ref inv, in itemNtt);
+                        _ = InventoryHelper.AddItem(in ntt, ref inv, in itemNtt);
 
                         var drc = new RequestDropItemComponent(ntt.Id, in itemNtt);
                         ntt.Set(ref drc);
@@ -435,16 +414,16 @@ namespace MagnumOpus.Helpers
                     {
                         var msg = MsgText.Create("SYSTEM", "ALLUSERS", action.param.Trim(), (MsgTextType)action.data);
                         ntt.NetSync(ref msg, true);
-                        if (_trace)
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {action.param.Trim()} | {(MsgTextType)action.data} -> {action.id_next}");
+                        if (Trace)
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {action.param.Trim()} | {(MsgTextType)action.data} -> {action.id_next}");
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_ITEM_CHECK:
                     {
                         ref var inv = ref ntt.Get<InventoryComponent>();
-                        bool found = InventoryHelper.CountItemId(ref inv, action.data) > 0;
-                        if (_trace)
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {action.data} -> {(found ? "Found/Success" : "NotFound/Fail")} -> {(found ? action.id_next : action.id_nextfail)}");
+                        var found = InventoryHelper.CountItemId(ref inv, action.data) > 0;
+                        if (Trace)
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {action.data} -> {(found ? "Found/Success" : "NotFound/Fail")} -> {(found ? action.id_next : action.id_nextfail)}");
 
                         return action.id_nextfail;
                     }
@@ -459,15 +438,15 @@ namespace MagnumOpus.Helpers
                         var count = 0;
 
                         ref readonly var inv = ref ntt.Get<InventoryComponent>();
-                        for (int i = 0; i < inv.Items.Length; i++)
+                        for (var i = 0; i < inv.Items.Length; i++)
                         {
                             ref readonly var item = ref inv.Items[i].Get<ItemComponent>();
                             if (chkRange.Contains(item.Id))
                                 count++;
                         }
 
-                        if (_trace)
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {action.param.Trim()} -> {(count >= chkCount ? "Found/Success" : "NotFound/Fail")} -> {(count >= chkCount ? action.id_next : action.id_nextfail)}");
+                        if (Trace)
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {action.param.Trim()} -> {(count >= chkCount ? "Found/Success" : "NotFound/Fail")} -> {(count >= chkCount ? action.id_next : action.id_nextfail)}");
                         return count >= chkCount ? action.id_next : action.id_nextfail;
                     }
                 case TaskActionType.ACTION_ITEM_MULTIDEL:
@@ -481,13 +460,13 @@ namespace MagnumOpus.Helpers
                         var count = 0;
 
                         ref readonly var inv = ref ntt.Get<InventoryComponent>();
-                        for (int i = 0; i < inv.Items.Length; i++)
+                        for (var i = 0; i < inv.Items.Length; i++)
                         {
                             ref readonly var item = ref inv.Items[i].Get<ItemComponent>();
 
                             if (chkRange.Contains(item.Id))
                             {
-                                var msg = MsgItem.Create(ntt.NetId, inv.Items[i].NetId, inv.Items[i].NetId, MsgItemType.RemoveInventory);
+                                var msg = MsgItem.Create(ntt.Id, inv.Items[i].Id, inv.Items[i].Id, MsgItemType.RemoveInventory);
                                 ntt.NetSync(ref msg);
                                 count++;
 
@@ -499,8 +478,8 @@ namespace MagnumOpus.Helpers
                                 break;
                         }
 
-                        if (_trace)
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {action.param.Trim()} -> {(count >= chkCount ? "Found/Success" : "NotFound/Fail")} -> {(count >= chkCount ? action.id_next : action.id_nextfail)}");
+                        if (Trace)
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {action.param.Trim()} -> {(count >= chkCount ? "Found/Success" : "NotFound/Fail")} -> {(count >= chkCount ? action.id_next : action.id_nextfail)}");
                         return count >= chkCount ? action.id_next : action.id_nextfail;
                     }
                 case TaskActionType.ACTION_ITEM_LEAVESPACE:
@@ -509,8 +488,8 @@ namespace MagnumOpus.Helpers
                         var chkCount = action.data;
                         var success = InventoryHelper.HasFreeSpace(ref inv, chkCount);
 
-                        if (_trace)
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {chkCount} -> {(success ? "Success" : "Fail")} -> {(success ? action.id_next : action.id_nextfail)}");
+                        if (Trace)
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {chkCount} -> {(success ? "Success" : "Fail")} -> {(success ? action.id_next : action.id_nextfail)}");
                         return success ? action.id_next : action.id_nextfail;
                     }
                 case TaskActionType.ACTION_ITEM_ADD:
@@ -519,8 +498,8 @@ namespace MagnumOpus.Helpers
                         var itemFound = Collections.ItemType.TryGetValue(itemId, out var itemType);
                         if (!itemFound)
                         {
-                            if (_trace)
-                                FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {itemId} -> Fail -> {action.id_nextfail}");
+                            if (Trace)
+                                FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {itemId} -> Fail -> {action.id_nextfail}");
                             return action.id_nextfail;
                         }
 
@@ -528,15 +507,15 @@ namespace MagnumOpus.Helpers
 
                         if (!InventoryHelper.HasFreeSpace(ref inv))
                         {
-                            if (_trace)
-                                FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {itemId} -> Fail -> {action.id_nextfail}");
+                            if (Trace)
+                                FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {itemId} -> Fail -> {action.id_nextfail}");
                             return action.id_nextfail;
                         }
 
                         ref var itemNtt = ref NttWorld.CreateEntity(EntityType.Item);
                         var item = new ItemComponent(itemNtt.Id, itemId, itemType.Amount, itemType.AmountLimit, 0, 0, 0, 0, 0, 0, RebornItemEffect.None, 0);
                         itemNtt.Set(ref item);
-                        InventoryHelper.AddItem(in ntt, ref inv, in itemNtt, netSync: true);
+                        _ = InventoryHelper.AddItem(in ntt, ref inv, in itemNtt, netSync: true);
 
                         return action.id_next;
                     }
@@ -548,7 +527,7 @@ namespace MagnumOpus.Helpers
                         if (!InventoryHelper.HasItemId(ref inv, itemId))
                             return action.id_nextfail;
 
-                        InventoryHelper.RemoveItemId(ref inv, itemId, destroy: true);
+                        _ = InventoryHelper.RemoveItemId(ref inv, itemId, destroy: true);
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_ITEM_DELTHIS:
@@ -559,7 +538,7 @@ namespace MagnumOpus.Helpers
                         if (!InventoryHelper.HasItemId(ref inv, itemId))
                             return action.id_nextfail;
 
-                        InventoryHelper.RemoveItemId(ref inv, itemId, destroy: true);
+                        _ = InventoryHelper.RemoveItemId(ref inv, itemId, destroy: true);
 
                         return action.id_next;
                     }
@@ -597,13 +576,13 @@ namespace MagnumOpus.Helpers
 
                             var isNow = startTime <= DateTime.Now && DateTime.Now <= endTime;
 
-                            if (_trace)
-                                FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.NetId} -> {taskType} -> {startTime} to {endTime} -> {(isNow ? "Success" : "Fail")} -> {(isNow ? action.id_next : action.id_nextfail)}");
+                            if (Trace)
+                                FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {startTime} to {endTime} -> {(isNow ? "Success" : "Fail")} -> {(isNow ? action.id_next : action.id_nextfail)}");
 
                             return isNow ? action.id_next : action.id_nextfail;
                         }
                     }
-                    case TaskActionType.ACTION_MAP_FIREWORKS:
+                case TaskActionType.ACTION_MAP_FIREWORKS:
                     {
                         /*
                             When Using Fireworks in the Market (only one of the three)

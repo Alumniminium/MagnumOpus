@@ -2,7 +2,8 @@ using MagnumOpus.ECS;
 
 namespace MagnumOpus.Components
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public readonly struct HealthRegenComponent
     {
         public readonly int EntityId;

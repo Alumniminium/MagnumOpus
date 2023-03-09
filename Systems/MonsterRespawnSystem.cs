@@ -1,5 +1,11 @@
 using System.Numerics;
 using MagnumOpus.Components;
+using MagnumOpus.Components.AI;
+using MagnumOpus.Components.CQ;
+using MagnumOpus.Components.Death;
+using MagnumOpus.Components.Entity;
+using MagnumOpus.Components.Items;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
@@ -7,7 +13,7 @@ using MagnumOpus.Networking.Packets;
 using MagnumOpus.SpacePartitioning;
 using MagnumOpus.Squiggly;
 
-namespace MagnumOpus.Simulation.Systems
+namespace MagnumOpus.Systems
 {
     public sealed class MonsterRespawnSystem : NttSystem<SpawnerComponent, PositionComponent>
     {
@@ -35,11 +41,11 @@ namespace MagnumOpus.Simulation.Systems
                 return;
             }
 
-            if (Trace)
+            if (IsLogging)
                 Logger.Debug("{ntt} respawning {num} of {mob} on map {map}", _, spc.GenPerTimer, cqMob.name, cqMap);
 
 
-            for (int i = 0; i < spc.GenPerTimer; i++)
+            for (var i = 0; i < spc.GenPerTimer; i++)
             {
                 var prefab = cqMob;
                 ref var mob = ref NttWorld.CreateEntity(EntityType.Monster);
@@ -55,7 +61,7 @@ namespace MagnumOpus.Simulation.Systems
                 var fsp = new FromSpawnerComponent(mob.Id, _.Id);
 
                 var items = ItemGenerator.GetDropItemsFor(cqm.CqMonsterId);
-                for (int x = 0; x < items.Count; x++)
+                for (var x = 0; x < items.Count; x++)
                 {
                     var item = items[x];
 
@@ -77,7 +83,7 @@ namespace MagnumOpus.Simulation.Systems
                     mob.Set(ref cq);
                 }
 
-                if (prefab.lookface == 900 || prefab.lookface == 910)
+                if (prefab.lookface is 900 or 910)
                 {
                     var grd = new GuardPositionComponent(mob.Id, new Vector2(spc.SpawnArea.X, spc.SpawnArea.Y));
                     mob.Set(ref grd);
@@ -85,7 +91,7 @@ namespace MagnumOpus.Simulation.Systems
 
                 vwp.Viewport.X = mpos.Position.X;
                 vwp.Viewport.Y = mpos.Position.Y;
-                vwp.Dirty=true;
+                vwp.Dirty = true;
                 mob.Set(ref mpos);
                 mob.Set(ref bdy);
                 mob.Set(ref hp);
@@ -105,7 +111,7 @@ namespace MagnumOpus.Simulation.Systems
 
                 spc.Count++;
 
-                if (Trace)
+                if (IsLogging)
                 {
                     Logger.Debug("{ntt} spawned {mob} at {pos}", mob, cqMob.name, mpos.Position);
                     var msgTalk = MsgText.Create(in _, "Respawning " + ntc.Name + " at " + mpos.Position.X + ", " + mpos.Position.Y);

@@ -16,12 +16,12 @@ namespace MagnumOpus.Networking.Packets
         public fixed byte Password[16];
         [FieldOffset(36)]
         public fixed byte Server[16];
-        
+
         public string GetUsername()
         {
             fixed (byte* ptr = Username)
                 return Encoding.ASCII.GetString(ptr, 16).Trim('\0');
-        }        
+        }
 
         public string GetPassword()
         {

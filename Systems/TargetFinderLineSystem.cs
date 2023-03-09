@@ -1,10 +1,14 @@
 using System.Numerics;
 using MagnumOpus.Components;
+using MagnumOpus.Components.Attack;
+using MagnumOpus.Components.Death;
+using MagnumOpus.Components.Entity;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
 
-namespace MagnumOpus.Simulation.Systems
+namespace MagnumOpus.Systems
 {
     public sealed class TargetFinderLineSystem : NttSystem<LineTargetComponent, PositionComponent, ViewportComponent>
     {
@@ -28,9 +32,9 @@ namespace MagnumOpus.Simulation.Systems
 
                 if (!CoMath.DdaLine(pos.Position, new Vector2(atk.X, atk.Y), atk.MagicType.Distance, bPos.Position))
                     continue;
-                
+
                 tcc.Targets.Add(b);
-                if (Trace)
+                if (IsLogging)
                     Logger.Debug("{ntt} adding {b} to target list of {skill}:{level}", ntt, b, atk.MagicType.MagicType, atk.MagicType.Level);
             }
 

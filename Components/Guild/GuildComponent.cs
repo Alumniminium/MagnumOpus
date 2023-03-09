@@ -1,9 +1,10 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Guild
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public struct GuildComponent
     {
         public readonly int EntityId;

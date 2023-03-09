@@ -17,6 +17,6 @@ namespace MagnumOpus.Components
             Ping = 0;
         }
 
-        public override int GetHashCode() => EntityId;        
+        public override int GetHashCode() => EntityId;
     }
 }

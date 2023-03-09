@@ -1,8 +1,9 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Entity
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public struct VirtuePointComponent
     {
         public readonly int EntityId;

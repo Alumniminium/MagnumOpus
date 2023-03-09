@@ -4,7 +4,7 @@ using System.Text;
 namespace MagnumOpus.Networking.Packets
 {
     [StructLayout(LayoutKind.Explicit, Pack = 1)]
-    public unsafe  struct MsgAccountResponse
+    public unsafe struct MsgAccountResponse
     {
         [FieldOffset(0)]
         public ushort Size;
@@ -29,7 +29,7 @@ namespace MagnumOpus.Networking.Packets
                 ClientId = key2,
                 Port = port
             };
-            
+
             var ipBytes = Encoding.ASCII.GetBytes(serverIP);
             for (var i = 0; i < ipBytes.Length; i++)
                 packet.ServerIP[i] = ipBytes[i];

@@ -24,7 +24,7 @@ namespace MagnumOpus.Networking.Cryptography
         /// </summary>
         /// <param name="p">Prime root to modulo with the generated probable prime.</param>
         /// <param name="g">Generator used to seed the modulo of primes.</param>
-        public DiffieHellman(string p = DefaultPrimativeRoot,string g = DefaultGenerator)
+        public DiffieHellman(string p = DefaultPrimativeRoot, string g = DefaultGenerator)
         {
             PrimeRoot = new BigInteger(p, 16);
             Generator = new BigInteger(g, 16);
@@ -45,7 +45,7 @@ namespace MagnumOpus.Networking.Cryptography
         /// <returns>Bytes representing the private key for Blowfish Cipher.</returns>
         public void ComputePrivateKey(string clientKeyString)
         {
-            BigInteger clientKey = new(clientKeyString,16);
+            BigInteger clientKey = new(clientKeyString, 16);
             PrivateKey = clientKey.ModPow(Modulus, PrimeRoot);
         }
 

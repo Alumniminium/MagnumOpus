@@ -1,9 +1,11 @@
 using MagnumOpus.Components;
+using MagnumOpus.Components.Entity;
+using MagnumOpus.Components.Leveling;
 using MagnumOpus.ECS;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Squiggly;
 
-namespace MagnumOpus.Simulation.Systems
+namespace MagnumOpus.Systems
 {
     public sealed class ExpRewardSystem : NttSystem<LevelComponent, ExpRewardComponent>
     {
@@ -16,7 +18,7 @@ namespace MagnumOpus.Simulation.Systems
             if (lvl.Experience < lvl.ExperienceToNextLevel)
             {
                 ntt.Remove<ExpRewardComponent>();
-                if (Trace)
+                if (IsLogging)
                     Logger.Debug("{ntt} gained {exp} exp, now at {current}/{next} (level: {lvl})", ntt, rew.Experience, lvl.Experience, lvl.ExperienceToNextLevel, lvl.Level);
                 return;
             }
@@ -30,7 +32,7 @@ namespace MagnumOpus.Simulation.Systems
             lvl.ChangedTick = NttWorld.Tick;
             hlt.Health = hlt.MaxHealth;
 
-            var allot = Collections.CqPointAllot.FirstOrDefault(x => x.level == level && x.profession == ((long)profession / 10));
+            var allot = Collections.CqPointAllot.FirstOrDefault(x => x.level == level && x.profession == (long)profession / 10);
             if (allot != null)
             {
                 ref var pnt = ref ntt.Get<AttributeComponent>();
@@ -40,10 +42,10 @@ namespace MagnumOpus.Simulation.Systems
                 pnt.Spirit = (ushort)allot.soul;
             }
 
-            var lvlActionMsg = MsgAction.Create(ntt.NetId, 0, 0, 0, 0, Enums.MsgActionType.LevelUp);
+            var lvlActionMsg = MsgAction.Create(ntt.Id, 0, 0, 0, 0, Enums.MsgActionType.LevelUp);
             ntt.NetSync(ref lvlActionMsg, true);
 
-            if (Trace)
+            if (IsLogging)
                 Logger.Debug("{ntt} gained {exp} exp and leveled to {lvl}, now at {current}/{next} (level: {lvl})", ntt, rew.Experience, lvl.Level, lvl.Experience, lvl.ExperienceToNextLevel, lvl.Level);
 
             ntt.Remove<ExpRewardComponent>();

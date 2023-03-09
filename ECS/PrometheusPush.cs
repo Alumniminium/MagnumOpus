@@ -12,8 +12,8 @@ namespace MagnumOpus.ECS
 
         public static readonly Counter NTTCreations = Metrics.CreateCounter("MO_NTT_CREATION_COUNT", "Amount of times an NTT was created");
         public static readonly Counter NTTDestroys = Metrics.CreateCounter("MO_NTT_DELETION_COUNT", "Amount of times an NTT was destroyed");
-        public static readonly Counter NTTChanges = Metrics.CreateCounter("MO_NTT_CHANGE_COUNT",  "Amount of times an NTT was changed");
-        public static readonly Counter LoginCount = Metrics.CreateCounter("MO_LOGIN_COUNT",  "Amount of times a player logged in");
+        public static readonly Counter NTTChanges = Metrics.CreateCounter("MO_NTT_CHANGE_COUNT", "Amount of times an NTT was changed");
+        public static readonly Counter LoginCount = Metrics.CreateCounter("MO_LOGIN_COUNT", "Amount of times a player logged in");
         public static readonly Counter WalkCount = Metrics.CreateCounter("MO_WALK_COUNT", "Amount of times a player walked");
         public static readonly Counter JumpCount = Metrics.CreateCounter("MO_JUMP_COUNT", "Amount of times a player jumped");
         public static readonly Counter JumpDistance = Metrics.CreateCounter("MO_JUMP_DISTANCE", "Amount of distance a player jumped");
@@ -27,7 +27,7 @@ namespace MagnumOpus.ECS
 
         public static readonly Counter ServerIncome = Metrics.CreateCounter("MO_SERVER_INCOME", "Amount of Money earned by the Server");
         public static readonly Counter ServerExpenses = Metrics.CreateCounter("MO_SERVER_EXPENSES", "Amount of Money spent by the Server");
-# endregion
+        #endregion
         #region Drop Metrics
         public static readonly Counter MeteorDropsCount = Metrics.CreateCounter("MO_DROPS_METEOR", "Amount of Meteors dropped");
         public static readonly Counter DragonballDropsCount = Metrics.CreateCounter("MO_DROPS_DRAGONBALL", "Amount of Dragonballs dropped");

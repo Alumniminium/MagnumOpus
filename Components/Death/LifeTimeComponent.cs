@@ -1,8 +1,9 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Death
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public struct LifeTimeComponent
     {
         public readonly int EntityId;
@@ -11,7 +12,7 @@ namespace MagnumOpus.Components
         public LifeTimeComponent(int entityId, TimeSpan timespan)
         {
             EntityId = entityId;
-            ExpireTick = (uint)(NttWorld.Tick + (NttWorld.TargetTps * timespan.TotalSeconds));
+            ExpireTick = (uint)(NttWorld.Tick + NttWorld.TargetTps * timespan.TotalSeconds);
         }
         public override int GetHashCode() => EntityId;
     }

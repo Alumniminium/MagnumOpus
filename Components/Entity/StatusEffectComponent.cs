@@ -2,14 +2,15 @@ using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Entity
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public struct StatusEffectComponent
     {
         public readonly int EntityId;
         public long ChangedTick;
-        
+
         private StatusEffect _effects;
         public StatusEffect Effects
         {
@@ -18,9 +19,9 @@ namespace MagnumOpus.Components
             {
                 _effects = value;
                 ChangedTick = NttWorld.Tick;
-                ref readonly var entity = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(entity.NetId, (uint)_effects, MsgUserAttribType.StatusEffect);
-                entity.NetSync(ref packet, true);
+                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
+                var packet = MsgUserAttrib.Create(ntt.Id, (uint)_effects, MsgUserAttribType.StatusEffect);
+                ntt.NetSync(ref packet, true);
             }
         }
 

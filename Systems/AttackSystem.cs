@@ -1,10 +1,14 @@
 using System.Numerics;
 using MagnumOpus.Components;
+using MagnumOpus.Components.AI;
+using MagnumOpus.Components.Attack;
+using MagnumOpus.Components.Death;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
 
-namespace MagnumOpus.Simulation.Systems
+namespace MagnumOpus.Systems
 {
     public sealed class AttackSystem : NttSystem<AttackComponent, PositionComponent>
     {
@@ -62,7 +66,7 @@ namespace MagnumOpus.Simulation.Systems
                     var dmg = new DamageComponent(in atk.Target, in ntt, damage);
                     atk.Target.Set(ref dmg);
 
-                    var atkPacket = MsgInteract.Create(in ntt, in atk.Target, MsgInteractType.Archer, damage/2);
+                    var atkPacket = MsgInteract.Create(in ntt, in atk.Target, MsgInteractType.Archer, damage / 2);
                     ntt.NetSync(ref atkPacket, true);
                 }
                 else

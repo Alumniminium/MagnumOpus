@@ -1,6 +1,6 @@
 namespace MagnumOpus.Networking.Cryptography
 {
-    class Keys
+    internal class Keys
     {
         public static Memory<byte> Key1 = new byte[]
         {

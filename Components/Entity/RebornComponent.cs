@@ -1,13 +1,14 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Entity
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public struct RebornComponent
     {
         public readonly int EntityId;
         public long ChangedTick;
-        
+
         public byte Count;
 
         public RebornComponent(int entityId)

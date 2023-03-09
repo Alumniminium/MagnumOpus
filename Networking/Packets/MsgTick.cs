@@ -1,10 +1,10 @@
-using System.Buffers;
 using System.Runtime.InteropServices;
 using System.Text;
 using HerstLib.IO;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Components;
+using MagnumOpus.Components.Entity;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -27,7 +27,7 @@ namespace MagnumOpus.Networking.Packets
             {
                 Size = (ushort)sizeof(MsgTick),
                 Id = PacketId.MsgTick,
-                UniqueId = target.NetId,
+                UniqueId = target.Id,
                 Timestamp = Environment.TickCount,
                 Junk1 = 0,
                 Junk2 = 0,
@@ -50,7 +50,7 @@ namespace MagnumOpus.Networking.Packets
             }
             ref var pin = ref ntt.Get<PingComponent>();
 
-            if (ntt.NetId != msg.UniqueId)
+            if (ntt.Id != msg.UniqueId)
                 FConsole.WriteLine($"UID Mismatch! {msg.UniqueId}");
             if (msg.Hash != HashName(ntc.Name))
                 FConsole.WriteLine($"Hash Mismatch! {msg.Hash}");
@@ -58,7 +58,7 @@ namespace MagnumOpus.Networking.Packets
             msg.Timestamp ^= msg.UniqueId;
             pin.Ping = Math.Abs(msg.Timestamp - pin.LastPing - 10000);
             pin.LastPing = msg.Timestamp;
-            
+
             // var pingMsg = MsgText.Create("SYSTEM", "PING", $"10s Avg Ping: {pin.Ping}ms", MsgTextType.MiniMap);
             // ntt.NetSync(ref pingMsg);
         }

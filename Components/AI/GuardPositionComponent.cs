@@ -1,9 +1,10 @@
 using System.Numerics;
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.AI
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public readonly struct GuardPositionComponent
     {
         public readonly int EntityId;
@@ -14,7 +15,7 @@ namespace MagnumOpus.Components
             EntityId = entityId;
             Position = pos;
         }
-        
-        public override int GetHashCode() => EntityId;        
+
+        public override int GetHashCode() => EntityId;
     }
 }

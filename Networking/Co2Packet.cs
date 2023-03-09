@@ -14,7 +14,7 @@ namespace MagnumOpus.Networking
             return buffer.AsMemory()[0..size];
         }
 
-        public static T Deserialze<T>(in Memory<byte> buffer) where T : unmanaged 
+        public static T Deserialze<T>(in Memory<byte> buffer) where T : unmanaged
         {
             fixed (byte* ptr = buffer.Span)
                 return *(T*)ptr;

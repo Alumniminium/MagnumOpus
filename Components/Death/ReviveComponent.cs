@@ -1,6 +1,6 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Death
 {
     [Component]
     public readonly struct ReviveComponent
@@ -10,7 +10,7 @@ namespace MagnumOpus.Components
         public ReviveComponent(int id, uint seconds)
         {
             EntityId = id;
-            ReviveTick = NttWorld.Tick + (seconds * NttWorld.TargetTps);
+            ReviveTick = NttWorld.Tick + seconds * NttWorld.TargetTps;
         }
 
         public override int GetHashCode() => EntityId;

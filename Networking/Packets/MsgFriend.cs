@@ -1,8 +1,7 @@
-using System.Buffers;
 using System.Runtime.InteropServices;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Components;
+using MagnumOpus.Components.Entity;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -29,7 +28,7 @@ namespace MagnumOpus.Networking.Packets
                 IsOnline = status,
                 Unknow1 = 0,
                 Unknow2 = 0,
-                UniqId = target.NetId,
+                UniqId = target.Id,
             };
             for (byte i = 0; i < ntc.Name.Length; i++)
                 packet.Name[i] = (byte)ntc.Name[i];

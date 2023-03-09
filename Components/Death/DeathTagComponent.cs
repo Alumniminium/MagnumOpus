@@ -1,15 +1,15 @@
-using System.Text.Json.Serialization;
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Death
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public readonly struct DeathTagComponent
     {
         public readonly int EntityId;
         public readonly NTT Killer;
         public readonly long Tick;
-        
+
         public DeathTagComponent(int entityId, in NTT killer)
         {
             EntityId = entityId;

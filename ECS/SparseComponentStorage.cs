@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -19,9 +18,9 @@ namespace MagnumOpus.ECS
             var filename = "_STATE_FILES/" + typeof(T).Name + ".json";
             if (!File.Exists(filename))
                 return;
-            
+
             using var stream = File.OpenRead(filename);
-            NttToComponents = JsonSerializer.Deserialize<Dictionary<int,T>>(stream) ?? new ();
+            NttToComponents = JsonSerializer.Deserialize<Dictionary<int, T>>(stream) ?? new();
             var time = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
             FConsole.WriteLine($"Loaded {typeof(T).Name} in {time}ms");
         }
@@ -44,9 +43,7 @@ namespace MagnumOpus.ECS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref T Get(scoped in NTT owner)
         {
-            if (NttToComponents.ContainsKey(owner.Id))
-                return ref CollectionsMarshal.GetValueRefOrNullRef(NttToComponents, owner.Id);
-            return ref Default[0];
+            return ref NttToComponents.ContainsKey(owner.Id) ? ref CollectionsMarshal.GetValueRefOrNullRef(NttToComponents, owner.Id) : ref Default[0];
         }
 
         // called via reflection @ ReflectionHelper.Remove<T>()
@@ -65,7 +62,7 @@ namespace MagnumOpus.ECS
         // called via reflection @ ReflectionHelper.Save<T>()
         private static readonly JsonSerializerOptions serializerOptions = new()
         {
-            IncludeFields=true,
+            IncludeFields = true,
             IgnoreReadOnlyFields = false,
             WriteIndented = false
         };

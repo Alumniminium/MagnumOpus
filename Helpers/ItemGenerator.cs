@@ -1,10 +1,9 @@
 using System.Text;
 using HerstLib.IO;
 using Co2Core.IO;
-using MagnumOpus.Components;
 using MagnumOpus.Enums;
 using MagnumOpus.Squiggly;
-using MagnumOpus.Squiggly.Models;
+using MagnumOpus.Components.Items;
 
 namespace MagnumOpus.Helpers
 {
@@ -16,14 +15,14 @@ namespace MagnumOpus.Helpers
         public static int GetLevel(int nType) => nType % 1000 / 10;
         public static ref ItemComponent SetLevel(ref ItemComponent item, int level)
         {
-            item.Id = item.Id / 1000 * 1000 + level * 10 + item.Id % 10;
+            item.Id = (item.Id / 1000 * 1000) + (level * 10) + (item.Id % 10);
             return ref item;
         }
         public static int GetQuality(ref ItemComponent item) => item.Id % 10;
         public static int GetQuality(int nType) => nType % 10;
         public static ref ItemComponent SetQuality(ref ItemComponent item, int quality)
         {
-            item.Id = item.Id / 10 * 10 + quality;
+            item.Id = (item.Id / 10 * 10) + quality;
             return ref item;
         }
         public static int GetItemSubtype(ref ItemComponent item) => item.Id / 1000;
@@ -49,12 +48,12 @@ namespace MagnumOpus.Helpers
 
         public static int GetItemIdFromMoney(int money)
         {
-            int id = 1090000; //Silver
-            if (money <= 100 && money >= 10)
+            var id = 1090000; //Silver
+            if (money is <= 100 and >= 10)
                 id = 1090010; //Sycee
-            else if (money <= 1000 && money >= 100)
+            else if (money is <= 1000 and >= 100)
                 id = 1090020; //Gold
-            else if (money <= 10000 && money >= 1000)
+            else if (money is <= 10000 and >= 1000)
                 id = 1091010; //GoldBar
             else if (money > 10000)
                 id = 1091020; //GoldBarsa
@@ -95,7 +94,7 @@ namespace MagnumOpus.Helpers
             var level = possibleCombination.Item1;
             var type = possibleCombination.Item2[Random.Shared.Next(0, possibleCombination.Item2.Length)];
 
-            item.Id = type * 1000 + level * 10 + Random.Shared.Next(0, 5);
+            item.Id = (type * 1000) + (level * 10) + Random.Shared.Next(0, 5);
             // item = GenerateQuality(ref item, mobLevel);
 
             if (!Collections.ItemType.TryGetValue(item.Id, out var entry))
@@ -151,14 +150,14 @@ namespace MagnumOpus.Helpers
 
         public static List<ItemType.Entry> GetDropItemsFor(int mobId)
         {
-            if(!Collections.Drops.TryGetValue(mobId, out var drops))
+            if (!Collections.Drops.TryGetValue(mobId, out var drops))
                 drops = new List<ItemType.Entry>();
             else
                 return drops;
-            
+
             using var ctx = new SquigglyContext();
-            var mob = ctx.cq_monstertype.FirstOrDefault(x=>x.id == mobId);
-            if(mob == null)
+            var mob = ctx.cq_monstertype.FirstOrDefault(x => x.id == mobId);
+            if (mob == null)
                 return drops;
 
             var possibleTypes = new List<(int, ushort[])>();
@@ -187,12 +186,12 @@ namespace MagnumOpus.Helpers
                 var level = kvp.Item1;
                 foreach (var t in kvp.Item2)
                 {
-                    for (int r = 0; r < 10; r++)
+                    for (var r = 0; r < 10; r++)
                     {
 
                         var item = new ItemComponent
                         {
-                            Id = t * 1000 + level * 10
+                            Id = (t * 1000) + (level * 10)
                         };
 
                         if (r > 0)
@@ -209,15 +208,15 @@ namespace MagnumOpus.Helpers
                             item.Id += (r - 1) * 100;
 
                         var entry = default(ItemType.Entry);
-                        for (int i = -2; i < 3; i++)
+                        for (var i = -2; i < 3; i++)
                         {
-                            item.Id = t * 1000 + level * 10;
+                            item.Id = (t * 1000) + (level * 10);
                             item.Id += i * 100;
 
                             if (Collections.ItemType.TryGetValue(item.Id, out entry))
                                 break;
 
-                            for (int ii = 0; ii < 5; ii++)
+                            for (var ii = 0; ii < 5; ii++)
                             {
                                 item.Id += ii;
 
@@ -259,7 +258,7 @@ namespace MagnumOpus.Helpers
                     }
                 }
             }
-            Collections.Drops.TryAdd(mob.id, drops);
+            _ = Collections.Drops.TryAdd(mob.id, drops);
             return drops;
         }
     }

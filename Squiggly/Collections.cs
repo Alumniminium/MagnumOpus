@@ -8,10 +8,10 @@ namespace MagnumOpus.Squiggly
     public static class Collections
     {
         internal static readonly Dictionary<int, SpatialHash> SpatialHashs = new();
-        
-        internal static ConcurrentDictionary<long,cq_action> CqAction = new();
-        internal static ConcurrentDictionary<long,cq_task> CqTask = new();
-        internal static ConcurrentDictionary<long,cq_npc> CqNpc = new();
+
+        internal static ConcurrentDictionary<long, cq_action> CqAction = new();
+        internal static ConcurrentDictionary<long, cq_task> CqTask = new();
+        internal static ConcurrentDictionary<long, cq_npc> CqNpc = new();
 
         public static List<cq_point_allot> CqPointAllot { get; set; } = new();
         public static HashSet<CqPortal> CqPortal { get; set; } = new();
@@ -23,7 +23,7 @@ namespace MagnumOpus.Squiggly
         public static ItemType ItemType { get; set; } = new();
         public static MagicType MagicType { get; set; } = new();
         public static Dictionary<int, ShopDatEntry> Shops { get; set; } = new();
-        public static ConcurrentDictionary<int, List<ItemType.Entry>> Drops { get;set; } = new ();
-        public static Dictionary<int, cq_monstertype> CqMonsterType { get; set; } = new ();
+        public static ConcurrentDictionary<int, List<ItemType.Entry>> Drops { get; set; } = new();
+        public static Dictionary<int, cq_monstertype> CqMonsterType { get; set; } = new();
     }
 }

@@ -1,7 +1,7 @@
 using System.Numerics;
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Location
 {
     [Component]
     public struct JumpComponent

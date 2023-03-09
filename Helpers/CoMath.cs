@@ -1,6 +1,5 @@
 using System.Drawing;
 using System.Numerics;
-using HerstLib.IO;
 using MagnumOpus.Enums;
 
 namespace MagnumOpus.Helpers
@@ -9,8 +8,8 @@ namespace MagnumOpus.Helpers
     {
         public static Vector2 GetRandomPointInRect(in Rectangle rect)
         {
-            int randX = Random.Shared.Next(rect.X, rect.X + rect.Width + 1);
-            int randY = Random.Shared.Next(rect.Y, rect.Y + rect.Height + 1);
+            var randX = Random.Shared.Next(rect.X, rect.X + rect.Width + 1);
+            var randY = Random.Shared.Next(rect.Y, rect.Y + rect.Height + 1);
             return new Vector2(randX, randY);
         }
 
@@ -18,7 +17,7 @@ namespace MagnumOpus.Helpers
         {
             var deltaX = end.X - start.X;
             var deltaY = end.Y - start.Y;
-            var distance = deltaX * deltaX + deltaY * deltaY;
+            var distance = (deltaX * deltaX) + (deltaY * deltaY);
             return distance <= range * range;
         }
         public static Direction GetDirection(Vector2 end, Vector2 start) => (Direction)(GetRawDirection(end, start) % 8);
@@ -31,13 +30,9 @@ namespace MagnumOpus.Helpers
             var deltaY = end.Y - start.Y;
 
             if (deltaX == 0)
-            {
                 dir = deltaY > 0 ? 0 : 4;
-            }
             else if (deltaY == 0)
-            {
                 dir = deltaX > 0 ? 6 : 2;
-            }
             else
             {
                 var flag = Math.Abs(deltaX) / deltaX;
@@ -76,6 +71,8 @@ namespace MagnumOpus.Helpers
                         case 3:
                             dir = deltaY > 0 ? 0 : 4;
                             break;
+                        default:
+                            break;
                     }
                 }
                 else
@@ -93,6 +90,8 @@ namespace MagnumOpus.Helpers
                             break;
                         case 3:
                             dir = deltaY > 0 ? 0 : 4;
+                            break;
+                        default:
                             break;
                     }
                 }
@@ -158,6 +157,8 @@ namespace MagnumOpus.Helpers
                 case 16:
                     time = 1.3f;
                     break;
+                default:
+                    break;
             }
             return time;
         }
@@ -167,8 +168,8 @@ namespace MagnumOpus.Helpers
             double aimRad = GetRadian(pos, click);
             double checkRad = GetRadian(pos, check);
 
-            if (aimRad - widthRadians / 2 < checkRad)
-                if (aimRad + widthRadians / 2 > checkRad)
+            if (aimRad - (widthRadians / 2) < checkRad)
+                if (aimRad + (widthRadians / 2) > checkRad)
                     return true;
             return false;
         }
@@ -181,8 +182,8 @@ namespace MagnumOpus.Helpers
             var scale = (float)(1.0f * range / Vector2.Distance(start, end));
             var x0 = (int)start.X;
             var y0 = (int)start.Y;
-            var x1 = (int)(0.5f + scale * (end.X - x0) + x0);
-            var y1 = (int)(0.5f + scale * (end.Y - y0) + y0);
+            var x1 = (int)(0.5f + (scale * (end.X - x0)) + x0);
+            var y1 = (int)(0.5f + (scale * (end.Y - y0)) + y0);
             return DdaLineEx(x0, y0, x1, y1, ref target);
         }
 
@@ -210,7 +211,7 @@ namespace MagnumOpus.Helpers
                     // x0 ++
                     for (var i = 1; i <= absDx; i++)
                     {
-                        vector2 = new Vector2((ushort)(x0 + i), (ushort)(y0 + (numerator * i + delta) / denominator));
+                        vector2 = new Vector2((ushort)(x0 + i), (ushort)(y0 + (((numerator * i) + delta) / denominator)));
                         if (vector2 == target)
                             return true;
                     }
@@ -220,7 +221,7 @@ namespace MagnumOpus.Helpers
                     // x0 --
                     for (var i = 1; i <= absDx; i++)
                     {
-                        vector2 = new Vector2((ushort)(x0 - i), (ushort)(y0 + (numerator * i + delta) / denominator));
+                        vector2 = new Vector2((ushort)(x0 - i), (ushort)(y0 + (((numerator * i) + delta) / denominator)));
                         if (vector2 == target)
                             return true;
                     }
@@ -235,7 +236,7 @@ namespace MagnumOpus.Helpers
                     // y0 ++
                     for (var i = 1; i <= absDy; i++)
                     {
-                        vector2 = new Vector2((ushort)(y0 + i), (ushort)(x0 + (numerator * i + delta) / denominator));
+                        vector2 = new Vector2((ushort)(y0 + i), (ushort)(x0 + (((numerator * i) + delta) / denominator)));
                         if (vector2 == target)
                             return true;
                     }
@@ -245,7 +246,7 @@ namespace MagnumOpus.Helpers
                     // y0 -- 
                     for (var i = 1; i <= absDy; i++)
                     {
-                        vector2 = new Vector2((ushort)(y0 - i), (ushort)(x0 + (numerator * i + delta) / denominator));
+                        vector2 = new Vector2((ushort)(y0 - i), (ushort)(x0 + (((numerator * i) + delta) / denominator)));
                         if (vector2 == target)
                             return true;
                     }
@@ -260,13 +261,13 @@ namespace MagnumOpus.Helpers
                 return 0f;
 
             var delta = target - source;
-            var distance = (float)Math.Sqrt(delta.X * delta.X + delta.Y * delta.Y);
+            var distance = (float)Math.Sqrt((delta.X * delta.X) + (delta.Y * delta.Y));
 
             if (!(delta.X <= distance && distance > 0))
                 return 0f;
             var radian = Math.Asin(delta.X / distance);
 
-            return (float)(delta.Y > 0 ? Math.PI / 2 - radian : Math.PI + radian + Math.PI / 2);
+            return (float)(delta.Y > 0 ? (Math.PI / 2) - radian : Math.PI + radian + (Math.PI / 2));
         }
     }
 }

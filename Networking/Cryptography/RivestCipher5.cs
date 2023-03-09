@@ -2,12 +2,12 @@ namespace MagnumOpus.Networking.Cryptography
 {
     public static unsafe class RivestCipher5
     {
-        public const uint RC5_PW32 = 0xB7E15163;
-        public const uint RC5_QW32 = 0x61C88647;
+        public const uint RC5PW32 = 0xB7E15163;
+        public const uint RC5QW32 = 0x61C88647;
 
         private const int RC5_32 = 32;
         private const int RC5_12 = 12;
-        private const int RC5_SUB = RC5_12 * 2 + 2;
+        private const int RC5_SUB = (RC5_12 * 2) + 2;
         private const int RC5_16 = 16;
         private const int RC5_KEY = RC5_16 / 4;
 
@@ -19,14 +19,14 @@ namespace MagnumOpus.Networking.Cryptography
             var aSeed = new byte[RC5_16] { 0x3C, 0xDC, 0xFE, 0xE8, 0xC4, 0x54, 0xD6, 0x7E, 0x16, 0xA6, 0xF8, 0x1A, 0xE8, 0xD0, 0x38, 0xBE };
             fixed (byte* seed = aSeed)
             {
-                for (int z = 0; z < RC5_KEY; ++z)
+                for (var z = 0; z < RC5_KEY; ++z)
                     mKey[z] = ((uint*)seed)[z];
             }
 
-            mSub[0] = RC5_PW32;
+            mSub[0] = RC5PW32;
             int i, j;
             for (i = 1; i < RC5_SUB; ++i)
-                mSub[i] = mSub[i - 1] - RC5_QW32;
+                mSub[i] = mSub[i - 1] - RC5QW32;
 
             uint x, y;
             i = j = 0;
@@ -52,19 +52,19 @@ namespace MagnumOpus.Networking.Cryptography
 
             fixed (byte* buf = aBuf.Span)
             {
-                uint* data = (uint*)buf;
+                var data = (uint*)buf;
                 for (int k = 0, len = aLength / 8; k < len; ++k)
                 {
-                    uint lv = data[2 * k] + mSub[0];
-                    uint rv = data[2 * k + 1] + mSub[1];
-                    for (int i = 1; i <= RC5_12; ++i)
+                    var lv = data[2 * k] + mSub[0];
+                    var rv = data[(2 * k) + 1] + mSub[1];
+                    for (var i = 1; i <= RC5_12; ++i)
                     {
                         lv = RotL(lv ^ rv, rv) + mSub[2 * i];
-                        rv = RotL(rv ^ lv, lv) + mSub[2 * i + 1];
+                        rv = RotL(rv ^ lv, lv) + mSub[(2 * i) + 1];
                     }
 
                     data[2 * k] = lv;
-                    data[2 * k + 1] = rv;
+                    data[(2 * k) + 1] = rv;
                 }
             }
         }
@@ -77,17 +77,17 @@ namespace MagnumOpus.Networking.Cryptography
             if ((aLength & 7) != 0)
                 throw new ArgumentException("Length of the buffer must be a multiple of 64 bits.", nameof(aLength));
 
-            uint* data = (uint*)buf;
+            var data = (uint*)buf;
 
             fixed (uint* sub = mSub)
             {
 
                 for (int k = 0, len = aLength >> 3; k < len; ++k)
                 {
-                    uint lv = data[k << 1];
-                    uint rv = data[(k << 1) + 1];
+                    var lv = data[k << 1];
+                    var rv = data[(k << 1) + 1];
 
-                    for (int i = RC5_12; i >= 1; --i)
+                    for (var i = RC5_12; i >= 1; --i)
                     {
                         rv = RotR(rv - sub[(i << 1) + 1], lv) ^ lv;
                         lv = RotR(lv - sub[i << 1], rv) ^ rv;

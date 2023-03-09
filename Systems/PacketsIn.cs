@@ -3,8 +3,9 @@ using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
+using MagnumOpus.Networking;
 
-namespace MagnumOpus.Networking
+namespace MagnumOpus.Systems
 {
     public class PacketsIn : NttSystem<NetworkComponent>
     {
@@ -30,17 +31,17 @@ namespace MagnumOpus.Networking
         {
             try
             {
-            while (net.RecvQueue.TryDequeue(out var packet))
-            {
-                var packetType = (PacketId)BitConverter.ToUInt16(packet.Span[2..4]);
-                if (Trace) 
-                    Logger.Debug("Received {packet} from {ntt}", packetType, ntt);
+                while (net.RecvQueue.TryDequeue(out var packet))
+                {
+                    var packetType = (PacketId)BitConverter.ToUInt16(packet.Span[2..4]);
+                    if (IsLogging)
+                        Logger.Debug("Received {packet} from {ntt}", packetType, ntt);
 
-                if (PacketHandlers.TryGetValue(packetType, out var handler))
-                    handler.Invoke(ntt, packet);
-                else if (Trace)
-                    Logger.Debug("Undefined PacketId: {packet} {dump}", packetType, packet.Dump());
-            }
+                    if (PacketHandlers.TryGetValue(packetType, out var handler))
+                        handler.Invoke(ntt, packet);
+                    else if (IsLogging)
+                        Logger.Debug("Undefined PacketId: {packet} {dump}", packetType, packet.Dump());
+                }
             }
             catch (Exception ex)
             {

@@ -7,5 +7,5 @@ namespace MagnumOpus.Networking
     {
         public PacketId Id { get; }
         public PacketHandlerAttribute(PacketId id) => Id = id;
-    }   
+    }
 }

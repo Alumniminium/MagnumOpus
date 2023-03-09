@@ -3,8 +3,8 @@ using MagnumOpus.Squiggly.Models;
 
 namespace MagnumOpus.Squiggly
 {
-    #pragma warning disable CS8618
-    #pragma warning disable IDE1006
+#pragma warning disable CS8618
+#pragma warning disable IDE1006
     public class SquigglyContext : DbContext
     {
         public DbSet<cq_action> cq_action { get; set; }

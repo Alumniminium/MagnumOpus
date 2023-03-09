@@ -1,13 +1,12 @@
-using System.Net.Security;
-using HerstLib.IO;
-using MagnumOpus.Components;
+using MagnumOpus.Components.Death;
+using MagnumOpus.Components.Items;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
-using MagnumOpus.Networking;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Squiggly;
 
-namespace MagnumOpus.Simulation.Systems
+namespace MagnumOpus.Systems
 {
     public sealed class PickupSystem : NttSystem<PositionComponent, InventoryComponent, PickupRequestComponent>
     {
@@ -23,9 +22,9 @@ namespace MagnumOpus.Simulation.Systems
                 var moneyTxtMsg = MsgText.Create(in ntt, $"You picked up {rew.Amount} gold", Enums.MsgTextType.TopLeft);
                 ntt.NetSync(ref moneyTxtMsg);
 
-                if(rew.Amount > 1000)
+                if (rew.Amount > 1000)
                 {
-                    var moneyActionMsg = MsgAction.Create(ntt.NetId, ntt.NetId, 0, 0, 0, Enums.MsgActionType.GetMoney);
+                    var moneyActionMsg = MsgAction.Create(ntt.Id, ntt.Id, 0, 0, 0, Enums.MsgActionType.GetMoney);
                     ntt.NetSync(ref moneyActionMsg, true);
                 }
 
@@ -34,7 +33,7 @@ namespace MagnumOpus.Simulation.Systems
             }
             else
             {
-                if(!InventoryHelper.HasFreeSpace(ref inv))
+                if (!InventoryHelper.HasFreeSpace(ref inv))
                 {
                     ntt.Remove<PickupRequestComponent>();
                     return;
@@ -44,16 +43,16 @@ namespace MagnumOpus.Simulation.Systems
                 pic.Item.Remove<LifeTimeComponent>();
                 pic.Item.Remove<DestroyEndOfFrameComponent>();
 
-                InventoryHelper.AddItem(in ntt, ref inv, in pic.Item);
+                _ = InventoryHelper.AddItem(in ntt, ref inv, in pic.Item);
                 InventoryHelper.SortById(in ntt, ref inv, netSync: true);
             }
 
             Collections.SpatialHashs[pos.Map].Remove(in pic.Item, ref pos);
-            
+
             var delFloorMsg = MsgFloorItem.Create(in pic.Item, Enums.MsgFloorItemType.Delete);
             ntt.NetSync(ref delFloorMsg, true);
 
-            if (Trace) 
+            if (IsLogging)
                 Logger.Debug("{0} picked up {1}", ntt, pic.Item);
             ntt.Remove<PickupRequestComponent>();
         }

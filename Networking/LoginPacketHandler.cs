@@ -1,5 +1,6 @@
 using HerstLib.IO;
 using MagnumOpus.Components;
+using MagnumOpus.Components.Entity;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
@@ -26,7 +27,7 @@ namespace MagnumOpus.Networking
 
                         FConsole.WriteLine($"[LOGIN/1051] Account: {username}, Pass: {password}, Server: {server}");
 
-                        var response = MsgAccountResponse.Create(Constants.SERVER_IP, 5816, ntt.Id, ntt.Id);
+                        var response = MsgAccountResponse.Create(Constants.SERVERIP, 5816, ntt.Id, ntt.Id);
                         ref var net = ref ntt.Get<NetworkComponent>();
                         net.Username = username;
                         ntt.NetSync(ref response);
@@ -35,7 +36,7 @@ namespace MagnumOpus.Networking
                 case PacketId.MsgLogin:
                     {
                         var msg = Co2Packet.Deserialze<MsgConnectLogin>(packet);
-                        
+
                         var player = NttWorld.GetEntity((int)msg.UniqueId);
                         var filename = msg.GetFileName();
                         FConsole.WriteLine($"[LOGIN/1052] Client Id: {msg.UniqueId}, File: {filename} Contents: {msg.Contents}");
@@ -45,6 +46,63 @@ namespace MagnumOpus.Networking
                         player.Set(ref ntc);
                         break;
                     }
+
+                case PacketId.MsgRole:
+                    break;
+                case PacketId.MsgText:
+                    break;
+                case PacketId.MsgWalk:
+                    break;
+                case PacketId.MsgHero:
+                    break;
+                case PacketId.MsgItem:
+                    break;
+                case PacketId.MsgTick:
+                    break;
+                case PacketId.MsgAction:
+                    break;
+                case PacketId.MsgSpwan:
+                    break;
+                case PacketId.MsgName:
+                    break;
+                case PacketId.MsgUpdate:
+                    break;
+                case PacketId.MsgFriend:
+                    break;
+                case PacketId.MsgInteract:
+                    break;
+                case PacketId.MsgTeam:
+                    break;
+                case PacketId.MsgSockEm:
+                    break;
+                case PacketId.MsgForge:
+                    break;
+                case PacketId.MsgTime:
+                    break;
+                case PacketId.MsgTransfer:
+                    break;
+                case PacketId.MsgTrade:
+                    break;
+                case PacketId.MsgFloorItem:
+                    break;
+                case PacketId.MsgStorage:
+                    break;
+                case PacketId.MsgMagicEffect:
+                    break;
+                case PacketId.MsgGuild:
+                    break;
+                case PacketId.MsgNpc:
+                    break;
+                case PacketId.MsgGuildInfo:
+                    break;
+                case PacketId.MsgNpcSpawn:
+                    break;
+                case PacketId.MsgDialog:
+                    break;
+                case PacketId.MsgDialog2:
+                    break;
+                case PacketId.MsgCompose:
+                    break;
                 default:
                     {
                         FConsole.WriteLine($"[LOGIN/{(int)packetType}/{packetType}] Unknown packet");

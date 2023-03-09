@@ -1,16 +1,15 @@
-using HerstLib.IO;
-using MagnumOpus.Components;
+using MagnumOpus.Components.Death;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Networking;
 using MagnumOpus.Networking.Packets;
 
-namespace MagnumOpus.Simulation.Systems
+namespace MagnumOpus.Systems
 {
     public sealed class LifetimeSystem : NttSystem<LifeTimeComponent>
     {
         private static readonly uint[] countdown = new uint[] { 5, 4, 3, 2, 1 }.Select(sec => (uint)NttWorld.TargetTps * sec).ToArray();
-        public LifetimeSystem() : base("Lifetime", threads: 2) { Trace = false; }
+        public LifetimeSystem() : base("Lifetime", threads: 2) { IsLogging = false; }
 
         public override void Update(in NTT ntt, ref LifeTimeComponent ltc)
         {
@@ -20,14 +19,14 @@ namespace MagnumOpus.Simulation.Systems
 
                 if (!Array.Exists(countdown, x => x == ticksLeft))
                     return;
-                
-                if (Trace) 
+
+                if (IsLogging)
                     Logger.Debug("{ntt} -> {seconds} seconds left", ntt, ticksLeft / NttWorld.TargetTps);
 
                 ref var pos = ref ntt.Get<PositionComponent>();
                 pos.ChangedTick = NttWorld.Tick;
 
-                var eff = MsgName.Create((ushort)pos.Position.X, (ushort)pos.Position.Y, "downnumber" + (ticksLeft / NttWorld.TargetTps), MsgNameType.MapEffect);
+                var eff = MsgName.Create((ushort)pos.Position.X, (ushort)pos.Position.Y, "downnumber" + ticksLeft / NttWorld.TargetTps, MsgNameType.MapEffect);
                 ntt.NetSync(ref eff, true);
                 return;
             }
@@ -35,7 +34,7 @@ namespace MagnumOpus.Simulation.Systems
             var dtc = new DeathTagComponent(ntt.Id, default);
             ntt.Set(ref dtc);
             ntt.Remove<LifeTimeComponent>();
-            if (Trace) 
+            if (IsLogging)
                 Logger.Debug("{ntt} -> EXPIRED", ntt);
         }
     }

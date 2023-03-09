@@ -1,9 +1,5 @@
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System;
 
 namespace HerstLib.Drawing
 {
@@ -22,15 +18,15 @@ namespace HerstLib.Drawing
             RealWidth = width;
             RealHeight = height;
 
-            Width = width-2;
-            Height = height-2;
+            Width = width - 2;
+            Height = height - 2;
             Data = data;
             BufferArea = new char[RealWidth][];
 
-            for (int i = 0; i < RealWidth; i++)
+            for (var i = 0; i < RealWidth; i++)
             {
                 BufferArea[i] = new char[RealHeight];
-                for (int j = 0; j < RealHeight; j++)
+                for (var j = 0; j < RealHeight; j++)
                 {
                     BufferArea[i][j] = ' ';
                 }
@@ -43,13 +39,13 @@ namespace HerstLib.Drawing
         {
             while (Data.Count > Width)
                 Data = InterpolateData(Data);
-            
+
             var spacingX = Width / Data.Count;
-            long maxY = Data.Values.Max();
-            long minY = Data.Values.Min();
+            var maxY = Data.Values.Max();
+            var minY = Data.Values.Min();
 
             var lastX = 2;
-            var lastY = (int)(Height / 2  + -Normalize(Data.Values.First(), minY, maxY) * (Height /2));
+            var lastY = (int)((Height / 2) + (-Normalize(Data.Values.First(), minY, maxY) * (Height / 2)));
 
             foreach (var item in Data)
             {
@@ -57,7 +53,7 @@ namespace HerstLib.Drawing
                 var label = item.Key;
 
                 var x = lastX + spacingX;
-                var y = 1+(int)(Height/2 + -Normalize(value, minY, maxY) * (Height /2));
+                var y = 1 + (int)((Height / 2) + (-Normalize(value, minY, maxY) * (Height / 2)));
 
                 DrawLine(lastX, lastY, x, y);
                 lastX = x;
@@ -74,8 +70,8 @@ namespace HerstLib.Drawing
             var first = Data.First().Key;
             var last = Data.Last().Key;
 
-            DrawText(first, 1, RealHeight-1);
-            DrawText(last, RealWidth -1- last.Length, RealHeight-1);
+            DrawText(first, 1, RealHeight - 1);
+            DrawText(last, RealWidth - 1 - last.Length, RealHeight - 1);
         }
         private void DrawLegendVertical()
         {
@@ -87,14 +83,14 @@ namespace HerstLib.Drawing
         }
         private void DrawTextVertical(string text, int x, int y)
         {
-            for (int i = 0; i < text.Length; i++)
+            for (var i = 0; i < text.Length; i++)
             {
                 BufferArea[x][y - i] = text[i];
             }
         }
         private void DrawText(string label, int x, int y)
         {
-            for (int i = 0; i < label.Length; i++)
+            for (var i = 0; i < label.Length; i++)
             {
                 BufferArea[x + i][y] = label[i];
             }
@@ -125,20 +121,20 @@ namespace HerstLib.Drawing
             y1 = Math.Clamp(y1, 1, Height);
             y2 = Math.Clamp(y2, 1, Height);
 
-            int dx = Math.Abs(x2 - x1);
-            int dy = Math.Abs(y2 - y1);
-            int sx = x1 < x2 ? 1 : -1;
-            int sy = y1 < y2 ? 1 : -1;
-            int err = dx - dy;
+            var dx = Math.Abs(x2 - x1);
+            var dy = Math.Abs(y2 - y1);
+            var sx = x1 < x2 ? 1 : -1;
+            var sy = y1 < y2 ? 1 : -1;
+            var err = dx - dy;
 
             while (true)
             {
-                Canvas.Set(x1,y1);
+                Canvas.Set(x1, y1);
 
                 if (x1 == x2 && y1 == y2)
                     break;
 
-                int e2 = 2 * err;
+                var e2 = 2 * err;
                 if (e2 > -dy)
                 {
                     err -= dy;
@@ -199,20 +195,20 @@ namespace HerstLib.Drawing
             }
             if (height % 4 != 0)
             {
-                height += 4 - height % 4;
+                height += 4 - (height % 4);
             }
             chars = new int[width * height / 8];
         }
         public void Clear()
         {
-            for (int i = 0; i < chars.Length; i++)
+            for (var i = 0; i < chars.Length; i++)
             {
                 chars[i] = 0;
             }
         }
         public void Set(int x, int y)
         {
-            Tuple<int, int> data = GetMethodData(x, y);
+            var data = GetMethodData(x, y);
             SetInternal(data.Item1, data.Item2);
         }
 
@@ -220,30 +216,30 @@ namespace HerstLib.Drawing
 
         public void UnSet(int x, int y)
         {
-            Tuple<int, int> data = GetMethodData(x, y);
+            var data = GetMethodData(x, y);
             UnsetInternal(data.Item1, data.Item2);
         }
         private void UnsetInternal(int coord, int mask) => chars[coord] &= ~mask;
 
         public void Toggle(int x, int y)
         {
-            Tuple<int,int> data = GetMethodData(x,y);
+            var data = GetMethodData(x, y);
             ToggleInternal(data.Item1, data.Item2);
         }
         private void ToggleInternal(int coord, int mask) => chars[coord] ^= mask;
 
         private Tuple<int, int> GetMethodData(int x, int y)
         {
-            int nx = x / 2;
-            int ny = y / 4;
-            int coord = nx + width / 2 * ny;
-            int mask = PIXEL_MAP[y % 4, x % 2];
-            return new Tuple<int,int>(coord,mask);
+            var nx = x / 2;
+            var ny = y / 4;
+            var coord = nx + (width / 2 * ny);
+            var mask = PIXEL_MAP[y % 4, x % 2];
+            return new Tuple<int, int>(coord, mask);
         }
 
         public string Frame()
         {
-            string result = string.Empty;
+            var result = string.Empty;
             for (int i = 0, j = 0; i < chars.Length; i++, j++)
             {
                 if (j == width / 2)
@@ -257,7 +253,7 @@ namespace HerstLib.Drawing
                 }
                 else
                 {
-                    string newChar = "\\u" +(2800 + chars[i]);
+                    var newChar = "\\u" + (2800 + chars[i]);
                     result += UnescapeCodes(newChar);
                 }
             }
@@ -266,8 +262,8 @@ namespace HerstLib.Drawing
         }
         public static string UnescapeCodes(string src)
         {
-            Regex rx = MyRegex();
-            string result = src;
+            var rx = MyRegex();
+            var result = src;
             result = rx.Replace(result, match => ((char)int.Parse(match.Value[2..], NumberStyles.HexNumber)).ToString());
             return result;
         }

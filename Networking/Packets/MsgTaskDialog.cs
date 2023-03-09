@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using HerstLib.IO;
-using MagnumOpus.Components;
+using MagnumOpus.Components.CQ;
+using MagnumOpus.Components.Entity;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
@@ -27,7 +28,7 @@ namespace MagnumOpus.Networking.Packets
             {
                 Size = (ushort)(14 + text.Length),
                 Id = 2032,
-                UniqeId = target.NetId,
+                UniqeId = target.Id,
                 Avatar = hed.FaceId,
                 OptionId = optionId,
                 Action = action
@@ -35,7 +36,7 @@ namespace MagnumOpus.Networking.Packets
 
             packet.Unknown[0] = 1;
             packet.Unknown[1] = (byte)text.Length;
-            for (int i = 0; i < text.Length; i++)
+            for (var i = 0; i < text.Length; i++)
                 packet.Unknown[2 + i] = (byte)text[i];
 
             return packet;
@@ -45,10 +46,10 @@ namespace MagnumOpus.Networking.Packets
         public static void Process(NTT ntt, Memory<byte> memory)
         {
             var msgTaskDialog = Co2Packet.Deserialze<MsgTaskDialog>(in memory);
-            var npc = NttWorld.GetEntityByNetId(msgTaskDialog.UniqeId);
+            var npc = NttWorld.GetEntity(msgTaskDialog.UniqeId);
 
-            FConsole.WriteLine($"MsgTaskDialog: Npc {npc.NetId}, action: {msgTaskDialog.Action}, Option: {msgTaskDialog.OptionId}");
-            var cq_npc = CqProcessor.GetNpc(npc.NetId);
+            FConsole.WriteLine($"MsgTaskDialog: Npc {npc.Id}, action: {msgTaskDialog.Action}, Option: {msgTaskDialog.OptionId}");
+            var cq_npc = CqProcessor.GetNpc(npc.Id);
 
             if (cq_npc == null)
                 return;
@@ -86,13 +87,13 @@ namespace MagnumOpus.Networking.Packets
 
             var msgTaskDialog = Co2Packet.Deserialze<MsgTaskDialog>(in memory);
 
-            if (msgTaskDialog.OptionId == 255 || msgTaskDialog.OptionId == 0)
+            if (msgTaskDialog.OptionId is 255 or 0)
             {
                 ntt.Remove<CqTaskComponent>();
                 return;
             }
 
-            var npc = NttWorld.GetEntityByNetId(msgTaskDialog.UniqeId);
+            var npc = NttWorld.GetEntity(msgTaskDialog.UniqeId);
             using var ctx = new SquigglyContext();
 
             ref readonly var taskComponent = ref ntt.Get<CqTaskComponent>();
@@ -113,14 +114,14 @@ namespace MagnumOpus.Networking.Packets
 
 
             var nextId = task.id_next;
-            for(int i = 0; i < 32; i++)
+            for (var i = 0; i < 32; i++)
             {
                 var action = CqProcessor.GetAction(nextId);
                 if (action == null)
                     break;
 
                 // FConsole.WriteLine($"Type: {task.type}, Data: {task.param.Trim()}, Next: {task.id_next}, Fail: {task.id_nextfail}");
-                
+
                 nextId = CqActionProcessor.Process(in ntt, in npc, action);
                 task = CqProcessor.GetTask(nextId);
             }

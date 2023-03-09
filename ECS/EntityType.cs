@@ -7,7 +7,7 @@ namespace MagnumOpus.ECS
         Npc,
         Item,
         InvItem,
-        Trap,        
+        Trap,
         Other
     }
 }

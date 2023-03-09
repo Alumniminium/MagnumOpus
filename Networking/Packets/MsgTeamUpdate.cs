@@ -1,8 +1,9 @@
-using System.Buffers;
 using System.Runtime.InteropServices;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Components;
+using MagnumOpus.Components.Location;
+using MagnumOpus.Components.Entity;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -35,7 +36,7 @@ namespace MagnumOpus.Networking.Packets
                 Action = action,
                 Amount = 1,
                 NameLength = 16,
-                UniqueId = owner.NetId,
+                UniqueId = owner.Id,
                 Look = look,
                 MaxHp = (ushort)hlt.MaxHealth,
                 CurHp = (ushort)hlt.Health

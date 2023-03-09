@@ -1,10 +1,11 @@
-using MagnumOpus.Components;
+using MagnumOpus.Components.Entity;
+using MagnumOpus.Components.Items;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
 
-namespace MagnumOpus.Simulation.Systems
+namespace MagnumOpus.Systems
 {
     public sealed class EquipSystem : NttSystem<InventoryComponent, EquipmentComponent, RequestChangeEquipComponent>
     {
@@ -12,23 +13,23 @@ namespace MagnumOpus.Simulation.Systems
 
         public override void Update(in NTT ntt, ref InventoryComponent inv, ref EquipmentComponent eq, ref RequestChangeEquipComponent change)
         {
-            ref var item = ref NttWorld.GetEntityByNetId(change.ItemNetId);
+            ref var item = ref NttWorld.GetEntity(change.ItemNetId);
 
             if (change.Equip)
             {
                 // TODO: If current weapon is bow and new weapon is not bow, unequip arrows
                 var oldEq = eq.Items[change.Slot];
 
-                if(oldEq != default)
-                    InventoryHelper.AddItem(in ntt, ref inv, in oldEq, netSync: true);
-                
+                if (oldEq != default)
+                    _ = InventoryHelper.AddItem(in ntt, ref inv, in oldEq, netSync: true);
+
                 eq.Items[change.Slot] = item;
 
-                var msg = MsgItem.Create(item.NetId, item.NetId, (int)change.Slot, MsgItemType.SetEquipPosition);
+                var msg = MsgItem.Create(item.Id, item.Id, (int)change.Slot, MsgItemType.SetEquipPosition);
                 ntt.NetSync(ref msg);
-                InventoryHelper.RemoveNttFromInventory(in ntt, ref inv, in item, netSync: true);
+                _ = InventoryHelper.RemoveNttFromInventory(in ntt, ref inv, in item, netSync: true);
 
-                if (Trace) 
+                if (IsLogging)
                     Logger.Debug("{ntt} equipped {item} to {slot}", ntt, item, change.Slot);
             }
             else
@@ -39,10 +40,10 @@ namespace MagnumOpus.Simulation.Systems
                     ntt.Remove<RequestChangeEquipComponent>();
                     return;
                 }
-                
+
                 eq.Items[change.Slot] = default;
-                InventoryHelper.AddItem(in ntt, ref inv, in item, true);
-                if (Trace)
+                _ = InventoryHelper.AddItem(in ntt, ref inv, in item, true);
+                if (IsLogging)
                     Logger.Debug("{ntt} unequipped {item} from {slot}", ntt, item, change.Slot);
             }
             ntt.Remove<RequestChangeEquipComponent>();

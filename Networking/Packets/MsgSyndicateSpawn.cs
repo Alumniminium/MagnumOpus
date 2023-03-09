@@ -1,8 +1,8 @@
-using System.Buffers;
 using System.Runtime.InteropServices;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Components;
+using MagnumOpus.Components.Guild;
+using MagnumOpus.Components.Entity;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -24,11 +24,11 @@ namespace MagnumOpus.Networking.Packets
             ref readonly var leader = ref NttWorld.GetEntity(gld.LeaderId);
             ref readonly var ntc = ref leader.Get<NameTagComponent>();
 
-            MsgSyndicateSpawn* msgP = stackalloc MsgSyndicateSpawn[1];
+            var msgP = stackalloc MsgSyndicateSpawn[1];
 
             msgP->Size = (ushort)sizeof(MsgSyndicateSpawn);
             msgP->Id = 1106;
-            if (gld.EntityId == ntt.NetId)
+            if (gld.EntityId == ntt.Id)
             {
                 msgP->UniqueId = gld.GuildId;
                 msgP->Donation = gld.Donation;

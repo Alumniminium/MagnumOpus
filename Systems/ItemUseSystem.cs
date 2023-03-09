@@ -1,11 +1,10 @@
 using MagnumOpus.Components;
+using MagnumOpus.Components.Items;
 using MagnumOpus.ECS;
-using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
-using MagnumOpus.Networking.Packets;
 using MagnumOpus.Squiggly;
 
-namespace MagnumOpus.Simulation.Systems
+namespace MagnumOpus.Systems
 {
     public sealed class ItemUseSystem : NttSystem<InventoryComponent, RequestItemUseComponent>
     {
@@ -13,13 +12,13 @@ namespace MagnumOpus.Simulation.Systems
 
         public override void Update(in NTT ntt, ref InventoryComponent inv, ref RequestItemUseComponent use)
         {
-            bool destroy = false;
-            ref var item = ref NttWorld.GetEntityByNetId(use.ItemNetId);
+            var destroy = false;
+            ref var item = ref NttWorld.GetEntity(use.ItemNetId);
             ref var itemComp = ref item.Get<ItemComponent>();
 
             if (!Collections.ItemType.TryGetValue(itemComp.Id, out var entry))
             {
-                if(Trace)
+                if (IsLogging)
                     Logger.Error("Item {item} not found in ItemType", item);
                 ntt.Remove<RequestItemUseComponent>();
                 return;
@@ -43,10 +42,10 @@ namespace MagnumOpus.Simulation.Systems
                 destroy = true;
             }
 
-            if(destroy)
-                InventoryHelper.RemoveNttFromInventory(in ntt, ref inv, in item, destroy: true, netSync: true);
+            if (destroy)
+                _ = InventoryHelper.RemoveNttFromInventory(in ntt, ref inv, in item, destroy: true, netSync: true);
 
-            if (Trace) 
+            if (IsLogging)
                 Logger.Debug("{0} used {1} ({2})", ntt, item, itemComp.Id);
             ntt.Remove<RequestItemUseComponent>();
         }

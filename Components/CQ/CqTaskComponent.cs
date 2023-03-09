@@ -1,8 +1,9 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.CQ
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public struct CqTaskComponent
     {
         public readonly int EntityId;
@@ -13,7 +14,7 @@ namespace MagnumOpus.Components
         public CqTaskComponent(int entityId, int npcId)
         {
             EntityId = entityId;
-            Npc = NttWorld.GetEntityByNetId(npcId);
+            Npc = NttWorld.GetEntity(npcId);
         }
         public override int GetHashCode() => EntityId;
     }

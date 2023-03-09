@@ -1,8 +1,9 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Entity
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public readonly struct ProfComponent
     {
         public readonly int EntityId;
@@ -11,7 +12,7 @@ namespace MagnumOpus.Components
         public readonly ushort Level;
         public readonly ushort Experience;
         public readonly ushort ExperienceToNextLevel;
-        
+
         public ProfComponent(int entityId, ushort skillId, ushort level, ushort experience, ushort experienceToNextLevel)
         {
             EntityId = entityId;

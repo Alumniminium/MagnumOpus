@@ -1,6 +1,6 @@
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using MagnumOpus.Components;
+using MagnumOpus.Components.Entity;
 using MagnumOpus.Networking;
 
 namespace MagnumOpus.ECS
@@ -8,13 +8,11 @@ namespace MagnumOpus.ECS
     public readonly struct NTT
     {
         public readonly int Id;
-        public readonly int NetId;
         public readonly EntityType Type;
 
-        public NTT(int id, int netId, EntityType type)
+        public NTT(int id, EntityType type)
         {
             Id = id;
-            NetId = netId;
             Type = type;
         }
 
@@ -48,25 +46,19 @@ namespace MagnumOpus.ECS
                 foreach (var kvp in vwp.EntitiesVisible)
                 {
                     var b = kvp.Value;
-                    
+
                     if (b.Type != EntityType.Player)
                         continue;
-                    if (!b.Has<NetworkComponent>())
-                        continue;
 
+                    ref readonly var net = ref b.Get<NetworkComponent>();
                     var packet = Co2Packet.Serialize(ref msg);
-                    if (packet.Length == 0)
-                        Debugger.Break();
-                    ref var net = ref b.Get<NetworkComponent>();
                     net.SendQueue.Enqueue(packet);
                 }
             }
-            else if (Type == EntityType.Player && Has<NetworkComponent>())
+            else if (Type == EntityType.Player)
             {
+                ref readonly var net = ref Get<NetworkComponent>();
                 var packet = Co2Packet.Serialize(ref msg);
-                if (packet.Length == 0)
-                    Debugger.Break();
-                ref var net = ref Get<NetworkComponent>();
                 net.SendQueue.Enqueue(packet);
             }
         }

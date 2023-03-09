@@ -1,30 +1,26 @@
-using System.Net.Sockets;
 using System.Text;
-using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 
-namespace MagnumOpus.Networking
+namespace MagnumOpus.Systems
 {
     public class PacketsOut : NttSystem<NetworkComponent>
     {
         public static readonly Memory<byte> TqServer = Encoding.ASCII.GetBytes("TQServer");
         public PacketsOut() : base("Packets Out", threads: 2) { }
-
-        // private const int MAX_PACKET_SIZE = 1024 * 8;
         public override void Update(in NTT ntt, ref NetworkComponent net)
         {
             try
             {
                 while (net.SendQueue.TryDequeue(out var packet))
                 {
-                    if(packet.Length < 4)
+                    if (packet.Length < 4)
                         continue;
 
                     var id = BitConverter.ToInt16(packet.Span[2..4]);
-                    if (Trace) 
+                    if (IsLogging)
                     {
                         Logger.Debug(packet.Dump());
                         Logger.Debug("Sending {id}/{id} (Size: {Length}) to {ntt}...", ((PacketId)id).ToString(), id, packet.Length, ntt);
@@ -40,7 +36,7 @@ namespace MagnumOpus.Networking
                     else
                         net.AuthCrypto.Encrypt(packet.Span);
 
-                    net.Socket.Send(packet.Span);
+                    _ = net.Socket.Send(packet.Span);
                 }
             }
             catch

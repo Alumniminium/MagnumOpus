@@ -1,7 +1,9 @@
-using System.Buffers;
 using System.Runtime.InteropServices;
 using MagnumOpus.ECS;
-using MagnumOpus.Components;
+using MagnumOpus.Components.Location;
+using MagnumOpus.Components.Leveling;
+using MagnumOpus.Components.Guild;
+using MagnumOpus.Components.Entity;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -31,12 +33,12 @@ namespace MagnumOpus.Networking.Packets
 
             ref readonly var spouse = ref NttWorld.GetEntity(mar.SpouseId);
             ref readonly var spouseNtc = ref spouse.Get<NameTagComponent>();
-            
+
             var packet = new MsgFriendInfo
             {
                 Size = (ushort)sizeof(MsgFriendInfo),
                 Id = 2033,
-                UniqId = target.NetId,
+                UniqId = target.Id,
                 Look = bdy.Look,
                 Level = lvl.Level,
                 Profession = (byte)pro.Profession,
@@ -45,7 +47,7 @@ namespace MagnumOpus.Networking.Packets
                 Unknow = 0,
                 Position = (byte)gld.Rank,
             };
-            
+
             for (byte i = 0; i < spouseNtc.Name.Length; i++)
                 packet.Spouse[i] = (byte)spouseNtc.Name[i];
             return packet;

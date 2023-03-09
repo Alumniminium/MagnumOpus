@@ -1,10 +1,14 @@
 using System.Numerics;
 using MagnumOpus.Components;
+using MagnumOpus.Components.Attack;
+using MagnumOpus.Components.Death;
+using MagnumOpus.Components.Entity;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 
-namespace MagnumOpus.Simulation.Systems
+namespace MagnumOpus.Systems
 {
     public sealed class TargetFinderCircleSystem : NttSystem<CircleTargetComponent, ViewportComponent>
     {
@@ -23,9 +27,9 @@ namespace MagnumOpus.Simulation.Systems
 
                 if (dir == Direction.South)
                     range += 2;
-                if (dir == Direction.SouthWest || dir == Direction.SouthEast)
+                if (dir is Direction.SouthWest or Direction.SouthEast)
                     range += 1;
-                if (dir == Direction.West || dir == Direction.East)
+                if (dir is Direction.West or Direction.East)
                     range -= 1;
 
                 if (!CoMath.InRange(new Vector2(atk.X, atk.Y), bPos.Position, range))
@@ -38,7 +42,7 @@ namespace MagnumOpus.Simulation.Systems
                     continue;
 
                 tcc.Targets.Add(b);
-                if (Trace)
+                if (IsLogging)
                     Logger.Debug("{ntt} adding {b} to target list of {skill}:{level}", ntt, b, atk.MagicType.MagicType, atk.MagicType.Level);
             }
             ntt.Set(ref tcc);

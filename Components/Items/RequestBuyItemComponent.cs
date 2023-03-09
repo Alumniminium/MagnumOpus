@@ -1,6 +1,6 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Items
 {
     [Component]
     public readonly struct RequestShopItemTransactionComponent
@@ -17,7 +17,7 @@ namespace MagnumOpus.Components
             ItemId = itemId;
             Buy = buy;
         }
-        
+
         public override int GetHashCode() => EntityId;
     }
 }

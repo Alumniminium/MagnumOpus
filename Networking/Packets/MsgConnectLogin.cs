@@ -14,7 +14,7 @@ namespace MagnumOpus.Networking.Packets
         public uint UniqueId;
         [FieldOffset(8)]
         public uint Contents;
-       
+
         [FieldOffset(12)]
         public fixed byte FileName[16];
 

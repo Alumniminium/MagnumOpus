@@ -1,5 +1,9 @@
 using System.Runtime.InteropServices;
 using MagnumOpus.Components;
+using MagnumOpus.Components.Entity;
+using MagnumOpus.Components.Items;
+using MagnumOpus.Components.Leveling;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 
 namespace MagnumOpus.Networking.Packets
@@ -75,7 +79,7 @@ namespace MagnumOpus.Networking.Packets
             // sNtc.Name ??= "None";
 
             var look = bdy.Look;
-            look = (uint)(hed.FaceId * 10_000 + bdy.Look);
+            look = (uint)((hed.FaceId * 10_000) + bdy.Look);
 
             if (atr.Statpoints == 0)
             {
@@ -94,7 +98,7 @@ namespace MagnumOpus.Networking.Packets
             {
                 Size = (ushort)(sizeof(MsgCharacter) - 30 + ntc.Name.Length + spouseName.Length),
                 Id = 1006,
-                EntityId = ntt.NetId,
+                EntityId = ntt.Id,
                 Look = look,
                 Hair = hed.Hair,
                 Money = inv.Money,
@@ -116,11 +120,11 @@ namespace MagnumOpus.Networking.Packets
             };
 
             packet.Name[0] = (byte)ntc.Name.Length;
-            for (int i = 0; i < ntc.Name.Length; i++)
+            for (var i = 0; i < ntc.Name.Length; i++)
                 packet.Name[i + 1] = (byte)ntc.Name[i];
 
             packet.Name[1 + ntc.Name.Length] = (byte)spouseName.Length;
-            for (int i = 0; i < spouseName.Length; i++)
+            for (var i = 0; i < spouseName.Length; i++)
                 packet.Name[ntc.Name.Length + 2 + i] = (byte)spouseName[i];
             return packet;
         }

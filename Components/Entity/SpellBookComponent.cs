@@ -1,12 +1,13 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Entity
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public readonly struct SpellBookComponent
     {
         public readonly int EntityId;
-        public readonly Dictionary<ushort,(ushort lvl, ushort exp, ushort cooldown)> Spells = new();
+        public readonly Dictionary<ushort, (ushort lvl, ushort exp, ushort cooldown)> Spells = new();
 
         public SpellBookComponent(int id) => EntityId = id;
 

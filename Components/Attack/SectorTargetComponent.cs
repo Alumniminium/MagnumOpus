@@ -1,7 +1,7 @@
 using Co2Core.IO;
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Attack
 {
     [Component]
     public readonly struct SectorTargetComponent
@@ -21,5 +21,5 @@ namespace MagnumOpus.Components
 
         public override int GetHashCode() => EntityId;
     }
-    
+
 }

@@ -2,7 +2,7 @@ using System.Numerics;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.AI
 {
     [Component]
     public struct BrainComponent
@@ -13,7 +13,7 @@ namespace MagnumOpus.Components
         public Vector2 TargetPosition;
         public int SleepTicks;
 
-        
+
         public BrainComponent(int entityId)
         {
             EntityId = entityId;

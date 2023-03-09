@@ -1,9 +1,10 @@
 using System.Numerics;
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Location
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public struct PositionComponent
     {
         public readonly int EntityId;

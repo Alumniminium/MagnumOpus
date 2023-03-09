@@ -14,12 +14,12 @@ namespace MagnumOpus.Networking.Cryptography
 
         static TQCipher()
         {
-            for (int i = 0; i < 0x100; i++)
+            for (var i = 0; i < 0x100; i++)
             {
                 KInit.Span[i] = seed[0];
                 KInit.Span[i + 0x100] = seed[4];
-                seed[0] = (byte)((seed[1] + (seed[0] * seed[2])) * seed[0] + seed[3]);
-                seed[4] = (byte)((seed[5] - (seed[4] * seed[6])) * seed[4] + seed[7]);
+                seed[0] = (byte)(((seed[1] + (seed[0] * seed[2])) * seed[0]) + seed[3]);
+                seed[4] = (byte)(((seed[5] - (seed[4] * seed[6])) * seed[4]) + seed[7]);
             }
         }
 
@@ -35,9 +35,9 @@ namespace MagnumOpus.Networking.Cryptography
         private void XOR(Span<byte> src, Span<byte> dst, Memory<byte> k, ref ushort c)
         {
             byte* pSrc = null, pDst = null, pK = null;
-            ushort delta = (ushort)src.Length;
+            var delta = (ushort)src.Length;
             c ^= delta;
-            ushort x = (ushort)(c - delta);
+            var x = (ushort)(c - delta);
 
             fixed (byte* pTmp = src, pOut = dst, pKey = k.Span)
             {
@@ -45,10 +45,10 @@ namespace MagnumOpus.Networking.Cryptography
                 pDst = pOut;
                 pK = pKey;
 
-                for (int i = 0; i < src.Length; i++)
+                for (var i = 0; i < src.Length; i++)
                 {
                     pDst[i] = (byte)(*pSrc++ ^ 0xAB);
-                    pDst[i] = (byte)(pDst[i] >> 4 | pDst[i] << 4);
+                    pDst[i] = (byte)((pDst[i] >> 4) | (pDst[i] << 4));
                     pDst[i] = (byte)(pDst[i] ^ pK[x & 0xff]);
                     pDst[i] = (byte)(pDst[i] ^ pK[(x >> 8) + 0x100]);
                     x++;

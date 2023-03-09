@@ -1,11 +1,16 @@
 using System.Numerics;
 using MagnumOpus.Components;
+using MagnumOpus.Components.AI;
+using MagnumOpus.Components.Attack;
+using MagnumOpus.Components.Death;
+using MagnumOpus.Components.Entity;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Squiggly;
 
-namespace MagnumOpus.Simulation.Systems
+namespace MagnumOpus.Systems
 {
     public sealed class BasicAISystem : NttSystem<PositionComponent, ViewportComponent, BrainComponent>
     {
@@ -28,13 +33,13 @@ namespace MagnumOpus.Simulation.Systems
             {
                 vwp.EntitiesVisible.Clear();
                 Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
-                if (Trace) 
+                if (IsLogging)
                     Logger.Debug("Waking up {ntt} with {visibleCount} visible entities", ntt, vwp.EntitiesVisible.Count);
             }
 
             if (brn.TargetId == 0)
             {
-                
+
                 foreach (var kvp in vwp.EntitiesVisible)
                 {
                     var b = kvp.Value;
@@ -77,15 +82,12 @@ namespace MagnumOpus.Simulation.Systems
             {
                 brn.TargetId = 0;
                 brn.State = BrainState.Idle;
-                if (Trace) 
+                if (IsLogging)
                     Logger.Debug("{Entity} target {target} out of range", ntt, target);
                 return;
             }
 
-            if (distance > 1)
-                brn.State = BrainState.Approaching;
-            else
-                brn.State = BrainState.Attacking;
+            brn.State = distance > 1 ? BrainState.Approaching : BrainState.Attacking;
 
             if (brn.State == BrainState.Approaching)
             {
@@ -93,19 +95,19 @@ namespace MagnumOpus.Simulation.Systems
 
                 var wlk = new WalkComponent(ntt.Id, dir, false);
                 ntt.Set(ref wlk);
-                if (Trace) 
+                if (IsLogging)
                     Logger.Debug("{Entity} walking {dir} to {target}", ntt, (Direction)dir, target);
             }
             if (brn.State == BrainState.Attacking)
             {
                 var atk = new AttackComponent(ntt.Id, in target, MsgInteractType.Physical);
                 ntt.Set(ref atk);
-                if (Trace) 
+                if (IsLogging)
                     Logger.Debug("{Entity} attacking {target}", ntt, target);
             }
 
             brn.State = BrainState.Sleeping;
-            brn.SleepTicks = (int)(NttWorld.TargetTps * (1+Random.Shared.NextSingle()));
+            brn.SleepTicks = (int)(NttWorld.TargetTps * (1 + Random.Shared.NextSingle()));
         }
     }
 }

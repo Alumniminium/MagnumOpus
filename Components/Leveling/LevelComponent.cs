@@ -2,9 +2,10 @@ using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Leveling
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public struct LevelComponent
     {
         public readonly int EntityId;
@@ -19,9 +20,9 @@ namespace MagnumOpus.Components
             {
                 level = value;
                 ChangedTick = NttWorld.Tick;
-                ref readonly var entity = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(entity.NetId, level, MsgUserAttribType.Level);
-                entity.NetSync(ref packet, true);
+                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
+                var packet = MsgUserAttrib.Create(ntt.Id, level, MsgUserAttribType.Level);
+                ntt.NetSync(ref packet, true);
             }
         }
         public uint Experience
@@ -30,13 +31,13 @@ namespace MagnumOpus.Components
             {
                 experience = value;
                 ChangedTick = NttWorld.Tick;
-                ref readonly var entity = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(entity.NetId, experience, MsgUserAttribType.Experience);
-                entity.NetSync(ref packet, true);
+                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
+                var packet = MsgUserAttrib.Create(ntt.Id, experience, MsgUserAttribType.Experience);
+                ntt.NetSync(ref packet, true);
             }
         }
 
-        public LevelComponent(int entityId, byte level=1, uint experience=0, uint experienceToNextLevel=120)
+        public LevelComponent(int entityId, byte level = 1, uint experience = 0, uint experienceToNextLevel = 120)
         {
             EntityId = entityId;
             Level = level;

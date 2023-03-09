@@ -1,8 +1,9 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Floor
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public readonly struct PortalComponent
     {
         public readonly int EntityId;

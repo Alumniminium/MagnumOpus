@@ -2,7 +2,8 @@ using System.Collections.Concurrent;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using MagnumOpus.Components;
+using MagnumOpus.Components.Entity;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 
 namespace MagnumOpus.SpacePartitioning
@@ -22,7 +23,7 @@ namespace MagnumOpus.SpacePartitioning
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(in NTT entity, ref PositionComponent pos)
         {
-            int hash = GetHash(pos.Position);
+            var hash = GetHash(pos.Position);
 
             if (!Hashtbl.ContainsKey(hash))
                 Hashtbl[hash] = new List<NTT>();
@@ -34,11 +35,11 @@ namespace MagnumOpus.SpacePartitioning
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Remove(in NTT entity, ref PositionComponent pos)
         {
-            int hash = GetHash(pos.Position);
+            var hash = GetHash(pos.Position);
 
             if (Hashtbl.TryGetValue(hash, out var bucket))
                 lock (_lock)
-                    bucket.Remove(entity);
+                    _ = bucket.Remove(entity);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -51,34 +52,34 @@ namespace MagnumOpus.SpacePartitioning
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void GetVisibleEntities(ref ViewportComponent vwp)
         {
-            var cx = vwp.Viewport.X + vwp.Viewport.Width / 2;
-            var cy = vwp.Viewport.Y + vwp.Viewport.Height / 2;
+            var cx = vwp.Viewport.X + (vwp.Viewport.Width / 2);
+            var cy = vwp.Viewport.Y + (vwp.Viewport.Height / 2);
 
-            int minX = (int)((vwp.Viewport.Left - vwp.Viewport.Width / 2) / cellSize);
-            int maxX = (int)((vwp.Viewport.Right + vwp.Viewport.Width / 2) / cellSize);
-            int minY = (int)((vwp.Viewport.Top - vwp.Viewport.Height / 2) / cellSize);
-            int maxY = (int)((vwp.Viewport.Bottom + vwp.Viewport.Height / 2) / cellSize);
+            var minX = (int)((vwp.Viewport.Left - (vwp.Viewport.Width / 2)) / cellSize);
+            var maxX = (int)((vwp.Viewport.Right + (vwp.Viewport.Width / 2)) / cellSize);
+            var minY = (int)((vwp.Viewport.Top - (vwp.Viewport.Height / 2)) / cellSize);
+            var maxY = (int)((vwp.Viewport.Bottom + (vwp.Viewport.Height / 2)) / cellSize);
 
-            for (int x = minX; x <= maxX; x++)
+            for (var x = minX; x <= maxX; x++)
             {
-                for (int y = minY; y <= maxY; y++)
+                for (var y = minY; y <= maxY; y++)
                 {
-                    int hash = GetHash(new Vector2(x * cellSize, y * cellSize));
+                    var hash = GetHash(new Vector2(x * cellSize, y * cellSize));
 
                     if (!Hashtbl.TryGetValue(hash, out var entities))
                         continue;
-                    
-                    lock(_lock)
+
+                    lock (_lock)
                     {
                         var span = CollectionsMarshal.AsSpan(entities);
-                        for (int i = 0; i < entities.Count; i++)
+                        for (var i = 0; i < entities.Count; i++)
                         {
                             ref readonly var ntt = ref span[i];
                             ref readonly var pos = ref ntt.Get<PositionComponent>();
-                            var distanceSquared = Vector2.DistanceSquared(pos.Position, new Vector2(cx, cy));   
+                            var distanceSquared = Vector2.DistanceSquared(pos.Position, new Vector2(cx, cy));
 
                             if (distanceSquared <= 324f)
-                                vwp.EntitiesVisible.TryAdd(ntt.Id, ntt);
+                                _ = vwp.EntitiesVisible.TryAdd(ntt.Id, ntt);
                         }
                     }
                 }
@@ -89,10 +90,10 @@ namespace MagnumOpus.SpacePartitioning
         private int GetHash(Vector2 position)
         {
             var scaled = position / cellSize;
-            int x = (int)scaled.X;
-            int y = (int)scaled.Y;
+            var x = (int)scaled.X;
+            var y = (int)scaled.Y;
 
-            return x * 73856093 ^ y * 19349663;
+            return (x * 73856093) ^ (y * 19349663);
         }
     }
 }

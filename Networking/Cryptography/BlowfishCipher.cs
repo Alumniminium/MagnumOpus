@@ -60,13 +60,13 @@ namespace MagnumOpus.Networking.Cryptography
             DecryptCount = copy.DecryptCount;
             EncryptCount = copy.EncryptCount;
 
-            if(copy.S != null && copy.P != null)
+            if (copy.S != null && copy.P != null)
             {
                 S = new uint[copy.S.Length];
                 P = new uint[copy.P.Length];
 
-                copy.S.CopyTo(S,0);
-                copy.P.CopyTo(P,0);
+                copy.S.CopyTo(S, 0);
+                copy.P.CopyTo(P, 0);
             }
         }
 
@@ -95,15 +95,15 @@ namespace MagnumOpus.Networking.Cryptography
                 P[i] ^= rv;
             }
 
-            uint[] block = new uint[BlockSize / sizeof(uint)];
-            for (int i = 0; i < P.Length; )
+            var block = new uint[BlockSize / sizeof(uint)];
+            for (var i = 0; i < P.Length;)
             {
                 EncipherBlock(block);
                 P[i++] = block[0];
                 P[i++] = block[1];
             }
 
-            for (int i = 0; i < S.Length; )
+            for (var i = 0; i < S.Length;)
             {
                 EncipherBlock(block);
                 S[i++] = block[0];
@@ -130,8 +130,8 @@ namespace MagnumOpus.Networking.Cryptography
         /// <param name="dst">Destination span to contain the decrypted result</param>
         public void Decrypt(Span<byte> src)
         {
-            uint[] block = new uint[2];
-            for (int i = 0; i < src.Length; i++)
+            var block = new uint[2];
+            for (var i = 0; i < src.Length; i++)
             {
                 if (DecryptCount == 0)
                 {
@@ -142,7 +142,7 @@ namespace MagnumOpus.Networking.Cryptography
                     N12(DecryptionIV, 4, block[1]);
                 }
 
-                byte tmp = DecryptionIV.Span[DecryptCount];
+                var tmp = DecryptionIV.Span[DecryptCount];
                 DecryptionIV.Span[DecryptCount] = src[i];
                 src[i] = (byte)(src[i] ^ tmp);
                 DecryptCount = (DecryptCount + 1) & (BlockSize - 1);
@@ -157,8 +157,8 @@ namespace MagnumOpus.Networking.Cryptography
         /// <param name="dst">Destination span to contain the encrypted result</param>
         public void Encrypt(Span<byte> src)
         {
-            uint[] block = new uint[2];
-            for (int i = 0; i < src.Length; i++)
+            var block = new uint[2];
+            for (var i = 0; i < src.Length; i++)
             {
                 if (EncryptCount == 0)
                 {
@@ -186,10 +186,9 @@ namespace MagnumOpus.Networking.Cryptography
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private uint F(uint x)
         {
-            if(S == null)
-                throw new InvalidOperationException("Cipher must be initialized with a shared secret!");
-
-            return (((S[(x >> 24) & 0xFF] + S[0x100 + ((x >> 16) & 0xFF)]) ^ S[0x200 + ((x >> 8) & 0xFF)]) + S[0x300 + ((x) & 0xFF)]) & 0xFFFFFFFF;
+            return S == null
+                ? throw new InvalidOperationException("Cipher must be initialized with a shared secret!")
+                : (((S[(x >> 24) & 0xFF] + S[0x100 + ((x >> 16) & 0xFF)]) ^ S[0x200 + ((x >> 8) & 0xFF)]) + S[0x300 + ((x) & 0xFF)]) & 0xFFFFFFFF;
         }
 
         /// <summary>
@@ -200,7 +199,7 @@ namespace MagnumOpus.Networking.Cryptography
         /// <returns>An unsigned integer representing a side of the block.</returns>
         private static uint N21(in Memory<byte> iv, int x)
         {
-            uint l = (uint)(iv.Span[x] << 24);
+            var l = (uint)(iv.Span[x] << 24);
             l |= (uint)(iv.Span[x + 1] << 16);
             l |= (uint)(iv.Span[x + 2] << 8);
             l |= iv.Span[x + 3];
@@ -229,10 +228,10 @@ namespace MagnumOpus.Networking.Cryptography
         /// <param name="block">A block of two 32-bit unsigned integers</param>
         private void EncipherBlock(uint[] block)
         {
-            if(P==null)
+            if (P == null)
                 throw new InvalidOperationException("Cipher must be initialized with a shared secret!");
-            uint lv = block[0];
-            uint rv = block[1];
+            var lv = block[0];
+            var rv = block[1];
 
             lv ^= P[0];
             for (uint i = 1; i <= Rounds; i++)
@@ -242,7 +241,7 @@ namespace MagnumOpus.Networking.Cryptography
                 (rv, lv) = (lv, rv);
             }
 
-            rv ^= P[Rounds + 1];            
+            rv ^= P[Rounds + 1];
             block[0] = rv & 0xFFFFFFFF;
             block[1] = lv & 0xFFFFFFFF;
         }

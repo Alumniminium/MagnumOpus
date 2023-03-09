@@ -2,9 +2,10 @@ using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Entity
 {
-    [Component][Save]
+    [Component]
+    [Save]
     public struct HeadComponent
     {
         public readonly int EntityId;
@@ -19,13 +20,13 @@ namespace MagnumOpus.Components
             {
                 hair = value;
                 ChangedTick = NttWorld.Tick;
-                ref readonly var entity = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(entity.NetId, hair, MsgUserAttribType.HairStyle);
-                entity.NetSync(ref packet, true);
+                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
+                var packet = MsgUserAttrib.Create(ntt.Id, hair, MsgUserAttribType.HairStyle);
+                ntt.NetSync(ref packet, true);
             }
         }
 
-        public HeadComponent(int entityId, ushort face=6, ushort hair = 310)
+        public HeadComponent(int entityId, ushort face = 6, ushort hair = 310)
         {
             EntityId = entityId;
             ChangedTick = NttWorld.Tick;

@@ -1,7 +1,7 @@
 using Co2Core.IO;
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Attack
 {
 
     [Component]

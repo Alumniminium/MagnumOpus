@@ -1,7 +1,8 @@
-using System.Buffers;
 using System.Runtime.InteropServices;
 using HerstLib.IO;
 using MagnumOpus.Components;
+using MagnumOpus.Components.Attack;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Cryptography;
@@ -32,8 +33,8 @@ namespace MagnumOpus.Networking.Packets
                 Size = (ushort)sizeof(MsgInteract),
                 Id = 1022,
                 Timestamp = Environment.TickCount,
-                AttackerUniqueId = source.NetId,
-                TargetUniqueId = target.NetId,
+                AttackerUniqueId = source.Id,
+                TargetUniqueId = target.Id,
                 X = (ushort)pos.Position.X,
                 Y = (ushort)pos.Position.Y,
                 Type = type,
@@ -65,8 +66,8 @@ namespace MagnumOpus.Networking.Packets
                 Size = 32,
                 Id = 1022,
                 Timestamp = Environment.TickCount,
-                AttackerUniqueId = attacker.NetId,
-                TargetUniqueId = target.NetId,
+                AttackerUniqueId = attacker.Id,
+                TargetUniqueId = target.Id,
                 X = (ushort)bdy.Position.X,
                 Y = (ushort)bdy.Position.Y,
                 Type = MsgInteractType.Death,
@@ -86,13 +87,13 @@ namespace MagnumOpus.Networking.Packets
                 case MsgInteractType.Archer:
                 case MsgInteractType.Physical:
                     {
-                        if (ntt.NetId != msg.AttackerUniqueId)
+                        if (ntt.Id != msg.AttackerUniqueId)
                         {
-                            FConsole.WriteLine($"[MsgInteract] HAX! {ntt.NetId} != {msg.AttackerUniqueId}");
+                            FConsole.WriteLine($"[MsgInteract] HAX! {ntt.Id} != {msg.AttackerUniqueId}");
                             return;
                         }
 
-                        var target = NttWorld.GetEntityByNetId(msg.TargetUniqueId);
+                        var target = NttWorld.GetEntity(msg.TargetUniqueId);
 
                         // TODO: check if target not invalid
 
@@ -104,9 +105,9 @@ namespace MagnumOpus.Networking.Packets
                     {
                         var (skillId, targetId, x, y) = SpellCrypto.DecryptSkill(in ntt, ref msg);
 
-                        if (ntt.NetId != msg.AttackerUniqueId)
+                        if (ntt.Id != msg.AttackerUniqueId)
                         {
-                            FConsole.WriteLine($"[MsgInteract] HAX! {ntt.NetId} != {msg.AttackerUniqueId}");
+                            FConsole.WriteLine($"[MsgInteract] HAX! {ntt.Id} != {msg.AttackerUniqueId}");
                             return;
                         }
 
@@ -119,6 +120,19 @@ namespace MagnumOpus.Networking.Packets
                         // ntt.NetSync(ref atkMsg, true);
                         break;
                     }
+
+                case MsgInteractType.None:
+                    break;
+                case MsgInteractType.RequestMarriage:
+                    break;
+                case MsgInteractType.AcceptMarriage:
+                    break;
+                case MsgInteractType.Death:
+                    break;
+                case MsgInteractType.MonsterHunter:
+                    break;
+                default:
+                    break;
             }
         }
     }

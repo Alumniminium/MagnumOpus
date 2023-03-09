@@ -1,6 +1,6 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components.Attack
 {
     [Component]
     public struct MagicAttackRequestComponent

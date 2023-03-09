@@ -1,10 +1,9 @@
 ﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+using System.Runtime;
 using HerstLib.IO;
 using MagnumOpus.ECS;
-using MagnumOpus.Networking;
-using MagnumOpus.Simulation.Systems;
 using MagnumOpus.Squiggly;
+using MagnumOpus.Systems;
 
 namespace MagnumOpus
 {
@@ -14,6 +13,7 @@ namespace MagnumOpus
         {
             using var server = new Prometheus.MetricServer(port: 1234);
             server.Start();
+
             var systems = new List<NttSystem>
             {
                 new PacketsIn(),
@@ -92,7 +92,10 @@ namespace MagnumOpus
             LoginServer.Start();
             GameServer.Start();
 
-             while (true)
+
+            GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
+
+            while (true)
             {
                 NttWorld.Update();
 
