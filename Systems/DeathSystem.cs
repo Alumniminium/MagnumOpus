@@ -65,7 +65,7 @@ namespace MagnumOpus.Systems
 
                     if (inv.Money > 0 && Random.Shared.NextSingle() < 0.25f)
                     {
-                        var drop = new RequestDropMoneyComponent(ntt.Id, Random.Shared.Next((int)inv.Money));
+                        var drop = new RequestDropMoneyComponent(Random.Shared.Next((int)inv.Money));
                         ntt.Set(ref drop);
                     }
 
@@ -75,14 +75,14 @@ namespace MagnumOpus.Systems
                     {
                         if (Random.Shared.NextSingle() >= 0.1f)
                         {
-                            inv.Items[i].Set(new DestroyEndOfFrameComponent(ntt.Id));
+                            inv.Items[i].Set(new DestroyEndOfFrameComponent());
                             continue;
                         }
 
                         ref var itemComp = ref inv.Items[i].Get<ItemComponent>();
                         if (itemComp.Id == 0)
                             continue;
-                        var rdi = new RequestDropItemComponent(ntt.Id, in inv.Items[i]);
+                        var rdi = new RequestDropItemComponent(in inv.Items[i]);
                         ntt.Set(ref rdi);
                     }
                 }
@@ -125,7 +125,7 @@ namespace MagnumOpus.Systems
                 Collections.SpatialHashs[pos.Map].Remove(in ntt, ref pos);
                 ntt.Remove<PositionComponent>();
                 ntt.Remove<DeathTagComponent>();
-                ntt.Set(new DestroyEndOfFrameComponent(ntt.Id));
+                ntt.Set<DestroyEndOfFrameComponent>();
             }
         }
 
@@ -136,7 +136,7 @@ namespace MagnumOpus.Systems
                 ref var pos = ref ntt.Get<PositionComponent>();
                 var despawn = MsgFloorItem.Create(in ntt, MsgFloorItemType.Delete);
                 ntt.NetSync(ref despawn, true);
-                var ded = new DestroyEndOfFrameComponent(ntt.Id);
+                var ded = new DestroyEndOfFrameComponent();
                 ntt.Set(ref ded);
                 if (Collections.SpatialHashs.TryGetValue(pos.Map, out var hash))
                     hash.Remove(in ntt, ref pos);

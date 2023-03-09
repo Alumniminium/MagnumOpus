@@ -104,7 +104,7 @@ namespace MagnumOpus.Systems
             {
                 var dir = CoMath.GetRawDirection(brn.TargetPosition, pos.Position);
 
-                var wlk = new WalkComponent(ntt.Id, dir, true);
+                var wlk = new WalkComponent( dir, true);
                 ntt.Set(ref wlk);
 
                 if (IsLogging)
@@ -114,7 +114,7 @@ namespace MagnumOpus.Systems
             if (brn.State == BrainState.Attacking)
             {
                 ref readonly var _target = ref NttWorld.GetEntity(brn.TargetId);
-                var atk = new AttackComponent(ntt.Id, in _target, MsgInteractType.Physical);
+                var atk = new AttackComponent( in _target, MsgInteractType.Physical);
                 ntt.Set(ref atk);
                 if (IsLogging)
                     Logger.Debug("{ntt} attacking {target}", ntt, _target);

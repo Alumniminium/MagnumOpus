@@ -176,7 +176,7 @@ namespace MagnumOpus.Helpers
                     {
                         if (!ntt.Has<CqTaskComponent>())
                         {
-                            var tacComp = new CqTaskComponent(ntt.Id, 0);
+                            var tacComp = new CqTaskComponent(0);
                             ntt.Set(ref tacComp);
                         }
                         ref var tac = ref ntt.Get<CqTaskComponent>();
@@ -246,7 +246,7 @@ namespace MagnumOpus.Helpers
                         if (Trace)
                             FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {x},{y},{mapId} -> {action.id_next}");
 
-                        var tpc = new TeleportComponent(ntt.Id, (ushort)x, (ushort)y, (ushort)mapId);
+                        var tpc = new TeleportComponent((ushort)x, (ushort)y, (ushort)mapId);
                         ntt.Set(ref tpc);
                         return action.id_next;
                     }
@@ -254,15 +254,10 @@ namespace MagnumOpus.Helpers
                     {
                         ref readonly var rpc = ref ntt.Get<RecordPointComponent>();
                         if (Trace)
-                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {rpc.X},{rpc.Y},{rpc.Map} {(rpc.EntityId != 0 ? action.id_next : action.id_nextfail)}");
-
-                        if (rpc.EntityId != 0)
-                        {
-                            var tpc = new TeleportComponent(ntt.Id, rpc.X, rpc.Y, rpc.Map);
-                            ntt.Set(ref tpc);
-                            return action.id_next;
-                        }
-                        return action.id_nextfail;
+                            FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {rpc.X},{rpc.Y},{rpc.Map} {action.id_next}");
+                        var tpc = new TeleportComponent(rpc.X, rpc.Y, rpc.Map);
+                        ntt.Set(ref tpc);
+                        return action.id_next;
                     }
                 case TaskActionType.ACTION_POLICEWANTED_CHECK:
                     {
@@ -279,7 +274,7 @@ namespace MagnumOpus.Helpers
                         var x = ushort.Parse(parameters[1]);
                         var y = ushort.Parse(parameters[2]);
 
-                        var rpc = new RecordPointComponent(ntt.Id, x, y, map);
+                        var rpc = new RecordPointComponent(x, y, map);
                         ntt.Set(ref rpc);
 
                         if (Trace)
@@ -400,12 +395,12 @@ namespace MagnumOpus.Helpers
                         ref var itemNtt = ref NttWorld.CreateEntity(EntityType.Item);
 
                         var dura = (ushort)Random.Shared.Next(0, entry.AmountLimit);
-                        var itemComp = new ItemComponent(itemNtt.Id, itemId, dura, entry.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
+                        var itemComp = new ItemComponent(itemId, dura, entry.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
                         itemNtt.Set(ref itemComp);
 
                         _ = InventoryHelper.AddItem(in ntt, ref inv, in itemNtt);
 
-                        var drc = new RequestDropItemComponent(ntt.Id, in itemNtt);
+                        var drc = new RequestDropItemComponent(in itemNtt);
                         ntt.Set(ref drc);
 
                         return action.id_next;
@@ -470,7 +465,7 @@ namespace MagnumOpus.Helpers
                                 ntt.NetSync(ref msg);
                                 count++;
 
-                                var ded = new DestroyEndOfFrameComponent(inv.Items[i].Id);
+                                var ded = new DestroyEndOfFrameComponent();
                                 inv.Items[i].Set(ref ded);
                                 inv.Items[i] = default;
                             }
@@ -513,7 +508,7 @@ namespace MagnumOpus.Helpers
                         }
 
                         ref var itemNtt = ref NttWorld.CreateEntity(EntityType.Item);
-                        var item = new ItemComponent(itemNtt.Id, itemId, itemType.Amount, itemType.AmountLimit, 0, 0, 0, 0, 0, 0, RebornItemEffect.None, 0);
+                        var item = new ItemComponent(itemId, itemType.Amount, itemType.AmountLimit, 0, 0, 0, 0, 0, 0, RebornItemEffect.None, 0);
                         itemNtt.Set(ref item);
                         _ = InventoryHelper.AddItem(in ntt, ref inv, in itemNtt, netSync: true);
 

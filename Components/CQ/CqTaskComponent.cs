@@ -1,4 +1,5 @@
 using MagnumOpus.ECS;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.Components.CQ
 {
@@ -6,16 +7,11 @@ namespace MagnumOpus.Components.CQ
     [Save]
     public struct CqTaskComponent
     {
-        public readonly int EntityId;
         public readonly NTT Npc;
         public int[] Options = new int[16];
         public byte OptionCount;
 
-        public CqTaskComponent(int entityId, int npcId)
-        {
-            EntityId = entityId;
-            Npc = NttWorld.GetEntity(npcId);
-        }
-        public override int GetHashCode() => EntityId;
+        [JsonConstructor]
+        public CqTaskComponent(int npcId) => Npc = NttWorld.GetEntity(npcId);
     }
 }

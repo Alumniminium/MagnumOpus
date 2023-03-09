@@ -1,4 +1,5 @@
 using MagnumOpus.ECS;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.Components.Death
 {
@@ -6,15 +7,9 @@ namespace MagnumOpus.Components.Death
     [Save]
     public readonly struct RespawnTagComponent
     {
-        public readonly int EntityId;
         public readonly long RespawnTimeTick;
 
-        public RespawnTagComponent(int entityId, int respawnTimeDelaySeconds)
-        {
-            EntityId = entityId;
-            RespawnTimeTick = NttWorld.Tick + NttWorld.TargetTps * respawnTimeDelaySeconds;
-        }
-
-        public override int GetHashCode() => EntityId;
+        [JsonConstructor]
+        public RespawnTagComponent(int respawnTimeDelaySeconds) => RespawnTimeTick = NttWorld.Tick + (NttWorld.TargetTps * respawnTimeDelaySeconds);
     }
 }

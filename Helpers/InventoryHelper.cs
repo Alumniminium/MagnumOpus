@@ -30,7 +30,7 @@ namespace MagnumOpus.Helpers
             var found = invIdx != -1;
 
             if (found && destroy)
-                item.Set(new DestroyEndOfFrameComponent(item.Id));
+                item.Set(new DestroyEndOfFrameComponent());
 
             if (found)
                 inv.Items[invIdx] = default;
@@ -71,7 +71,7 @@ namespace MagnumOpus.Helpers
                     continue;
 
                 if (destroy)
-                    item.Set(new DestroyEndOfFrameComponent(item.Id));
+                    item.Set(new DestroyEndOfFrameComponent());
 
                 item = default;
                 return true;

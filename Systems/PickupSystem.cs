@@ -28,8 +28,7 @@ namespace MagnumOpus.Systems
                     ntt.NetSync(ref moneyActionMsg, true);
                 }
 
-                var ded = new DestroyEndOfFrameComponent(pic.Item.Id);
-                pic.Item.Set(ref ded);
+                pic.Item.Set<DestroyEndOfFrameComponent>();
             }
             else
             {

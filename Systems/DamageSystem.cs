@@ -18,7 +18,7 @@ namespace MagnumOpus.Systems
             if (hlt.Health <= 0)
             {
                 hlt.Health = 0;
-                var dtc = new DeathTagComponent(ntt.Id, dmg.Attacker);
+                var dtc = new DeathTagComponent(dmg.Attacker);
                 ntt.Set(ref dtc);
                 if (IsLogging)
                     Logger.Debug("{ntt} died after receiving {dmg} damage", ntt, dmg.Damage);
@@ -26,7 +26,7 @@ namespace MagnumOpus.Systems
 
             if (!dmg.Attacker.Has<ExpRewardComponent>())
             {
-                var expReward = new ExpRewardComponent(in dmg.Attacker, (ushort)actualDamage);
+                var expReward = new ExpRewardComponent((ushort)actualDamage);
                 dmg.Attacker.Set(ref expReward);
                 if (IsLogging)
                     Logger.Debug("{attacker} received {exp} experience", dmg.Attacker, actualDamage);

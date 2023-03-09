@@ -1,6 +1,7 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.Components.Location
 {
@@ -27,6 +28,7 @@ namespace MagnumOpus.Components.Location
         }
 
 
+        [JsonConstructor]
         public BodyComponent(int entityId, uint look = 1003, Direction direction = Direction.South)
         {
             EntityId = entityId;

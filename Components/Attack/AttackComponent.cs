@@ -1,24 +1,22 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.Components.Attack
 {
     [Component]
+    [Save]
     public struct AttackComponent
     {
-        public readonly int EntityId;
         public readonly NTT Target;
         public readonly MsgInteractType AttackType;
         public long SleepTicks;
 
-        public AttackComponent(int nttId, in NTT target, MsgInteractType attackType)
+        [JsonConstructor]
+        public AttackComponent(in NTT target, MsgInteractType attackType)
         {
-            EntityId = nttId;
             Target = target;
             AttackType = attackType;
         }
-
-        public override int GetHashCode() => EntityId;
     }
-
 }

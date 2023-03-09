@@ -1,5 +1,6 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.Components.Location
 {
@@ -7,17 +8,14 @@ namespace MagnumOpus.Components.Location
     [Save]
     public readonly struct EmoteComponent
     {
-        public readonly int EntityId;
         public readonly long ChangedTick;
         public readonly Emote Emote;
 
-        public EmoteComponent(int entityId, Emote emote = Emote.Stand)
+        [JsonConstructor]
+        public EmoteComponent(Emote emote = Emote.Stand)
         {
-            EntityId = entityId;
             Emote = emote;
             ChangedTick = NttWorld.Tick;
         }
-
-        public override int GetHashCode() => EntityId;
     }
 }

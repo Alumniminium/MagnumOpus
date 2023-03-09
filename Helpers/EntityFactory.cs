@@ -1,5 +1,4 @@
 using System.Numerics;
-using MagnumOpus.Components;
 using MagnumOpus.Components.Death;
 using MagnumOpus.Components.Entity;
 using MagnumOpus.Components.Items;
@@ -19,12 +18,12 @@ namespace MagnumOpus.Helpers
             var durability = randomDurability ? (ushort)(1 + (Random.Shared.NextSingle() * itemType.AmountLimit)) : itemType.AmountLimit;
 
             ref var ntt = ref NttWorld.CreateEntity(EntityType.InvItem);
-            var itemInfo = new ItemComponent(ntt.Id, itemId, durability, itemType.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
+            var itemInfo = new ItemComponent(itemId, durability, itemType.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
             ntt.Set(ref itemInfo);
 
             if (pos != Vector2.Zero && map != 0)
             {
-                var posInfo = new PositionComponent(ntt.Id, pos, map);
+                var posInfo = new PositionComponent(pos, map);
                 ntt.Set(ref posInfo);
             }
             return ntt;
@@ -37,12 +36,12 @@ namespace MagnumOpus.Helpers
             if (ntt == null)
                 return null;
 
-            var ltc = new LifeTimeComponent(ntt.Value.Id, TimeSpan.FromSeconds(30));
-            var vwp = new ViewportComponent(ntt.Value.Id, 18f);
+            var ltc = new LifeTimeComponent(TimeSpan.FromSeconds(30));
+            var vwp = new ViewportComponent(18f);
             ntt.Value.Set(ref vwp);
             ntt.Value.Set(ref ltc);
 
-            var moneyInfo = new MoneyRewardComponent(ntt.Value.Id, amount);
+            var moneyInfo = new MoneyRewardComponent(amount);
             ntt.Value.Set(ref moneyInfo);
 
             return ntt;

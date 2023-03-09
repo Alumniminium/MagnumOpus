@@ -32,22 +32,22 @@ namespace MagnumOpus.Systems
             switch (magicType.ActionSort)
             {
                 case 2: // heal self
-                    var tcc = new TargetCollectionComponent(ntt.Id, magicType);
+                    var tcc = new TargetCollectionComponent( magicType);
                     var target = NttWorld.GetEntity(atk.TargetId);
                     tcc.Targets.Add(target);
                     ntt.Set(ref tcc);
                     break;
                 case 11: // Roar
                 case 5: // Circle
-                    var circle = new CircleTargetComponent(ntt.Id, atk.X, atk.Y, magicType);
+                    var circle = new CircleTargetComponent( atk.X, atk.Y, magicType);
                     ntt.Set(ref circle);
                     break;
                 case 4: // Sector
-                    var sector = new SectorTargetComponent(ntt.Id, atk.X, atk.Y, magicType);
+                    var sector = new SectorTargetComponent( atk.X, atk.Y, magicType);
                     ntt.Set(ref sector);
                     break;
                 case 14: // Line
-                    var line = new LineTargetComponent(ntt.Id, atk.X, atk.Y, magicType);
+                    var line = new LineTargetComponent( atk.X, atk.Y, magicType);
                     ntt.Set(ref line);
                     break;
                 default:

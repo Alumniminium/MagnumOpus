@@ -72,11 +72,10 @@ namespace MagnumOpus.Systems
                     if ((int)pro.Profession is > 132 and < 136) // Water Taoiust
                         sharedExp *= 2;                    // Bonus Exp
 
-                    if (mrg.EntityId == member.Id)   // 
-                        if (mrg.SpouseId == ntt.Id) // Marriage bonus
-                            sharedExp *= 2;         // 
+                    if (mrg.SpouseId == ntt.Id) // Marriage bonus
+                        sharedExp *= 2;         // 
 
-                    var sexp = new ExpRewardComponent(in member, sharedExp);
+                    var sexp = new ExpRewardComponent(sharedExp);
                     member.Set(ref sexp);
 
                     var expShareMsg = $"{ntc.Name} shared {sharedExp} experience with you!";

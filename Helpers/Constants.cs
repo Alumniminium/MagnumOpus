@@ -1,4 +1,6 @@
 using System.Numerics;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace MagnumOpus.Helpers
 {
@@ -15,6 +17,14 @@ namespace MagnumOpus.Helpers
             new Vector2(1, -1),
             new Vector2(1, 0),
             new Vector2(1, 1)
+        };
+
+
+        public static readonly JsonSerializerOptions serializerOptions = new()
+        {
+            IncludeFields = true,
+            PropertyNameCaseInsensitive = true,
+            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
         };
     }
 }

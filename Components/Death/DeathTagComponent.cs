@@ -1,4 +1,5 @@
 using MagnumOpus.ECS;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.Components.Death
 {
@@ -6,16 +7,14 @@ namespace MagnumOpus.Components.Death
     [Save]
     public readonly struct DeathTagComponent
     {
-        public readonly int EntityId;
         public readonly NTT Killer;
         public readonly long Tick;
 
-        public DeathTagComponent(int entityId, in NTT killer)
+        [JsonConstructor]
+        public DeathTagComponent(in NTT killer)
         {
-            EntityId = entityId;
             Killer = killer;
             Tick = NttWorld.Tick;
         }
-        public override int GetHashCode() => EntityId;
     }
 }

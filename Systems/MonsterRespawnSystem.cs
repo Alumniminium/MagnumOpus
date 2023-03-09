@@ -31,13 +31,13 @@ namespace MagnumOpus.Systems
 
             if (!Collections.CqMonsterType.TryGetValue(spc.MonsterId, out var cqMob))
             {
-                _.Set(new DestroyEndOfFrameComponent(_.Id));
+                _.Set(new DestroyEndOfFrameComponent());
                 return;
             }
 
             if (!Collections.Maps.TryGetValue(pos.Map, out var cqMap))
             {
-                _.Set(new DestroyEndOfFrameComponent(_.Id));
+                _.Set(new DestroyEndOfFrameComponent());
                 return;
             }
 
@@ -51,14 +51,14 @@ namespace MagnumOpus.Systems
                 ref var mob = ref NttWorld.CreateEntity(EntityType.Monster);
                 var respawnPos = CoMath.GetRandomPointInRect(in spc.SpawnArea);
 
-                var cqm = new CqMonsterComponent(mob.Id, prefab.id);
-                var mpos = new PositionComponent(mob.Id, respawnPos, pos.Map);
-                var bdy = new BodyComponent(mob.Id, prefab.lookface, (Direction)Random.Shared.Next(0, 9));
-                var hp = new HealthComponent(mob.Id, prefab.life, prefab.life);
-                var ntc = new NameTagComponent(mob.Id, prefab.name.Trim());
-                var vwp = new ViewportComponent(mob.Id, 18f);
-                var inv = new InventoryComponent(mob.Id, prefab.drop_money, 0);
-                var fsp = new FromSpawnerComponent(mob.Id, _.Id);
+                var cqm = new CqMonsterComponent(prefab.id);
+                var mpos = new PositionComponent(respawnPos, pos.Map);
+                var bdy = new BodyComponent(mob, prefab.lookface, (Direction)Random.Shared.Next(0, 9));
+                var hp = new HealthComponent(mob, prefab.life, prefab.life);
+                // var ntc = new NameTagComponent(mob.Id, prefab.name.Trim());
+                var vwp = new ViewportComponent(18f);
+                var inv = new InventoryComponent(mob, prefab.drop_money, 0);
+                var fsp = new FromSpawnerComponent(_);
 
                 var items = ItemGenerator.GetDropItemsFor(cqm.CqMonsterId);
                 for (var x = 0; x < items.Count; x++)
@@ -79,13 +79,13 @@ namespace MagnumOpus.Systems
 
                 if (prefab.action != 0)
                 {
-                    var cq = new CqActionComponent(mob.Id, prefab.action);
+                    var cq = new CqActionComponent(prefab.action);
                     mob.Set(ref cq);
                 }
 
                 if (prefab.lookface is 900 or 910)
                 {
-                    var grd = new GuardPositionComponent(mob.Id, new Vector2(spc.SpawnArea.X, spc.SpawnArea.Y));
+                    var grd = new GuardPositionComponent(new Vector2(spc.SpawnArea.X, spc.SpawnArea.Y));
                     mob.Set(ref grd);
                 }
 
@@ -95,13 +95,13 @@ namespace MagnumOpus.Systems
                 mob.Set(ref mpos);
                 mob.Set(ref bdy);
                 mob.Set(ref hp);
-                mob.Set(ref ntc);
+                // mob.Set(ref ntc);
                 mob.Set(ref vwp);
                 mob.Set(ref inv);
                 mob.Set(ref cqm);
                 mob.Set(ref fsp);
 
-                var brn = new BrainComponent(mob.Id);
+                var brn = new BrainComponent();
                 mob.Set(ref brn);
 
                 if (!Collections.SpatialHashs.ContainsKey(pos.Map))
@@ -114,7 +114,7 @@ namespace MagnumOpus.Systems
                 if (IsLogging)
                 {
                     Logger.Debug("{ntt} spawned {mob} at {pos}", mob, cqMob.name, mpos.Position);
-                    var msgTalk = MsgText.Create(in _, "Respawning " + ntc.Name + " at " + mpos.Position.X + ", " + mpos.Position.Y);
+                    var msgTalk = MsgText.Create(in _, "Respawning " + cqMob.name + " at " + mpos.Position.X + ", " + mpos.Position.Y);
                     _.NetSync(ref msgTalk, true);
                 }
                 if (spc.Count >= spc.MaxCount)

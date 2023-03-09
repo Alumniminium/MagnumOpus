@@ -68,8 +68,8 @@ namespace MagnumOpus.Networking.Packets
                 return;
             }
 
-            var wlk = new WalkComponent(ntt.Id, msg.RawDirection, msg.Type == 1);
-            var emo = new EmoteComponent(ntt.Id, Emote.Stand);
+            var wlk = new WalkComponent( msg.RawDirection, msg.Type == 1);
+            var emo = new EmoteComponent( Emote.Stand);
             ntt.Set(ref wlk);
             ntt.Set(ref emo);
             ntt.Remove<AttackComponent>();

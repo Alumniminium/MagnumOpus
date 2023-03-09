@@ -1,6 +1,7 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.Components.Entity
 {
@@ -22,6 +23,7 @@ namespace MagnumOpus.Components.Entity
             }
         }
 
+        [JsonConstructor]
         public ProfessionComponent(int entityId, ClasseName profession)
         {
             EntityId = entityId;

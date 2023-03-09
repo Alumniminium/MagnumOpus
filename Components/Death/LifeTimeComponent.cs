@@ -1,4 +1,5 @@
 using MagnumOpus.ECS;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.Components.Death
 {
@@ -6,14 +7,9 @@ namespace MagnumOpus.Components.Death
     [Save]
     public struct LifeTimeComponent
     {
-        public readonly int EntityId;
         public uint ExpireTick;
 
-        public LifeTimeComponent(int entityId, TimeSpan timespan)
-        {
-            EntityId = entityId;
-            ExpireTick = (uint)(NttWorld.Tick + NttWorld.TargetTps * timespan.TotalSeconds);
-        }
-        public override int GetHashCode() => EntityId;
+        [JsonConstructor]
+        public LifeTimeComponent(TimeSpan timespan) => ExpireTick = (uint)(NttWorld.Tick + NttWorld.TargetTps * timespan.TotalSeconds);
     }
 }

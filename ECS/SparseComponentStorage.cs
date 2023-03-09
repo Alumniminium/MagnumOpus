@@ -1,80 +1,83 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text.Json;
 using HerstLib.IO;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.ECS
 {
     public static class SparseComponentStorage<T> where T : struct
     {
         private static readonly T[] Default = new T[1];
-        private static readonly Dictionary<int, T> NttToComponents = new();
+        private static readonly Dictionary<int, T> Components = new();
         private static readonly object lockObj = new();
 
         static SparseComponentStorage()
         {
             var start = Stopwatch.GetTimestamp();
-            var filename = "_STATE_FILES/" + typeof(T).Name + ".json";
+            var filename = Path.Combine("_STATE_FILES", $"{typeof(T).Name}.json");
+
             if (!File.Exists(filename))
                 return;
 
-            using var stream = File.OpenRead(filename);
-            NttToComponents = JsonSerializer.Deserialize<Dictionary<int, T>>(stream) ?? new();
+            var json = File.ReadAllText(filename);
+            Components = JsonConvert.DeserializeObject<Dictionary<int, T>>(json) ?? new();
+
             var time = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
             FConsole.WriteLine($"Loaded {typeof(T).Name} in {time}ms");
         }
 
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AddFor(in NTT owner, ref T component)
+        public static void AddFor(in NTT ntt, ref T c)
         {
             lock (lockObj)
             {
-                ref var existing = ref CollectionsMarshal.GetValueRefOrAddDefault(NttToComponents, owner.Id, out var exists);
-                existing = component;
+                ref var old = ref CollectionsMarshal.GetValueRefOrAddDefault(Components, ntt.Id, out var found);
+                old = c;
 
-                if (!exists)
-                    NttWorld.InformChangesFor(in owner);
+                if (!found)
+                    NttWorld.InformChangesFor(in ntt);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool HasFor(in NTT owner) => NttToComponents.ContainsKey(owner.Id);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref T Get(scoped in NTT owner)
+        public static void AddFor(in NTT ntt)
         {
-            return ref NttToComponents.ContainsKey(owner.Id) ? ref CollectionsMarshal.GetValueRefOrNullRef(NttToComponents, owner.Id) : ref Default[0];
+            lock (lockObj)
+            {
+                ref var old = ref CollectionsMarshal.GetValueRefOrAddDefault(Components, ntt.Id, out var found);
+                if (!found)
+                    NttWorld.InformChangesFor(in ntt);
+            }
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool HasFor(in NTT ntt) => Components.ContainsKey(ntt.Id);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ref T Get(scoped in NTT ntt) => ref Components.ContainsKey(ntt.Id) ? ref CollectionsMarshal.GetValueRefOrNullRef(Components, ntt.Id) : ref Default[0];
 
         // called via reflection @ ReflectionHelper.Remove<T>()
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Remove(NTT owner, bool notify)
+        public static void Remove(NTT ntt, bool notify)
         {
             lock (lockObj)
             {
-                if (!NttToComponents.Remove(owner.Id))
+                if (!Components.Remove(ntt.Id))
                     return;
             }
             if (notify)
-                NttWorld.InformChangesFor(in owner);
+                NttWorld.InformChangesFor(in ntt);
         }
 
         // called via reflection @ ReflectionHelper.Save<T>()
-        private static readonly JsonSerializerOptions serializerOptions = new()
-        {
-            IncludeFields = true,
-            IgnoreReadOnlyFields = false,
-            WriteIndented = false
-        };
         public static void Save(string path)
         {
             var start = Stopwatch.GetTimestamp();
-            using var stream = File.OpenWrite(path + "/" + typeof(T).Name + ".json");
-            using var writer = new Utf8JsonWriter(stream);
-            JsonSerializer.Serialize(stream, NttToComponents, serializerOptions);
-            var time = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
+            var filename = Path.Combine(path, $"{typeof(T).Name}.json");
 
-            FConsole.WriteLine($"Saved {typeof(T).Name} to {path} in {time}ms");
+            var json = JsonConvert.SerializeObject(Components);
+            File.WriteAllText(filename, json);
+
+            var time = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
+            FConsole.WriteLine($"Saved {typeof(T).Name} to {filename} in {time}ms");
         }
     }
 }

@@ -1,4 +1,5 @@
 using MagnumOpus.ECS;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.Components.Entity
 {
@@ -6,15 +7,9 @@ namespace MagnumOpus.Components.Entity
     [Save]
     public struct VirtuePointComponent
     {
-        public readonly int EntityId;
         public long Points;
 
-        public VirtuePointComponent(int entityId, long points)
-        {
-            EntityId = entityId;
-            Points = points;
-        }
-
-        public override int GetHashCode() => EntityId;
+        [JsonConstructor]
+        public VirtuePointComponent(long points) => Points = points;
     }
 }

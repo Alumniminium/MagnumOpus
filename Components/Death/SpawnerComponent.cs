@@ -1,13 +1,13 @@
 using System.Drawing;
 using MagnumOpus.ECS;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.Components.Death
 {
     [Component]
+    [Save]
     public struct SpawnerComponent
     {
-        public readonly int EntityId;
-
         public readonly int GeneratorId;
         public readonly int MonsterId;
         public readonly Rectangle SpawnArea;
@@ -18,9 +18,9 @@ namespace MagnumOpus.Components.Death
         public long RunTick;
         public int Count;
 
-        public SpawnerComponent(in NTT ntt, long generatorId, in Rectangle spawnArea, int monsterId, int spawnLimit, int spawnInterval, int spawnCount)
+        [JsonConstructor]
+        public SpawnerComponent(long generatorId, in Rectangle spawnArea, int monsterId, int spawnLimit, int spawnInterval, int spawnCount)
         {
-            EntityId = ntt.Id;
             GeneratorId = (int)generatorId;
             MonsterId = monsterId;
             SpawnArea = spawnArea;
@@ -29,7 +29,5 @@ namespace MagnumOpus.Components.Death
             GenPerTimer = spawnCount;
             RunTick = NttWorld.TargetTps * TimerSeconds;
         }
-
-        public override int GetHashCode() => EntityId;
     }
 }

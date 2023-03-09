@@ -28,17 +28,15 @@ namespace MagnumOpus.Networking.Packets
 
             msgP->Size = (ushort)sizeof(MsgSyndicateSpawn);
             msgP->Id = 1106;
-            if (gld.EntityId == ntt.Id)
-            {
-                msgP->UniqueId = gld.GuildId;
-                msgP->Donation = gld.Donation;
-                msgP->Funds = gld.Funds;
-                msgP->Rank = gld.Rank;
-                msgP->MemberCount = gld.Members.Length;
 
-                for (byte i = 0; i < ntc.Name.Length; i++)
-                    msgP->LeaderName[i] = (byte)ntc.Name[i];
-            }
+            msgP->UniqueId = gld.GuildId;
+            msgP->Donation = gld.Donation;
+            msgP->Funds = gld.Funds;
+            msgP->Rank = gld.Rank;
+            msgP->MemberCount = gld.Members.Length;
+
+            for (byte i = 0; i < ntc.Name.Length; i++)
+                msgP->LeaderName[i] = (byte)ntc.Name[i];
 
             var buffer = new byte[sizeof(MsgSyndicateSpawn)];
             fixed (byte* p = buffer)

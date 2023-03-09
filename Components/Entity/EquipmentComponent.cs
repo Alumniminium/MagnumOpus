@@ -1,16 +1,17 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.Components.Entity
 {
     [Component]
     [Save]
-    public struct EquipmentComponent
+    public readonly struct EquipmentComponent
     {
-        public readonly int EntityId;
-        public long ChangedTick;
+        public readonly Dictionary<MsgItemPosition, NTT> Items;
 
-        public readonly Dictionary<MsgItemPosition, NTT> Items = new()
+        [JsonConstructor]
+        public EquipmentComponent(Dictionary<MsgItemPosition, NTT>? items) => Items = items ?? new()
         {
                 { MsgItemPosition.Head, default },
                 { MsgItemPosition.Necklace, default },
@@ -22,13 +23,5 @@ namespace MagnumOpus.Components.Entity
                 { MsgItemPosition.LeftWeapon, default },
                 { MsgItemPosition.Boots, default }
         };
-
-        public EquipmentComponent(int entityId)
-        {
-            EntityId = entityId;
-            ChangedTick = NttWorld.Tick;
-        }
-
-        public override int GetHashCode() => EntityId;
     }
 }

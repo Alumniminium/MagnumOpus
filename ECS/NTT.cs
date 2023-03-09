@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using MagnumOpus.Components;
 using MagnumOpus.Components.Entity;
 using MagnumOpus.Networking;
@@ -10,6 +11,7 @@ namespace MagnumOpus.ECS
         public readonly int Id;
         public readonly EntityType Type;
 
+        [JsonConstructor]
         public NTT(int id, EntityType type)
         {
             Id = id;
@@ -20,6 +22,7 @@ namespace MagnumOpus.ECS
         public readonly void Set<T>(ref T component) where T : struct => SparseComponentStorage<T>.AddFor(in this, ref component);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly void Set<T>(T component) where T : struct => SparseComponentStorage<T>.AddFor(in this, ref component);
+        public readonly void Set<T>() where T : struct => SparseComponentStorage<T>.AddFor(in this);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly ref T Get<T>() where T : struct => ref SparseComponentStorage<T>.Get(in this);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -35,7 +38,7 @@ namespace MagnumOpus.ECS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly void Remove<T>() => ReflectionHelper.Remove<T>(in this);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly void Recycle() => ReflectionHelper.RecycleComponents(in this);
+        public readonly void Recycle() => ReflectionHelper.RecycleComponents(this);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly void NetSync<T>(ref T msg, bool broadcast = false) where T : unmanaged
         {
@@ -52,14 +55,14 @@ namespace MagnumOpus.ECS
 
                     ref readonly var net = ref b.Get<NetworkComponent>();
                     var packet = Co2Packet.Serialize(ref msg);
-                    net.SendQueue.Enqueue(packet);
+                    net.SendQueue?.Enqueue(packet);
                 }
             }
             else if (Type == EntityType.Player)
             {
                 ref readonly var net = ref Get<NetworkComponent>();
                 var packet = Co2Packet.Serialize(ref msg);
-                net.SendQueue.Enqueue(packet);
+                net.SendQueue?.Enqueue(packet);
             }
         }
 
@@ -71,6 +74,7 @@ namespace MagnumOpus.ECS
         public static bool operator ==(in NTT a, in NTT b) => a.Id == b.Id;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(in NTT a, in NTT b) => a.Id != b.Id;
+        public static implicit operator int(in NTT a) => a.Id;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => $"NTT {Id} ({Type})";
     }

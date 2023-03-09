@@ -15,7 +15,7 @@ namespace MagnumOpus.ECS
             GetSaveMethods();
         }
 
-        private static void GetRemoveMethods()
+        public static void GetRemoveMethods()
         {
             var types = Assembly.GetExecutingAssembly()
                             .GetTypes()
@@ -33,7 +33,7 @@ namespace MagnumOpus.ECS
             {
                 var type = componentTypes[i];
                 var method = RemoveMethodCache[i];
-                RemoveCache.Add(type, method);
+                RemoveCache.TryAdd(type, method);
             }
         }
 
@@ -65,11 +65,7 @@ namespace MagnumOpus.ECS
                 return;
             method.Invoke(ntt, true);
         }
-        public static void RecycleComponents(in NTT ntt)
-        {
-            for (var i = 0; i < RemoveMethodCache.Count; i++)
-                RemoveMethodCache[i].Invoke(ntt, false);
-        }
+        public static void RecycleComponents(NTT ntt) => Parallel.For(0, RemoveMethodCache.Count, i => RemoveMethodCache[i].Invoke(ntt, false));
         public static void SaveComponents(string path) => Parallel.For(0, SaveMethodCache.Count, i => SaveMethodCache[i].Invoke(path));
     }
 }

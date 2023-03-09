@@ -2,7 +2,9 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using HerstLib.IO;
 using MagnumOpus.Helpers;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.ECS
 {
@@ -14,7 +16,7 @@ namespace MagnumOpus.ECS
         public static int EntityCount => NTTs.Count;
 
         private static readonly NTT[] Default = new NTT[1];
-        private static readonly Dictionary<int, NTT> NTTs = new();
+        public static readonly Dictionary<int, NTT> NTTs = new();
         public static readonly HashSet<NTT> Players = new();
 
         private static readonly ConcurrentQueue<NTT> ToBeRemoved = new();
@@ -31,6 +33,26 @@ namespace MagnumOpus.ECS
         private static Action? OnSecond;
         private static Action? OnEndTick;
 
+        static NttWorld()
+        {
+            var start = Stopwatch.GetTimestamp();
+            var filename = Path.Combine("_STATE_FILES", "NttWorld.json");
+
+            if (!File.Exists(filename))
+            {
+                NTTs = new();
+                return;
+            }
+
+            if (File.Exists("_STATE_FILES/tick.last"))
+                Tick = long.Parse(File.ReadAllText("_STATE_FILES/tick.last"));
+
+            var json = File.ReadAllText(filename);
+            NTTs = JsonConvert.DeserializeObject<Dictionary<int, NTT>>(json) ?? new();
+
+            var time = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
+            FConsole.WriteLine($"Loaded NttWorld in {time}ms");
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetSystems(params NttSystem[] systems)
@@ -126,6 +148,18 @@ namespace MagnumOpus.ECS
             PrometheusPush.TickTime.Observe(tickDuration);
             var sleepTime = (int)Math.Max(0, -1 + (UpdateTime * 1000) - tickDuration);
             Thread.Sleep(sleepTime);
+        }
+
+        public static void Save(string path)
+        {
+            var start = Stopwatch.GetTimestamp();
+            var filename = Path.Combine(path, $"{nameof(NttWorld)}.json");
+            var json = JsonConvert.SerializeObject(NTTs);
+            File.WriteAllText(filename, json);
+            File.WriteAllText(path + "/tick.last", $"{Tick}");
+
+            var time = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
+            FConsole.WriteLine($"Saved {nameof(NttWorld)} to {filename} in {time}ms");
         }
     }
 }

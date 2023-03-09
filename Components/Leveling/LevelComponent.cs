@@ -1,6 +1,7 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.Components.Leveling
 {
@@ -37,9 +38,9 @@ namespace MagnumOpus.Components.Leveling
             }
         }
 
-        public LevelComponent(int entityId, byte level = 1, uint experience = 0, uint experienceToNextLevel = 120)
+        [JsonConstructor]
+        public LevelComponent(byte level = 1, uint experience = 0, uint experienceToNextLevel = 120)
         {
-            EntityId = entityId;
             Level = level;
             Experience = experience;
             ExperienceToNextLevel = experienceToNextLevel;

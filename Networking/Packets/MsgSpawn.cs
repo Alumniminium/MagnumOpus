@@ -8,6 +8,7 @@ using MagnumOpus.Components.Leveling;
 using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -64,7 +65,7 @@ namespace MagnumOpus.Networking.Packets
         {
             ref readonly var hed = ref ntt.Get<HeadComponent>();
             ref readonly var bdy = ref ntt.Get<BodyComponent>();
-            ref readonly var ntc = ref ntt.Get<NameTagComponent>();
+            ref var ntc = ref ntt.Get<NameTagComponent>();
             ref readonly var gld = ref ntt.Get<GuildComponent>();
             ref readonly var eqc = ref ntt.Get<EquipmentComponent>();
             ref readonly var pos = ref ntt.Get<PositionComponent>();
@@ -72,16 +73,14 @@ namespace MagnumOpus.Networking.Packets
             var look = bdy.Look;
             look = (uint)((hed.FaceId * 10_000) + bdy.Look);
             if (ntt.Has<DeathTagComponent>())
-            {
                 look = bdy.Look % 10000 is 2001 or 2002 ? AddTransform(bdy.Look, 99) : AddTransform(bdy.Look, 98);
-            }
 
             var head = 0;
             var armor = 0;
             var mainHand = 0;
             var offHand = 0;
 
-            if (eqc.EntityId == ntt.Id)
+            if (eqc.Items != null)
             {
                 _ = eqc.Items.TryGetValue(MsgItemPosition.Head, out var headItem);
                 head = headItem.Get<ItemComponent>().Id;
@@ -93,6 +92,7 @@ namespace MagnumOpus.Networking.Packets
                 offHand = offHandItem.Get<ItemComponent>().Id;
             }
 
+            ntc.Name ??= "Id:" + ntt.Id;
 
             var msg = new MsgSpawn
             {
@@ -127,15 +127,18 @@ namespace MagnumOpus.Networking.Packets
         public static MsgSpawn CreateMonster(in NTT ntt)
         {
             ref readonly var bdy = ref ntt.Get<BodyComponent>();
-            ref var ntc = ref ntt.Get<NameTagComponent>();
             ref readonly var lvl = ref ntt.Get<LevelComponent>();
             ref readonly var gld = ref ntt.Get<GuildComponent>();
+            ref readonly var cqm = ref ntt.Get<CqMonsterComponent>();
             ref readonly var hlt = ref ntt.Get<HealthComponent>();
             ref readonly var pos = ref ntt.Get<PositionComponent>();
             ref readonly var eff = ref ntt.Get<StatusEffectComponent>();
+            var name = string.Empty;
 
-            if (string.IsNullOrEmpty(ntc.Name))
-                ntc.Name = "";
+            if (!Collections.CqMonsterType.TryGetValue(cqm.CqMonsterId, out var cqMob))
+                name = "Id:" + ntt.Id;
+            else
+                name = cqMob.name;
 
             var msg = new MsgSpawn
             {
@@ -149,12 +152,12 @@ namespace MagnumOpus.Networking.Packets
                 Direction = bdy.Direction,
                 Emote = Emote.Stand,
                 StringCount = 1,
-                NameLen = (byte)ntc.Name.Trim().Length,
+                NameLen = (byte)name.Trim().Length,
                 X = (ushort)pos.Position.X,
                 Y = (ushort)pos.Position.Y,
             };
-            for (byte i = 0; i < ntc.Name.Trim().Length; i++)
-                msg.Name[i] = (byte)ntc.Name.Trim()[i];
+            for (byte i = 0; i < name.Trim().Length; i++)
+                msg.Name[i] = (byte)name.Trim()[i];
 
             return msg;
         }

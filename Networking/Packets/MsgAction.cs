@@ -96,14 +96,17 @@ namespace MagnumOpus.Networking.Packets
             {
                 case MsgActionType.Revive:
                     {
-                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id}");
-                        var rev = new ReviveComponent(ntt.Id, 1);
+                        if (_trace)
+                            FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id}");
+                        var rev = new ReviveComponent(1);
                         ntt.Set(ref rev);
                         break;
                     }
                 case MsgActionType.SendLocation:
                     {
-                        if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.X}, {msg.Y}");
+                        if (_trace)
+                            FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.X}, {msg.Y}");
+
                         ref var pos = ref ntt.Get<PositionComponent>();
                         ref var vwp = ref ntt.Get<ViewportComponent>();
                         vwp.EntitiesVisible.Clear();
@@ -165,15 +168,15 @@ namespace MagnumOpus.Networking.Packets
                 case MsgActionType.ChangeAction:
                     {
                         if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.Param}");
-                        var emo = new EmoteComponent(ntt.Id, (Emote)msg.Param);
+                        var emo = new EmoteComponent((Emote)msg.Param);
                         ntt.Set(ref emo);
                         break;
                     }
                 case MsgActionType.Jump:
                     {
                         if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.JumpX}, {msg.JumpY}");
-                        var jmp = new JumpComponent(ntt.Id, msg.JumpX, msg.JumpY);
-                        var emo = new EmoteComponent(ntt.Id, Emote.Stand);
+                        var jmp = new JumpComponent(msg.JumpX, msg.JumpY);
+                        var emo = new EmoteComponent(Emote.Stand);
                         ntt.Set(ref jmp);
                         ntt.Set(ref emo);
                         break;
@@ -181,7 +184,7 @@ namespace MagnumOpus.Networking.Packets
                 case MsgActionType.EnterPortalChangeMap:
                     {
                         if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.Param}");
-                        var tpc = new PortalComponent(ntt.Id, msg.X, msg.Y);
+                        var tpc = new PortalComponent(msg.X, msg.Y);
                         ntt.Set(ref tpc);
                         break;
                     }

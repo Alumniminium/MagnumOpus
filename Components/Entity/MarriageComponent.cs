@@ -1,4 +1,5 @@
 using MagnumOpus.ECS;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.Components.Entity
 {
@@ -6,22 +7,16 @@ namespace MagnumOpus.Components.Entity
     [Save]
     public struct MarriageComponent
     {
-        public readonly int EntityId;
         public int SpouseId;
         public int WeddingTick;
         public int DivorceTick;
 
-        public MarriageComponent(int entityId, int spouseId, int weddingTick, int divorceTick)
+        [JsonConstructor]
+        public MarriageComponent(int spouseId, int weddingTick, int divorceTick)
         {
-            EntityId = entityId;
             SpouseId = spouseId;
             WeddingTick = weddingTick;
             DivorceTick = divorceTick;
-        }
-
-        public override int GetHashCode()
-        {
-            return EntityId;
         }
     }
 }

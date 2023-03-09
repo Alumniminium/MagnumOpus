@@ -97,7 +97,7 @@ namespace MagnumOpus.Networking.Packets
 
                         // TODO: check if target not invalid
 
-                        var atk = new AttackComponent(ntt.Id, in target, msg.Type);
+                        var atk = new AttackComponent( in target, msg.Type);
                         ntt.Set(ref atk);
                         break;
                     }
@@ -111,7 +111,7 @@ namespace MagnumOpus.Networking.Packets
                             return;
                         }
 
-                        var mAtk = new MagicAttackRequestComponent(ntt.Id, skillId, targetId, x, y, NttWorld.TargetTps);
+                        var mAtk = new MagicAttackRequestComponent( skillId, targetId, x, y, NttWorld.TargetTps);
                         ntt.Set(ref mAtk);
 
                         // var target = PixelWorld.GetEntityByNetId((int)targetId);

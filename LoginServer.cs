@@ -34,7 +34,7 @@ namespace MagnumOpus
                 while (!ready) ;
 
                 var player = NttWorld.CreateEntity(EntityType.Player);
-                var net = new NetworkComponent(in player, client.Client);
+                var net = new NetworkComponent(client.Client);
                 player.Set(ref net);
 
                 var ipendpoint = client.Client.RemoteEndPoint?.ToString();

@@ -16,7 +16,7 @@ namespace MagnumOpus.Systems
 
         public override void Update(in NTT ntt, ref CircleTargetComponent atk, ref ViewportComponent vwp)
         {
-            var tcc = new TargetCollectionComponent(ntt.Id, atk.MagicType);
+            var tcc = new TargetCollectionComponent( atk.MagicType);
 
             foreach (var kvp in vwp.EntitiesVisible)
             {

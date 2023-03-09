@@ -1,19 +1,14 @@
 using MagnumOpus.ECS;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.Components.Items
 {
     [Component]
     public readonly struct RequestDropMoneyComponent
     {
-        public readonly int EntityId;
         public readonly int Amount;
 
-        public RequestDropMoneyComponent(int entityId, int amount)
-        {
-            EntityId = entityId;
-            Amount = amount;
-        }
-
-        public override int GetHashCode() => EntityId;
+        [JsonConstructor]
+        public RequestDropMoneyComponent(int amount) => Amount = amount;
     }
 }

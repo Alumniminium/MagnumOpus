@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using MagnumOpus.ECS;
 
 namespace MagnumOpus.Components.Entity
@@ -6,14 +7,8 @@ namespace MagnumOpus.Components.Entity
     [Save]
     public struct NameTagComponent
     {
-        public readonly int EntityId;
-        public string Name = string.Empty;
-
-        public NameTagComponent(int entityId, string name)
-        {
-            EntityId = entityId;
-            Name = name;
-        }
-        public override int GetHashCode() => EntityId;
+        public string Name;
+        [JsonConstructor]
+        public NameTagComponent(string Name) => this.Name = Name;
     }
 }

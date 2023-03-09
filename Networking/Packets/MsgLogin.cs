@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using HerstLib.IO;
 using MagnumOpus.Components;
+using MagnumOpus.Components.Death;
 using MagnumOpus.Components.Entity;
 using MagnumOpus.Components.Items;
 using MagnumOpus.Components.Leveling;
@@ -41,24 +42,42 @@ namespace MagnumOpus.Networking.Packets
             var msg = Co2Packet.Deserialze<MsgLogin>(packet);
             var language = msg.GetLanguage();
             FConsole.WriteLine($"[GAME] Client Version: {msg.ClientVersion}, Language: {language}");
+
             PrometheusPush.LoginCount.Inc();
+
             ref readonly var net = ref ntt.Get<NetworkComponent>();
-            if (!ntt.Has<NameTagComponent>())
+            var found = false;
+            foreach (var kvp in NttWorld.NTTs)
             {
-                var ntc = new NameTagComponent(ntt.Id, net.Username);
+                var oldNtt = kvp.Value;
+                ref var oldNtc = ref oldNtt.Get<NameTagComponent>();
+
+                if (oldNtc.Name == net.Username)
+                {
+                    oldNtt.Set(net);
+                    // ntt.Remove<NetworkComponent>();
+                    // ntt.Set<DestroyEndOfFrameComponent>();
+                    found = true;
+                    ntt = oldNtt;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                var ntc = new NameTagComponent(net.Username);
                 var bdy = new BodyComponent(ntt.Id, (uint)(net.Username == "trbl" ? 2003 : 2002));
-                var hed = new HeadComponent(ntt.Id, 6);
-                var emo = new EmoteComponent(ntt.Id, Emote.Stand);
-                var vwp = new ViewportComponent(ntt.Id, 21);
-                var pos = new PositionComponent(ntt.Id, new System.Numerics.Vector2(438, 377), 1002);
+                var hed = new HeadComponent(6);
+                var emo = new EmoteComponent(Emote.Stand);
+                var vwp = new ViewportComponent(21);
+                var pos = new PositionComponent(new System.Numerics.Vector2(438, 377), 1002);
                 var eff = new StatusEffectComponent(ntt.Id);
                 var inv = new InventoryComponent(ntt.Id, 1000000, 0);
-                var lvl = new LevelComponent(ntt.Id, 1);
-                var hlt = new HealthComponent(ntt.Id, 330, 330);
-                var mana = new ManaComponent(ntt.Id, 1000, 1000);
-                var pro = new ProfessionComponent(ntt.Id, ClasseName.Archer);
-                var sbc = new SpellBookComponent(ntt.Id);
-                var eqc = new EquipmentComponent(ntt.Id);
+                var lvl = new LevelComponent(1);
+                var hlt = new HealthComponent(ntt, 330, 330);
+                var mana = new ManaComponent(1000, 1000);
+                var pro = new ProfessionComponent(ntt, ClasseName.Archer);
+                var sbc = new SpellBookComponent();
+                var eqc = new EquipmentComponent();
 
                 sbc.Spells.Add(1000, (4, 0, 0));
                 sbc.Spells.Add(1005, (4, 0, 0));
@@ -85,24 +104,22 @@ namespace MagnumOpus.Networking.Packets
                 ntt.Set(ref hed);
 
                 var testItem = NttWorld.CreateEntity(EntityType.Item);
-                var itemComp = new ItemComponent(testItem.Id, 1001020, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+                var itemComp = new ItemComponent(1001020, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
                 testItem.Set(ref itemComp);
                 inv.Items[0] = testItem;
 
                 var testItem2 = NttWorld.CreateEntity(EntityType.Item);
-                var itemComp2 = new ItemComponent(testItem2.Id, 1000000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+                var itemComp2 = new ItemComponent(1000000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
                 testItem2.Set(ref itemComp2);
                 inv.Items[1] = testItem2;
-
             }
-
             var ok = MsgText.Create("SYSTEM", "ALLUSERS", "ANSWER_OK", MsgTextType.LoginInformation);
             var info = MsgCharacter.Create(ntt);
-            var msgStatus = MsgMapStatus.Create(1002, (uint)(MapFlags.NewbieProtect | MapFlags.NoPk));
+            var msgMap = MsgMapStatus.Create(1002, (uint)(MapFlags.EnablePlayerShop | MapFlags.Mine | MapFlags.NewbieProtect));
 
             ntt.NetSync(ref ok);
             ntt.NetSync(ref info);
-            ntt.NetSync(ref msgStatus);
+            ntt.NetSync(ref msgMap);
         }
     }
 }

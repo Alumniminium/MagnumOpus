@@ -62,7 +62,7 @@ namespace MagnumOpus.Systems
                     {
                         inv.Money -= itemEntry.Price;
                         ref var itemNtt = ref NttWorld.CreateEntity(EntityType.Item);
-                        var newItemComp = new ItemComponent(itemNtt.Id, txc.ItemId, itemEntry.Amount, itemEntry.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
+                        var newItemComp = new ItemComponent(txc.ItemId, itemEntry.Amount, itemEntry.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
                         itemNtt.Set(ref newItemComp);
                         inv.Items[i] = itemNtt;
 
@@ -84,7 +84,7 @@ namespace MagnumOpus.Systems
                         inv.Money += money;
 
                         ref var itemNtt = ref NttWorld.GetEntity(txc.ItemId);
-                        var def = new DestroyEndOfFrameComponent(itemNtt.Id);
+                        var def = new DestroyEndOfFrameComponent();
                         itemNtt.Set(ref def);
 
                         inv.Items[i] = default;

@@ -1,5 +1,6 @@
 using System.Numerics;
 using MagnumOpus.ECS;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.Components.AI
 {
@@ -7,15 +8,8 @@ namespace MagnumOpus.Components.AI
     [Save]
     public readonly struct GuardPositionComponent
     {
-        public readonly int EntityId;
         public readonly Vector2 Position;
-
-        public GuardPositionComponent(int entityId, Vector2 pos)
-        {
-            EntityId = entityId;
-            Position = pos;
-        }
-
-        public override int GetHashCode() => EntityId;
+        [JsonConstructor]
+        public GuardPositionComponent(Vector2 pos) => Position = pos;
     }
 }

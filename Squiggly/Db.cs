@@ -1,18 +1,17 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Numerics;
-using HerstLib.IO;
 using Co2Core.Security.Cryptography;
-using MagnumOpus.Components;
+using HerstLib.IO;
+using MagnumOpus._HerstLib.IO;
+using MagnumOpus.Components.CQ;
+using MagnumOpus.Components.Death;
+using MagnumOpus.Components.Entity;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.SpacePartitioning;
 using MagnumOpus.Squiggly.Models;
-using MagnumOpus.Components.Death;
-using MagnumOpus.Components.Location;
-using MagnumOpus.Components.Entity;
-using MagnumOpus._HerstLib.IO;
-using MagnumOpus.Components.CQ;
 
 namespace MagnumOpus.Squiggly
 {
@@ -36,19 +35,19 @@ namespace MagnumOpus.Squiggly
 
                 ref var ntt = ref NttWorld.CreateEntity(EntityType.Other);
 
-                var pos = new PositionComponent(ntt.Id, center, cq_spawn.mapid);
+                var pos = new PositionComponent(center, cq_spawn.mapid);
                 ntt.Set(ref pos);
 
-                var spawner = new SpawnerComponent(in ntt, cq_spawn.id, in rectangle, cq_spawn.npctype, cq_spawn.maxnpc, cq_spawn.rest_secs, cq_spawn.max_per_gen);
+                var spawner = new SpawnerComponent(cq_spawn.id, in rectangle, cq_spawn.npctype, cq_spawn.maxnpc, cq_spawn.rest_secs, cq_spawn.max_per_gen);
                 ntt.Set(ref spawner);
 
-                var body = new BodyComponent(ntt.Id);
+                var body = new BodyComponent();
                 ntt.Set(ref body);
 
-                var ntc = new NameTagComponent(ntt.Id, $"Spwnr {cq_spawn.id}");
-                ntt.Set(ref ntc);
+                // var ntc = new NameTagComponent( $"Spwnr {cq_spawn.id}");
+                // ntt.Set(ref ntc);
 
-                var vwp = new ViewportComponent(ntt.Id, 18f);
+                var vwp = new ViewportComponent(18f);
                 ntt.Set(ref vwp);
 
                 Collections.SpatialHashs[cq_spawn.mapid].Add(in ntt, ref pos);
@@ -136,15 +135,18 @@ namespace MagnumOpus.Squiggly
             {
                 foreach (var cqNpc in db.cq_npc.AsQueryable())
                 {
+                    if (NttWorld.EntityExists((int)cqNpc.id))
+                        continue;
+
                     var npc = new CqNpc((int)cqNpc.id, new Vector2(cqNpc.cellx, cqNpc.celly),
                         cqNpc.mapid, cqNpc.sort, cqNpc.@base, cqNpc.type, cqNpc.lookface, cqNpc.name.Trim(), cqNpc.task0, cqNpc.task1,
                         cqNpc.task2, cqNpc.task3, cqNpc.task4, cqNpc.task5, cqNpc.task6, cqNpc.task7);
 
                     var ntt = NttWorld.CreateEntityWithNetId(EntityType.Npc, (int)cqNpc.id);
-                    var pos = new PositionComponent(ntt.Id, new Vector2(cqNpc.cellx, cqNpc.celly), cqNpc.mapid);
+                    var pos = new PositionComponent(new Vector2(cqNpc.cellx, cqNpc.celly), cqNpc.mapid);
                     var bdy = new BodyComponent(ntt.Id, cqNpc.lookface);
-                    var npcc = new NpcComponent(ntt.Id, npc.Base, npc.Type, npc.Sort);
-                    var vwp = new ViewportComponent(ntt.Id, 40);
+                    var npcc = new NpcComponent(npc.Base, npc.Type, npc.Sort);
+                    var vwp = new ViewportComponent(18f);
                     ntt.Set(ref pos);
                     ntt.Set(ref bdy);
                     ntt.Set(ref npcc);

@@ -1,4 +1,5 @@
 using MagnumOpus.ECS;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.Components.Entity
 {
@@ -6,11 +7,9 @@ namespace MagnumOpus.Components.Entity
     [Save]
     public readonly struct SpellBookComponent
     {
-        public readonly int EntityId;
-        public readonly Dictionary<ushort, (ushort lvl, ushort exp, ushort cooldown)> Spells = new();
+        public readonly Dictionary<ushort, (ushort lvl, ushort exp, ushort cooldown)> Spells;
 
-        public SpellBookComponent(int id) => EntityId = id;
-
-        public override int GetHashCode() => EntityId;
+        [JsonConstructor]
+        public SpellBookComponent() => Spells = new();
     }
 }

@@ -24,9 +24,9 @@ namespace MagnumOpus.Systems
                 return;
             }
 
-            rdi.ItemNtt.Set(new PositionComponent(rdi.ItemNtt.Id, pos.Position, pos.Map));
-            rdi.ItemNtt.Set(new LifeTimeComponent(rdi.ItemNtt.Id, TimeSpan.FromSeconds(30)));
-            rdi.ItemNtt.Set(new ViewportComponent(rdi.ItemNtt.Id, 18f));
+            rdi.ItemNtt.Set(new PositionComponent(pos.Position, pos.Map));
+            rdi.ItemNtt.Set(new LifeTimeComponent(TimeSpan.FromSeconds(30)));
+            rdi.ItemNtt.Set(new ViewportComponent(18f));
 
             Collections.SpatialHashs[pos.Map].Add(in rdi.ItemNtt, ref pos);
 

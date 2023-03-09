@@ -1,4 +1,5 @@
 using MagnumOpus.ECS;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.Components.Items
 {
@@ -6,15 +7,9 @@ namespace MagnumOpus.Components.Items
     [Save]
     public readonly struct MoneyRewardComponent
     {
-        public readonly int EntityId;
         public readonly int Amount;
 
-        public MoneyRewardComponent(int entityId, int amount)
-        {
-            EntityId = entityId;
-            Amount = amount;
-        }
-
-        public override int GetHashCode() => EntityId;
+        [JsonConstructor]
+        public MoneyRewardComponent(int amount) => Amount = amount;
     }
 }

@@ -272,11 +272,11 @@ namespace MagnumOpus.Networking.Packets
                     pos.Position.X = ushort.Parse(args[0]);
                     pos.Position.Y = ushort.Parse(args[1]);
                     pos.Map = ushort.Parse(args[2]);
-                    var tpc = new TeleportComponent(ntt.Id, (ushort)pos.Position.X, (ushort)pos.Position.Y, (ushort)pos.Map);
+                    var tpc = new TeleportComponent( (ushort)pos.Position.X, (ushort)pos.Position.Y, (ushort)pos.Map);
                     ntt.Set(ref tpc);
                     break;
                 case "rev":
-                    var rev = new ReviveComponent(ntt.Id, 1);
+                    var rev = new ReviveComponent( 1);
                     ntt.Set(ref rev);
                     break;
                 case "eff":

@@ -2,6 +2,7 @@
 using System.Runtime;
 using HerstLib.IO;
 using MagnumOpus.ECS;
+using MagnumOpus.Helpers;
 using MagnumOpus.Squiggly;
 using MagnumOpus.Systems;
 
@@ -49,6 +50,11 @@ namespace MagnumOpus
             };
 
             FConsole.WriteLine("[DATABASE] Loading...");
+            NttWorld.SetSystems(systems.ToArray());
+            NttWorld.SetTPS(30);
+            ReflectionHelper.GetRemoveMethods();
+            ref var ntt = ref NttWorld.GetEntity(0);
+            ntt.Recycle();
             Db.LoadDatFiles();
             Db.LoadShopDat("CLIENT_FILES/Shop.dat");
             Db.LoadMaps();
@@ -62,32 +68,6 @@ namespace MagnumOpus
             Db.LoadSpawners();
             Db.LoadNpcs();
 
-            NttWorld.SetSystems(systems.ToArray());
-            NttWorld.SetTPS(30);
-            NttWorld.RegisterOnSecond(() =>
-            {
-                // var lines = PerformanceMetrics.Draw();
-                // var linesArr = lines.Split('\r', '\n');
-                // FConsole.WriteLine(lines);
-
-                // for (int i = 0; i < linesArr.Length; i++)
-                // {
-                //     foreach (var player in NttWorld.Players)
-                //     {
-                //         if (i == 0)
-                //         {
-                //             var msgUp = MsgText.Create(player, linesArr[i], Enums.MsgTextType.MiniMap);
-                //             player.NetSync(ref msgUp);
-                //             continue;
-                //         }
-
-                //         var msg = MsgText.Create(player, linesArr[i], Enums.MsgTextType.MiniMap2);
-                //         player.NetSync(ref msg);
-                //     }
-                // }
-
-                // PerformanceMetrics.Restart();
-            });
 
             LoginServer.Start();
             GameServer.Start();
@@ -99,9 +79,6 @@ namespace MagnumOpus
             {
                 NttWorld.Update();
 
-                if (Debugger.IsAttached)
-                    continue;
-
                 if (!Console.KeyAvailable)
                     continue;
 
@@ -109,9 +86,12 @@ namespace MagnumOpus
                 if (input.Key == ConsoleKey.S)
                 {
                     FConsole.WriteLine("[SERVER] Saving...");
+                    var ts = Stopwatch.GetTimestamp();
                     ReflectionHelper.SaveComponents("_STATE_FILES");
-                    // NttWorld.Save("_STATE_FILES");
-                    FConsole.WriteLine("[SERVER] Saved.");
+                    NttWorld.Save("_STATE_FILES");
+                    IdGenerator.Save("_STATE_FILES");
+                    var ms = Stopwatch.GetElapsedTime(ts).TotalMilliseconds;
+                    FConsole.WriteLine($"[SERVER] Saved in {ms:0.00}ms");
                 }
             }
         }

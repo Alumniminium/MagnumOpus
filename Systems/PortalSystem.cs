@@ -22,7 +22,7 @@ namespace MagnumOpus.Systems
                     Logger.Debug("No Dmap Portal found at {0}, {1} on map {2}", ptc.X, ptc.Y, mapId);
                 ntt.Remove<PortalComponent>();
 
-                var backupTpc = new TeleportComponent(ntt.Id, 477, 380, 1002);
+                var backupTpc = new TeleportComponent(477, 380, 1002);
                 ntt.Set(ref backupTpc);
                 return;
             }
@@ -34,7 +34,7 @@ namespace MagnumOpus.Systems
                     Logger.Debug("No Passway found for {0} on map {1}", entry.PortalId, mapId);
                 ntt.Remove<PortalComponent>();
 
-                var backupTpc = new TeleportComponent(ntt.Id, 477, 380, 1002);
+                var backupTpc = new TeleportComponent(477, 380, 1002);
                 ntt.Set(ref backupTpc);
                 return;
             }
@@ -46,12 +46,12 @@ namespace MagnumOpus.Systems
                     Logger.Debug("No Exit Portal for {0} on map {1}", passway.passway_mapid, passway.passway_mapportal);
                 ntt.Remove<PortalComponent>();
 
-                var backupTpc = new TeleportComponent(ntt.Id, 477, 380, 1002);
+                var backupTpc = new TeleportComponent(477, 380, 1002);
                 ntt.Set(ref backupTpc);
                 return;
             }
 
-            var tpc = new TeleportComponent(ntt.Id, (ushort)exit.X, (ushort)exit.Y, (ushort)exit.MapId);
+            var tpc = new TeleportComponent((ushort)exit.X, (ushort)exit.Y, (ushort)exit.MapId);
             ntt.Set(ref tpc);
 
             if (IsLogging)

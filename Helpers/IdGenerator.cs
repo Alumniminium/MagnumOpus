@@ -1,4 +1,7 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Text.Json;
+using HerstLib.IO;
 using MagnumOpus.ECS;
 
 namespace MagnumOpus.Helpers
@@ -9,7 +12,16 @@ namespace MagnumOpus.Helpers
 
         static IdGenerator()
         {
-            Ids = new Dictionary<EntityType, ConcurrentStack<int>>
+            var filename = Path.Combine("_STATE_FILES", $"{nameof(IdGenerator)}.json");
+
+            if (File.Exists(filename))
+            {
+                var json = File.ReadAllText(filename);
+                Ids = JsonSerializer.Deserialize<Dictionary<EntityType, ConcurrentStack<int>>>(json) ?? new();
+                return;
+            }
+
+            Ids = new()
             {
                 [EntityType.Npc] = new(Enumerable.Range(0, 100_000)),
                 [EntityType.Item] = new(Enumerable.Range(100_000, 299_999)),
@@ -22,5 +34,17 @@ namespace MagnumOpus.Helpers
 
         public static int Get(EntityType type) => Ids[type].TryPop(out var id) ? id : throw new IndexOutOfRangeException(type.ToString());
         public static void Return(EntityType type, int id) => Ids[type].Push(id);
+
+        public static void Save(string path)
+        {
+            var start = Stopwatch.GetTimestamp();
+            var filename = Path.Combine(path, $"{nameof(IdGenerator)}.json");
+
+            using var stream = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true);
+            JsonSerializer.Serialize(stream, Ids, Constants.serializerOptions);
+
+            var time = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
+            FConsole.WriteLine($"Saved {nameof(IdGenerator)} to {filename} in {time}ms");
+        }
     }
 }

@@ -1,4 +1,5 @@
 using MagnumOpus.ECS;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.Components.Entity
 {
@@ -6,18 +7,15 @@ namespace MagnumOpus.Components.Entity
     [Save]
     public struct RebornComponent
     {
-        public readonly int EntityId;
         public long ChangedTick;
 
         public byte Count;
 
-        public RebornComponent(int entityId)
+        [JsonConstructor]
+        public RebornComponent()
         {
-            EntityId = entityId;
             ChangedTick = NttWorld.Tick;
             Count = 0;
         }
-
-        public override int GetHashCode() => EntityId;
     }
 }

@@ -36,14 +36,8 @@ namespace MagnumOpus.Networking
                 case PacketId.MsgLogin:
                     {
                         var msg = Co2Packet.Deserialze<MsgConnectLogin>(packet);
-
-                        var player = NttWorld.GetEntity((int)msg.UniqueId);
                         var filename = msg.GetFileName();
                         FConsole.WriteLine($"[LOGIN/1052] Client Id: {msg.UniqueId}, File: {filename} Contents: {msg.Contents}");
-
-                        ref readonly var net = ref player.Get<NetworkComponent>();
-                        var ntc = new NameTagComponent(player.Id, "test");
-                        player.Set(ref ntc);
                         break;
                     }
 

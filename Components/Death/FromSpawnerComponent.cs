@@ -1,19 +1,14 @@
 using MagnumOpus.ECS;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.Components.Death
 {
     [Component]
     public readonly struct FromSpawnerComponent
     {
-        public readonly int EntityId;
         public readonly int SpawnerId;
 
-        public FromSpawnerComponent(int entityId, int spawnerId)
-        {
-            EntityId = entityId;
-            SpawnerId = spawnerId;
-        }
-
-        public override int GetHashCode() => EntityId;
+        [JsonConstructor]
+        public FromSpawnerComponent(int spawnerId) => SpawnerId = spawnerId;
     }
 }

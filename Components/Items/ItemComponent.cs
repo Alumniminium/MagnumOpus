@@ -1,5 +1,6 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.Components.Items
 {
@@ -7,7 +8,6 @@ namespace MagnumOpus.Components.Items
     [Save]
     public struct ItemComponent
     {
-        public readonly int EntityId;
         public int Id;
         public ushort CurrentDurability;
         public ushort MaximumDurability;
@@ -30,9 +30,9 @@ namespace MagnumOpus.Components.Items
             }
         }
 
-        public ItemComponent(int id, int itemId, ushort currentDurability, ushort maximumDurability, byte stackAmount, byte plus, byte bless, byte enchant, byte gem1, byte gem2, RebornItemEffect rebornEffect, int customTextId)
+        [JsonConstructor]
+        public ItemComponent(int itemId, ushort currentDurability, ushort maximumDurability, byte stackAmount, byte plus, byte bless, byte enchant, byte gem1, byte gem2, RebornItemEffect rebornEffect, int customTextId)
         {
-            EntityId = id;
             Id = itemId;
             CurrentDurability = currentDurability;
             MaximumDurability = maximumDurability;
@@ -44,12 +44,6 @@ namespace MagnumOpus.Components.Items
             RebornEffect = rebornEffect;
             CustomTextId = customTextId;
             StackAmount = stackAmount;
-        }
-
-
-        public override int GetHashCode()
-        {
-            return EntityId;
         }
     }
 }

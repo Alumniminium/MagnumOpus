@@ -45,7 +45,7 @@ namespace MagnumOpus.Networking.Packets
             ref readonly var ntc = ref ntt.Get<NameTagComponent>();
             if (!ntt.Has<PingComponent>())
             {
-                var ping = new PingComponent(ntt.Id);
+                var ping = new PingComponent();
                 ntt.Set(ref ping);
             }
             ref var pin = ref ntt.Get<PingComponent>();
