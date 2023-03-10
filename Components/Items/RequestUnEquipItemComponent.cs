@@ -16,7 +16,5 @@ namespace MagnumOpus.Components.Items
             Slot = (MsgItemPosition)slot;
             Equip = equip;
         }
-
-        
     }
 }

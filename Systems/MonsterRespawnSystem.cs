@@ -31,13 +31,13 @@ namespace MagnumOpus.Systems
 
             if (!Collections.CqMonsterType.TryGetValue(spc.MonsterId, out var cqMob))
             {
-                _.Set(new DestroyEndOfFrameComponent());
+                _.Set<DestroyEndOfFrameComponent>();
                 return;
             }
 
             if (!Collections.Maps.TryGetValue(pos.Map, out var cqMap))
             {
-                _.Set(new DestroyEndOfFrameComponent());
+                _.Set<DestroyEndOfFrameComponent>();
                 return;
             }
 

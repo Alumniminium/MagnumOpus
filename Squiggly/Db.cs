@@ -44,8 +44,8 @@ namespace MagnumOpus.Squiggly
                 var body = new BodyComponent();
                 ntt.Set(ref body);
 
-                // var ntc = new NameTagComponent( $"Spwnr {cq_spawn.id}");
-                // ntt.Set(ref ntc);
+                var ntc = new NameTagComponent($"Spwnr {cq_spawn.id}");
+                ntt.Set(ref ntc);
 
                 var vwp = new ViewportComponent(18f);
                 ntt.Set(ref vwp);

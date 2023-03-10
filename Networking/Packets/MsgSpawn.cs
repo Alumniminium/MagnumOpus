@@ -70,8 +70,9 @@ namespace MagnumOpus.Networking.Packets
             ref readonly var eqc = ref ntt.Get<EquipmentComponent>();
             ref readonly var pos = ref ntt.Get<PositionComponent>();
 
-            var look = bdy.Look;
-            look = (uint)((hed.FaceId * 10_000) + bdy.Look);
+            var look = bdy.Look == 0 ? 1003 : bdy.Look;
+            if (hed.FaceId != 0)
+                look = (uint)((hed.FaceId * 10_000) + bdy.Look);
             if (ntt.Has<DeathTagComponent>())
                 look = bdy.Look % 10000 is 2001 or 2002 ? AddTransform(bdy.Look, 99) : AddTransform(bdy.Look, 98);
 
@@ -135,10 +136,7 @@ namespace MagnumOpus.Networking.Packets
             ref readonly var eff = ref ntt.Get<StatusEffectComponent>();
             var name = string.Empty;
 
-            if (!Collections.CqMonsterType.TryGetValue(cqm.CqMonsterId, out var cqMob))
-                name = "Id:" + ntt.Id;
-            else
-                name = cqMob.name;
+            name = !Collections.CqMonsterType.TryGetValue(cqm.CqMonsterId, out var cqMob) ? "Id:" + ntt.Id : cqMob.name;
 
             var msg = new MsgSpawn
             {

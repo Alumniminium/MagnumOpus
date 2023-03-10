@@ -13,7 +13,7 @@ namespace MagnumOpus.Components.Location
         public long ChangedTick;
 
         public Direction Direction;
-        private uint look;
+        private uint look = 1003;
         public uint Look
         {
             get => look;

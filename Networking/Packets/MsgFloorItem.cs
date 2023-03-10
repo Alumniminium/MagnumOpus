@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using MagnumOpus.Components;
 using MagnumOpus.Components.Items;
 using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
@@ -62,7 +61,7 @@ namespace MagnumOpus.Networking.Packets
                         if (item == default)
                             return;
 
-                        var pic = new PickupRequestComponent( in item);
+                        var pic = new PickupRequestComponent(in item);
                         ntt.Set(ref pic);
 
                         ntt.NetSync(ref msg, true);

@@ -115,7 +115,8 @@ namespace MagnumOpus.Networking.Packets
             }
             var ok = MsgText.Create("SYSTEM", "ALLUSERS", "ANSWER_OK", MsgTextType.LoginInformation);
             var info = MsgCharacter.Create(ntt);
-            var msgMap = MsgMapStatus.Create(1002, (uint)(MapFlags.EnablePlayerShop | MapFlags.Mine | MapFlags.NewbieProtect));
+            //(MapFlags.EnablePlayerShop | MapFlags.Mine | MapFlags.NewbieProtect)
+            var msgMap = MsgMapStatus.Create(1002, (uint)0);
 
             ntt.NetSync(ref ok);
             ntt.NetSync(ref info);

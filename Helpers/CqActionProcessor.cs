@@ -392,13 +392,13 @@ namespace MagnumOpus.Helpers
                         if (InventoryHelper.CountItemId(ref inv, itemId) > 0)
                             return action.id_nextfail;
 
-                        ref var itemNtt = ref NttWorld.CreateEntity(EntityType.Item);
+                        ref var itemNtt = ref NttWorld.CreateEntity(EntityType.InvItem);
 
                         var dura = (ushort)Random.Shared.Next(0, entry.AmountLimit);
                         var itemComp = new ItemComponent(itemId, dura, entry.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
                         itemNtt.Set(ref itemComp);
 
-                        _ = InventoryHelper.AddItem(in ntt, ref inv, in itemNtt);
+                        InventoryHelper.AddItem(in ntt, ref inv, in itemNtt);
 
                         var drc = new RequestDropItemComponent(in itemNtt);
                         ntt.Set(ref drc);

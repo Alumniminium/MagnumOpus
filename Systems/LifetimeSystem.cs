@@ -26,12 +26,12 @@ namespace MagnumOpus.Systems
                 ref var pos = ref ntt.Get<PositionComponent>();
                 pos.ChangedTick = NttWorld.Tick;
 
-                var eff = MsgName.Create((ushort)pos.Position.X, (ushort)pos.Position.Y, "downnumber" + ticksLeft / NttWorld.TargetTps, MsgNameType.MapEffect);
+                var eff = MsgName.Create((ushort)pos.Position.X, (ushort)pos.Position.Y, "downnumber" + (ticksLeft / NttWorld.TargetTps), MsgNameType.MapEffect);
                 ntt.NetSync(ref eff, true);
                 return;
             }
 
-            var dtc = new DeathTagComponent( default);
+            var dtc = new DeathTagComponent(default);
             ntt.Set(ref dtc);
             ntt.Remove<LifeTimeComponent>();
             if (IsLogging)

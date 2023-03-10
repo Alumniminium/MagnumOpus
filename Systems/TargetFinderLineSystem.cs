@@ -1,5 +1,4 @@
 using System.Numerics;
-using MagnumOpus.Components;
 using MagnumOpus.Components.Attack;
 using MagnumOpus.Components.Death;
 using MagnumOpus.Components.Entity;
@@ -16,7 +15,7 @@ namespace MagnumOpus.Systems
 
         public override void Update(in NTT ntt, ref LineTargetComponent atk, ref PositionComponent pos, ref ViewportComponent vwp)
         {
-            var tcc = new TargetCollectionComponent( atk.MagicType);
+            var tcc = new TargetCollectionComponent(atk.MagicType);
 
 
             foreach (var kvp in vwp.EntitiesVisible)

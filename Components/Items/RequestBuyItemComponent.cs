@@ -15,7 +15,5 @@ namespace MagnumOpus.Components.Items
             ItemId = itemId;
             Buy = buy;
         }
-
-        
     }
 }

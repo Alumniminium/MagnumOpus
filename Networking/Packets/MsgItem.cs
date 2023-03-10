@@ -1,6 +1,5 @@
 using System.Runtime.InteropServices;
 using HerstLib.IO;
-using MagnumOpus.Components;
 using MagnumOpus.Components.Items;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -50,7 +49,7 @@ namespace MagnumOpus.Networking.Packets
                     }
                 case MsgItemType.DropMoney:
                     {
-                        var rdmc = new RequestDropMoneyComponent( msg.Value);
+                        var rdmc = new RequestDropMoneyComponent(msg.Value);
                         ntt.Set(ref rdmc);
 
                         ntt.NetSync(ref msg);
@@ -59,7 +58,7 @@ namespace MagnumOpus.Networking.Packets
                 case MsgItemType.RemoveInventory:
                     {
                         ref readonly var itemNtt = ref NttWorld.GetEntity(msg.UnqiueId);
-                        var drc = new RequestDropItemComponent( in itemNtt);
+                        var drc = new RequestDropItemComponent(in itemNtt);
                         ntt.Set(ref drc);
 
                         ntt.NetSync(ref msg);
@@ -78,12 +77,12 @@ namespace MagnumOpus.Networking.Packets
 
                         if (slot == 0 && !isArrow)
                         {
-                            var uic = new RequestItemUseComponent( itemNttId, slot);
+                            var uic = new RequestItemUseComponent(itemNttId, slot);
                             ntt.Set(ref uic);
                         }
                         else
                         {
-                            var rue = new RequestChangeEquipComponent( itemNttId, slot, msg.Type == MsgItemType.Use);
+                            var rue = new RequestChangeEquipComponent(itemNttId, slot, msg.Type == MsgItemType.Use);
                             ntt.Set(ref rue);
                         }
                         ntt.NetSync(ref msg);
@@ -95,7 +94,7 @@ namespace MagnumOpus.Networking.Packets
                         var shopId = msg.UnqiueId;
                         var itemId = msg.Param;
 
-                        var rbi = new RequestShopItemTransactionComponent( shopId, itemId, msg.Type == MsgItemType.Buy);
+                        var rbi = new RequestShopItemTransactionComponent(shopId, itemId, msg.Type == MsgItemType.Buy);
                         ntt.Set(ref rbi);
 
                         ntt.NetSync(ref msg);

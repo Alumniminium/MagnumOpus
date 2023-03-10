@@ -13,7 +13,5 @@ namespace MagnumOpus.Components.Items
             ItemNetId = itemNetId;
             Param = param;
         }
-
-        
     }
 }

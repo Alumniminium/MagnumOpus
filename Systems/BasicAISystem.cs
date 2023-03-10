@@ -1,5 +1,4 @@
 using System.Numerics;
-using MagnumOpus.Components;
 using MagnumOpus.Components.AI;
 using MagnumOpus.Components.Attack;
 using MagnumOpus.Components.Death;
@@ -93,14 +92,14 @@ namespace MagnumOpus.Systems
             {
                 var dir = CoMath.GetRawDirection(targetPos.Position, pos.Position);
 
-                var wlk = new WalkComponent( dir, false);
+                var wlk = new WalkComponent(dir, false);
                 ntt.Set(ref wlk);
                 if (IsLogging)
                     Logger.Debug("{Entity} walking {dir} to {target}", ntt, (Direction)dir, target);
             }
             if (brn.State == BrainState.Attacking)
             {
-                var atk = new AttackComponent( in target, MsgInteractType.Physical);
+                var atk = new AttackComponent(in target, MsgInteractType.Physical);
                 ntt.Set(ref atk);
                 if (IsLogging)
                     Logger.Debug("{Entity} attacking {target}", ntt, target);

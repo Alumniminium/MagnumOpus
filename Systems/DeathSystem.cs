@@ -75,7 +75,7 @@ namespace MagnumOpus.Systems
                     {
                         if (Random.Shared.NextSingle() >= 0.1f)
                         {
-                            inv.Items[i].Set(new DestroyEndOfFrameComponent());
+                            inv.Items[i].Set<DestroyEndOfFrameComponent>();
                             continue;
                         }
 

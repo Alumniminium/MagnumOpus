@@ -19,7 +19,5 @@ namespace MagnumOpus.Components.Attack
             Y = y;
             SleepTicks = sleepTicks;
         }
-
-        
     }
 }
