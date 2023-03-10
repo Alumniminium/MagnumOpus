@@ -4,9 +4,9 @@ namespace MagnumOpus.Components
 {
     [Component]
     [Save]
-    public readonly struct HealthRegenComponent
+    public  struct HealthRegenComponent
     {
-        public readonly float PassiveHealPerSec;
+        public  float PassiveHealPerSec;
 
         public HealthRegenComponent(float healthRegFactor) => PassiveHealPerSec = healthRegFactor;
     }

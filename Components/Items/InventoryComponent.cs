@@ -7,7 +7,7 @@ namespace MagnumOpus.Components.Items
     [Save]
     public struct InventoryComponent
     {
-        public readonly int EntityId;
+        public  NTT NTT;
         public long ChangedTick;
 
         public NTT[] Items = new NTT[40];
@@ -20,9 +20,8 @@ namespace MagnumOpus.Components.Items
             {
                 money = value;
                 ChangedTick = NttWorld.Tick;
-                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(ntt.Id, money, MsgUserAttribType.MoneyInventory);
-                ntt.NetSync(ref packet, true);
+                var packet = MsgUserAttrib.Create(NTT.Id, money, MsgUserAttribType.MoneyInventory);
+                NTT.NetSync(ref packet, true);
             }
         }
 
@@ -34,20 +33,23 @@ namespace MagnumOpus.Components.Items
             {
                 cps = value;
                 ChangedTick = NttWorld.Tick;
-                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(ntt.Id, cps, MsgUserAttribType.CPsInventory);
-                ntt.NetSync(ref packet, true);
+                var packet = MsgUserAttrib.Create(NTT.Id, cps, MsgUserAttribType.CPsInventory);
+                NTT.NetSync(ref packet, true);
             }
         }
-
-        public InventoryComponent(int entityId, uint money, uint cps)
+        public InventoryComponent()
         {
-            EntityId = entityId;
+            Items = new NTT[40];
+            ChangedTick = NttWorld.Tick;
+        }
+        public InventoryComponent(in NTT ntt, uint money, uint cps)
+        {
+            NTT = ntt;
             ChangedTick = NttWorld.Tick;
             Money = money;
             CPs = cps;
         }
 
-        public override int GetHashCode() => EntityId;
+        public override int GetHashCode() => NTT;
     }
 }

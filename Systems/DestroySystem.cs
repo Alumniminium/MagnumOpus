@@ -1,27 +1,40 @@
 using MagnumOpus.Components.Death;
+using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
+using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Systems
 {
     public sealed class DestroySystem : NttSystem<DestroyEndOfFrameComponent>
     {
-        public DestroySystem() : base("Destroy", threads: 2) { }
+        public DestroySystem() : base("Destroy", threads: 2, log: true) { }
 
         public override void Update(in NTT ntt, ref DestroyEndOfFrameComponent def)
         {
-            if (ntt.Type is EntityType.Player or EntityType.Monster)
+            if (ntt.Has<PositionComponent>())
             {
-                var despawn = MsgAction.RemoveEntity(ntt.Id);
-                ntt.NetSync(ref despawn, true);
+                ref var pos = ref ntt.Get<PositionComponent>();
+                if (Collections.SpatialHashs.TryGetValue(pos.Map, out var hash))
+                    hash.Remove(in ntt, ref pos);
             }
-            else if (ntt.Type == EntityType.Item)
+
+            switch (ntt.Type)
             {
-                var delete = MsgFloorItem.Create(in ntt, MsgFloorItemType.Delete);
-                ntt.NetSync(ref delete, true);
+                case EntityType.Player:
+                case EntityType.Monster:
+                    var despawn = MsgAction.RemoveEntity(ntt.Id);
+                    ntt.NetSync(ref despawn, true);
+                    break;
+                case EntityType.Item:
+                    var delete = MsgFloorItem.Create(in ntt, MsgFloorItemType.Delete);
+                    ntt.NetSync(ref delete, true);
+                    break;
             }
+
             NttWorld.Destroy(in ntt);
+
             if (IsLogging)
                 Logger.Debug("Destroyed {ntt}", ntt);
         }

@@ -83,7 +83,7 @@ namespace MagnumOpus.Networking.Packets
 
             if (atr.Statpoints == 0)
             {
-                atr = new AttributeComponent(ntt.Id)
+                atr = new AttributeComponent(in ntt)
                 {
                     Agility = 10,
                     Strength = 10,

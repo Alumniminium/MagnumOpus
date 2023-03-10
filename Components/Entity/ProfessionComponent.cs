@@ -7,7 +7,7 @@ namespace MagnumOpus.Components.Entity
     [Save]
     public struct ProfessionComponent
     {
-        public readonly int EntityId;
+        public  NTT NTT;
         private ClasseName profession;
 
         public ClasseName Profession
@@ -15,18 +15,17 @@ namespace MagnumOpus.Components.Entity
             get => profession; set
             {
                 profession = value;
-                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(ntt.Id, (uint)value, MsgUserAttribType.Class);
-                ntt.NetSync(ref packet, true);
+                var packet = MsgUserAttrib.Create(NTT, (uint)value, MsgUserAttribType.Class);
+                NTT.NetSync(ref packet, true);
             }
         }
 
-        public ProfessionComponent(int entityId, ClasseName profession)
+        public ProfessionComponent(in NTT ntt, ClasseName profession)
         {
-            EntityId = entityId;
+            NTT = ntt;
             Profession = profession;
         }
 
-        public override int GetHashCode() => EntityId;
+        public override int GetHashCode() => NTT.Id;
     }
 }

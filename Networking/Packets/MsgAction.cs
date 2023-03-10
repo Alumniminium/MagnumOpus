@@ -111,6 +111,7 @@ namespace MagnumOpus.Networking.Packets
                         ref var vwp = ref ntt.Get<ViewportComponent>();
                         vwp.EntitiesVisible.Clear();
                         vwp.EntitiesVisibleLast.Clear();
+                        vwp.Dirty = true;
                         pos.ChangedTick = NttWorld.Tick;
                         var reply = Create(ntt.Id, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
                         ntt.NetSync(ref reply);

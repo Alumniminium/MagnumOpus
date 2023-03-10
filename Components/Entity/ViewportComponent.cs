@@ -15,6 +15,12 @@ namespace MagnumOpus.Components.Entity
         public RectangleF Viewport;
         internal bool Dirty;
 
+        public ViewportComponent()
+        {
+            ChangedTick = NttWorld.Tick;
+            EntitiesVisible = new();
+            EntitiesVisibleLast = new();
+        }
         public ViewportComponent(float viewDistance)
         {
             EntitiesVisible = new();

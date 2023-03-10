@@ -6,12 +6,12 @@ namespace MagnumOpus.Components.Death
     [Save]
     public struct SpawnerComponent
     {
-        public readonly int GeneratorId;
-        public readonly int MonsterId;
-        public readonly Rectangle SpawnArea;
-        public readonly int MaxCount;
-        public readonly int TimerSeconds;
-        public readonly int GenPerTimer;
+        public  int GeneratorId;
+        public  int MonsterId;
+        public  Rectangle SpawnArea;
+        public  int MaxCount;
+        public  int TimerSeconds;
+        public  int GenPerTimer;
 
         public long RunTick;
         public int Count;

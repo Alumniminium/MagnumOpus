@@ -144,7 +144,7 @@ namespace MagnumOpus.Squiggly
 
                     var ntt = NttWorld.CreateEntityWithNetId(EntityType.Npc, (int)cqNpc.id);
                     var pos = new PositionComponent(new Vector2(cqNpc.cellx, cqNpc.celly), cqNpc.mapid);
-                    var bdy = new BodyComponent(ntt.Id, cqNpc.lookface);
+                    var bdy = new BodyComponent(in ntt, cqNpc.lookface);
                     var npcc = new NpcComponent(npc.Base, npc.Type, npc.Sort);
                     var vwp = new ViewportComponent(18f);
                     ntt.Set(ref pos);

@@ -9,6 +9,7 @@ namespace MagnumOpus.Components
         public ushort Mana;
         public ushort MaxMana;
 
+        public ManaComponent() => ChangedTick = NttWorld.Tick;
         public ManaComponent(ushort mana, ushort maxMana)
         {
             ChangedTick = NttWorld.Tick;

@@ -3,10 +3,10 @@ namespace MagnumOpus.Components.Floor
 {
     [Component]
     [Save]
-    public readonly struct PortalComponent
+    public  struct PortalComponent
     {
-        public readonly ushort X;
-        public readonly ushort Y;
+        public  ushort X;
+        public  ushort Y;
 
         public PortalComponent(ushort x, ushort y)
         {

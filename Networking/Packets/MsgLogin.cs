@@ -1,8 +1,8 @@
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using HerstLib.IO;
 using MagnumOpus.Components;
-using MagnumOpus.Components.Death;
 using MagnumOpus.Components.Entity;
 using MagnumOpus.Components.Items;
 using MagnumOpus.Components.Leveling;
@@ -45,7 +45,7 @@ namespace MagnumOpus.Networking.Packets
 
             PrometheusPush.LoginCount.Inc();
 
-            ref readonly var net = ref ntt.Get<NetworkComponent>();
+            ref var net = ref ntt.Get<NetworkComponent>();
             var found = false;
             foreach (var kvp in NttWorld.NTTs)
             {
@@ -54,25 +54,25 @@ namespace MagnumOpus.Networking.Packets
 
                 if (oldNtc.Name == net.Username)
                 {
-                    oldNtt.Set(net);
-                    // ntt.Remove<NetworkComponent>();
+                    oldNtt.Set(ref net);
+                    ntt.Remove<NetworkComponent>();
                     // ntt.Set<DestroyEndOfFrameComponent>();
                     found = true;
-                    ntt = oldNtt;
+                    // ntt = oldNtt;
                     break;
                 }
             }
             if (!found)
             {
                 var ntc = new NameTagComponent(net.Username);
-                var bdy = new BodyComponent(ntt.Id, (uint)(net.Username == "trbl" ? 2003 : 2002));
-                var hed = new HeadComponent(6);
+                var bdy = new BodyComponent(in ntt, (uint)(net.Username == "trbl" ? 2003 : 2002));
+                var hed = new HeadComponent(in ntt);
                 var emo = new EmoteComponent(Emote.Stand);
                 var vwp = new ViewportComponent(21);
                 var pos = new PositionComponent(new System.Numerics.Vector2(438, 377), 1002);
-                var eff = new StatusEffectComponent(ntt.Id);
-                var inv = new InventoryComponent(ntt.Id, 1000000, 0);
-                var lvl = new LevelComponent(1);
+                var eff = new StatusEffectComponent(in ntt);
+                var inv = new InventoryComponent(in ntt, 1000000, 0);
+                var lvl = new LevelComponent(in ntt);
                 var hlt = new HealthComponent(ntt, 330, 330);
                 var mana = new ManaComponent(1000, 1000);
                 var pro = new ProfessionComponent(ntt, ClasseName.Archer);
@@ -115,8 +115,7 @@ namespace MagnumOpus.Networking.Packets
             }
             var ok = MsgText.Create("SYSTEM", "ALLUSERS", "ANSWER_OK", MsgTextType.LoginInformation);
             var info = MsgCharacter.Create(ntt);
-            //(MapFlags.EnablePlayerShop | MapFlags.Mine | MapFlags.NewbieProtect)
-            var msgMap = MsgMapStatus.Create(1002, (uint)0);
+            var msgMap = MsgMapStatus.Create(1002, (uint)(MapFlags.Mine | MapFlags.NewbieProtect));
 
             ntt.NetSync(ref ok);
             ntt.NetSync(ref info);

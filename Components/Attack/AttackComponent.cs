@@ -6,8 +6,8 @@ namespace MagnumOpus.Components.Attack
     [Save]
     public struct AttackComponent
     {
-        public readonly NTT Target;
-        public readonly MsgInteractType AttackType;
+        public  NTT Target;
+        public  MsgInteractType AttackType;
         public long SleepTicks;
 
         public AttackComponent(in NTT target, MsgInteractType attackType)

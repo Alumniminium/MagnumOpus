@@ -12,6 +12,7 @@ namespace MagnumOpus.Components.Location
         public Vector2 LastPosition;
         public int Map;
 
+        public PositionComponent() => ChangedTick = NttWorld.Tick;
         public PositionComponent(Vector2 position, int map)
         {
             Position = position;

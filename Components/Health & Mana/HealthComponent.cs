@@ -7,7 +7,7 @@ namespace MagnumOpus.Components
     [Save]
     public struct HealthComponent
     {
-        public readonly int EntityId;
+        public  NTT NTT;
         private int health;
         private int maxHealth;
 
@@ -16,9 +16,8 @@ namespace MagnumOpus.Components
             get => health; set
             {
                 health = value;
-                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(ntt.Id, (uint)health, MsgUserAttribType.Health);
-                ntt.NetSync(ref packet, true);
+                var packet = MsgUserAttrib.Create(NTT.Id, (uint)health, MsgUserAttribType.Health);
+                NTT.NetSync(ref packet, true);
             }
         }
         public int MaxHealth
@@ -26,18 +25,17 @@ namespace MagnumOpus.Components
             get => maxHealth; set
             {
                 maxHealth = value;
-                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(ntt.Id, (uint)maxHealth, MsgUserAttribType.MaxHealth);
-                ntt.NetSync(ref packet, true);
+                var packet = MsgUserAttrib.Create(NTT.Id, (uint)maxHealth, MsgUserAttribType.MaxHealth);
+                NTT.NetSync(ref packet, true);
             }
         }
 
-        public HealthComponent(int entityId, ushort health, ushort maxHealth)
+        public HealthComponent(in NTT ntt, ushort health, ushort maxHealth)
         {
-            EntityId = entityId;
+            NTT = ntt;
             Health = health;
             MaxHealth = maxHealth;
         }
-        public override int GetHashCode() => EntityId;
+        public override int GetHashCode() => NTT;
     }
 }

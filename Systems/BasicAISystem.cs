@@ -14,7 +14,7 @@ namespace MagnumOpus.Systems
     public sealed class BasicAISystem : NttSystem<PositionComponent, ViewportComponent, BrainComponent>
     {
         public BasicAISystem() : base("Basic AI", threads: 12) { }
-        protected override bool MatchesFilter(in NTT ntt) => ntt.Type == EntityType.Monster && !ntt.Has<GuardPositionComponent>() && base.MatchesFilter(in ntt);
+        protected override bool MatchesFilter(in NTT ntt) => ntt.Type == EntityType.Monster && !ntt.Has<DeathTagComponent>() && !ntt.Has<GuardPositionComponent>() && base.MatchesFilter(in ntt);
 
         public override void Update(in NTT ntt, ref PositionComponent pos, ref ViewportComponent vwp, ref BrainComponent brn)
         {

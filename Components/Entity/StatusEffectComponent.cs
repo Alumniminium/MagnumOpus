@@ -7,7 +7,7 @@ namespace MagnumOpus.Components.Entity
     [Save]
     public struct StatusEffectComponent
     {
-        public readonly int EntityId;
+        public  NTT NTT;
         public long ChangedTick;
 
         private StatusEffect _effects;
@@ -18,19 +18,18 @@ namespace MagnumOpus.Components.Entity
             {
                 _effects = value;
                 ChangedTick = NttWorld.Tick;
-                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(ntt.Id, (uint)_effects, MsgUserAttribType.StatusEffect);
-                ntt.NetSync(ref packet, true);
+                var packet = MsgUserAttrib.Create(NTT.Id, (uint)_effects, MsgUserAttribType.StatusEffect);
+                NTT.NetSync(ref packet, true);
             }
         }
 
-        public StatusEffectComponent(int entityId)
+        public StatusEffectComponent(in NTT entityId)
         {
-            EntityId = entityId;
+            NTT = entityId;
             ChangedTick = NttWorld.Tick;
             Effects = StatusEffect.None;
         }
 
-        public override int GetHashCode() => EntityId;
+        public override int GetHashCode() => NTT.Id;
     }
 }

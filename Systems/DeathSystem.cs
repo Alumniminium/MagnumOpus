@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using MagnumOpus.Components.AI;
 using MagnumOpus.Components.Attack;
 using MagnumOpus.Components.CQ;
@@ -22,7 +23,7 @@ namespace MagnumOpus.Systems
             if (ntt.Type is EntityType.Player or EntityType.Npc or EntityType.Monster)
                 EntityDeath(in ntt, ref dtc);
             else if (ntt.Type == EntityType.Item)
-                ItemDeath(in ntt, ref dtc);
+                ItemDeath(in ntt);
             // else if (ntt.Type == EntityType.Trap)
             //     TrapDeath(in ntt, ref dtc);
         }
@@ -37,7 +38,7 @@ namespace MagnumOpus.Systems
                 ntt.NetSync(ref deathMsg, true);
 
                 if (!ntt.Has<StatusEffectComponent>())
-                    ntt.Set(new StatusEffectComponent(ntt.Id));
+                    ntt.Set(new StatusEffectComponent(in ntt));
 
                 ref var eff = ref ntt.Get<StatusEffectComponent>();
                 eff.Effects |= StatusEffect.Dead | StatusEffect.FrozenRemoveName;
@@ -100,50 +101,21 @@ namespace MagnumOpus.Systems
             }
             else if (dtc.Tick + (NttWorld.TargetTps * 10) == NttWorld.Tick && ntt.Type == EntityType.Monster)
             {
-                ref var pos = ref ntt.Get<PositionComponent>();
-                ref readonly var spawn = ref ntt.Get<FromSpawnerComponent>();
-                ref readonly var vwp = ref ntt.Get<ViewportComponent>();
-
-                ref readonly var spawner = ref NttWorld.GetEntity(spawn.SpawnerId);
-                ref var spc = ref spawner.Get<SpawnerComponent>();
+                ref readonly var lgc = ref ntt.Get<LifeGiverComponent>();
+                ref var spc = ref lgc.NTT.Get<SpawnerComponent>();
                 spc.Count--;
-
-                var despawn = MsgAction.RemoveEntity(ntt.Id);
-                ntt.NetSync(ref despawn, true);
-
-                foreach (var b in vwp.EntitiesVisible)
-                {
-                    if (!b.Value.Has<ViewportComponent>())
-                        continue;
-                    ref var bVwp = ref b.Value.Get<ViewportComponent>();
-                    _ = bVwp.EntitiesVisible.Remove(ntt.Id, out _);
-                    _ = bVwp.EntitiesVisibleLast.Remove(ntt.Id, out _);
-                }
-                vwp.EntitiesVisible.Clear();
-                vwp.EntitiesVisibleLast.Clear();
-
-                Collections.SpatialHashs[pos.Map].Remove(in ntt, ref pos);
-                ntt.Remove<PositionComponent>();
-                ntt.Remove<DeathTagComponent>();
                 ntt.Set<DestroyEndOfFrameComponent>();
             }
         }
 
-        public static void ItemDeath(in NTT ntt, ref DeathTagComponent dtc)
+        public static void ItemDeath(in NTT ntt)
         {
-            if (dtc.Tick + NttWorld.TargetTps == NttWorld.Tick && ntt.Type == EntityType.Item)
-            {
-                ref var pos = ref ntt.Get<PositionComponent>();
-                var despawn = MsgFloorItem.Create(in ntt, MsgFloorItemType.Delete);
-                ntt.NetSync(ref despawn, true);
-                var ded = new DestroyEndOfFrameComponent();
-                ntt.Set(ref ded);
-                if (Collections.SpatialHashs.TryGetValue(pos.Map, out var hash))
-                    hash.Remove(in ntt, ref pos);
+            var despawn = MsgFloorItem.Create(in ntt, MsgFloorItemType.Delete);
+            var delete = MsgFloorItem.Create(in ntt, MsgFloorItemType.Delete);
+            ntt.NetSync(ref despawn, true);
+            ntt.NetSync(ref delete, true);
 
-                var delete = MsgFloorItem.Create(in ntt, MsgFloorItemType.Delete);
-                ntt.NetSync(ref delete, true);
-            }
+            ntt.Set<DestroyEndOfFrameComponent>();
         }
 
         // public static void TrapDeath(in NTT ntt, ref DeathTagComponent dtc)

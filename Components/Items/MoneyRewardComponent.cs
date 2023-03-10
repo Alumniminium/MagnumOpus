@@ -3,9 +3,9 @@ namespace MagnumOpus.Components.Items
 {
     [Component]
     [Save]
-    public readonly struct MoneyRewardComponent
+    public  struct MoneyRewardComponent
     {
-        public readonly int Amount;
+        public  int Amount;
 
         public MoneyRewardComponent(int amount) => Amount = amount;
     }

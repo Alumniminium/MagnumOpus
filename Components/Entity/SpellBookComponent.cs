@@ -3,10 +3,9 @@ namespace MagnumOpus.Components.Entity
 {
     [Component]
     [Save]
-    public readonly struct SpellBookComponent
+    public  struct SpellBookComponent
     {
-        public readonly Dictionary<ushort, (ushort lvl, ushort exp, ushort cooldown)> Spells;
-
+        public  Dictionary<ushort, (ushort lvl, ushort exp, ushort cooldown)> Spells;
         public SpellBookComponent() => Spells = new();
     }
 }

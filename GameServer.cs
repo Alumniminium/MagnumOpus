@@ -2,6 +2,8 @@ using System.Net.Sockets;
 using System.Text;
 using HerstLib.IO;
 using MagnumOpus.Components;
+using MagnumOpus.Components.Death;
+using MagnumOpus.Components.Entity;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
@@ -45,6 +47,25 @@ namespace MagnumOpus
                 net.Socket.Close();
                 net.Socket.Dispose();
                 net.Socket = client.Client;
+
+                found = false;
+                foreach (var kvp in NttWorld.NTTs)
+                {
+                    var oldNtt = kvp.Value;
+                    ref var oldNtc = ref oldNtt.Get<NameTagComponent>();
+
+                    if (oldNtc.Name == net.Username)
+                    {
+                        oldNtt.Set(ref net);
+                        // ntt.Remove<NetworkComponent>();
+                        // ntt.Set<DestroyEndOfFrameComponent>();
+                        found = true;
+                        ntt = oldNtt;
+                        break;
+                    }
+                }
+
+
 
                 try
                 {

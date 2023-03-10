@@ -3,9 +3,9 @@ namespace MagnumOpus.Components
 {
     [Component]
     [Save]
-    public readonly struct CqMonsterComponent
+    public  struct CqMonsterComponent
     {
-        public readonly int CqMonsterId;
+        public  int CqMonsterId;
 
         public CqMonsterComponent(int cq_monsterId) => CqMonsterId = cq_monsterId;
     }

@@ -7,7 +7,7 @@ namespace MagnumOpus.Components.Location
     [Save]
     public struct BodyComponent
     {
-        public readonly int EntityId;
+        public  NTT ntt;
         public long ChangedTick;
 
         public Direction Direction;
@@ -19,21 +19,21 @@ namespace MagnumOpus.Components.Location
             {
                 look = value;
                 ChangedTick = NttWorld.Tick;
-                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
                 var packet = MsgUserAttrib.Create(ntt.Id, look, MsgUserAttribType.Look);
                 ntt.NetSync(ref packet, true);
             }
         }
 
+        public BodyComponent() => ChangedTick = NttWorld.Tick;
 
-        public BodyComponent(int entityId, uint look = 1003, Direction direction = Direction.South)
+        public BodyComponent(in NTT ntt, uint look = 1003, Direction direction = Direction.South)
         {
-            EntityId = entityId;
+            this.ntt = ntt;
             ChangedTick = NttWorld.Tick;
             Look = look;
             Direction = direction;
         }
 
-        public override int GetHashCode() => EntityId;
+        public override int GetHashCode() => ntt;
     }
 }

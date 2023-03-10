@@ -3,11 +3,12 @@ namespace MagnumOpus.Components.Death
 {
     [Component]
     [Save]
-    public readonly struct DeathTagComponent
+    public  struct DeathTagComponent
     {
-        public readonly NTT Killer;
-        public readonly long Tick;
+        public  NTT Killer;
+        public  long Tick;
 
+        public DeathTagComponent() => Tick = NttWorld.Tick;
         public DeathTagComponent(in NTT killer)
         {
             Killer = killer;

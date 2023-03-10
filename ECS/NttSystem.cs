@@ -59,10 +59,10 @@ namespace MagnumOpus.ECS
             var start = 0;
             var amount = _entitiesList.Count;
 
-            if (amount > Environment.ProcessorCount * 2)
+            if (amount > ThreadCount * 2)
             {
-                var chunkSize = amount / Environment.ProcessorCount;
-                var remaining = amount % Environment.ProcessorCount;
+                var chunkSize = amount / ThreadCount;
+                var remaining = amount % ThreadCount;
                 start = (chunkSize * idx) + Math.Min(idx, remaining);
                 amount = chunkSize + (idx < remaining ? 1 : 0);
             }

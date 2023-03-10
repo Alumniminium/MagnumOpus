@@ -9,14 +9,14 @@ namespace MagnumOpus.Components
     {
         public Socket Socket;
         public bool UseGameCrypto;
-        public readonly Memory<byte> RecvBuffer;
-        public readonly TQCipher AuthCrypto = new();
+        public  Memory<byte> RecvBuffer;
+        public  TQCipher AuthCrypto = new();
         public BlowfishCipher GameCrypto = new();
-        public readonly DiffieHellman DiffieHellman = new();
-        public readonly Memory<byte> ClientIV = new byte[8];
-        public readonly Memory<byte> ServerIV = new byte[8];
-        public readonly ConcurrentQueue<Memory<byte>> SendQueue = new();
-        public readonly ConcurrentQueue<Memory<byte>> RecvQueue = new();
+        public  DiffieHellman DiffieHellman = new();
+        public  Memory<byte> ClientIV = new byte[8];
+        public  Memory<byte> ServerIV = new byte[8];
+        public  ConcurrentQueue<Memory<byte>> SendQueue = new();
+        public  ConcurrentQueue<Memory<byte>> RecvQueue = new();
         public string Username;
 
 

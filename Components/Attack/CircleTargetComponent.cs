@@ -4,11 +4,11 @@ using MagnumOpus.ECS;
 namespace MagnumOpus.Components.Attack
 {
     [Component]
-    public readonly struct CircleTargetComponent
+    public  struct CircleTargetComponent
     {
-        public readonly MagicType.Entry MagicType;
-        public readonly ushort X;
-        public readonly ushort Y;
+        public  MagicType.Entry MagicType;
+        public  ushort X;
+        public  ushort Y;
 
         public CircleTargetComponent(ushort x, ushort y, MagicType.Entry magicType)
         {

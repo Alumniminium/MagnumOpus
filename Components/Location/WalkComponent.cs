@@ -3,12 +3,13 @@ using MagnumOpus.Enums;
 namespace MagnumOpus.Components.Location
 {
     [Component]
-    public readonly struct WalkComponent
+    public  struct WalkComponent
     {
-        public readonly long ChangedTick;
-        public readonly Direction Direction;
-        public readonly bool IsRunning;
+        public  long ChangedTick;
+        public  Direction Direction;
+        public  bool IsRunning;
 
+        public WalkComponent() => ChangedTick = NttWorld.Tick;
         public WalkComponent(byte direction, bool isRunning)
         {
             ChangedTick = NttWorld.Tick;

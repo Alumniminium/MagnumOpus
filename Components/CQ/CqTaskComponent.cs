@@ -5,10 +5,11 @@ namespace MagnumOpus.Components.CQ
     [Save]
     public struct CqTaskComponent
     {
-        public readonly NTT Npc;
+        public  NTT Npc;
         public int[] Options = new int[16];
         public byte OptionCount;
 
+        public CqTaskComponent() => Options = new int[16];
         public CqTaskComponent(int npcId) => Npc = NttWorld.GetEntity(npcId);
     }
 }

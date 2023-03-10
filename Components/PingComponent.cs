@@ -7,11 +7,5 @@ namespace MagnumOpus.Components
     {
         public int LastPing;
         public int Ping;
-
-        public PingComponent()
-        {
-            LastPing = 0;
-            Ping = 0;
-        }
     }
 }

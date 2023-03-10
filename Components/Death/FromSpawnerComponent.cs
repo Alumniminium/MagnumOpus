@@ -2,10 +2,10 @@ using MagnumOpus.ECS;
 namespace MagnumOpus.Components.Death
 {
     [Component]
-    public readonly struct FromSpawnerComponent
+    public  struct LifeGiverComponent
     {
-        public readonly int SpawnerId;
+        public  NTT NTT;
 
-        public FromSpawnerComponent(int spawnerId) => SpawnerId = spawnerId;
+        public LifeGiverComponent(in NTT spawnerId) => NTT = spawnerId;
     }
 }

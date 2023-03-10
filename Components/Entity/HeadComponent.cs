@@ -7,7 +7,7 @@ namespace MagnumOpus.Components.Entity
     [Save]
     public struct HeadComponent
     {
-        public readonly int EntityId;
+        public  NTT NTT;
         public long ChangedTick;
 
         private ushort hair;
@@ -19,18 +19,20 @@ namespace MagnumOpus.Components.Entity
             {
                 hair = value;
                 ChangedTick = NttWorld.Tick;
-                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(ntt.Id, hair, MsgUserAttribType.HairStyle);
-                ntt.NetSync(ref packet, true);
+                var packet = MsgUserAttrib.Create(NTT, hair, MsgUserAttribType.HairStyle);
+                NTT.NetSync(ref packet, true);
             }
         }
-        public HeadComponent(ushort face = 6, ushort hair = 310)
+
+        public HeadComponent() => ChangedTick = NttWorld.Tick;
+        public HeadComponent(in NTT ntt, ushort face = 6, ushort hair = 310)
         {
+            NTT = ntt;
             ChangedTick = NttWorld.Tick;
             Hair = hair;
             FaceId = face;
         }
 
-        public override int GetHashCode() => EntityId;
+        public override int GetHashCode() => NTT.Id;
     }
 }

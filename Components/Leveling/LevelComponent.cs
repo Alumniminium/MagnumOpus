@@ -7,7 +7,7 @@ namespace MagnumOpus.Components.Leveling
     [Save]
     public struct LevelComponent
     {
-        public readonly int EntityId;
+        public  NTT NTT;
         public long ChangedTick;
         private byte level;
         private uint experience;
@@ -19,9 +19,8 @@ namespace MagnumOpus.Components.Leveling
             {
                 level = value;
                 ChangedTick = NttWorld.Tick;
-                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(ntt.Id, level, MsgUserAttribType.Level);
-                ntt.NetSync(ref packet, true);
+                var packet = MsgUserAttrib.Create(NTT.Id, level, MsgUserAttribType.Level);
+                NTT.NetSync(ref packet, true);
             }
         }
         public uint Experience
@@ -30,19 +29,19 @@ namespace MagnumOpus.Components.Leveling
             {
                 experience = value;
                 ChangedTick = NttWorld.Tick;
-                ref readonly var ntt = ref NttWorld.GetEntity(EntityId);
-                var packet = MsgUserAttrib.Create(ntt.Id, experience, MsgUserAttribType.Experience);
-                ntt.NetSync(ref packet, true);
+                var packet = MsgUserAttrib.Create(NTT.Id, experience, MsgUserAttribType.Experience);
+                NTT.NetSync(ref packet, true);
             }
         }
 
-        public LevelComponent(byte level = 1, uint experience = 0, uint experienceToNextLevel = 120)
+        public LevelComponent(in NTT ntt, byte level = 1, uint experience = 0, uint experienceToNextLevel = 120)
         {
+            NTT = ntt;
             Level = level;
             Experience = experience;
             ExperienceToNextLevel = experienceToNextLevel;
             ChangedTick = NttWorld.Tick;
         }
-        public override int GetHashCode() => EntityId;
+        public override int GetHashCode() => NTT;
     }
 }

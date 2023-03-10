@@ -19,7 +19,7 @@ namespace MagnumOpus.Systems
     {
         public MonsterRespawnSystem() : base("Mob Respawn", threads: 2) { }
 
-        public override void Update(in NTT _, ref SpawnerComponent spc, ref PositionComponent pos)
+        public override void Update(in NTT spawner, ref SpawnerComponent spc, ref PositionComponent pos)
         {
             if (spc.RunTick != NttWorld.Tick)
                 return;
@@ -31,18 +31,18 @@ namespace MagnumOpus.Systems
 
             if (!Collections.CqMonsterType.TryGetValue(spc.MonsterId, out var cqMob))
             {
-                _.Set<DestroyEndOfFrameComponent>();
+                spawner.Set<DestroyEndOfFrameComponent>();
                 return;
             }
 
             if (!Collections.Maps.TryGetValue(pos.Map, out var cqMap))
             {
-                _.Set<DestroyEndOfFrameComponent>();
+                spawner.Set<DestroyEndOfFrameComponent>();
                 return;
             }
 
             if (IsLogging)
-                Logger.Debug("{ntt} respawning {num} of {mob} on map {map}", _, spc.GenPerTimer, cqMob.name, cqMap);
+                Logger.Debug("{ntt} respawning {num} of {mob} on map {map}", spawner, spc.GenPerTimer, cqMob.name, cqMap);
 
 
             for (var i = 0; i < spc.GenPerTimer; i++)
@@ -55,10 +55,9 @@ namespace MagnumOpus.Systems
                 var mpos = new PositionComponent(respawnPos, pos.Map);
                 var bdy = new BodyComponent(mob, prefab.lookface, (Direction)Random.Shared.Next(0, 9));
                 var hp = new HealthComponent(mob, prefab.life, prefab.life);
-                // var ntc = new NameTagComponent(mob.Id, prefab.name.Trim());
                 var vwp = new ViewportComponent(18f);
                 var inv = new InventoryComponent(mob, prefab.drop_money, 0);
-                var fsp = new FromSpawnerComponent(_);
+                var fsp = new LifeGiverComponent(spawner);
 
                 var items = ItemGenerator.GetDropItemsFor(cqm.CqMonsterId);
                 for (var x = 0; x < items.Count; x++)
@@ -114,8 +113,8 @@ namespace MagnumOpus.Systems
                 if (IsLogging)
                 {
                     Logger.Debug("{ntt} spawned {mob} at {pos}", mob, cqMob.name, mpos.Position);
-                    var msgTalk = MsgText.Create(in _, "Respawning " + cqMob.name + " at " + mpos.Position.X + ", " + mpos.Position.Y);
-                    _.NetSync(ref msgTalk, true);
+                    var msgTalk = MsgText.Create(in spawner, "Respawning " + cqMob.name + " at " + mpos.Position.X + ", " + mpos.Position.Y);
+                    spawner.NetSync(ref msgTalk, true);
                 }
                 if (spc.Count >= spc.MaxCount)
                     break;

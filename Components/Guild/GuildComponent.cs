@@ -6,22 +6,26 @@ namespace MagnumOpus.Components.Guild
     [Save]
     public struct GuildComponent
     {
-        public readonly int EntityId;
-        public readonly int GuildId;
-        public readonly int LeaderId;
-        public readonly string GuildName;
-        public readonly string GuildTag;
-        public readonly GuildRanks Rank;
+        public  int EntityId;
+        public  int GuildId;
+        public  int LeaderId;
+        public  string GuildName;
+        public  GuildRanks Rank;
         public int Donation;
         public int Funds;
         public NTT[] Members = Array.Empty<NTT>();
 
-        public GuildComponent(int entityId, int guildId, int leaderId, string guildName, string guildTag, int donation, int funds, GuildRanks guildRank)
+        public GuildComponent()
+        {
+            GuildName = "Default Guild";
+            Members = new NTT[1];
+        }
+
+        public GuildComponent(int entityId, int guildId, int leaderId, string guildName, int donation, int funds, GuildRanks guildRank)
         {
             EntityId = entityId;
             GuildId = guildId;
             GuildName = guildName;
-            GuildTag = guildTag;
             Rank = guildRank;
             LeaderId = leaderId;
             Donation = donation;

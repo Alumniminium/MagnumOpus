@@ -4,11 +4,12 @@ namespace MagnumOpus.Components.Location
 {
     [Component]
     [Save]
-    public readonly struct EmoteComponent
+    public  struct EmoteComponent
     {
-        public readonly long ChangedTick;
-        public readonly Emote Emote;
+        public  long ChangedTick;
+        public  Emote Emote;
 
+        public EmoteComponent() => ChangedTick = NttWorld.Tick;
         public EmoteComponent(Emote emote = Emote.Stand)
         {
             Emote = emote;

@@ -23,6 +23,8 @@ namespace MagnumOpus.ECS
             var json = File.ReadAllText(filename);
             Components = JsonConvert.DeserializeObject<Dictionary<int, T>>(json) ?? new();
 
+            // JsonConvert.PopulateObject(json, Components);
+
             var time = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
             FConsole.WriteLine($"Loaded {typeof(T).Name} in {time}ms");
         }

@@ -6,13 +6,8 @@ namespace MagnumOpus.Components.Entity
     public struct RebornComponent
     {
         public long ChangedTick;
-
         public byte Count;
 
-        public RebornComponent()
-        {
-            ChangedTick = NttWorld.Tick;
-            Count = 0;
-        }
+        public RebornComponent() => ChangedTick = NttWorld.Tick;
     }
 }

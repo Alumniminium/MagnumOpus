@@ -49,7 +49,7 @@ namespace MagnumOpus.ECS
 
             var json = File.ReadAllText(filename);
             NTTs = JsonConvert.DeserializeObject<Dictionary<int, NTT>>(json) ?? new();
-
+            PrometheusPush.NTTCount.IncTo(NTTs.Count);
             var time = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
             FConsole.WriteLine($"Loaded NttWorld in {time}ms");
         }

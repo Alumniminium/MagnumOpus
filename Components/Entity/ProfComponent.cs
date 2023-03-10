@@ -3,14 +3,15 @@ namespace MagnumOpus.Components.Entity
 {
     [Component]
     [Save]
-    public readonly struct ProfComponent
+    public  struct ProfComponent
     {
-        public readonly long ChangedTick;
-        public readonly ushort Id;
-        public readonly ushort Level;
-        public readonly ushort Experience;
-        public readonly ushort ExperienceToNextLevel;
+        public  long ChangedTick;
+        public  ushort Id;
+        public  ushort Level;
+        public  ushort Experience;
+        public  ushort ExperienceToNextLevel;
 
+        public ProfComponent() => ChangedTick = NttWorld.Tick;
         public ProfComponent(ushort skillId, ushort level, ushort experience, ushort experienceToNextLevel)
         {
             ChangedTick = NttWorld.Tick;

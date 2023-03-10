@@ -3,9 +3,9 @@ namespace MagnumOpus.Components.Death
 {
     [Component]
     [Save]
-    public readonly struct ReviveComponent
+    public  struct ReviveComponent
     {
-        public readonly long ReviveTick;
+        public  long ReviveTick;
         public ReviveComponent(uint seconds) => ReviveTick = NttWorld.Tick + seconds * NttWorld.TargetTps;
     }
 }

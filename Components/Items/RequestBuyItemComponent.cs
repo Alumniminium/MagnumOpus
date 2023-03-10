@@ -3,11 +3,11 @@ using MagnumOpus.ECS;
 namespace MagnumOpus.Components.Items
 {
     [Component]
-    public readonly struct RequestShopItemTransactionComponent
+    public  struct RequestShopItemTransactionComponent
     {
-        public readonly int ShopId;
-        public readonly int ItemId;
-        public readonly bool Buy;
+        public  int ShopId;
+        public  int ItemId;
+        public  bool Buy;
 
         public RequestShopItemTransactionComponent(int shopId, int itemId, bool buy)
         {

@@ -31,7 +31,7 @@ namespace MagnumOpus.Systems
                 return;
             }
 
-            var dtc = new DeathTagComponent(default);
+            var dtc = new DeathTagComponent();
             ntt.Set(ref dtc);
             ntt.Remove<LifeTimeComponent>();
             if (IsLogging)
