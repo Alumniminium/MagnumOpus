@@ -1,6 +1,4 @@
 using MagnumOpus.ECS;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Entity
 {
     [Component]
@@ -9,7 +7,6 @@ namespace MagnumOpus.Components.Entity
     {
         public long Points;
 
-        [JsonConstructor]
         public VirtuePointComponent(long points) => Points = points;
     }
 }

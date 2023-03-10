@@ -1,6 +1,4 @@
 using MagnumOpus.ECS;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.CQ
 {
     [Component]
@@ -9,7 +7,6 @@ namespace MagnumOpus.Components.CQ
     {
         public readonly long cq_Action;
 
-        [JsonConstructor]
         public CqActionComponent(long cqAction) => cq_Action = cqAction;
     }
 }

@@ -1,6 +1,4 @@
 using MagnumOpus.ECS;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Death
 {
     [Component]
@@ -8,7 +6,6 @@ namespace MagnumOpus.Components.Death
     {
         public readonly int SpawnerId;
 
-        [JsonConstructor]
         public FromSpawnerComponent(int spawnerId) => SpawnerId = spawnerId;
     }
 }

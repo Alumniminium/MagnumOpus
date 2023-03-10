@@ -1,6 +1,4 @@
 using MagnumOpus.ECS;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components
 {
     [Component]
@@ -9,7 +7,6 @@ namespace MagnumOpus.Components
     {
         public readonly int CqMonsterId;
 
-        [JsonConstructor]
         public CqMonsterComponent(int cq_monsterId) => CqMonsterId = cq_monsterId;
     }
 }

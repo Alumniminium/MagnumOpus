@@ -1,6 +1,4 @@
 using MagnumOpus.ECS;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Attack
 {
     [Component]
@@ -11,7 +9,6 @@ namespace MagnumOpus.Components.Attack
         public readonly NTT Attacked;
         public int Damage;
 
-        [JsonConstructor]
         public DamageComponent(in NTT attacked, in NTT attacker, int damage)
         {
             Attacked = attacked;

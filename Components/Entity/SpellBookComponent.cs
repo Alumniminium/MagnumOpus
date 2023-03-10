@@ -1,6 +1,4 @@
 using MagnumOpus.ECS;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Entity
 {
     [Component]
@@ -9,7 +7,6 @@ namespace MagnumOpus.Components.Entity
     {
         public readonly Dictionary<ushort, (ushort lvl, ushort exp, ushort cooldown)> Spells;
 
-        [JsonConstructor]
         public SpellBookComponent() => Spells = new();
     }
 }

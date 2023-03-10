@@ -1,7 +1,5 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Location
 {
     [Component]
@@ -11,7 +9,6 @@ namespace MagnumOpus.Components.Location
         public readonly long ChangedTick;
         public readonly Emote Emote;
 
-        [JsonConstructor]
         public EmoteComponent(Emote emote = Emote.Stand)
         {
             Emote = emote;

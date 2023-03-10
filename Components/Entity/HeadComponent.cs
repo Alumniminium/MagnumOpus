@@ -1,8 +1,6 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Entity
 {
     [Component]
@@ -26,7 +24,6 @@ namespace MagnumOpus.Components.Entity
                 ntt.NetSync(ref packet, true);
             }
         }
-        [JsonConstructor]
         public HeadComponent(ushort face = 6, ushort hair = 310)
         {
             ChangedTick = NttWorld.Tick;

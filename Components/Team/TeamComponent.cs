@@ -13,7 +13,6 @@ namespace MagnumOpus.Components.Team
         public bool ShareItems;
         public bool ShareGold;
 
-        [JsonConstructor]
         public TeamComponent(in NTT ntt)
         {
             CreatedTick = NttWorld.Tick;

@@ -1,6 +1,4 @@
 using MagnumOpus.ECS;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Items
 {
     [Component]
@@ -9,7 +7,6 @@ namespace MagnumOpus.Components.Items
     {
         public readonly int Amount;
 
-        [JsonConstructor]
         public MoneyRewardComponent(int amount) => Amount = amount;
     }
 }

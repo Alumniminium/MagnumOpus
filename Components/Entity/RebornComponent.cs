@@ -1,6 +1,4 @@
 using MagnumOpus.ECS;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Entity
 {
     [Component]
@@ -11,7 +9,6 @@ namespace MagnumOpus.Components.Entity
 
         public byte Count;
 
-        [JsonConstructor]
         public RebornComponent()
         {
             ChangedTick = NttWorld.Tick;

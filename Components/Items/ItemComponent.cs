@@ -1,7 +1,5 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Items
 {
     [Component]
@@ -30,7 +28,6 @@ namespace MagnumOpus.Components.Items
             }
         }
 
-        [JsonConstructor]
         public ItemComponent(int itemId, ushort currentDurability, ushort maximumDurability, byte stackAmount, byte plus, byte bless, byte enchant, byte gem1, byte gem2, RebornItemEffect rebornEffect, int customTextId)
         {
             Id = itemId;

@@ -8,7 +8,6 @@ namespace MagnumOpus.Components.Entity
     public struct NameTagComponent
     {
         public string Name;
-        [JsonConstructor]
         public NameTagComponent(string Name) => this.Name = Name;
     }
 }

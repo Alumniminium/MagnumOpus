@@ -1,8 +1,6 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components
 {
     [Component]
@@ -34,7 +32,6 @@ namespace MagnumOpus.Components
             }
         }
 
-        [JsonConstructor]
         public HealthComponent(int entityId, ushort health, ushort maxHealth)
         {
             EntityId = entityId;

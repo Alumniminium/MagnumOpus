@@ -1,6 +1,4 @@
 using MagnumOpus.ECS;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Items
 {
     [Component]
@@ -8,7 +6,6 @@ namespace MagnumOpus.Components.Items
     {
         public readonly NTT ItemNtt;
 
-        [JsonConstructor]
         public RequestDropItemComponent(in NTT itemNtt) => ItemNtt = itemNtt;
     }
 }

@@ -1,8 +1,6 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Entity
 {
     [Component]
@@ -78,7 +76,6 @@ namespace MagnumOpus.Components.Entity
             }
         }
 
-        [JsonConstructor]
         public AttributeComponent(int entityId)
         {
             EntityId = entityId;

@@ -1,7 +1,5 @@
 using System.Numerics;
 using MagnumOpus.ECS;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Location
 {
     [Component]
@@ -12,7 +10,6 @@ namespace MagnumOpus.Components.Location
         public readonly Vector2 Position;
         public float Time;
 
-        [JsonConstructor]
         public JumpComponent(ushort x, ushort y)
         {
             ChangedTick = NttWorld.Tick;

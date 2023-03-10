@@ -1,7 +1,5 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Location
 {
     [Component]
@@ -11,7 +9,6 @@ namespace MagnumOpus.Components.Location
         public readonly Direction Direction;
         public readonly bool IsRunning;
 
-        [JsonConstructor]
         public WalkComponent(byte direction, bool isRunning)
         {
             ChangedTick = NttWorld.Tick;

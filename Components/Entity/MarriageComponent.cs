@@ -1,6 +1,4 @@
 using MagnumOpus.ECS;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Entity
 {
     [Component]
@@ -11,7 +9,6 @@ namespace MagnumOpus.Components.Entity
         public int WeddingTick;
         public int DivorceTick;
 
-        [JsonConstructor]
         public MarriageComponent(int spouseId, int weddingTick, int divorceTick)
         {
             SpouseId = spouseId;

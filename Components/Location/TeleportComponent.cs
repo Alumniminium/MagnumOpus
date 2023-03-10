@@ -1,6 +1,4 @@
 using MagnumOpus.ECS;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Location
 {
     [Component]
@@ -11,7 +9,6 @@ namespace MagnumOpus.Components.Location
         public readonly ushort X;
         public readonly ushort Y;
 
-        [JsonConstructor]
         public TeleportComponent(ushort x, ushort y, ushort map)
         {
             X = x;

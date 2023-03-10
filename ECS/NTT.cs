@@ -11,7 +11,6 @@ namespace MagnumOpus.ECS
         public readonly int Id;
         public readonly EntityType Type;
 
-        [JsonConstructor]
         public NTT(int id, EntityType type)
         {
             Id = id;

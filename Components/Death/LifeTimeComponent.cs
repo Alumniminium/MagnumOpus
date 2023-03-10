@@ -1,6 +1,4 @@
 using MagnumOpus.ECS;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Death
 {
     [Component]
@@ -9,7 +7,6 @@ namespace MagnumOpus.Components.Death
     {
         public uint ExpireTick;
 
-        [JsonConstructor]
         public LifeTimeComponent(TimeSpan timespan) => ExpireTick = (uint)(NttWorld.Tick + NttWorld.TargetTps * timespan.TotalSeconds);
     }
 }

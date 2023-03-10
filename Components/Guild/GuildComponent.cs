@@ -1,7 +1,5 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Guild
 {
     [Component]
@@ -18,7 +16,6 @@ namespace MagnumOpus.Components.Guild
         public int Funds;
         public NTT[] Members = Array.Empty<NTT>();
 
-        [JsonConstructor]
         public GuildComponent(int entityId, int guildId, int leaderId, string guildName, string guildTag, int donation, int funds, GuildRanks guildRank)
         {
             EntityId = entityId;

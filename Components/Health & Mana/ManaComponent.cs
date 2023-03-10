@@ -1,6 +1,4 @@
 using MagnumOpus.ECS;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components
 {
     [Component]
@@ -11,7 +9,6 @@ namespace MagnumOpus.Components
         public ushort Mana;
         public ushort MaxMana;
 
-        [JsonConstructor]
         public ManaComponent(ushort mana, ushort maxMana)
         {
             ChangedTick = NttWorld.Tick;

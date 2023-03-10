@@ -1,8 +1,6 @@
 using System.Numerics;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.AI
 {
     [Component]
@@ -14,8 +12,6 @@ namespace MagnumOpus.Components.AI
         public Vector2 TargetPosition;
         public int SleepTicks;
 
-
-        [JsonConstructor]
         public BrainComponent()
         {
             State = BrainState.Idle;

@@ -1,6 +1,4 @@
 using MagnumOpus.ECS;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Entity
 {
     [Component]
@@ -13,7 +11,6 @@ namespace MagnumOpus.Components.Entity
         public readonly ushort Experience;
         public readonly ushort ExperienceToNextLevel;
 
-        [JsonConstructor]
         public ProfComponent(ushort skillId, ushort level, ushort experience, ushort experienceToNextLevel)
         {
             ChangedTick = NttWorld.Tick;

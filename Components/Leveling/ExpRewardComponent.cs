@@ -1,6 +1,4 @@
 using MagnumOpus.ECS;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Leveling
 {
     [Component]
@@ -9,7 +7,6 @@ namespace MagnumOpus.Components.Leveling
     {
         public int Experience;
 
-        [JsonConstructor]
         public ExpRewardComponent(int experience) => Experience = experience;
     }
 }

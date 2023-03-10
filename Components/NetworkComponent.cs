@@ -2,8 +2,6 @@ using System.Collections.Concurrent;
 using System.Net.Sockets;
 using MagnumOpus.ECS;
 using MagnumOpus.Networking.Cryptography;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components
 {
     [Component]
@@ -22,7 +20,6 @@ namespace MagnumOpus.Components
         public string Username;
 
 
-        [JsonConstructor]
         public NetworkComponent(Socket socket, byte[]? civ = null, byte[]? siv = null)
         {
             UseGameCrypto = false;

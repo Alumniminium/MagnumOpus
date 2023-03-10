@@ -1,7 +1,5 @@
 using System.Numerics;
 using MagnumOpus.ECS;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Location
 {
     [Component]

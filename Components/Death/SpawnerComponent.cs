@@ -1,7 +1,5 @@
 using System.Drawing;
 using MagnumOpus.ECS;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Death
 {
     [Component]
@@ -18,7 +16,6 @@ namespace MagnumOpus.Components.Death
         public long RunTick;
         public int Count;
 
-        [JsonConstructor]
         public SpawnerComponent(long generatorId, in Rectangle spawnArea, int monsterId, int spawnLimit, int spawnInterval, int spawnCount)
         {
             GeneratorId = (int)generatorId;

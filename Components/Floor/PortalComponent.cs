@@ -1,6 +1,4 @@
 using MagnumOpus.ECS;
-using Newtonsoft.Json;
-
 namespace MagnumOpus.Components.Floor
 {
     [Component]
@@ -10,7 +8,6 @@ namespace MagnumOpus.Components.Floor
         public readonly ushort X;
         public readonly ushort Y;
 
-        [JsonConstructor]
         public PortalComponent(ushort x, ushort y)
         {
             X = x;
