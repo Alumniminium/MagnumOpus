@@ -3,11 +3,11 @@ namespace MagnumOpus.Components.Location
 {
     [Component]
     [Save]
-    public  struct TeleportComponent
+    public struct TeleportComponent
     {
-        public  ushort Map;
-        public  ushort X;
-        public  ushort Y;
+        public ushort Map;
+        public ushort X;
+        public ushort Y;
 
         public TeleportComponent(ushort x, ushort y, ushort map)
         {

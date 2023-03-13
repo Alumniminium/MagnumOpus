@@ -5,8 +5,8 @@ namespace MagnumOpus.Components.Location
     [Component]
     public struct JumpComponent
     {
-        public  long CreatedTick;
-        public  Vector2 Position;
+        public long CreatedTick;
+        public Vector2 Position;
         public float Time;
 
         public JumpComponent(ushort x, ushort y)

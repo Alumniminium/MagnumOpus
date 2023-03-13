@@ -4,5 +4,5 @@ namespace MagnumOpus.Components.Death
 {
     [Component]
     [Save]
-    public  struct DestroyEndOfFrameComponent { }
+    public struct DestroyEndOfFrameComponent { }
 }

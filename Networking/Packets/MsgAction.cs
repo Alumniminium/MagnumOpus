@@ -133,9 +133,30 @@ namespace MagnumOpus.Networking.Packets
                     {
                         if (_trace) FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id}");
                         ref var inv = ref ntt.Get<InventoryComponent>();
+                        ref var eq = ref ntt.Get<EquipmentComponent>();
 
                         InventoryHelper.SortById(in ntt, ref inv, netSync: true);
                         ntt.NetSync(ref msg);
+
+                        var head = MsgItemInformation.Create(eq.Head, MsgItemInfoAction.AddItem, MsgItemPosition.Head);
+                        var garm = MsgItemInformation.Create(eq.Garment, MsgItemInfoAction.AddItem, MsgItemPosition.Garment);
+                        var bottle = MsgItemInformation.Create(eq.Bottle, MsgItemInfoAction.AddItem, MsgItemPosition.Bottle);
+                        var neck = MsgItemInformation.Create(eq.Necklace, MsgItemInfoAction.AddItem, MsgItemPosition.Necklace);
+                        var ring = MsgItemInformation.Create(eq.Ring, MsgItemInfoAction.AddItem, MsgItemPosition.Ring);
+                        var chest = MsgItemInformation.Create(eq.Armor, MsgItemInfoAction.AddItem, MsgItemPosition.Armor);
+                        var weaponR = MsgItemInformation.Create(eq.RightWeapon, MsgItemInfoAction.AddItem, MsgItemPosition.RightWeapon);
+                        var weaponL = MsgItemInformation.Create(eq.LeftWeapon, MsgItemInfoAction.AddItem, MsgItemPosition.LeftWeapon);
+                        var boots = MsgItemInformation.Create(eq.Boots, MsgItemInfoAction.AddItem, MsgItemPosition.Boots);
+
+                        ntt.NetSync(ref head, false);
+                        ntt.NetSync(ref garm, false);
+                        ntt.NetSync(ref bottle, false);
+                        ntt.NetSync(ref neck, false);
+                        ntt.NetSync(ref ring, false);
+                        ntt.NetSync(ref chest, false);
+                        ntt.NetSync(ref weaponR, false);
+                        ntt.NetSync(ref weaponL, false);
+                        ntt.NetSync(ref boots, false);
                         break;
                     }
                 case MsgActionType.SendSpells:

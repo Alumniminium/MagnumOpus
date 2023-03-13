@@ -2,8 +2,6 @@ using System.Net.Sockets;
 using System.Text;
 using HerstLib.IO;
 using MagnumOpus.Components;
-using MagnumOpus.Components.Death;
-using MagnumOpus.Components.Entity;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
@@ -12,25 +10,21 @@ namespace MagnumOpus
 {
     public static class GameServer
     {
-        private static readonly TcpListener GameListener = new(System.Net.IPAddress.Any, 5816);
-        private static readonly Thread gameThread;
-        static GameServer()
-        {
-            gameThread = new Thread(GameServerLoop) { IsBackground = true, Priority = ThreadPriority.Highest };
-        }
+        private static readonly TcpListener listener = new(System.Net.IPAddress.Any, 5816);
+        private static readonly Thread thread;
+        static GameServer() => thread = new Thread(GameServerLoop) { IsBackground = true, Priority = ThreadPriority.Highest };
         public static void Start()
         {
             FConsole.WriteLine($"[GAME] Listening on port {5816}...");
-            GameListener.Start();
-
-            gameThread.Start();
+            listener.Start();
+            thread.Start();
         }
 
         private static void GameServerLoop()
         {
             while (true)
             {
-                var client = GameListener.AcceptTcpClient();
+                var client = listener.AcceptTcpClient();
 
                 FConsole.WriteLine($"[GAME] Client connected: {client.Client.RemoteEndPoint}");
 
@@ -47,25 +41,6 @@ namespace MagnumOpus
                 net.Socket.Close();
                 net.Socket.Dispose();
                 net.Socket = client.Client;
-
-                found = false;
-                foreach (var kvp in NttWorld.NTTs)
-                {
-                    var oldNtt = kvp.Value;
-                    ref var oldNtc = ref oldNtt.Get<NameTagComponent>();
-
-                    if (oldNtc.Name == net.Username)
-                    {
-                        oldNtt.Set(ref net);
-                        // ntt.Remove<NetworkComponent>();
-                        // ntt.Set<DestroyEndOfFrameComponent>();
-                        found = true;
-                        ntt = oldNtt;
-                        break;
-                    }
-                }
-
-
 
                 try
                 {
@@ -91,16 +66,16 @@ namespace MagnumOpus
                     net.GameCrypto.GenerateKeys(net.DiffieHellman.GetPrivateKey());
                     net.GameCrypto.SetIVs(net.ServerIV, net.ClientIV);
 
-                    new Thread(() => GameClientLoop(in ntt)).Start();
+                    new Thread(() => GameClientLoop(ntt)).Start();
                 }
                 catch (Exception e)
                 {
                     FConsole.WriteLine(e.Message);
-                    NttWorld.Destroy(in ntt);
+                    NttWorld.Destroy(ntt);
                 }
             }
         }
-        private static void GameClientLoop(in NTT ntt)
+        private static void GameClientLoop(NTT ntt)
         {
             ref var net = ref ntt.Get<NetworkComponent>();
             var buffer = net.RecvBuffer;
@@ -140,12 +115,9 @@ namespace MagnumOpus
                     FConsole.WriteLine($"[GAME] Client disconnected: {net.Username}");
                     net.Socket?.Close();
                     net.Socket?.Dispose();
-                    NttWorld.Destroy(in ntt);
                     break;
                 }
             }
-
-            NttWorld.Destroy(in ntt);
         }
     }
 }

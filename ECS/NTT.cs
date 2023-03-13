@@ -19,14 +19,14 @@ namespace MagnumOpus.ECS
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly void Set<T>(ref T component) where T : struct => SparseComponentStorage<T>.AddFor(in this, ref component);
+        public readonly void Set<T>(ref T component) where T : struct => SparseComponentStorage<T>.AddFor(this, ref component);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly void Set<T>(T component) where T : struct => SparseComponentStorage<T>.AddFor(in this, ref component);
-        public readonly void Set<T>() where T : struct => SparseComponentStorage<T>.AddFor(in this);
+        public readonly void Set<T>(T component) where T : struct => SparseComponentStorage<T>.AddFor(this, ref component);
+        public readonly void Set<T>() where T : struct => SparseComponentStorage<T>.AddFor(this);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly ref T Get<T>() where T : struct => ref SparseComponentStorage<T>.Get(in this);
+        public readonly ref T Get<T>() where T : struct => ref SparseComponentStorage<T>.Get(this);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool Has<T>() where T : struct => SparseComponentStorage<T>.HasFor(in this);
+        public readonly bool Has<T>() where T : struct => SparseComponentStorage<T>.HasFor(this);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly bool Has<T, T2>() where T : struct where T2 : struct => Has<T>() && Has<T2>();
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -36,9 +36,10 @@ namespace MagnumOpus.ECS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly bool Has<T, T2, T3, T4, T5>() where T : struct where T2 : struct where T3 : struct where T4 : struct where T5 : struct => Has<T, T2, T3, T4>() && Has<T5>();
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly void Remove<T>() => ReflectionHelper.Remove<T>(in this);
+        public readonly void Remove<T>() => ReflectionHelper.Remove<T>(this);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly void Recycle() => ReflectionHelper.RecycleComponents(this);
+        public readonly void ChangeOwner(NTT to) => ReflectionHelper.ChangeOwner(this, to);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly void NetSync<T>(ref T msg, bool broadcast = false) where T : unmanaged
         {
@@ -71,9 +72,9 @@ namespace MagnumOpus.ECS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object? obj) => obj is NTT nttId && nttId.Id == Id;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(in NTT a, in NTT b) => a.Id == b.Id;
+        public static bool operator ==(NTT a, NTT b) => a.Id == b.Id;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(in NTT a, in NTT b) => a.Id != b.Id;
+        public static bool operator !=(NTT a, NTT b) => a.Id != b.Id;
         public static implicit operator int(in NTT a) => a.Id;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => $"NTT {Id} ({Type})";

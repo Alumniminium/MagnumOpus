@@ -17,12 +17,15 @@ namespace MagnumOpus.Squiggly
 {
     public static partial class Db
     {
+        public static void LoadCqMonsterType()
+        {
+            using var ctx = new SquigglyContext();
+            foreach (var cq_monstertype in ctx.cq_monstertype)
+                _ = Collections.CqMonsterType.TryAdd(cq_monstertype.id, cq_monstertype);
+        }
         public static void LoadSpawners()
         {
             using var ctx = new SquigglyContext();
-
-            foreach (var cq_monstertype in ctx.cq_monstertype)
-                _ = Collections.CqMonsterType.TryAdd(cq_monstertype.id, cq_monstertype);
 
             foreach (var cq_spawn in ctx.cq_generator)
             {
@@ -50,7 +53,7 @@ namespace MagnumOpus.Squiggly
                 var vwp = new ViewportComponent(18f);
                 ntt.Set(ref vwp);
 
-                Collections.SpatialHashs[cq_spawn.mapid].Add(in ntt, ref pos);
+                Collections.SpatialHashs[cq_spawn.mapid].Add(ntt, ref pos);
             }
         }
 
@@ -158,7 +161,7 @@ namespace MagnumOpus.Squiggly
                             continue;
                         Collections.SpatialHashs[pos.Map] = new SpatialHash(10);
                     }
-                    Collections.SpatialHashs[pos.Map].Add(in ntt, ref pos);
+                    Collections.SpatialHashs[pos.Map].Add(ntt, ref pos);
                 }
             }
             sw.Stop();

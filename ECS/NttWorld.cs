@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using HerstLib.IO;
+using MagnumOpus.Components.Location;
 using MagnumOpus.Helpers;
 using Newtonsoft.Json;
 
@@ -35,6 +36,7 @@ namespace MagnumOpus.ECS
 
         static NttWorld()
         {
+            Default[0] = new(0, EntityType.Other);
             var start = Stopwatch.GetTimestamp();
             var filename = Path.Combine("_STATE_FILES", "NttWorld.json");
 
@@ -88,12 +90,12 @@ namespace MagnumOpus.ECS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool EntityExists(int nttId) => NTTs.ContainsKey(nttId);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void InformChangesFor(in NTT ntt) => ChangedThisTick.Enqueue(ntt);
+        public static void InformChangesFor(NTT ntt) => ChangedThisTick.Enqueue(ntt);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Destroy(in NTT ntt) => ToBeRemoved.Enqueue(ntt);
+        public static void Destroy(NTT ntt) => ToBeRemoved.Enqueue(ntt);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void DestroyInternal(in NTT ntt)
+        public static void DestroyInternal(NTT ntt)
         {
             lock (_lock)
             {
@@ -111,7 +113,7 @@ namespace MagnumOpus.ECS
         public static void UpdateNTTs()
         {
             while (ToBeRemoved.TryDequeue(out var ntt))
-                DestroyInternal(in ntt);
+                DestroyInternal(ntt);
             SystemNotifier?.Start();
         }
         public static void Update()

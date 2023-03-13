@@ -94,7 +94,7 @@ namespace MagnumOpus.Helpers
             }
             for (var i = 0; i < inv.Items.Length; i++)
             {
-                var packet = MsgItemInformation.Create(in inv.Items[i]);
+                var packet = MsgItemInformation.Create(inv.Items[i]);
                 ntt.NetSync(ref packet);
             }
         }
@@ -109,7 +109,7 @@ namespace MagnumOpus.Helpers
                 inv.Items[i] = item;
                 if (netSync)
                 {
-                    var packet = MsgItemInformation.Create(in inv.Items[i]);
+                    var packet = MsgItemInformation.Create(inv.Items[i]);
                     ntt.NetSync(ref packet);
                 }
                 return true;

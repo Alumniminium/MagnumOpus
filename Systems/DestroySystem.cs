@@ -17,7 +17,7 @@ namespace MagnumOpus.Systems
             {
                 ref var pos = ref ntt.Get<PositionComponent>();
                 if (Collections.SpatialHashs.TryGetValue(pos.Map, out var hash))
-                    hash.Remove(in ntt, ref pos);
+                    hash.Remove(ntt, ref pos);
             }
 
             switch (ntt.Type)
@@ -33,7 +33,7 @@ namespace MagnumOpus.Systems
                     break;
             }
 
-            NttWorld.Destroy(in ntt);
+            NttWorld.Destroy(ntt);
 
             if (IsLogging)
                 Logger.Debug("Destroyed {ntt}", ntt);

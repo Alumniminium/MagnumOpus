@@ -21,7 +21,7 @@ namespace MagnumOpus.SpacePartitioning
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Add(in NTT entity, ref PositionComponent pos)
+        public void Add(NTT entity, ref PositionComponent pos)
         {
             var hash = GetHash(pos.Position);
 
@@ -33,7 +33,7 @@ namespace MagnumOpus.SpacePartitioning
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Remove(in NTT entity, ref PositionComponent pos)
+        public void Remove(NTT entity, ref PositionComponent pos)
         {
             var hash = GetHash(pos.Position);
 
@@ -43,10 +43,10 @@ namespace MagnumOpus.SpacePartitioning
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Move(in NTT ntt, ref PositionComponent pos)
+        public void Move(NTT ntt, ref PositionComponent pos)
         {
-            Remove(in ntt, ref pos);
-            Add(in ntt, ref pos);
+            Remove(ntt, ref pos);
+            Add(ntt, ref pos);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

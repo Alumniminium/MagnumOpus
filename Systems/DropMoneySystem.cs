@@ -28,10 +28,10 @@ namespace MagnumOpus.Systems
             PrometheusPush.ServerExpenses.Inc(drc.Amount);
 
             var itemNtt = EntityFactory.MakeMoneyDrop(drc.Amount, ref pos);
-            if (itemNtt != null)
+            if (itemNtt != default)
             {
-                Collections.SpatialHashs[pos.Map].Add(itemNtt.Value, ref pos);
-                var dropMsg = MsgFloorItem.Create(itemNtt.Value, Enums.MsgFloorItemType.Create);
+                Collections.SpatialHashs[pos.Map].Add(itemNtt, ref pos);
+                var dropMsg = MsgFloorItem.Create(itemNtt, Enums.MsgFloorItemType.Create);
                 ntt.NetSync(ref dropMsg, true);
                 if (IsLogging)
                     Logger.Debug("{ntt} dropped {amount} money at {pos}", ntt, drc.Amount, pos.Position);

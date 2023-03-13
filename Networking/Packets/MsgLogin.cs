@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using HerstLib.IO;
 using MagnumOpus.Components;
+using MagnumOpus.Components.Death;
 using MagnumOpus.Components.Entity;
 using MagnumOpus.Components.Items;
 using MagnumOpus.Components.Leveling;
@@ -46,6 +47,7 @@ namespace MagnumOpus.Networking.Packets
             PrometheusPush.LoginCount.Inc();
 
             ref var net = ref ntt.Get<NetworkComponent>();
+
             var found = false;
             foreach (var kvp in NttWorld.NTTs)
             {
@@ -54,21 +56,22 @@ namespace MagnumOpus.Networking.Packets
 
                 if (oldNtc.Name == net.Username)
                 {
-                    oldNtt.Set(ref net);
-                    ntt.Remove<NetworkComponent>();
+                    oldNtt.ChangeOwner(ntt);
+                    // ntt.Remove<NetworkComponent>();
                     // ntt.Set<DestroyEndOfFrameComponent>();
                     found = true;
-                    // ntt = oldNtt;
+                    // ntt.Id = oldNtt.Id;
+                    FConsole.WriteLine($"Found NTT with Id: {oldNtt.Id}!");
                     break;
                 }
             }
+
             if (!found)
             {
                 var ntc = new NameTagComponent(net.Username);
                 var bdy = new BodyComponent(in ntt, (uint)(net.Username == "trbl" ? 2003 : 2002));
                 var hed = new HeadComponent(in ntt);
                 var emo = new EmoteComponent(Emote.Stand);
-                var vwp = new ViewportComponent(21);
                 var pos = new PositionComponent(new System.Numerics.Vector2(438, 377), 1002);
                 var eff = new StatusEffectComponent(in ntt);
                 var inv = new InventoryComponent(in ntt, 1000000, 0);
@@ -90,7 +93,6 @@ namespace MagnumOpus.Networking.Packets
 
                 ntt.Set(ref bdy);
                 ntt.Set(ref ntc);
-                ntt.Set(ref vwp);
                 ntt.Set(ref emo);
                 ntt.Set(ref pos);
                 ntt.Set(ref eff);
@@ -113,6 +115,10 @@ namespace MagnumOpus.Networking.Packets
                 testItem2.Set(ref itemComp2);
                 inv.Items[1] = testItem2;
             }
+
+            var vwp = new ViewportComponent(21);
+            ntt.Set(ref vwp);
+
             var ok = MsgText.Create("SYSTEM", "ALLUSERS", "ANSWER_OK", MsgTextType.LoginInformation);
             var info = MsgCharacter.Create(ntt);
             var msgMap = MsgMapStatus.Create(1002, (uint)(MapFlags.Mine | MapFlags.NewbieProtect));

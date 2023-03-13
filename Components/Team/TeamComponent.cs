@@ -6,7 +6,7 @@ namespace MagnumOpus.Components.Team
     [Component]
     public struct TeamComponent
     {
-        public  long CreatedTick;
+        public long CreatedTick;
         public int MemberCount;
         public NTT[] Members = new NTT[5];
         public NTT Leader => Members[0];

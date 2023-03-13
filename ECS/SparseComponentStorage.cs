@@ -14,23 +14,10 @@ namespace MagnumOpus.ECS
 
         static SparseComponentStorage()
         {
-            var start = Stopwatch.GetTimestamp();
-            var filename = Path.Combine("_STATE_FILES", $"{typeof(T).Name}.json");
-
-            if (!File.Exists(filename))
-                return;
-
-            var json = File.ReadAllText(filename);
-            Components = JsonConvert.DeserializeObject<Dictionary<int, T>>(json) ?? new();
-
-            // JsonConvert.PopulateObject(json, Components);
-
-            var time = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
-            FConsole.WriteLine($"Loaded {typeof(T).Name} in {time}ms");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AddFor(in NTT ntt, ref T c)
+        public static void AddFor(NTT ntt, ref T c)
         {
             lock (lockObj)
             {
@@ -38,23 +25,23 @@ namespace MagnumOpus.ECS
                 old = c;
 
                 if (!found)
-                    NttWorld.InformChangesFor(in ntt);
+                    NttWorld.InformChangesFor(ntt);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AddFor(in NTT ntt)
+        public static void AddFor(NTT ntt)
         {
             lock (lockObj)
             {
                 ref var old = ref CollectionsMarshal.GetValueRefOrAddDefault(Components, ntt.Id, out var found);
                 if (!found)
-                    NttWorld.InformChangesFor(in ntt);
+                    NttWorld.InformChangesFor(ntt);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool HasFor(in NTT ntt) => Components.ContainsKey(ntt.Id);
+        public static bool HasFor(NTT ntt) => Components.ContainsKey(ntt.Id);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref T Get(scoped in NTT ntt) => ref Components.ContainsKey(ntt.Id) ? ref CollectionsMarshal.GetValueRefOrNullRef(Components, ntt.Id) : ref Default[0];
+        public static ref T Get(NTT ntt) => ref Components.ContainsKey(ntt.Id) ? ref CollectionsMarshal.GetValueRefOrNullRef(Components, ntt.Id) : ref Default[0];
 
         // called via reflection @ ReflectionHelper.Remove<T>()
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -66,7 +53,13 @@ namespace MagnumOpus.ECS
                     return;
             }
             if (notify)
-                NttWorld.InformChangesFor(in ntt);
+                NttWorld.InformChangesFor(ntt);
+        }
+
+        public static void ChangeOwner(NTT from, NTT to)
+        {
+            if (Components.Remove(from.Id, out var c))
+                Components.TryAdd(to.Id, c);
         }
 
         // called via reflection @ ReflectionHelper.Save<T>()
@@ -80,6 +73,24 @@ namespace MagnumOpus.ECS
 
             var time = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
             FConsole.WriteLine($"Saved {typeof(T).Name} to {filename} in {time}ms");
+        }
+
+        public static void Load(string path)
+        {
+            var start = Stopwatch.GetTimestamp();
+            var filename = Path.Combine(path, $"{typeof(T).Name}.json");
+
+            if (!File.Exists(filename))
+                return;
+
+            var json = File.ReadAllText(filename);
+            var components = JsonConvert.DeserializeObject<Dictionary<int, T>>(json) ?? new();
+            foreach (var kvp in components)
+                Components.Add(kvp.Key, kvp.Value);
+            // JsonConvert.PopulateObject(json, Components);
+
+            var time = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
+            FConsole.WriteLine($"Loaded {typeof(T).Name} in {time}ms");
         }
     }
 }

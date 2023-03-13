@@ -7,7 +7,7 @@ namespace MagnumOpus.Components.Items
     [Save]
     public struct InventoryComponent
     {
-        public  NTT NTT;
+        public NTT NTT;
         public long ChangedTick;
 
         public NTT[] Items = new NTT[40];
@@ -37,17 +37,17 @@ namespace MagnumOpus.Components.Items
                 NTT.NetSync(ref packet, true);
             }
         }
-        public InventoryComponent()
-        {
-            Items = new NTT[40];
-            ChangedTick = NttWorld.Tick;
-        }
+
         public InventoryComponent(in NTT ntt, uint money, uint cps)
         {
             NTT = ntt;
             ChangedTick = NttWorld.Tick;
             Money = money;
             CPs = cps;
+
+            Items = new NTT[40];
+            for (var i = 0; i < Items.Length; i++)
+                Items[i] = new(0, EntityType.Other);
         }
 
         public override int GetHashCode() => NTT;

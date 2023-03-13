@@ -6,11 +6,11 @@ namespace MagnumOpus.Components.Guild
     [Save]
     public struct GuildComponent
     {
-        public  int EntityId;
-        public  int GuildId;
-        public  int LeaderId;
-        public  string GuildName;
-        public  GuildRanks Rank;
+        public int EntityId;
+        public int GuildId;
+        public int LeaderId;
+        public string GuildName;
+        public GuildRanks Rank;
         public int Donation;
         public int Funds;
         public NTT[] Members = Array.Empty<NTT>();

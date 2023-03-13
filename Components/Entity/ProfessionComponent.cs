@@ -7,7 +7,7 @@ namespace MagnumOpus.Components.Entity
     [Save]
     public struct ProfessionComponent
     {
-        public  NTT NTT;
+        public NTT NTT;
         private ClasseName profession;
 
         public ClasseName Profession

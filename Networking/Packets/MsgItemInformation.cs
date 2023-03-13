@@ -27,7 +27,7 @@ namespace MagnumOpus.Networking.Packets
         public byte Enchant;
         public int Restrain;
 
-        public static MsgItemInformation Create(in NTT ntt, MsgItemInfoAction action = MsgItemInfoAction.AddItem, MsgItemPosition position = MsgItemPosition.Inventory)
+        public static MsgItemInformation Create(NTT ntt, MsgItemInfoAction action = MsgItemInfoAction.AddItem, MsgItemPosition position = MsgItemPosition.Inventory)
         {
             var item = ntt.Get<ItemComponent>();
             var msg = new MsgItemInformation

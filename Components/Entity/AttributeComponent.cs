@@ -7,7 +7,7 @@ namespace MagnumOpus.Components.Entity
     [Save]
     public struct AttributeComponent
     {
-        public  NTT NTT;
+        public NTT NTT;
         public long ChangedTick;
         private ushort strength;
         private ushort agility;

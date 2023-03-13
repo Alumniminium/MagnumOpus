@@ -3,11 +3,11 @@ namespace MagnumOpus.Components.CQ
 {
     [Component]
     [Save]
-    public  struct RecordPointComponent
+    public struct RecordPointComponent
     {
-        public  ushort Map;
-        public  ushort X;
-        public  ushort Y;
+        public ushort Map;
+        public ushort X;
+        public ushort Y;
 
         public RecordPointComponent(ushort x, ushort y, ushort map)
         {

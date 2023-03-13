@@ -7,7 +7,7 @@ namespace MagnumOpus.Components.Leveling
     [Save]
     public struct LevelComponent
     {
-        public  NTT NTT;
+        public NTT NTT;
         public long ChangedTick;
         private byte level;
         private uint experience;

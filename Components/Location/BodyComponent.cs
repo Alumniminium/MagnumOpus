@@ -7,7 +7,7 @@ namespace MagnumOpus.Components.Location
     [Save]
     public struct BodyComponent
     {
-        public  NTT ntt;
+        public NTT ntt;
         public long ChangedTick;
 
         public Direction Direction;

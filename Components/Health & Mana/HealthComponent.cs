@@ -7,7 +7,7 @@ namespace MagnumOpus.Components
     [Save]
     public struct HealthComponent
     {
-        public  NTT NTT;
+        public NTT NTT;
         private int health;
         private int maxHealth;
 

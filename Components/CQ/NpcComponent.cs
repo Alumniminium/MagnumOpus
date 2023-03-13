@@ -3,11 +3,11 @@ namespace MagnumOpus.Components.CQ
 {
     [Component]
     [Save]
-    public  struct NpcComponent
+    public struct NpcComponent
     {
-        public  ushort Base;
-        public  ushort Type;
-        public  ushort Sort;
+        public ushort Base;
+        public ushort Type;
+        public ushort Sort;
 
         public NpcComponent(ushort baseId, ushort typeId, ushort sort)
         {

@@ -7,7 +7,7 @@ namespace MagnumOpus.Components.Entity
     [Save]
     public struct StatusEffectComponent
     {
-        public  NTT NTT;
+        public NTT NTT;
         public long ChangedTick;
 
         private StatusEffect _effects;

@@ -41,7 +41,7 @@ namespace MagnumOpus.Systems
             }
             catch
             {
-                NttWorld.Destroy(in ntt);
+                NttWorld.Destroy(ntt);
             }
         }
     }

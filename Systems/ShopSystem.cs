@@ -66,7 +66,7 @@ namespace MagnumOpus.Systems
                         itemNtt.Set(ref newItemComp);
                         inv.Items[i] = itemNtt;
 
-                        var msg = MsgItemInformation.Create(in itemNtt);
+                        var msg = MsgItemInformation.Create(itemNtt);
                         ntt.NetSync(ref msg);
 
                         if (IsLogging)

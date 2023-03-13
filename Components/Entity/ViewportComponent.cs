@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Drawing;
 using MagnumOpus.ECS;
+using Newtonsoft.Json;
 
 namespace MagnumOpus.Components.Entity
 {
@@ -15,11 +16,13 @@ namespace MagnumOpus.Components.Entity
         public RectangleF Viewport;
         internal bool Dirty;
 
+        [JsonConstructor]
         public ViewportComponent()
         {
             ChangedTick = NttWorld.Tick;
             EntitiesVisible = new();
             EntitiesVisibleLast = new();
+            Dirty = true;
         }
         public ViewportComponent(float viewDistance)
         {

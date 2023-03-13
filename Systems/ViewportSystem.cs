@@ -26,7 +26,7 @@ namespace MagnumOpus.Systems
                 _ = vwp.EntitiesVisibleLast.TryAdd(e.Key, e.Value);
 
             vwp.EntitiesVisible.Clear();
-            Collections.SpatialHashs[pos.Map].Move(in ntt, ref pos);
+            Collections.SpatialHashs[pos.Map].Move(ntt, ref pos);
             Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
 
             if (IsLogging)

@@ -46,7 +46,7 @@ namespace MagnumOpus.Systems
                 InventoryHelper.SortById(in ntt, ref inv, netSync: true);
             }
 
-            Collections.SpatialHashs[pos.Map].Remove(in pic.Item, ref pos);
+            Collections.SpatialHashs[pos.Map].Remove(pic.Item, ref pos);
 
             var delFloorMsg = MsgFloorItem.Create(in pic.Item, Enums.MsgFloorItemType.Delete);
             ntt.NetSync(ref delFloorMsg, true);

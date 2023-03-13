@@ -3,10 +3,10 @@ namespace MagnumOpus.Components.Entity
 {
     [Component]
     [Save]
-    public  struct PkPointComponent
+    public struct PkPointComponent
     {
-        public  byte Points;
-        public  TimeSpan DecreaseTime;
+        public byte Points;
+        public TimeSpan DecreaseTime;
 
         public PkPointComponent(byte points, TimeSpan decreaseTime)
         {

@@ -28,7 +28,7 @@ namespace MagnumOpus.Systems
             rdi.ItemNtt.Set(new LifeTimeComponent(TimeSpan.FromSeconds(30)));
             rdi.ItemNtt.Set(new ViewportComponent(18f));
 
-            Collections.SpatialHashs[pos.Map].Add(in rdi.ItemNtt, ref pos);
+            Collections.SpatialHashs[pos.Map].Add(rdi.ItemNtt, ref pos);
 
             var msgDropFloor = MsgFloorItem.Create(in rdi.ItemNtt, MsgFloorItemType.Create);
             ntt.NetSync(ref msgDropFloor, true);
