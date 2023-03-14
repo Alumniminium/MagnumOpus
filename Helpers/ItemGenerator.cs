@@ -258,7 +258,7 @@ namespace MagnumOpus.Helpers
                     }
                 }
             }
-            _ = Collections.Drops.TryAdd(mob.id, drops);
+            Collections.Drops.TryAdd(mob.id, drops);
             return drops;
         }
     }

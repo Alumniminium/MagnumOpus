@@ -98,10 +98,10 @@ namespace MagnumOpus.ECS
         {
             lock (_lock)
             {
-                _ = Players.Remove(ntt);
+                Players.Remove(ntt);
                 ntt.Recycle();
                 ChangedThisTick.Enqueue(ntt);
-                _ = NTTs.Remove(ntt.Id);
+                NTTs.Remove(ntt.Id);
             }
 
             PrometheusPush.NTTCount.Set(EntityCount);

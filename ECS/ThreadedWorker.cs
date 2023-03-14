@@ -28,11 +28,11 @@ namespace MagnumOpus.ECS
         public static void Run(Action<int> action, int threads)
         {
             Action = action;
-            _ = _allReady.Reset();
-            _ = Interlocked.Exchange(ref _readyThreads, _readyThreads - threads);
+            _allReady.Reset();
+            Interlocked.Exchange(ref _readyThreads, _readyThreads - threads);
             for (var i = 0; i < threads; i++)
-                _ = _blocks[i].Set();
-            _ = _allReady.WaitOne();
+                _blocks[i].Set();
+            _allReady.WaitOne();
         }
 
 
@@ -44,11 +44,11 @@ namespace MagnumOpus.ECS
             var idx = (int)id;
             while (true)
             {
-                _ = Interlocked.Increment(ref _readyThreads);
+                Interlocked.Increment(ref _readyThreads);
                 if (_readyThreads >= _threads.Length)
-                    _ = _allReady.Set();
+                    _allReady.Set();
 
-                _ = _blocks[idx].WaitOne();
+                _blocks[idx].WaitOne();
                 Action.Invoke(idx);
             }
         }

@@ -24,7 +24,7 @@ namespace MagnumOpus.Systems
 
             vwp.EntitiesVisibleLast.Clear();
             foreach (var e in vwp.EntitiesVisible)
-                _ = vwp.EntitiesVisibleLast.TryAdd(e.Key, e.Value);
+                vwp.EntitiesVisibleLast.TryAdd(e.Key, e.Value);
 
             vwp.EntitiesVisible.Clear();
             Collections.SpatialHashs[pos.Map].Move(ntt, ref pos);
@@ -45,7 +45,7 @@ namespace MagnumOpus.Systems
                 if (b.Has<ViewportComponent>())
                 {
                     ref readonly var bvwp = ref b.Get<ViewportComponent>();
-                    _ = bvwp.EntitiesVisible.TryAdd(ntt.Id, ntt);
+                    bvwp.EntitiesVisible.TryAdd(ntt.Id, ntt);
                 }
 
                 if (b.Has<BrainComponent>())

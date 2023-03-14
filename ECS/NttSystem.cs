@@ -33,9 +33,9 @@ namespace MagnumOpus.ECS
                                 // .WriteTo.GrafanaLoki("http://loki.her.st")
                                 .WriteTo.File($"{DateTime.UtcNow:dd-MM-yyyy}.log");
             if (IsLogging)
-                _ = logCfg.MinimumLevel.Debug();
+                logCfg.MinimumLevel.Debug();
             else
-                _ = logCfg.MinimumLevel.Information();
+                logCfg.MinimumLevel.Information();
 
             Logger = logCfg.CreateLogger();
         }
@@ -81,7 +81,7 @@ namespace MagnumOpus.ECS
             {
                 if (_entities.TryRemove(ntt.Id, out _))
                     lock (_entitiesList)
-                        _ = _entitiesList.Remove(ntt);
+                        _entitiesList.Remove(ntt);
             }
             else
             {

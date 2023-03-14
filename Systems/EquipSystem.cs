@@ -20,13 +20,13 @@ namespace MagnumOpus.Systems
                 var oldEq = eq.Items[change.Slot];
 
                 if (oldEq != default)
-                    _ = InventoryHelper.AddItem(in ntt, ref inv, in oldEq, netSync: true);
+                    InventoryHelper.AddItem(in ntt, ref inv, in oldEq, netSync: true);
 
                 eq.Items[change.Slot] = item;
 
                 var msg = MsgItem.Create(item.Id, item.Id, (int)change.Slot, MsgItemType.SetEquipPosition);
                 ntt.NetSync(ref msg);
-                _ = InventoryHelper.RemoveNttFromInventory(in ntt, ref inv, in item, netSync: true);
+                InventoryHelper.RemoveNttFromInventory(in ntt, ref inv, in item, netSync: true);
 
                 if (IsLogging)
                     Logger.Debug("{ntt} equipped {item} to {slot}", ntt, item, change.Slot);
@@ -41,7 +41,7 @@ namespace MagnumOpus.Systems
                 }
 
                 eq.Items[change.Slot] = default;
-                _ = InventoryHelper.AddItem(in ntt, ref inv, in item, true);
+                InventoryHelper.AddItem(in ntt, ref inv, in item, true);
                 if (IsLogging)
                     Logger.Debug("{ntt} unequipped {item} from {slot}", ntt, item, change.Slot);
             }

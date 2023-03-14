@@ -77,13 +77,13 @@ namespace MagnumOpus.Networking.Packets
 
             if (eqc.Items != null)
             {
-                _ = eqc.Items.TryGetValue(MsgItemPosition.Head, out var headItem);
+                eqc.Items.TryGetValue(MsgItemPosition.Head, out var headItem);
                 head = headItem.Get<ItemComponent>().Id;
-                _ = eqc.Items.TryGetValue(MsgItemPosition.Armor, out var armorItem);
+                eqc.Items.TryGetValue(MsgItemPosition.Armor, out var armorItem);
                 armor = armorItem.Get<ItemComponent>().Id;
-                _ = eqc.Items.TryGetValue(MsgItemPosition.RightWeapon, out var mainHandItem);
+                eqc.Items.TryGetValue(MsgItemPosition.RightWeapon, out var mainHandItem);
                 mainHand = mainHandItem.Get<ItemComponent>().Id;
-                _ = eqc.Items.TryGetValue(MsgItemPosition.LeftWeapon, out var offHandItem);
+                eqc.Items.TryGetValue(MsgItemPosition.LeftWeapon, out var offHandItem);
                 offHand = offHandItem.Get<ItemComponent>().Id;
             }
 

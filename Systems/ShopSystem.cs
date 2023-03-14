@@ -77,7 +77,7 @@ namespace MagnumOpus.Systems
                     }
                     else
                     {
-                        _ = Collections.ItemType.TryGetValue(itemComp.Id, out var Info);
+                        Collections.ItemType.TryGetValue(itemComp.Id, out var Info);
 
                         var money = Info.Price / 3;
                         money = (uint)((double)money * ((float)itemComp.CurrentDurability / itemComp.MaximumDurability));

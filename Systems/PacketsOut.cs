@@ -36,7 +36,7 @@ namespace MagnumOpus.Systems
                     else
                         net.AuthCrypto.Encrypt(packet.Span);
 
-                    _ = net.Socket.Send(packet.Span);
+                    net.Socket.Send(packet.Span);
                 }
             }
             catch

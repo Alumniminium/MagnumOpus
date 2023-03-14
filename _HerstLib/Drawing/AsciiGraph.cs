@@ -29,28 +29,28 @@ namespace MagnumOpus._HerstLib.Drawing
                 var strLegend = FormatNumber(legend) + "┫";
 
                 if (i == 1)
-                    _ = sb.Append(strLegend.PadLeft(5));
+                    sb.Append(strLegend.PadLeft(5));
                 else if (i % 4 == 0 && i != maxBarheight)
-                    _ = sb.Append(strLegend.PadLeft(5));
+                    sb.Append(strLegend.PadLeft(5));
                 else if (i == maxBarheight)
-                    _ = sb.Append(strLegend.PadLeft(5));
+                    sb.Append(strLegend.PadLeft(5));
                 else
-                    _ = sb.Append("┫".PadLeft(5));
+                    sb.Append("┫".PadLeft(5));
 
                 for (long j = 0; j < Data.Keys.Count; j++)
-                    _ = sb.Append(values[j] >= i ? " ███ " : "     ");
-                _ = sb.AppendLine();
+                    sb.Append(values[j] >= i ? " ███ " : "     ");
+                sb.AppendLine();
             }
-            _ = sb.Append("┗".PadLeft(5));
+            sb.Append("┗".PadLeft(5));
             foreach (var label in lables)
-                _ = sb.Append("━━╋━━");
-            _ = sb.AppendLine();
+                sb.Append("━━╋━━");
+            sb.AppendLine();
             for (var i = 0; i < maxLabelLength; i++)
             {
-                _ = sb.Append("     ");
+                sb.Append("     ");
                 foreach (var label in lables)
-                    _ = sb.Append(label.Length > i ? $"  {label[i]}  " : "    ");
-                _ = sb.AppendLine();
+                    sb.Append(label.Length > i ? $"  {label[i]}  " : "    ");
+                sb.AppendLine();
             }
 
             return sb.ToString().Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
@@ -75,22 +75,22 @@ namespace MagnumOpus._HerstLib.Drawing
                 var legend = rawvalues[i];
                 var strLegend = FormatNumber(legend);
                 if (compact)
-                    _ = sb.Append($"{$"{(labels[i] + ':').PadRight(maxLabelLength + 1)} {strLegend,4}".PadRight(1)}");
+                    sb.Append($"{$"{(labels[i] + ':').PadRight(maxLabelLength + 1)} {strLegend,4}".PadRight(1)}");
                 else
-                    _ = sb.Append($"{i.ToString().PadRight(Data.Keys.Count.ToString().Length)}");
+                    sb.Append($"{i.ToString().PadRight(Data.Keys.Count.ToString().Length)}");
 
-                _ = sb.Append(' ');
-                _ = sb.Append("┣".PadRight((int)values[i], '━'));
-                _ = sb.AppendLine();
+                sb.Append(' ');
+                sb.Append("┣".PadRight((int)values[i], '━'));
+                sb.AppendLine();
             }
             if (!compact)
             {
-                _ = sb.AppendLine();
+                sb.AppendLine();
                 for (var i = 0; i < labels.Length; i++)
                 {
                     var legend = rawvalues[i];
                     var strLegend = FormatNumber(legend);
-                    _ = sb.AppendLine($"{i.ToString().PadRight(2)} {(labels[i] + ':').PadRight(maxLabelLength + 1)} {rawvalues[i]}");
+                    sb.AppendLine($"{i.ToString().PadRight(2)} {(labels[i] + ':').PadRight(maxLabelLength + 1)} {rawvalues[i]}");
                 }
             }
 

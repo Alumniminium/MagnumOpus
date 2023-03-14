@@ -28,7 +28,7 @@ namespace MagnumOpus._HerstLib.IO
                     var kvp = curLine.Split("=", 2);
                     if (string.IsNullOrEmpty(kvp[0]) || string.IsNullOrEmpty(kvp[1]))
                         continue;
-                    _ = _iniFile[curHeader].TryAdd(kvp[0], kvp[1]);
+                    _iniFile[curHeader].TryAdd(kvp[0], kvp[1]);
                 }
             }
         }

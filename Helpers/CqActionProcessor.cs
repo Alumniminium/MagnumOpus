@@ -504,7 +504,7 @@ namespace MagnumOpus.Helpers
                         ref var itemNtt = ref NttWorld.CreateEntity(EntityType.Item);
                         var item = new ItemComponent(itemId, itemType.Amount, itemType.AmountLimit, 0, 0, 0, 0, 0, 0, RebornItemEffect.None, 0);
                         itemNtt.Set(ref item);
-                        _ = InventoryHelper.AddItem(in ntt, ref inv, in itemNtt, netSync: true);
+                        InventoryHelper.AddItem(in ntt, ref inv, in itemNtt, netSync: true);
 
                         return action.id_next;
                     }
@@ -516,7 +516,7 @@ namespace MagnumOpus.Helpers
                         if (!InventoryHelper.HasItemId(ref inv, itemId))
                             return action.id_nextfail;
 
-                        _ = InventoryHelper.RemoveItemId(ref inv, itemId, destroy: true);
+                        InventoryHelper.RemoveItemId(ref inv, itemId, destroy: true);
                         return action.id_next;
                     }
                 case TaskActionType.ACTION_ITEM_DELTHIS:
@@ -527,7 +527,7 @@ namespace MagnumOpus.Helpers
                         if (!InventoryHelper.HasItemId(ref inv, itemId))
                             return action.id_nextfail;
 
-                        _ = InventoryHelper.RemoveItemId(ref inv, itemId, destroy: true);
+                        InventoryHelper.RemoveItemId(ref inv, itemId, destroy: true);
 
                         return action.id_next;
                     }

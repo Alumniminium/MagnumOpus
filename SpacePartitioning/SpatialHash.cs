@@ -38,7 +38,7 @@ namespace MagnumOpus.SpacePartitioning
 
             if (Hashtbl.TryGetValue(hash, out var bucket))
                 lock (_lock)
-                    _ = bucket.Remove(entity);
+                    bucket.Remove(entity);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -78,7 +78,7 @@ namespace MagnumOpus.SpacePartitioning
                             var distanceSquared = Vector2.DistanceSquared(pos.Position, new Vector2(cx, cy));
 
                             if (distanceSquared <= 324f)
-                                _ = vwp.EntitiesVisible.TryAdd(ntt.Id, ntt);
+                                vwp.EntitiesVisible.TryAdd(ntt.Id, ntt);
                         }
                     }
                 }

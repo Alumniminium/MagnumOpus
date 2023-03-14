@@ -11,8 +11,8 @@ namespace MagnumOpus.Helpers
         {
             if (Name2Ntt.TryGetValue(name, out var value))
             {
-                _ = Ntt2Name.Remove(value);
-                _ = Name2Ntt.Remove(name);
+                Ntt2Name.Remove(value);
+                Name2Ntt.Remove(name);
             }
 
             Name2Ntt.Add(name, entity);

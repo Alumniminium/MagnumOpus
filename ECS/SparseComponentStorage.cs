@@ -12,10 +12,6 @@ namespace MagnumOpus.ECS
         private static readonly Dictionary<int, T> Components = new();
         private static readonly object lockObj = new();
 
-        static SparseComponentStorage()
-        {
-        }
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void AddFor(NTT ntt, ref T c)
         {
@@ -56,6 +52,7 @@ namespace MagnumOpus.ECS
                 NttWorld.InformChangesFor(ntt);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ChangeOwner(NTT from, NTT to)
         {
             if (Components.Remove(from.Id, out var c))

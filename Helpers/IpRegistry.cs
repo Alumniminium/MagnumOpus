@@ -11,8 +11,8 @@ namespace MagnumOpus.Helpers
         {
             if (IpToEntity.TryGetValue(ip, out var value))
             {
-                _ = EntityToIp.Remove(value);
-                _ = IpToEntity.Remove(ip);
+                EntityToIp.Remove(value);
+                IpToEntity.Remove(ip);
             }
 
             IpToEntity.Add(ip, entity);
