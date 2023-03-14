@@ -1,9 +1,9 @@
 using System.Numerics;
 using HerstLib.IO;
 using MagnumOpus.Components;
-using MagnumOpus.Components.Death;
-using MagnumOpus.Components.Entity;
-using MagnumOpus.Components.Location;
+
+
+
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;

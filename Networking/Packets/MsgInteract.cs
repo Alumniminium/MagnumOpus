@@ -1,7 +1,6 @@
 using System.Runtime.InteropServices;
 using HerstLib.IO;
-using MagnumOpus.Components.Attack;
-using MagnumOpus.Components.Location;
+using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Cryptography;

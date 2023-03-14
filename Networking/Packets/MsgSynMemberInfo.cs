@@ -1,8 +1,7 @@
 using System.Runtime.InteropServices;
+using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Components.Guild;
-using MagnumOpus.Components.Entity;
 
 namespace MagnumOpus.Networking.Packets
 {

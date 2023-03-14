@@ -1,5 +1,4 @@
-using MagnumOpus.Components.Death;
-using MagnumOpus.Components.Location;
+using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;

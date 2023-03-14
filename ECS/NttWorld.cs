@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using HerstLib.IO;
-using MagnumOpus.Components.Location;
 using MagnumOpus.Helpers;
 using Newtonsoft.Json;
 

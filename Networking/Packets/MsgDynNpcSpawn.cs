@@ -1,8 +1,6 @@
 using System.Runtime.InteropServices;
 using MagnumOpus.ECS;
 using MagnumOpus.Components;
-using MagnumOpus.Components.Location;
-using MagnumOpus.Components.CQ;
 
 namespace MagnumOpus.Networking.Packets
 {

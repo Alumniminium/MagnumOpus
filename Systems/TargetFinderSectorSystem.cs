@@ -1,8 +1,5 @@
 using System.Numerics;
-using MagnumOpus.Components.Attack;
-using MagnumOpus.Components.Death;
-using MagnumOpus.Components.Entity;
-using MagnumOpus.Components.Location;
+using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 

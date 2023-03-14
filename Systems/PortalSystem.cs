@@ -1,5 +1,4 @@
-using MagnumOpus.Components.Floor;
-using MagnumOpus.Components.Location;
+using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Squiggly;
 

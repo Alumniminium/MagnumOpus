@@ -1,17 +1,8 @@
-using System.Numerics;
 using HerstLib.IO;
 using MagnumOpus.Components;
-using MagnumOpus.Components.AI;
-using MagnumOpus.Components.CQ;
-using MagnumOpus.Components.Death;
-using MagnumOpus.Components.Entity;
-using MagnumOpus.Components.Items;
-using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
-using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
-using MagnumOpus.SpacePartitioning;
 using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Systems

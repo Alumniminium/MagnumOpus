@@ -1,5 +1,5 @@
 using MagnumOpus.Components;
-using MagnumOpus.Components.Items;
+
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Squiggly;

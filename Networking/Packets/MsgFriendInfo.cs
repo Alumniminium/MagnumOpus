@@ -1,9 +1,6 @@
 using System.Runtime.InteropServices;
 using MagnumOpus.ECS;
-using MagnumOpus.Components.Location;
-using MagnumOpus.Components.Leveling;
-using MagnumOpus.Components.Guild;
-using MagnumOpus.Components.Entity;
+using MagnumOpus.Components;
 
 namespace MagnumOpus.Networking.Packets
 {

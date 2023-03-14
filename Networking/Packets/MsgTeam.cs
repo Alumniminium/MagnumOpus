@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
-using MagnumOpus.Components.Team;
+using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 

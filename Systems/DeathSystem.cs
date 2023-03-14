@@ -1,16 +1,8 @@
-using System.Diagnostics;
-using MagnumOpus.Components.AI;
-using MagnumOpus.Components.Attack;
-using MagnumOpus.Components.CQ;
-using MagnumOpus.Components.Death;
-using MagnumOpus.Components.Entity;
-using MagnumOpus.Components.Items;
-using MagnumOpus.Components.Location;
+using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
-using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Systems
 {

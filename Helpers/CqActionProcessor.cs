@@ -1,12 +1,6 @@
 using System.Globalization;
 using HerstLib.IO;
 using MagnumOpus.Components;
-using MagnumOpus.Components.CQ;
-using MagnumOpus.Components.Death;
-using MagnumOpus.Components.Entity;
-using MagnumOpus.Components.Items;
-using MagnumOpus.Components.Leveling;
-using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;

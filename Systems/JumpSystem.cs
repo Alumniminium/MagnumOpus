@@ -1,6 +1,5 @@
 using System.Numerics;
-using MagnumOpus.Components.Entity;
-using MagnumOpus.Components.Location;
+using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;

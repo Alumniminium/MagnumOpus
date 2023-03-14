@@ -3,7 +3,7 @@ using HerstLib.IO;
 using Co2Core.IO;
 using MagnumOpus.Enums;
 using MagnumOpus.Squiggly;
-using MagnumOpus.Components.Items;
+using MagnumOpus.Components;
 
 namespace MagnumOpus.Helpers
 {

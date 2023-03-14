@@ -1,6 +1,6 @@
 using HerstLib.IO;
 using MagnumOpus.Components;
-using MagnumOpus.Components.Entity;
+
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;

@@ -1,4 +1,5 @@
-using MagnumOpus.Components.Attack;
+
+using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Networking.Packets;
 

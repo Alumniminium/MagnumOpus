@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
-using MagnumOpus.Components.Entity;
+using MagnumOpus.Components;
 
 namespace MagnumOpus.Networking.Packets
 {

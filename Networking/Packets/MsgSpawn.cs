@@ -1,11 +1,5 @@
 using System.Runtime.InteropServices;
 using MagnumOpus.Components;
-using MagnumOpus.Components.Death;
-using MagnumOpus.Components.Entity;
-using MagnumOpus.Components.Guild;
-using MagnumOpus.Components.Items;
-using MagnumOpus.Components.Leveling;
-using MagnumOpus.Components.Location;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Squiggly;

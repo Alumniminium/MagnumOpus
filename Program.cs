@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime;
 using HerstLib.IO;
-using MagnumOpus.Components.Location;
+using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Squiggly;
@@ -66,7 +66,7 @@ namespace MagnumOpus
             Db.LoadCqMonsterType();
             Db.LoadCqAction();
             Db.LoadCqTask();
-            // Db.LoadCqNpc();
+            Db.LoadCqNpc();
             Db.LoadCqPointAllot();
             // Db.LoadSpawners();
             // Db.LoadNpcs();

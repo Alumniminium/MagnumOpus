@@ -1,7 +1,6 @@
 using System.Runtime.InteropServices;
 using HerstLib.IO;
-using MagnumOpus.Components.CQ;
-using MagnumOpus.Components.Entity;
+using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
@@ -50,6 +49,7 @@ namespace MagnumOpus.Networking.Packets
 
             FConsole.WriteLine($"MsgTaskDialog: Npc {npc.Id}, action: {msgTaskDialog.Action}, Option: {msgTaskDialog.OptionId}");
             var cq_npc = CqProcessor.GetNpc(npc.Id);
+            ref readonly var task = ref npc.Get<CqActionComponent>();
 
             if (cq_npc == null)
                 return;

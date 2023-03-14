@@ -1,9 +1,5 @@
 using MagnumOpus.Components;
-using MagnumOpus.Components.Attack;
-using MagnumOpus.Components.Death;
-using MagnumOpus.Components.Leveling;
 using MagnumOpus.ECS;
-
 namespace MagnumOpus.Systems
 {
     public sealed class DamageSystem : NttSystem<HealthComponent, DamageComponent>

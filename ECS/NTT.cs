@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using MagnumOpus.Components;
-using MagnumOpus.Components.Entity;
 using MagnumOpus.Networking;
 
 namespace MagnumOpus.ECS

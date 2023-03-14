@@ -1,6 +1,5 @@
 using System.Runtime.InteropServices;
-using MagnumOpus.Components.Items;
-using MagnumOpus.Components.Location;
+using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 

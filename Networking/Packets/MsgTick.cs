@@ -4,7 +4,7 @@ using HerstLib.IO;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Components;
-using MagnumOpus.Components.Entity;
+
 
 namespace MagnumOpus.Networking.Packets
 {

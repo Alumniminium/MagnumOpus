@@ -1,9 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 using HerstLib.IO;
-using MagnumOpus.Components.Death;
-using MagnumOpus.Components.Entity;
-using MagnumOpus.Components.Location;
+using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;

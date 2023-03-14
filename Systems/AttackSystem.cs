@@ -1,9 +1,9 @@
 using System.Numerics;
 using MagnumOpus.Components;
-using MagnumOpus.Components.AI;
-using MagnumOpus.Components.Attack;
-using MagnumOpus.Components.Death;
-using MagnumOpus.Components.Location;
+
+
+
+
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;

@@ -1,8 +1,5 @@
 using HerstLib.IO;
-using MagnumOpus.Components.Entity;
-using MagnumOpus.Components.Leveling;
-using MagnumOpus.Components.Location;
-using MagnumOpus.Components.Team;
+using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;

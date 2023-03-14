@@ -1,6 +1,6 @@
 using MagnumOpus.Components;
-using MagnumOpus.Components.Entity;
-using MagnumOpus.Components.Leveling;
+
+
 using MagnumOpus.ECS;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Squiggly;

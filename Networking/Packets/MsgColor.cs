@@ -1,8 +1,9 @@
 using System.Drawing;
 using System.Runtime.InteropServices;
+using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Components.Location;
+
 
 namespace MagnumOpus.Networking.Packets
 {
