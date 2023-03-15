@@ -13,7 +13,7 @@ namespace MagnumOpus.Systems
 
         public override void Update(in NTT spawner, ref SpawnerComponent spc, ref PositionComponent pos)
         {
-            if (spc.RunTick != NttWorld.Tick)
+            if (spc.RunTick > NttWorld.Tick)
                 return;
 
             spc.RunTick += NttWorld.TargetTps * spc.TimerSeconds;
