@@ -73,6 +73,7 @@ namespace MagnumOpus
 
             foreach (var worldNtt in NttWorld.NTTs)
             {
+                NttWorld.InformChangesFor(worldNtt.Value);
                 ref var pos = ref worldNtt.Value.Get<PositionComponent>();
                 if (pos.Position == default)
                     continue;
