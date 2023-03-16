@@ -33,19 +33,20 @@ namespace MagnumOpus.Systems
             {
                 while (net.RecvQueue.TryDequeue(out var packet))
                 {
-                    var packetType = (PacketId)BitConverter.ToUInt16(packet.Span[2..4]);
+                    var packetType = (PacketId)BitConverter.ToUInt16(packet.AsSpan()[2..4]);
                     if (IsLogging)
                         Logger.Debug("Received {packet} from {ntt}", packetType, ntt);
 
                     if (PacketHandlers.TryGetValue(packetType, out var handler))
                         handler.Invoke(ntt, packet);
                     else if (IsLogging)
-                        Logger.Debug("Undefined PacketId: {packet} {dump}", packetType, packet.Dump());
+                        Logger.Debug("Undefined PacketId: {packet} {dump}", packetType, packet.AsMemory().Dump());
                 }
             }
             catch (Exception ex)
             {
                 Logger.Error(ex, "Error in PacketsIn");
+                ntt.Remove<NetworkComponent>();
             }
         }
     }

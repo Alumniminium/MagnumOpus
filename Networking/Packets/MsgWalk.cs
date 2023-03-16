@@ -54,7 +54,7 @@ namespace MagnumOpus.Networking.Packets
         [PacketHandler(PacketId.MsgWalk)]
         public static void Process(NTT ntt, Memory<byte> memory)
         {
-            var msg = Co2Packet.Deserialze<MsgWalk>(memory);
+            var msg = Co2Packet.Deserialize<MsgWalk>(memory.Span);
             if (ntt.Id != msg.UniqueId)
                 FConsole.WriteLine($"[{nameof(MsgWalk)}] UID Mismatch! Packet: {msg.UniqueId}, ntt: {ntt.Id}");
 

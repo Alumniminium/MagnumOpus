@@ -7,9 +7,6 @@ namespace MagnumOpus.Helpers
 {
     public static class InventoryHelper
     {
-        /// <summary>
-        /// Returns the first item in the inventory that matches the given netId.
-        /// </summary>
         public static NTT GetInventoryItemByNetIdFrom(ref InventoryComponent inv, int netId)
         {
             for (var i = 0; i < inv.Items.Length; i++)
@@ -17,13 +14,15 @@ namespace MagnumOpus.Helpers
                     return inv.Items[i];
             return default;
         }
-        public static bool RemoveNetIdFromInventory(in NTT ntt, ref InventoryComponent inv, int netId, bool destroy = false, bool netSync = false)
+
+        public static bool RemoveNetIdFromInventory(NTT ntt, ref InventoryComponent inv, int netId, bool destroy = false, bool netSync = false)
         {
-            var item = GetInventoryItemByNetIdFrom(ref inv, netId);
-            var removed = RemoveNttFromInventory(in ntt, ref inv, in item, destroy, netSync);
+            var itemNtt = GetInventoryItemByNetIdFrom(ref inv, netId);
+            var removed = RemoveNttFromInventory(ntt, ref inv, itemNtt, destroy, netSync);
             return removed;
         }
-        public static bool RemoveNttFromInventory(in NTT ntt, ref InventoryComponent inv, in NTT item, bool destroy = false, bool netSync = false)
+
+        public static bool RemoveNttFromInventory(NTT ntt, ref InventoryComponent inv, NTT item, bool destroy = false, bool netSync = false)
         {
             var invIdx = Array.IndexOf(inv.Items, item);
             var found = invIdx != -1;
@@ -42,6 +41,7 @@ namespace MagnumOpus.Helpers
 
             return found;
         }
+
         public static bool HasFreeSpace(ref InventoryComponent inv, int count = 1) => CountItemId(ref inv, 0) >= count;
         public static bool HasItemId(ref InventoryComponent inv, int id) => CountItemId(ref inv, id) > 0;
         public static int CountItemId(ref InventoryComponent inv, int id)
@@ -79,9 +79,10 @@ namespace MagnumOpus.Helpers
             return false;
         }
 
-        public static void SortById(in NTT ntt, ref InventoryComponent inv, bool netSync = false)
+        public static void SortById(NTT ntt, ref InventoryComponent inv, bool netSync = false)
         {
-            inv.Items = inv.Items.OrderByDescending(x => x.Get<ItemComponent>().Id).ToArray();
+            // Replace the use of LINQ's OrderByDescending with an inline sorting function
+            Array.Sort(inv.Items, (x, y) => y.Get<ItemComponent>().Id.CompareTo(x.Get<ItemComponent>().Id));
 
             if (!netSync)
                 return;
@@ -98,7 +99,7 @@ namespace MagnumOpus.Helpers
             }
         }
 
-        public static bool AddItem(in NTT ntt, ref InventoryComponent inv, in NTT item, bool netSync = false)
+        public static bool AddItem(NTT ntt, ref InventoryComponent inv, in NTT item, bool netSync = false)
         {
             for (var i = 0; i < inv.Items.Length; i++)
             {
@@ -115,6 +116,15 @@ namespace MagnumOpus.Helpers
             }
 
             return false;
+        }
+
+        internal static int CountItems(ref InventoryComponent inv)
+        {
+            var itemCount = 0;
+            foreach (var item in inv.Items)
+                if (item.Id != 0)
+                    itemCount++;
+            return itemCount;
         }
     }
 }

@@ -40,8 +40,8 @@ namespace MagnumOpus.Systems
                 pic.Item.Remove<LifeTimeComponent>();
                 pic.Item.Remove<DestroyEndOfFrameComponent>();
 
-                InventoryHelper.AddItem(in ntt, ref inv, in pic.Item);
-                InventoryHelper.SortById(in ntt, ref inv, netSync: true);
+                InventoryHelper.AddItem(ntt, ref inv, in pic.Item);
+                InventoryHelper.SortById(ntt, ref inv, netSync: true);
             }
 
             Collections.SpatialHashs[pos.Map].Remove(pic.Item, ref pos);

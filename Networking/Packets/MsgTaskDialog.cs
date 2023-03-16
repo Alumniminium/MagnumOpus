@@ -44,7 +44,7 @@ namespace MagnumOpus.Networking.Packets
         [PacketHandler(PacketId.MsgDialog)]
         public static void Process(NTT ntt, Memory<byte> memory)
         {
-            var msgTaskDialog = Co2Packet.Deserialze<MsgTaskDialog>(in memory);
+            var msgTaskDialog = Co2Packet.Deserialize<MsgTaskDialog>(memory.Span);
             var npc = NttWorld.GetEntity(msgTaskDialog.UniqeId);
 
             FConsole.WriteLine($"MsgTaskDialog: Npc {npc.Id}, action: {msgTaskDialog.Action}, Option: {msgTaskDialog.OptionId}");
@@ -85,7 +85,7 @@ namespace MagnumOpus.Networking.Packets
             if (!ntt.Has<CqTaskComponent>())
                 return;
 
-            var msgTaskDialog = Co2Packet.Deserialze<MsgTaskDialog>(in memory);
+            var msgTaskDialog = Co2Packet.Deserialize<MsgTaskDialog>(memory.Span);
 
             if (msgTaskDialog.OptionId is 255 or 0)
             {

@@ -392,7 +392,7 @@ namespace MagnumOpus.Helpers
                         var itemComp = new ItemComponent(itemId, dura, entry.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
                         itemNtt.Set(ref itemComp);
 
-                        InventoryHelper.AddItem(in ntt, ref inv, in itemNtt);
+                        InventoryHelper.AddItem(ntt, ref inv, in itemNtt);
 
                         var drc = new RequestDropItemComponent(in itemNtt);
                         ntt.Set(ref drc);
@@ -504,7 +504,7 @@ namespace MagnumOpus.Helpers
                         ref var itemNtt = ref NttWorld.CreateEntity(EntityType.Item);
                         var item = new ItemComponent(itemId, itemType.Amount, itemType.AmountLimit, 0, 0, 0, 0, 0, 0, RebornItemEffect.None, 0);
                         itemNtt.Set(ref item);
-                        InventoryHelper.AddItem(in ntt, ref inv, in itemNtt, netSync: true);
+                        InventoryHelper.AddItem(ntt, ref inv, in itemNtt, netSync: true);
 
                         return action.id_next;
                     }

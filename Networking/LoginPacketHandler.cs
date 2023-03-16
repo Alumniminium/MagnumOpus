@@ -11,7 +11,7 @@ namespace MagnumOpus.Networking
 {
     public static unsafe class LoginPacketHandler
     {
-        internal static void Process(in NTT ntt, in Memory<byte> packet)
+        internal static void Process(NTT ntt, Memory<byte> packet)
         {
             var packetType = (PacketId)BitConverter.ToUInt16(packet.Span[2..]);
 
@@ -19,7 +19,7 @@ namespace MagnumOpus.Networking
             {
                 case PacketId.MsgConnect:
                     {
-                        var msgAccount = Co2Packet.Deserialze<MsgAccount>(packet);
+                        var msgAccount = Co2Packet.Deserialize<MsgAccount>(packet.Span);
                         var username = msgAccount.GetUsername();
                         RivestCipher5.Decrypt(msgAccount.Password, 16);
                         var password = msgAccount.GetPassword();
@@ -35,7 +35,7 @@ namespace MagnumOpus.Networking
                     }
                 case PacketId.MsgLogin:
                     {
-                        var msg = Co2Packet.Deserialze<MsgConnectLogin>(packet);
+                        var msg = Co2Packet.Deserialize<MsgConnectLogin>(packet.Span);
                         var filename = msg.GetFileName();
                         FConsole.WriteLine($"[LOGIN/1052] Client Id: {msg.UniqueId}, File: {filename} Contents: {msg.Contents}");
                         break;

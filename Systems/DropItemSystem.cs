@@ -16,7 +16,7 @@ namespace MagnumOpus.Systems
         public DropItemSystem() : base("Drop Item", threads: 2) { IsLogging = false; }
         public override void Update(in NTT ntt, ref PositionComponent pos, ref RequestDropItemComponent rdi, ref InventoryComponent inv)
         {
-            if (!InventoryHelper.RemoveNetIdFromInventory(in ntt, ref inv, rdi.ItemNtt.Id, netSync: true))
+            if (!InventoryHelper.RemoveNetIdFromInventory(ntt, ref inv, rdi.ItemNtt.Id, netSync: true))
             {
                 if (IsLogging)
                     Logger.Debug("{ntt} tried to drop an Item he does not have in his Inventory at {pos}", ntt, pos.Position);

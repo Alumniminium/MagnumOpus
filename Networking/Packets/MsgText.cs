@@ -114,7 +114,7 @@ namespace MagnumOpus.Networking.Packets
         [PacketHandler(PacketId.MsgText)]
         public static void Process(NTT ntt, Memory<byte> memory)
         {
-            var msg = Co2Packet.Deserialze<MsgText>(memory);
+            var msg = Co2Packet.Deserialize<MsgText>(memory.Span);
             FConsole.WriteLine($"MsgText: {msg.Channel} {msg.From()} -> {msg.To()}: {msg.Message()}");
 
             switch (msg.Channel)

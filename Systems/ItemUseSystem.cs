@@ -43,7 +43,7 @@ namespace MagnumOpus.Systems
             }
 
             if (destroy)
-                InventoryHelper.RemoveNttFromInventory(in ntt, ref inv, in item, destroy: true, netSync: true);
+                InventoryHelper.RemoveNttFromInventory(ntt, ref inv, item, destroy: true, netSync: true);
 
             if (IsLogging)
                 Logger.Debug("{0} used {1} ({2})", ntt, item, itemComp.Id);

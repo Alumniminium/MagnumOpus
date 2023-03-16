@@ -78,7 +78,7 @@ namespace MagnumOpus.Networking.Packets
         [PacketHandler(PacketId.MsgInteract)]
         public static void Process(NTT ntt, Memory<byte> memory)
         {
-            var msg = Co2Packet.Deserialze<MsgInteract>(memory);
+            var msg = Co2Packet.Deserialize<MsgInteract>(memory.Span);
 
             switch (msg.Type)
             {

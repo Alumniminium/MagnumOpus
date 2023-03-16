@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Net.Sockets;
 using System.Text;
 using MagnumOpus.Components;
@@ -15,18 +16,19 @@ namespace MagnumOpus.Systems
         {
             try
             {
-                int maxPacketSize = 800 - 8; // Maximum allowed packet size, accounting for the TqServer footer
-                int offset = 0;
+                var maxPacketSize = 800 - 8; // Maximum allowed packet size, accounting for the TqServer footer
+                var offset = 0;
 
-                while (net.SendQueue.TryDequeue(out var packet))
+                while (net.SendQueue.TryDequeue(out var array))
                 {
+                    var packet = array.AsSpan();
                     if (packet.Length < 4)
                         continue;
 
-                    var id = BitConverter.ToInt16(packet.Span[2..4]);
+                    var id = BitConverter.ToInt16(packet[2..4]);
                     if (IsLogging)
                     {
-                        Logger.Debug(packet.Dump());
+                        Logger.Debug(array.AsMemory().Dump());
                         Logger.Debug("Sending {id}/{id} (Size: {Length}) to {ntt}...", ((PacketId)id).ToString(), id, packet.Length, ntt);
                     }
 
@@ -34,32 +36,37 @@ namespace MagnumOpus.Systems
                     {
                         var resized = new byte[packet.Length + 8];
                         packet.CopyTo(resized);
+                        ArrayPool<byte>.Shared.Return(array);
+                        TqServer.CopyTo(resized.AsMemory()[^8..]);
                         net.GameCrypto.Encrypt(resized);
                         packet = resized;
                     }
                     else
                     {
-                        net.AuthCrypto.Encrypt(packet.Span);
+                        net.AuthCrypto.Encrypt(packet);
+                        // Resize the packet to include the TqServer footer
+                        var resized = new byte[packet.Length + 8];
+                        packet.CopyTo(resized);
+                        TqServer.CopyTo(resized.AsMemory()[^8..]);
+                        packet = resized;
                     }
 
                     // Check if the current packet would exceed the maximum allowed size
                     if (offset + packet.Length > maxPacketSize)
                     {
                         // Send the current data in the buffer before adding the new packet
-                        TqServer.CopyTo(net.SendBuffer[offset..]);
-                        net.Socket.Send(net.SendBuffer.Span[..(offset + 8)], SocketFlags.None);
+                        net.Socket.Send(net.SendBuffer.AsSpan()[..offset], SocketFlags.None);
                         offset = 0;
                     }
 
-                    packet.Span.CopyTo(net.SendBuffer.Span[offset..]);
+                    packet.CopyTo(net.SendBuffer.AsSpan()[offset..]);
                     offset += packet.Length;
                 }
 
                 if (offset > 0)
                 {
-                    // Append the TqServer footer and send the remaining data in the buffer
-                    TqServer.CopyTo(net.SendBuffer[offset..]);
-                    net.Socket.Send(net.SendBuffer.Span[..(offset + 8)], SocketFlags.None);
+                    // Send the remaining data in the buffer
+                    net.Socket.Send(net.SendBuffer.AsSpan()[..offset], SocketFlags.None);
                 }
             }
             catch

@@ -34,26 +34,13 @@ namespace MagnumOpus.Systems
 
             if (brn.TargetId == 0)
             {
+                FindNewTarget(ref vwp, ref brn);
+            }
 
-                foreach (var kvp in vwp.EntitiesVisible)
-                {
-                    var b = kvp.Value;
-                    if (b.Type != EntityType.Player)
-                        continue;
-
-                    if (b.Has<DeathTagComponent>())
-                        continue;
-
-                    brn.TargetId = b.Id;
-                    brn.State = BrainState.Approaching;
-                    break;
-                }
-
-                if (brn.TargetId == 0)
-                {
-                    brn.State = BrainState.Idle;
-                    return;
-                }
+            if (brn.TargetId == 0)
+            {
+                brn.State = BrainState.Idle;
+                return;
             }
 
             ref readonly var target = ref NttWorld.GetEntity(brn.TargetId);
@@ -65,13 +52,6 @@ namespace MagnumOpus.Systems
                 return;
             }
 
-            if (brn.TargetId == 0)
-            {
-                brn.State = BrainState.Idle;
-                return;
-            }
-
-
             var distance = (int)Vector2.Distance(pos.Position, targetPos.Position);
             if (distance > 16)
             {
@@ -82,12 +62,33 @@ namespace MagnumOpus.Systems
                 return;
             }
 
+            UpdateBrainState(distance, ref brn, ntt, pos, target, targetPos);
+        }
+
+        private static void FindNewTarget(ref ViewportComponent vwp, ref BrainComponent brn)
+        {
+            foreach (var kvp in vwp.EntitiesVisible)
+            {
+                var b = kvp.Value;
+                if (b.Type != EntityType.Player)
+                    continue;
+
+                if (b.Has<DeathTagComponent>())
+                    continue;
+
+                brn.TargetId = b.Id;
+                brn.State = BrainState.Approaching;
+                break;
+            }
+        }
+
+        private void UpdateBrainState(int distance, ref BrainComponent brn, in NTT ntt, in PositionComponent pos, in NTT target, in PositionComponent targetPos)
+        {
             brn.State = distance > 1 ? BrainState.Approaching : BrainState.Attacking;
 
             if (brn.State == BrainState.Approaching)
             {
                 var dir = CoMath.GetRawDirection(targetPos.Position, pos.Position);
-
                 var wlk = new WalkComponent(dir, false);
                 ntt.Set(ref wlk);
                 if (IsLogging)
@@ -100,7 +101,6 @@ namespace MagnumOpus.Systems
                 if (IsLogging)
                     Logger.Debug("{Entity} attacking {target}", ntt, target);
             }
-
             brn.State = BrainState.Sleeping;
             brn.SleepTicks = (int)(NttWorld.TargetTps * (1 + Random.Shared.NextSingle()));
         }

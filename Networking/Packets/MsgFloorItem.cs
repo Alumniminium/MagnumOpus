@@ -50,7 +50,7 @@ namespace MagnumOpus.Networking.Packets
         [PacketHandler(PacketId.MsgFloorItem)]
         public static void Process(NTT ntt, Memory<byte> memory)
         {
-            var msg = Co2Packet.Deserialze<MsgFloorItem>(in memory);
+            var msg = Co2Packet.Deserialize<MsgFloorItem>(memory.Span);
 
             switch (msg.MsgFloorItemType)
             {

@@ -48,11 +48,11 @@ namespace MagnumOpus
                     var dhx = MsgDHX.Create(net.ClientIV, net.ServerIV, Networking.Cryptography.DiffieHellman.P, Networking.Cryptography.DiffieHellman.G, net.DiffieHellman.GetPublicKey());
                     ntt.NetSync(ref dhx);
 
-                    var count = net.Socket.Receive(net.RecvBuffer.Span);
+                    var count = net.Socket.Receive(net.RecvBuffer);
                     var packet = net.RecvBuffer[..count];
-                    net.GameCrypto.Decrypt(packet.Span);
+                    net.GameCrypto.Decrypt(packet);
 
-                    var packetSpan = packet.Span;
+                    var packetSpan = packet.AsSpan();
 
                     var size = BitConverter.ToUInt16(packetSpan[7..]);
                     var junkSize = BitConverter.ToInt32(packetSpan[11..]);
@@ -87,19 +87,19 @@ namespace MagnumOpus
                 {
                     // Receive the packet size.
                     var sizeBytes = buffer[..2];
-                    var count = net.Socket.Receive(sizeBytes.Span);
+                    var count = net.Socket.Receive(sizeBytes);
                     if (count != 2)
                         throw new Exception("NO DIE");
 
                     // Decrypt the size bytes and compute the packet size.
-                    crypto.Decrypt(sizeBytes.Span);
-                    var size = BitConverter.ToUInt16(sizeBytes.Span) + 8;
+                    crypto.Decrypt(sizeBytes);
+                    var size = BitConverter.ToUInt16(sizeBytes) + 8;
 
                     // Keep receiving until the entire packet is received.
                     count = 2;
                     while (count < size)
                     {
-                        var received = net.Socket.Receive(buffer.Span[count..size]);
+                        var received = net.Socket.Receive(buffer.AsSpan()[count..size]);
                         if (received == 0)
                             throw new Exception("NO DIE");
 
@@ -107,7 +107,7 @@ namespace MagnumOpus
                     }
 
                     // Process the packet.
-                    crypto.Decrypt(buffer.Span[2..size]);
+                    crypto.Decrypt(buffer.AsSpan()[2..size]);
                     net.RecvQueue.Enqueue(buffer[..size]);
                 }
                 catch

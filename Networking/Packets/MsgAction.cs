@@ -85,7 +85,7 @@ namespace MagnumOpus.Networking.Packets
         public static void Process(NTT ntt, Memory<byte> memory)
         {
             var _trace = false;
-            var msg = Co2Packet.Deserialze<MsgAction>(in memory);
+            var msg = Co2Packet.Deserialize<MsgAction>(memory.Span);
 
             switch (msg.Type)
             {
@@ -130,7 +130,7 @@ namespace MagnumOpus.Networking.Packets
                         ref var inv = ref ntt.Get<InventoryComponent>();
                         ref var eq = ref ntt.Get<EquipmentComponent>();
 
-                        InventoryHelper.SortById(in ntt, ref inv, netSync: true);
+                        InventoryHelper.SortById(ntt, ref inv, netSync: true);
                         ntt.NetSync(ref msg);
 
                         var head = MsgItemInformation.Create(eq.Head, MsgItemInfoAction.AddItem, MsgItemPosition.Head);

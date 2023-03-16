@@ -34,7 +34,7 @@ namespace MagnumOpus.Networking.Packets
         [PacketHandler(PacketId.MsgLogin)]
         public static void Process(NTT ntt, Memory<byte> packet)
         {
-            var msg = Co2Packet.Deserialze<MsgLogin>(packet);
+            var msg = Co2Packet.Deserialize<MsgLogin>(packet.Span);
             var language = msg.GetLanguage();
             FConsole.WriteLine($"[GAME] Client Version: {msg.ClientVersion}, Language: {language}");
 

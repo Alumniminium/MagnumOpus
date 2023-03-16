@@ -41,7 +41,7 @@ namespace MagnumOpus.Networking.Packets
         [PacketHandler(PacketId.MsgTick)]
         public static void Process(NTT ntt, Memory<byte> memory)
         {
-            var msg = Co2Packet.Deserialze<MsgTick>(memory);
+            var msg = Co2Packet.Deserialize<MsgTick>(memory.Span);
             ref readonly var ntc = ref ntt.Get<NameTagComponent>();
             if (!ntt.Has<PingComponent>())
             {

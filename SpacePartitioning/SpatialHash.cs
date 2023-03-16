@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 
@@ -11,7 +10,7 @@ namespace MagnumOpus.SpacePartitioning
     {
         private readonly int cellSize;
         private readonly ConcurrentDictionary<int, List<NTT>> Hashtbl;
-        private readonly object _lock = new();
+        private readonly ReaderWriterLockSlim rwLock = new();
 
         public SpatialHash(int cellSize)
         {
@@ -23,22 +22,37 @@ namespace MagnumOpus.SpacePartitioning
         public void Add(NTT entity, ref PositionComponent pos)
         {
             var hash = GetHash(pos.Position);
-
-            if (!Hashtbl.ContainsKey(hash))
-                Hashtbl[hash] = new List<NTT>();
-
-            lock (_lock)
-                Hashtbl[hash].Add(entity);
+            rwLock.EnterWriteLock();
+            try
+            {
+                Hashtbl.AddOrUpdate(hash, new List<NTT> { entity }, (key, existingList) =>
+                {
+                    existingList.Add(entity);
+                    return existingList;
+                });
+            }
+            finally
+            {
+                rwLock.ExitWriteLock();
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Remove(NTT entity, ref PositionComponent pos)
         {
             var hash = GetHash(pos.Position);
-
-            if (Hashtbl.TryGetValue(hash, out var bucket))
-                lock (_lock)
+            rwLock.EnterWriteLock();
+            try
+            {
+                if (Hashtbl.TryGetValue(hash, out var bucket))
+                {
                     bucket.Remove(entity);
+                }
+            }
+            finally
+            {
+                rwLock.ExitWriteLock();
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -67,19 +81,21 @@ namespace MagnumOpus.SpacePartitioning
 
                     if (!Hashtbl.TryGetValue(hash, out var entities))
                         continue;
-
-                    lock (_lock)
+                    rwLock.EnterReadLock();
+                    try
                     {
-                        var span = CollectionsMarshal.AsSpan(entities);
-                        for (var i = 0; i < entities.Count; i++)
+                        foreach (var ntt in entities)
                         {
-                            ref readonly var ntt = ref span[i];
                             ref readonly var pos = ref ntt.Get<PositionComponent>();
                             var distanceSquared = Vector2.DistanceSquared(pos.Position, new Vector2(cx, cy));
 
                             if (distanceSquared <= 324f)
                                 vwp.EntitiesVisible.TryAdd(ntt.Id, ntt);
                         }
+                    }
+                    finally
+                    {
+                        rwLock.ExitReadLock();
                     }
                 }
             }

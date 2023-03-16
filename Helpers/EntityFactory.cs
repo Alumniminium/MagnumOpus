@@ -85,7 +85,7 @@ namespace MagnumOpus.Helpers
                 if (invItemNtt != default)
                     continue;
 
-                InventoryHelper.AddItem(in mob, ref inv, invItemNtt);
+                InventoryHelper.AddItem(mob, ref inv, invItemNtt);
             }
 
             if (prefab.action != 0)

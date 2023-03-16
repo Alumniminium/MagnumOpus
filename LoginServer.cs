@@ -44,29 +44,29 @@ namespace MagnumOpus
                 IpRegistry.Register(player, ipendpoint.Split(':')[0]);
                 FConsole.WriteLine($"[LOGIN] Client connected: {client.Client.RemoteEndPoint}");
 
-                var count = net.Socket.Receive(net.RecvBuffer.Span[..52]);
+                var count = net.Socket.Receive(net.RecvBuffer.AsSpan()[..52]);
                 var packet = net.RecvBuffer[..count];
-                net.AuthCrypto.Decrypt(packet.Span, packet.Span);
+                net.AuthCrypto.Decrypt(packet, packet);
 
-                LoginPacketHandler.Process(in player, in packet);
+                LoginPacketHandler.Process(player, packet);
 
-                new Thread(() => LoginClientLoop(in player)).Start();
+                new Thread(() => LoginClientLoop(player)).Start();
             }
         }
 
-        private static void LoginClientLoop(in NTT player)
+        private static void LoginClientLoop(NTT player)
         {
             ref var net = ref player.Get<NetworkComponent>();
             try
             {
                 while (net.Socket.Connected)
                 {
-                    var count = net.Socket.Receive(net.RecvBuffer.Span);
+                    var count = net.Socket.Receive(net.RecvBuffer);
                     if (count == 0)
                         break;
                     var packet = net.RecvBuffer[..count];
-                    net.AuthCrypto.Decrypt(packet.Span, packet.Span);
-                    LoginPacketHandler.Process(in player, in packet);
+                    net.AuthCrypto.Decrypt(packet, packet);
+                    LoginPacketHandler.Process(player, packet);
                 }
             }
             catch

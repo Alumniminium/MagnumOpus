@@ -39,6 +39,7 @@ namespace MagnumOpus.Systems
                 {
                     ref var bdy = ref ntt.Get<BodyComponent>();
                     var ghostLook = bdy.Look % 10000 is 2001 or 2002 ? MsgSpawn.AddTransform(bdy.Look, 99) : MsgSpawn.AddTransform(bdy.Look, 98);
+                    bdy.Look = ghostLook;
                 }
 
                 if (ntt.Has<CqActionComponent>())
@@ -62,8 +63,8 @@ namespace MagnumOpus.Systems
                         ntt.Set(ref drop);
                     }
 
-                    InventoryHelper.SortById(in ntt, ref inv);
-                    var itemCount = inv.Items.Where(x => x.Id != 0).Count();
+                    InventoryHelper.SortById(ntt, ref inv);
+                    var itemCount = InventoryHelper.CountItems(ref inv);
                     for (var i = 0; i < itemCount; i++)
                     {
                         if (Random.Shared.NextSingle() >= 0.1f)

@@ -34,7 +34,7 @@ namespace MagnumOpus.Networking.Packets
         [PacketHandler(PacketId.MsgTeam)]
         public static void Process(NTT ntt, Memory<byte> packet)
         {
-            var msg = Co2Packet.Deserialze<MsgTeam>(in packet);
+            var msg = Co2Packet.Deserialize<MsgTeam>(packet.Span);
             switch (msg.Mode)
             {
                 case MsgTeamAction.Create:
