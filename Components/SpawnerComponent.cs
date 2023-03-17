@@ -2,8 +2,10 @@ using System.Drawing;
 using MagnumOpus.ECS;
 namespace MagnumOpus.Components
 {
-    [Component]
-    [Save]
+
+
+
+    [Component(saveEnabled: true)]
     public struct SpawnerComponent
     {
         public int GeneratorId;

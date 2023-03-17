@@ -11,7 +11,7 @@ namespace MagnumOpus.Networking
 {
     public static unsafe class LoginPacketHandler
     {
-        internal static void Process(NTT ntt, Memory<byte> packet)
+        internal static void Process(in NTT ntt, in Memory<byte> packet)
         {
             var packetType = (PacketId)BitConverter.ToUInt16(packet.Span[2..]);
 
@@ -40,63 +40,6 @@ namespace MagnumOpus.Networking
                         FConsole.WriteLine($"[LOGIN/1052] Client Id: {msg.UniqueId}, File: {filename} Contents: {msg.Contents}");
                         break;
                     }
-
-                case PacketId.MsgRole:
-                    break;
-                case PacketId.MsgText:
-                    break;
-                case PacketId.MsgWalk:
-                    break;
-                case PacketId.MsgHero:
-                    break;
-                case PacketId.MsgItem:
-                    break;
-                case PacketId.MsgTick:
-                    break;
-                case PacketId.MsgAction:
-                    break;
-                case PacketId.MsgSpwan:
-                    break;
-                case PacketId.MsgName:
-                    break;
-                case PacketId.MsgUpdate:
-                    break;
-                case PacketId.MsgFriend:
-                    break;
-                case PacketId.MsgInteract:
-                    break;
-                case PacketId.MsgTeam:
-                    break;
-                case PacketId.MsgSockEm:
-                    break;
-                case PacketId.MsgForge:
-                    break;
-                case PacketId.MsgTime:
-                    break;
-                case PacketId.MsgTransfer:
-                    break;
-                case PacketId.MsgTrade:
-                    break;
-                case PacketId.MsgFloorItem:
-                    break;
-                case PacketId.MsgStorage:
-                    break;
-                case PacketId.MsgMagicEffect:
-                    break;
-                case PacketId.MsgGuild:
-                    break;
-                case PacketId.MsgNpc:
-                    break;
-                case PacketId.MsgGuildInfo:
-                    break;
-                case PacketId.MsgNpcSpawn:
-                    break;
-                case PacketId.MsgDialog:
-                    break;
-                case PacketId.MsgDialog2:
-                    break;
-                case PacketId.MsgCompose:
-                    break;
                 default:
                     {
                         FConsole.WriteLine($"[LOGIN/{(int)packetType}/{packetType}] Unknown packet");

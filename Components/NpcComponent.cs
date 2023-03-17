@@ -1,8 +1,10 @@
 using MagnumOpus.ECS;
 namespace MagnumOpus.Components
 {
-    [Component]
-    [Save]
+
+
+
+    [Component(saveEnabled: true)]
     public struct NpcComponent
     {
         public ushort Base;

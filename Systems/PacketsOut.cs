@@ -1,6 +1,9 @@
+<<<<<<< HEAD
 using System.Buffers;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+=======
+>>>>>>> 3161883ebe68e1efedc7baa80d392375ebd53323
 using System.Text;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
@@ -21,6 +24,7 @@ namespace MagnumOpus.Systems
 
             try
             {
+<<<<<<< HEAD
                 if (net.SendBufferOffset == 355) // DiffieHellman key exchange
             {
                 var chunkToSend = net.SendBuffer.Slice(0, net.SendBufferOffset);
@@ -82,6 +86,32 @@ namespace MagnumOpus.Systems
                 for (var i = 0; i < net.SendBufferOffset; i++)
                     net.SendBuffer.Span[i] = 0;
                 net.SendBufferOffset = 0;
+=======
+                while (net.SendQueue.TryDequeue(out var packet))
+                {
+                    if (packet.Length < 4)
+                        continue;
+
+                    if (IsLogging)
+                    {
+                        var id = BitConverter.ToInt16(packet.Span[2..4]);
+                        Logger.Debug(packet.Dump());
+                        Logger.Debug("Sending {id}/{id} (Size: {Length}) to {ntt}...", ((PacketId)id).ToString(), id, packet.Length, ntt);
+                    }
+                    if (net.UseGameCrypto)
+                    {
+                        Memory<byte> resized = new byte[packet.Length + 8];
+                        packet.CopyTo(resized);
+                        TqServer.CopyTo(resized[^8..]);
+                        net.GameCrypto.Encrypt(resized.Span);
+                        packet = resized;
+                    }
+                    else
+                        net.AuthCrypto.Encrypt(packet.Span);
+
+                    _ = net.Socket.Send(packet.Span);
+                }
+>>>>>>> 3161883ebe68e1efedc7baa80d392375ebd53323
             }
             catch
             {

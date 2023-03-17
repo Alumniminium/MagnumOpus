@@ -2,8 +2,10 @@ using System.Numerics;
 using MagnumOpus.ECS;
 namespace MagnumOpus.Components
 {
-    [Component]
-    [Save]
+
+
+
+    [Component(saveEnabled: true)]
     public struct PositionComponent
     {
         public long ChangedTick;
