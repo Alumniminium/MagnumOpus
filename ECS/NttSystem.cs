@@ -19,7 +19,7 @@ namespace MagnumOpus.ECS
         private readonly Gauge NTTCountMetricsExporter;
         internal readonly Logger Logger;
 
-        protected NttSystem(string name, int threads = 1, bool log = false)
+        protected NttSystem(string name, int threads = 1, bool log = true)
         {
             ThreadCount = threads;
             IsLogging = log;

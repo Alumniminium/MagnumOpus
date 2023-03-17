@@ -3,8 +3,10 @@ using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
 namespace MagnumOpus.Components
 {
-    [Component]
-    [Save]
+
+
+
+    [Component(saveEnabled: true)]
     public struct ProfessionComponent
     {
         public NTT NTT;

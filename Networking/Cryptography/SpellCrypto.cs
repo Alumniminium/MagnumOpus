@@ -8,15 +8,15 @@ namespace MagnumOpus.Networking.Cryptography
         public static (ushort id, int target, ushort x, ushort y) DecryptSkill(in NTT player, ref MsgInteract packet)
         {
             var buffer = Co2Packet.Serialize(ref packet);
-            var id = Convert.ToUInt16(((long)buffer.AsSpan()[24] & 0xFF) | (((long)buffer.AsSpan()[25] & 0xFF) << 8));
+            var id = Convert.ToUInt16(((long)buffer.Span[24] & 0xFF) | (((long)buffer.Span[25] & 0xFF) << 8));
 
             id ^= 0x915d;
             id ^= (ushort)player.Id;
             id = (ushort)((id << 0x3) | (id >> 0xd));
             id -= 0xeb42;
 
-            long x = (buffer.AsSpan()[16] & 0xFF) | ((buffer.AsSpan()[17] & 0xFF) << 8);
-            long y = (buffer.AsSpan()[18] & 0xFF) | ((buffer.AsSpan()[19] & 0xFF) << 8);
+            long x = (buffer.Span[16] & 0xFF) | ((buffer.Span[17] & 0xFF) << 8);
+            long y = (buffer.Span[18] & 0xFF) | ((buffer.Span[19] & 0xFF) << 8);
 
             x = x ^ (player.Id & 0xffff) ^ 0x2ed6;
             x = ((x << 1) | ((x & 0x8000) >> 15)) & 0xffff;
@@ -28,7 +28,7 @@ namespace MagnumOpus.Networking.Cryptography
             y |= 0xffff0000;
             y -= 0xffff8922;
 
-            var target = BitConverter.ToUInt32(buffer.AsSpan()[12..]);
+            var target = BitConverter.ToUInt32(buffer.Span[12..]);
             target = (uint)((((target & 0xffffe000) >> 13) | ((target & 0x1fff) << 19)) ^ 0x5F2D2463 ^ player.Id) - 0x746F4AE6;
             return (id, (int)target, (ushort)x, (ushort)y);
         }

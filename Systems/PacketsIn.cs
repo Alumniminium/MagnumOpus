@@ -15,12 +15,12 @@ namespace MagnumOpus.Systems
         {
             foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
             {
-                var methods = type.GetMethods(BindingFlags.Static | BindingFlags.Public);
-                foreach (var method in methods)
+                foreach (var method in type.GetMethods(BindingFlags.Static | BindingFlags.Public))
                 {
                     var attributes = method.GetCustomAttributes(typeof(PacketHandlerAttribute), false);
                     if (attributes.Length == 0)
                         continue;
+
                     var attribute = (PacketHandlerAttribute)attributes[0];
                     PacketHandlers.Add(attribute.Id, (Action<NTT, Memory<byte>>)Delegate.CreateDelegate(typeof(Action<NTT, Memory<byte>>), method));
                 }
@@ -33,20 +33,19 @@ namespace MagnumOpus.Systems
             {
                 while (net.RecvQueue.TryDequeue(out var packet))
                 {
-                    var packetType = (PacketId)BitConverter.ToUInt16(packet.AsSpan()[2..4]);
+                    var packetType = (PacketId)BitConverter.ToUInt16(packet.Span[2..4]);
                     if (IsLogging)
                         Logger.Debug("Received {packet} from {ntt}", packetType, ntt);
 
                     if (PacketHandlers.TryGetValue(packetType, out var handler))
                         handler.Invoke(ntt, packet);
                     else if (IsLogging)
-                        Logger.Debug("Undefined PacketId: {packet} {dump}", packetType, packet.AsMemory().Dump());
+                        Logger.Debug("Undefined PacketId: {packet} {dump}", packetType, packet.Dump());
                 }
             }
             catch (Exception ex)
             {
                 Logger.Error(ex, "Error in PacketsIn");
-                ntt.Remove<NetworkComponent>();
             }
         }
     }

@@ -1,7 +1,9 @@
 namespace MagnumOpus.ECS
 {
-    [AttributeUsage(AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-    public sealed class ComponentAttribute : Attribute { }
-    [AttributeUsage(AttributeTargets.Struct, Inherited = false, AllowMultiple = false)]
-    public sealed class SaveAttribute : Attribute { }
+    [AttributeUsage(AttributeTargets.Struct)]
+    public class ComponentAttribute : Attribute
+    {
+        public bool SaveEnabled { get; }
+        public ComponentAttribute(bool saveEnabled = false) => SaveEnabled = saveEnabled;
+    }
 }

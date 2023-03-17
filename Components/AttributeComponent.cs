@@ -1,10 +1,10 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
+
 namespace MagnumOpus.Components
 {
-    [Component]
-    [Save]
+    [Component(saveEnabled: true)]
     public struct AttributeComponent
     {
         public NTT NTT;

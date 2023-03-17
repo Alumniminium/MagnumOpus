@@ -11,8 +11,8 @@ namespace MagnumOpus
     public static class GameServer
     {
         private static readonly TcpListener listener = new(System.Net.IPAddress.Any, 5816);
-        private static readonly Thread thread;
-        static GameServer() => thread = new Thread(GameServerLoop) { IsBackground = true, Priority = ThreadPriority.Highest };
+        private static readonly Thread thread = new(GameServerLoop) { IsBackground = true, Priority = ThreadPriority.Highest };
+
         public static void Start()
         {
             FConsole.WriteLine($"[GAME] Listening on port {5816}...");
@@ -25,16 +25,12 @@ namespace MagnumOpus
             while (true)
             {
                 var client = listener.AcceptTcpClient();
-
                 FConsole.WriteLine($"[GAME] Client connected: {client.Client.RemoteEndPoint}");
-
                 var ipendpoint = client.Client.RemoteEndPoint?.ToString();
-                if (ipendpoint == null)
-                    break;
 
+                if (ipendpoint == null) break;
                 var (found, ntt) = IpRegistry.GetEntity(ipendpoint.Split(':')[0]);
-                if (!found)
-                    continue;
+                if (!found) continue;
 
                 ref var net = ref ntt.Get<NetworkComponent>();
                 net.UseGameCrypto = true;
@@ -48,18 +44,16 @@ namespace MagnumOpus
                     var dhx = MsgDHX.Create(net.ClientIV, net.ServerIV, Networking.Cryptography.DiffieHellman.P, Networking.Cryptography.DiffieHellman.G, net.DiffieHellman.GetPublicKey());
                     ntt.NetSync(ref dhx);
 
-                    var count = net.Socket.Receive(net.RecvBuffer);
+                    var count = net.Socket.Receive(net.RecvBuffer.Span);
                     var packet = net.RecvBuffer[..count];
-                    net.GameCrypto.Decrypt(packet);
+                    net.GameCrypto.Decrypt(packet.Span);
 
-                    var packetSpan = packet.AsSpan();
-
+                    var packetSpan = packet.Span;
                     var size = BitConverter.ToUInt16(packetSpan[7..]);
                     var junkSize = BitConverter.ToInt32(packetSpan[11..]);
                     var pkSize = BitConverter.ToInt32(packetSpan[(15 + junkSize)..]);
                     var pk = new byte[pkSize];
-                    for (var i = 0; i < pkSize; i++)
-                        pk[i] = packetSpan[19 + junkSize + i];
+                    for (var i = 0; i < pkSize; i++) pk[i] = packetSpan[19 + junkSize + i];
 
                     var pubkey = Encoding.ASCII.GetString(pk);
                     net.DiffieHellman.ComputePrivateKey(pubkey);
@@ -75,6 +69,7 @@ namespace MagnumOpus
                 }
             }
         }
+
         private static void GameClientLoop(NTT ntt)
         {
             ref var net = ref ntt.Get<NetworkComponent>();
@@ -85,29 +80,22 @@ namespace MagnumOpus
             {
                 try
                 {
-                    // Receive the packet size.
                     var sizeBytes = buffer[..2];
-                    var count = net.Socket.Receive(sizeBytes);
-                    if (count != 2)
-                        throw new Exception("NO DIE");
+                    var count = net.Socket.Receive(sizeBytes.Span);
+                    if (count != 2) throw new Exception("NO DIE");
 
-                    // Decrypt the size bytes and compute the packet size.
-                    crypto.Decrypt(sizeBytes);
-                    var size = BitConverter.ToUInt16(sizeBytes) + 8;
+                    crypto.Decrypt(sizeBytes.Span);
+                    var size = BitConverter.ToUInt16(sizeBytes.Span) + 8;
 
-                    // Keep receiving until the entire packet is received.
                     count = 2;
                     while (count < size)
                     {
-                        var received = net.Socket.Receive(buffer.AsSpan()[count..size]);
-                        if (received == 0)
-                            throw new Exception("NO DIE");
-
+                        var received = net.Socket.Receive(buffer.Span[count..size]);
+                        if (received == 0) throw new Exception("NO DIE");
                         count += received;
                     }
 
-                    // Process the packet.
-                    crypto.Decrypt(buffer.AsSpan()[2..size]);
+                    crypto.Decrypt(buffer.Span[2..size]);
                     net.RecvQueue.Enqueue(buffer[..size]);
                 }
                 catch
@@ -115,6 +103,7 @@ namespace MagnumOpus
                     FConsole.WriteLine($"[GAME] Client disconnected: {net.Username}");
                     net.Socket?.Close();
                     net.Socket?.Dispose();
+                    ntt.Remove<NetworkComponent>();
                     break;
                 }
             }

@@ -5,8 +5,7 @@ using Newtonsoft.Json;
 
 namespace MagnumOpus.Components
 {
-    [Component]
-    [Save]
+    [Component(saveEnabled: true)]
     public struct ViewportComponent
     {
         public long ChangedTick;
