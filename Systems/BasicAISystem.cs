@@ -94,13 +94,14 @@ namespace MagnumOpus.Systems
                 if (IsLogging)
                     Logger.Debug("{Entity} walking {dir} to {target}", ntt, (Direction)dir, target);
             }
-            if (brn.State == BrainState.Attacking)
+            else if (brn.State == BrainState.Attacking)
             {
                 var atk = new AttackComponent(in target, MsgInteractType.Physical);
                 ntt.Set(ref atk);
                 if (IsLogging)
                     Logger.Debug("{Entity} attacking {target}", ntt, target);
             }
+
             brn.State = BrainState.Sleeping;
             brn.SleepTicks = (int)(NttWorld.TargetTps * (1 + Random.Shared.NextSingle()));
         }

@@ -1,11 +1,4 @@
-<<<<<<< HEAD
-using System;
-using System.Buffers;
-using System.Diagnostics;
-=======
->>>>>>> 3161883ebe68e1efedc7baa80d392375ebd53323
 using System.Runtime.InteropServices;
-using MagnumOpus.Components;
 using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Networking

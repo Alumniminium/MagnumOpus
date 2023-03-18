@@ -8,7 +8,7 @@ namespace MagnumOpus.Systems
 {
     public sealed class DestroySystem : NttSystem<DestroyEndOfFrameComponent>
     {
-        public DestroySystem() : base("Destroy", threads: 2, log: true) { }
+        public DestroySystem() : base("Destroy", threads: 2, log: false) { }
 
         public override void Update(in NTT ntt, ref DestroyEndOfFrameComponent def)
         {

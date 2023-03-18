@@ -68,8 +68,8 @@ namespace MagnumOpus
             Db.LoadCqTask();
             Db.LoadCqNpc();
             Db.LoadCqPointAllot();
-            Db.LoadSpawners();
-            Db.LoadNpcs();
+            // Db.LoadSpawners();
+            // Db.LoadNpcs();
 
             foreach (var worldNtt in NttWorld.NTTs)
             {

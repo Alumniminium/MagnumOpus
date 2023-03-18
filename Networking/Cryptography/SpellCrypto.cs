@@ -9,8 +9,7 @@ namespace MagnumOpus.Networking.Cryptography
         public static (ushort id, int target, ushort x, ushort y) DecryptSkill(in NTT player, ref MsgInteract packet)
         {
             ref var net = ref player.Get<NetworkComponent>();
-            Co2Packet.Serialize(ref net, ref packet);
-            var buffer = net.SendBuffer[(net.SendBufferOffset - packet.Size)..].Span;
+            var buffer = Co2Packet.Serialize(ref packet).Span;
             var id = Convert.ToUInt16(((long)buffer[24] & 0xFF) | (((long)buffer[25] & 0xFF) << 8));
 
             id ^= 0x915d;

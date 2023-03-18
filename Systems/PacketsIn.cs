@@ -45,7 +45,8 @@ namespace MagnumOpus.Systems
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "Error in PacketsIn");
+                Logger.Error("Error in PacketsIn: {ex} - {ntt}", ex, ntt);
+                ntt.Remove<NetworkComponent>();
             }
         }
     }

@@ -42,8 +42,7 @@ namespace MagnumOpus.ECS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly void NetSync<T>(ref T msg, bool broadcast = false) where T : unmanaged
         {
-            if (Id == 0)
-                return;
+            var packet = Co2Packet.Serialize(ref msg);
 
             if (broadcast && Has<ViewportComponent>())
             {
@@ -56,14 +55,19 @@ namespace MagnumOpus.ECS
                     if (b.Type != EntityType.Player)
                         continue;
 
-                    ref var net = ref b.Get<NetworkComponent>();
-                    Co2Packet.Serialize(ref net, ref msg);
+                    if (!b.Has<NetworkComponent>())
+                        continue;
+
+                    ref readonly var net = ref b.Get<NetworkComponent>();
+                    net.SendQueue.Enqueue(packet);
                 }
             }
             else if (Type == EntityType.Player)
             {
-                ref var net = ref Get<NetworkComponent>();
-                Co2Packet.Serialize(ref net, ref msg);
+                if (!Has<NetworkComponent>())
+                    return;
+                ref readonly var net = ref Get<NetworkComponent>();
+                net.SendQueue.Enqueue(packet);
             }
         }
 
