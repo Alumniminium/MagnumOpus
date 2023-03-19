@@ -12,7 +12,7 @@ namespace HerstLib.IO
     {
         public static string StdoLogPath => $"{StartTime:dd-MM-yyyy}.log";
         private static DateTime StartTime = DateTime.UtcNow;
-        private static StreamWriter Logger = new(StdoLogPath, true);
+        // private static StreamWriter Logger = new(StdoLogPath, true);
         private static readonly BlockingCollection<string> Lines = new();
         private static readonly Thread WorkerThread;
 
@@ -20,7 +20,7 @@ namespace HerstLib.IO
 
         static FConsole()
         {
-            Logger.AutoFlush = true;
+            // Logger.AutoFlush = true;
             WorkerThread = new Thread(ProcessingQueue) { IsBackground = true };
             WorkerThread.Start();
         }
@@ -33,30 +33,30 @@ namespace HerstLib.IO
                 if (StartTime.Date != DateTime.UtcNow.Date)
                     BeginNewFile();
 
-                Logger.Write($"[{DateTime.UtcNow}]{line}");
+                // Logger.Write($"[{DateTime.UtcNow}]{line}");
                 MetricsExporter.Inc();
             }
         }
 
         private static void BeginNewFile()
         {
-            Logger.Close();
-            Logger.Dispose();
-            using var infs = new FileStream(StdoLogPath, FileMode.Open, FileAccess.Read);
-            using var outfs = new FileStream($"{StdoLogPath}.gz", FileMode.Create, FileAccess.Write);
-            using var gz = new GZipStream(outfs, CompressionMode.Compress);
-            infs.CopyTo(gz);
-            gz.Flush();
-            gz.Close();
-            infs.Close();
-            File.Delete(StdoLogPath);
+            // Logger.Close();
+            // Logger.Dispose();
+            // using var infs = new FileStream(StdoLogPath, FileMode.Open, FileAccess.Read);
+            // using var outfs = new FileStream($"{StdoLogPath}.gz", FileMode.Create, FileAccess.Write);
+            // using var gz = new GZipStream(outfs, CompressionMode.Compress);
+            // infs.CopyTo(gz);
+            // gz.Flush();
+            // gz.Close();
+            // infs.Close();
+            // File.Delete(StdoLogPath);
 
-            StartTime = DateTime.UtcNow;
-            Logger = new(StdoLogPath, true)
-            {
-                AutoFlush = true
-            };
-            GC.Collect();
+            // StartTime = DateTime.UtcNow;
+            // Logger = new(StdoLogPath, true)
+            // {
+            //     AutoFlush = true
+            // };
+            // GC.Collect();
         }
 
         public static void WriteLine(string line) => Lines.Add($"{line}{Environment.NewLine}");
@@ -69,7 +69,7 @@ namespace HerstLib.IO
             Lines.CompleteAdding();
             while (Lines.Count > 0)
                 await Task.Delay(100);
-            Logger.Close();
+            // Logger.Close();
             WorkerThread.Join();
         }
     }
