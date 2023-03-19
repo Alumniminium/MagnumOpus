@@ -26,6 +26,9 @@ namespace MagnumOpus.Systems
 
             if (brn.State == BrainState.WakingUp)
             {
+                if (ntt.CreatedTick + NttWorld.TargetTps * 1.5 > Tick)
+                    return;
+
                 vwp.EntitiesVisible.Clear();
                 Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
                 if (IsLogging)
@@ -33,9 +36,7 @@ namespace MagnumOpus.Systems
             }
 
             if (brn.TargetId == 0)
-            {
                 FindNewTarget(ref vwp, ref brn);
-            }
 
             if (brn.TargetId == 0)
             {

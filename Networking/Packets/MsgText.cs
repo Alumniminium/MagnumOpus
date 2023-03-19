@@ -278,7 +278,7 @@ namespace MagnumOpus.Networking.Packets
                     ntt.Set(ref rev);
                     break;
                 case "eff":
-                    var eff = MsgName.Create(ntt.Id, args[0], (byte)MsgNameType.RoleEffect);
+                    var eff = MsgName.Create(ntt.Id, args[0], MsgNameType.RoleEffect);
                     ntt.NetSync(ref eff, true);
                     break;
                 default:

@@ -8,7 +8,7 @@ namespace MagnumOpus.Networking
         public static byte[] Serialize<T>(ref T packetStruct) where T : unmanaged
         {
             var size = typeof(T) == typeof(MsgDHX) ? 355 : sizeof(T);
-            var buffer = ArrayPool<byte>.Shared.Rent(size);
+            var buffer = new byte[size];
 
             fixed (byte* pBuffer = buffer)
             {

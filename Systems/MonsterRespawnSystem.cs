@@ -1,6 +1,7 @@
 using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
+using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Squiggly;
@@ -42,6 +43,25 @@ namespace MagnumOpus.Systems
             for (var i = 0; i < spc.GenPerTimer; i++)
             {
                 var mob = EntityFactory.MakeMonster(cqMob, ref spc, pos, spawner);
+
+                ref var vwp = ref mob.Get<ViewportComponent>();
+                Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
+                var playerVisible = false;
+                foreach (var player in vwp.EntitiesVisible)
+                {
+                    if (player.Value.Type == EntityType.Player)
+                    {
+                        ref var pvwp = ref player.Value.Get<ViewportComponent>();
+                        pvwp.Dirty = true;
+                        playerVisible = true;
+                    }
+                }
+
+                if (playerVisible)
+                {
+                    ref var brain = ref mob.Get<BrainComponent>();
+                    brain.State = BrainState.WakingUp;
+                }
 
                 if (IsLogging)
                 {

@@ -21,6 +21,12 @@ namespace MagnumOpus.Helpers
             {
                 var spawnPacket = MsgSpawn.Create(ntt);
                 to.NetSync(ref spawnPacket);
+
+                if (ntt.CreatedTick == NttWorld.Tick)
+                {
+                    var spawnEffectMsg = MsgName.Create(ntt.Id, "MBStandard", MsgNameType.RoleEffect);
+                    to.NetSync(ref spawnEffectMsg);
+                }
             }
             else if (ntt.Type == EntityType.Item)
             {

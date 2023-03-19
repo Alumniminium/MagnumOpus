@@ -58,7 +58,7 @@ namespace MagnumOpus.Helpers
             return ntt;
         }
 
-        public static NTT? MakeMonster(cq_monstertype prefab, ref SpawnerComponent spc, PositionComponent pos, NTT spawner)
+        public static NTT MakeMonster(cq_monstertype prefab, ref SpawnerComponent spc, PositionComponent pos, NTT spawner)
         {
             ref var mob = ref NttWorld.CreateEntity(EntityType.Monster);
             var respawnPos = CoMath.GetRandomPointInRect(in spc.SpawnArea);

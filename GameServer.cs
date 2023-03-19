@@ -94,9 +94,10 @@ namespace MagnumOpus
                         if (received == 0) throw new Exception("NO DIE");
                         count += received;
                     }
-
-                    crypto.Decrypt(buffer.Span[2..size]);
-                    net.RecvQueue.Enqueue(buffer[..size]);
+                    Memory<byte> copy = new byte[size];
+                    buffer[..size].CopyTo(copy);
+                    crypto.Decrypt(copy.Span[2..]);
+                    net.RecvQueue.Enqueue(copy);
                 }
                 catch
                 {

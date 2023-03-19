@@ -317,7 +317,7 @@ namespace MagnumOpus.Helpers
                     {
                         var parameters = action.param.Trim().Split(' ');
                         var media = parameters[1];
-                        var msg = MsgName.Create(ntt.Id, media, (byte)MsgNameType.Sound);
+                        var msg = MsgName.Create(ntt.Id, media, MsgNameType.Sound);
                         ntt.NetSync(ref msg);
                         if (Trace)
                             FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {media} -> {action.id_next}");
@@ -327,7 +327,7 @@ namespace MagnumOpus.Helpers
                     {
                         var parameters = action.param.Trim().Split(' ');
                         var effect = parameters[1];
-                        var msg = MsgName.Create(ntt.Id, effect, (byte)MsgNameType.RoleEffect);
+                        var msg = MsgName.Create(ntt.Id, effect, MsgNameType.RoleEffect);
                         ntt.NetSync(ref msg, true);
                         if (Trace)
                             FConsole.WriteLine($"[{nameof(CqActionProcessor)}] [{action.id}] NTT: {ntt.Id}|{ntt.Id} -> {taskType} -> {effect} -> {action.id_next}");

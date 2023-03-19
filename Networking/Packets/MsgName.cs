@@ -25,14 +25,14 @@ namespace MagnumOpus.Networking.Packets
         [FieldOffset(11)]
         public fixed byte Params[255];
 
-        public static MsgName Create(int netId, string param, byte action)
+        public static MsgName Create(int netId, string param, MsgNameType action)
         {
             var msg = new MsgName
             {
                 Size = (ushort)(13 + param.Length),
                 Id = 1015,
                 UniqueId = netId,
-                Type = (MsgNameType)action,
+                Type = action,
                 Count = 1,
                 Length = (byte)param.Length
             };

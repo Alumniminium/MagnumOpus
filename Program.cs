@@ -27,7 +27,9 @@ namespace MagnumOpus
                 new EmoteSystem(),
                 new PortalSystem(),
                 new TeleportSystem(),
+
                 new ViewportSystem(),
+                
                 new MagicAttackRoutingSystem(),
                 new TargetFinderCircleSystem(),
                 new TargetFinderLineSystem(),

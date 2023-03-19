@@ -41,8 +41,6 @@ namespace MagnumOpus.Systems
                         net.AuthCrypto.Encrypt(packet);
                         net.Socket.Send(packet);
                     }
-
-                    ArrayPool<byte>.Shared.Return(buffer, true);
                 }
             }
             catch

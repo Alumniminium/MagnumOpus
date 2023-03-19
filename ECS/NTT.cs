@@ -9,12 +9,14 @@ namespace MagnumOpus.ECS
     {
         public readonly int Id;
         public readonly EntityType Type;
+        internal readonly long CreatedTick;
 
         [JsonConstructor]
         public NTT(int id, EntityType type)
         {
             Id = id;
             Type = type;
+            CreatedTick = NttWorld.Tick;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
