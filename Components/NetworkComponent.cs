@@ -16,7 +16,7 @@ namespace MagnumOpus.Components
         public Memory<byte> ClientIV = new byte[8];
         public Memory<byte> ServerIV = new byte[8];
         public ConcurrentQueue<Memory<byte>> RecvQueue = new();
-        public ConcurrentQueue<Memory<byte>> SendQueue = new();
+        public ConcurrentQueue<byte[]> SendQueue = new();
         public string Username;
 
 

@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Text;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
@@ -14,12 +15,14 @@ namespace MagnumOpus.Systems
         {
             try
             {
-                while (net.SendQueue.TryDequeue(out var packet))
+                while (net.SendQueue.TryDequeue(out var buffer))
                 {
+                    var packet = buffer.AsSpan();
+
                     if (packet.Length < 4)
                         continue;
 
-                    var id = BitConverter.ToInt16(packet.Span[2..4]);
+                    var id = BitConverter.ToInt16(packet[2..4]);
                     if (IsLogging)
                     {
                         Logger.Debug(packet.Dump());
@@ -28,16 +31,18 @@ namespace MagnumOpus.Systems
                     if (net.UseGameCrypto)
                     {
                         Span<byte> resized = stackalloc byte[packet.Length + 8];
-                        packet.Span.CopyTo(resized);
+                        packet.CopyTo(resized);
                         TqServer.Span.CopyTo(resized[^8..]);
                         net.GameCrypto.Encrypt(resized);
                         net.Socket.Send(resized);
                     }
                     else
                     {
-                        net.AuthCrypto.Encrypt(packet.Span);
-                        net.Socket.Send(packet.Span);
+                        net.AuthCrypto.Encrypt(packet);
+                        net.Socket.Send(packet);
                     }
+
+                    ArrayPool<byte>.Shared.Return(buffer, true);
                 }
             }
             catch

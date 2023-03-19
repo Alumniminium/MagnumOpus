@@ -4,10 +4,10 @@ namespace MagnumOpus.Helpers
 {
     public static class ByteExt
     {
-        public static string Dump(this in Memory<byte> packet)
+        public static string Dump(this Span<byte> packet)
         {
             var Hex = "";
-            foreach (var b in packet.Span)
+            foreach (var b in packet)
                 Hex = Hex + b.ToString("X2") + " ";
 
             var Out = "";
@@ -22,6 +22,7 @@ namespace MagnumOpus.Helpers
             }
             return Out;
         }
+        public static string Dump(this in Memory<byte> packet) => Dump(packet.Span);
 
         private static string StrHexToAnsi(string StrHex)
         {
