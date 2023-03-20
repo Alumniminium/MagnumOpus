@@ -28,7 +28,7 @@ namespace MagnumOpus.Systems
             {
                 if (ntt.CreatedTick + NttWorld.TargetTps * 1.5 > Tick)
                     return;
-                    
+
                 vwp.EntitiesVisible.Clear();
                 Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
 

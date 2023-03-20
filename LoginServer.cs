@@ -10,18 +10,13 @@ namespace MagnumOpus
     public static class LoginServer
     {
         private static readonly TcpListener LoginListener = new(System.Net.IPAddress.Any, Constants.LoginPort);
-        private static readonly Thread loginThread;
-
-        static LoginServer()
-        {
-            loginThread = new Thread(LoginServerLoop) { IsBackground = true, Priority = ThreadPriority.Highest };
-            loginThread.Start();
-        }
+        private static readonly Thread loginThread = new(LoginServerLoop) { IsBackground = true, Priority = ThreadPriority.Highest };
 
         public static void Start()
         {
             FConsole.WriteLine($"[GAME] Listening on port {Constants.LoginPort}...");
             LoginListener.Start();
+            loginThread.Start();
         }
 
         private static void LoginServerLoop()

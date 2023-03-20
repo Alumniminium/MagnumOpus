@@ -1,3 +1,5 @@
+using HerstLib.IO;
+
 namespace MagnumOpus.ECS
 {
     public static class ThreadedWorker
@@ -10,6 +12,7 @@ namespace MagnumOpus.ECS
 
         static ThreadedWorker()
         {
+            FConsole.WriteLine("ThreadedWorker Started");
             Action = Thread.Sleep;
             _threads = new Thread[Environment.ProcessorCount];
             _blocks = new AutoResetEvent[Environment.ProcessorCount];
@@ -27,6 +30,9 @@ namespace MagnumOpus.ECS
 
         public static void Run(Action<int> action, int threads)
         {
+            if (threads > Environment.ProcessorCount)
+                threads = Environment.ProcessorCount;
+
             Action = action;
             _allReady.Reset();
             Interlocked.Exchange(ref _readyThreads, _readyThreads - threads);

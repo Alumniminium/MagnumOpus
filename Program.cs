@@ -12,9 +12,9 @@ namespace MagnumOpus
     {
         private static unsafe void Main()
         {
-            Constants.PrometheusPort = ushort.TryParse(Environment.GetEnvironmentVariable("PROMETHEUS_PORT"), out var p) ? p : 1234;
-            Constants.LoginPort = ushort.TryParse(Environment.GetEnvironmentVariable("LOGIN_PORT"), out var p2) ? p2 : 9958;
-            Constants.GamePort = ushort.TryParse(Environment.GetEnvironmentVariable("GAME_PORT"), out var p3) ? p3 : 5816;
+            Constants.PrometheusPort = ushort.TryParse(Environment.GetEnvironmentVariable("PROMETHEUS_PORT"), out var p) ? p : (ushort)1234;
+            Constants.LoginPort = ushort.TryParse(Environment.GetEnvironmentVariable("LOGIN_PORT"), out var p2) ? p2 : (ushort)9958;
+            Constants.GamePort = ushort.TryParse(Environment.GetEnvironmentVariable("GAME_PORT"), out var p3) ? p3 : (ushort)5816;
             Constants.ServerIP = Environment.GetEnvironmentVariable("PUBLIC_IP") ?? "62.178.176.71";
 
             using var server = new Prometheus.MetricServer(port: Constants.PrometheusPort);
