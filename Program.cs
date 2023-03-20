@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Runtime;
+﻿using System.Runtime;
 using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
@@ -13,7 +12,12 @@ namespace MagnumOpus
     {
         private static unsafe void Main()
         {
-            using var server = new Prometheus.MetricServer(port: 1234);
+            Constants.PrometheusPort = ushort.TryParse(Environment.GetEnvironmentVariable("PROMETHEUS_PORT"), out var p) ? p : 1234;
+            Constants.LoginPort = ushort.TryParse(Environment.GetEnvironmentVariable("LOGIN_PORT"), out var p2) ? p2 : 9958;
+            Constants.GamePort = ushort.TryParse(Environment.GetEnvironmentVariable("GAME_PORT"), out var p3) ? p3 : 5816;
+            Constants.ServerIP = Environment.GetEnvironmentVariable("PUBLIC_IP") ?? "62.178.176.71";
+
+            using var server = new Prometheus.MetricServer(port: Constants.PrometheusPort);
             server.Start();
 
             var systems = new List<NttSystem>
@@ -83,10 +87,8 @@ namespace MagnumOpus
                 Collections.SpatialHashs[pos.Map].Add(worldNtt.Value, ref pos);
             }
 
-
             LoginServer.Start();
             GameServer.Start();
-
 
             GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
 
@@ -94,20 +96,23 @@ namespace MagnumOpus
             {
                 NttWorld.Update();
 
-                if (!Console.KeyAvailable)
-                    continue;
+                // if (Debugger.IsAttached)
+                // {
+                //     if (!Console.KeyAvailable)
+                //         continue;
 
-                var input = Console.ReadKey();
-                if (input.Key == ConsoleKey.S)
-                {
-                    FConsole.WriteLine("[SERVER] Saving...");
-                    var ts = Stopwatch.GetTimestamp();
-                    ReflectionHelper.SaveComponents("_STATE_FILES");
-                    NttWorld.Save("_STATE_FILES");
-                    IdGenerator.Save("_STATE_FILES");
-                    var ms = Stopwatch.GetElapsedTime(ts).TotalMilliseconds;
-                    FConsole.WriteLine($"[SERVER] Saved in {ms:0.00}ms");
-                }
+                //     var input = Console.ReadKey();
+                //     if (input.Key == ConsoleKey.S)
+                //     {
+                //         FConsole.WriteLine("[SERVER] Saving...");
+                //         var ts = Stopwatch.GetTimestamp();
+                //         ReflectionHelper.SaveComponents("_STATE_FILES");
+                //         NttWorld.Save("_STATE_FILES");
+                //         IdGenerator.Save("_STATE_FILES");
+                //         var ms = Stopwatch.GetElapsedTime(ts).TotalMilliseconds;
+                //         FConsole.WriteLine($"[SERVER] Saved in {ms:0.00}ms");
+                //     }
+                // }
             }
         }
     }

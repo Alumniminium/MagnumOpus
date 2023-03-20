@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using MagnumOpus.Components;
@@ -9,7 +10,7 @@ namespace MagnumOpus.SpacePartitioning
     {
         private readonly int cellSize;
         private readonly Dictionary<int, List<NTT>> Hashtbl;
-        private readonly ReaderWriterLockSlim rwLock = new();
+        private readonly object rwLock = new();
 
         public SpatialHash(int cellSize)
         {
@@ -21,14 +22,14 @@ namespace MagnumOpus.SpacePartitioning
         public void Add(NTT entity, ref PositionComponent pos)
         {
             var hash = GetHash(pos.Position);
-            rwLock.EnterWriteLock();
-            try
+            lock (rwLock)
             {
-                Hashtbl.TryAdd(hash, new List<NTT> { entity });
-            }
-            finally
-            {
-                rwLock.ExitWriteLock();
+                if (!Hashtbl.TryGetValue(hash, out var list))
+                {
+                    list = new List<NTT>();
+                    Hashtbl.Add(hash, list);
+                }
+                list.Add(entity);
             }
         }
 
@@ -36,17 +37,10 @@ namespace MagnumOpus.SpacePartitioning
         public void Remove(NTT entity, ref PositionComponent pos)
         {
             var hash = GetHash(pos.Position);
-            rwLock.EnterWriteLock();
-            try
+            lock (rwLock)
             {
                 if (Hashtbl.TryGetValue(hash, out var bucket))
-                {
                     bucket.Remove(entity);
-                }
-            }
-            finally
-            {
-                rwLock.ExitWriteLock();
             }
         }
 
@@ -74,11 +68,11 @@ namespace MagnumOpus.SpacePartitioning
                 {
                     var hash = GetHash(new Vector2(x * cellSize, y * cellSize));
 
-                    try
+                    lock (rwLock)
                     {
-                        rwLock.EnterWriteLock();
                         if (!Hashtbl.TryGetValue(hash, out var entities))
                             continue;
+
                         foreach (var ntt in entities)
                         {
                             ref readonly var pos = ref ntt.Get<PositionComponent>();
@@ -87,10 +81,6 @@ namespace MagnumOpus.SpacePartitioning
                             if (distanceSquared <= 324f)
                                 vwp.EntitiesVisible.TryAdd(ntt.Id, ntt);
                         }
-                    }
-                    finally
-                    {
-                        rwLock.ExitWriteLock();
                     }
                 }
             }

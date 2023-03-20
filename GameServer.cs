@@ -10,12 +10,12 @@ namespace MagnumOpus
 {
     public static class GameServer
     {
-        private static readonly TcpListener listener = new(System.Net.IPAddress.Any, 5816);
+        private static readonly TcpListener listener = new(System.Net.IPAddress.Any, Constants.GamePort);
         private static readonly Thread thread = new(GameServerLoop) { IsBackground = true, Priority = ThreadPriority.Highest };
 
         public static void Start()
         {
-            FConsole.WriteLine($"[GAME] Listening on port {5816}...");
+            FConsole.WriteLine($"[GAME] Listening on port {Constants.GamePort}...");
             listener.Start();
             thread.Start();
         }

@@ -28,9 +28,9 @@ namespace MagnumOpus.Systems
 
             if (brn.State == BrainState.WakingUp)
             {
-                vwp.rwLock.EnterWriteLock();
                 vwp.EntitiesVisible.Clear();
                 Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
+
                 var closestDistance = int.MaxValue;
                 var closestEntity = default(NTT);
 
@@ -63,7 +63,6 @@ namespace MagnumOpus.Systems
                     brn.State = BrainState.Approaching;
                 }
             }
-            vwp.rwLock.ExitWriteLock();
 
             if (brn.TargetId == 0)
             {

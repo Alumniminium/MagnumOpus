@@ -74,18 +74,13 @@ namespace MagnumOpus.ECS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref NTT CreateEntityWithNetId(EntityType type, int id = 0)
         {
-            lockObj.EnterWriteLock();
-            try
+            lock (lockObj)
             {
                 var ntt = new NTT(id, type);
                 NTTs.Add(ntt.Id, ntt);
                 PrometheusPush.NTTCount.Inc();
                 PrometheusPush.NTTCreations.Inc();
                 return ref CollectionsMarshal.GetValueRefOrNullRef(NTTs, id);
-            }
-            finally
-            {
-                lockObj.ExitWriteLock();
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -101,12 +96,10 @@ namespace MagnumOpus.ECS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void DestroyInternal(NTT ntt)
         {
-            lockObj.EnterWriteLock();
             Players.Remove(ntt);
             ntt.Recycle();
             ChangedThisTick.Enqueue(ntt);
             NTTs.Remove(ntt.Id);
-            lockObj.ExitWriteLock();
 
             PrometheusPush.NTTCount.Set(EntityCount);
             PrometheusPush.NTTDestroys.Inc();
@@ -115,9 +108,12 @@ namespace MagnumOpus.ECS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void UpdateNTTs()
         {
-            while (ToBeRemoved.TryDequeue(out var ntt))
-                DestroyInternal(ntt);
-            SystemNotifier?.Start();
+            lock (lockObj)
+            {
+                while (ToBeRemoved.TryDequeue(out var ntt))
+                    DestroyInternal(ntt);
+                SystemNotifier?.Start();
+            }
         }
         public static void Update()
         {

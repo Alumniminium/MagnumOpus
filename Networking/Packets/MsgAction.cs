@@ -104,15 +104,10 @@ namespace MagnumOpus.Networking.Packets
 
                         ref var pos = ref ntt.Get<PositionComponent>();
                         ref var vwp = ref ntt.Get<ViewportComponent>();
-                        vwp.rwLock.EnterWriteLock();
-                        try
+                        lock (vwp.rwLock)
                         {
                             vwp.EntitiesVisible.Clear();
                             vwp.EntitiesVisibleLast.Clear();
-                        }
-                        finally
-                        {
-                            vwp.rwLock.ExitWriteLock();
                         }
                         vwp.Dirty = true;
                         pos.ChangedTick = NttWorld.Tick;
@@ -223,9 +218,8 @@ namespace MagnumOpus.Networking.Packets
                             ntt.NetSync(ref msg);
 
                         ref readonly var vwp = ref ntt.Get<ViewportComponent>();
-                        vwp.rwLock.EnterWriteLock();
-                        vwp.EntitiesVisible.TryAdd(ent.Id, ent);
-                        vwp.rwLock.ExitWriteLock();
+                        lock (vwp.rwLock)
+                            vwp.EntitiesVisible.TryAdd(ent.Id, ent);
                         break;
                     }
                 case MsgActionType.QueryTeamMember:

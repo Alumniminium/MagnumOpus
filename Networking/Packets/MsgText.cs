@@ -125,52 +125,6 @@ namespace MagnumOpus.Networking.Packets
                 case MsgTextType.Talk:
                     TalkChat(in ntt, ref msg);
                     break;
-                case MsgTextType.Whisper:
-                    break;
-                case MsgTextType.Action:
-                    break;
-                case MsgTextType.Team:
-                    break;
-                case MsgTextType.Guild:
-                    break;
-                case MsgTextType.TopLeft:
-                    break;
-                case MsgTextType.Spouse:
-                    break;
-                case MsgTextType.Friend:
-                    break;
-                case MsgTextType.Broadcast:
-                    break;
-                case MsgTextType.Center:
-                    break;
-                case MsgTextType.Service:
-                    break;
-                case MsgTextType.Dialog:
-                    break;
-                case MsgTextType.LoginInformation:
-                    break;
-                case MsgTextType.VendorHawk:
-                    break;
-                case MsgTextType.Webpage:
-                    break;
-                case MsgTextType.MiniMap:
-                    break;
-                case MsgTextType.MiniMap2:
-                    break;
-                case MsgTextType.FriendsOfflineMessage:
-                    break;
-                case MsgTextType.GuildBulletin:
-                    break;
-                case MsgTextType.TradeBoard:
-                    break;
-                case MsgTextType.FriendBoard:
-                    break;
-                case MsgTextType.TeamBoard:
-                    break;
-                case MsgTextType.GuildBoard:
-                    break;
-                case MsgTextType.OthersBoard:
-                    break;
                 default:
                     FConsole.WriteLine("Unknown ChatType: " + msg.Channel);
                     FConsole.WriteLine(memory.Dump());
@@ -181,41 +135,31 @@ namespace MagnumOpus.Networking.Packets
         private static void GhostChat(in NTT ntt, ref MsgText mem)
         {
             ref readonly var vwp = ref ntt.Get<ViewportComponent>();
-            vwp.rwLock.EnterReadLock();
-            try
+            foreach (var kvp in vwp.EntitiesVisible)
             {
-                foreach (var kvp in vwp.EntitiesVisible)
-                {
-                    var entity = kvp.Value;
-                    ref readonly var job = ref entity.Get<ProfessionComponent>();
+                var entity = kvp.Value;
+                ref readonly var job = ref entity.Get<ProfessionComponent>();
 
-                    switch (job.Profession)
-                    {
-                        case ClasseName.WaterMaster:
-                        case ClasseName.WaterSaint:
-                        case ClasseName.WaterTaoist:
-                        case ClasseName.WaterWizard:
-                            {
-                                entity.NetSync(ref mem);
-                                break;
-                            }
-                    }
+                switch (job.Profession)
+                {
+                    case ClasseName.WaterMaster:
+                    case ClasseName.WaterSaint:
+                    case ClasseName.WaterTaoist:
+                    case ClasseName.WaterWizard:
+                        {
+                            entity.NetSync(ref mem);
+                            break;
+                        }
                 }
-            }
-            finally
-            {
-                vwp.rwLock.ExitReadLock();
             }
         }
 
         private static void TalkChat(in NTT ntt, ref MsgText mem)
         {
             ref readonly var vwp = ref ntt.Get<ViewportComponent>();
-            vwp.rwLock.EnterReadLock();
             foreach (var kvp in vwp.EntitiesVisible)
                 if (kvp.Key != ntt.Id)
                     kvp.Value.NetSync(ref mem);
-            vwp.rwLock.ExitReadLock();
 
             var txt = mem.Message();
             var command = txt.Replace("/", "").Split(' ')[0];

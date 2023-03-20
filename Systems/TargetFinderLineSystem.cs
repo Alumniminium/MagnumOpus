@@ -13,7 +13,6 @@ namespace MagnumOpus.Systems
         public override void Update(in NTT ntt, ref LineTargetComponent atk, ref PositionComponent pos, ref ViewportComponent vwp)
         {
             var tcc = new TargetCollectionComponent(atk.MagicType);
-            vwp.rwLock.EnterReadLock();
 
             foreach (var kvp in vwp.EntitiesVisible)
             {
@@ -33,7 +32,6 @@ namespace MagnumOpus.Systems
                 if (IsLogging)
                     Logger.Debug("{ntt} adding {b} to target list of {skill}:{level}", ntt, b, atk.MagicType.MagicType, atk.MagicType.Level);
             }
-            vwp.rwLock.ExitReadLock();
 
             var msgEffect = MsgMagicEffect.Create(in ntt, atk.X, atk.Y, (ushort)atk.MagicType.MagicType, (byte)atk.MagicType.Level);
             ntt.NetSync(ref msgEffect);

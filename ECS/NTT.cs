@@ -47,28 +47,19 @@ namespace MagnumOpus.ECS
             if (broadcast && Has<ViewportComponent>())
             {
                 ref readonly var vwp = ref Get<ViewportComponent>();
-
-                vwp.rwLock.EnterReadLock();
-                try
+                foreach (var kvp in vwp.EntitiesVisible)
                 {
-                    foreach (var kvp in vwp.EntitiesVisible)
-                    {
-                        var b = kvp.Value;
+                    var b = kvp.Value;
 
-                        if (b.Type != EntityType.Player)
-                            continue;
+                    if (b.Type != EntityType.Player)
+                        continue;
 
-                        if (!b.Has<NetworkComponent>())
-                            continue;
+                    if (!b.Has<NetworkComponent>())
+                        continue;
 
-                        ref readonly var net = ref b.Get<NetworkComponent>();
-                        var packet = Co2Packet.Serialize(ref msg);
-                        net.SendQueue.Enqueue(packet);
-                    }
-                }
-                finally
-                {
-                    vwp.rwLock.ExitReadLock();
+                    ref readonly var net = ref b.Get<NetworkComponent>();
+                    var packet = Co2Packet.Serialize(ref msg);
+                    net.SendQueue.Enqueue(packet);
                 }
             }
             else if (Type == EntityType.Player)

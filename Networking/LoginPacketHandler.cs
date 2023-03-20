@@ -27,7 +27,7 @@ namespace MagnumOpus.Networking
 
                         FConsole.WriteLine($"[LOGIN/1051] Account: {username}, Pass: {password}, Server: {server}");
 
-                        var response = MsgAccountResponse.Create(Constants.SERVERIP, 5816, ntt.Id, ntt.Id);
+                        var response = MsgAccountResponse.Create(Constants.ServerIP, 5816, ntt.Id, ntt.Id);
                         ref var net = ref ntt.Get<NetworkComponent>();
                         net.Username = username;
                         ntt.NetSync(ref response);

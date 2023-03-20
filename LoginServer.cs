@@ -9,7 +9,7 @@ namespace MagnumOpus
 {
     public static class LoginServer
     {
-        private static readonly TcpListener LoginListener = new(System.Net.IPAddress.Any, 9958);
+        private static readonly TcpListener LoginListener = new(System.Net.IPAddress.Any, Constants.LoginPort);
         private static readonly Thread loginThread;
 
         static LoginServer()
@@ -20,7 +20,7 @@ namespace MagnumOpus
 
         public static void Start()
         {
-            FConsole.WriteLine($"[GAME] Listening on port {9958}...");
+            FConsole.WriteLine($"[GAME] Listening on port {Constants.LoginPort}...");
             LoginListener.Start();
         }
 
