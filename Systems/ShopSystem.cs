@@ -55,7 +55,7 @@ namespace MagnumOpus.Systems
 
             for (var i = 0; i < inv.Items.Length; i++)
             {
-                ref readonly var itemComp = ref inv.Items[i].Get<ItemComponent>();
+                ref readonly var itemComp = ref inv.Items.Span[i].Get<ItemComponent>();
                 if ((itemComp.Id == 0 && txc.Buy) || (itemComp.Id == itemId && !txc.Buy))
                 {
                     if (txc.Buy)
@@ -64,7 +64,7 @@ namespace MagnumOpus.Systems
                         ref var itemNtt = ref NttWorld.CreateEntity(EntityType.Item);
                         var newItemComp = new ItemComponent(txc.ItemId, itemEntry.Amount, itemEntry.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
                         itemNtt.Set(ref newItemComp);
-                        inv.Items[i] = itemNtt;
+                        inv.Items.Span[i] = itemNtt;
 
                         var msg = MsgItemInformation.Create(itemNtt);
                         ntt.NetSync(ref msg);
@@ -87,7 +87,7 @@ namespace MagnumOpus.Systems
                         var def = new DestroyEndOfFrameComponent();
                         itemNtt.Set(ref def);
 
-                        inv.Items[i] = default;
+                        inv.Items.Span[i] = default;
 
                         var remInv = MsgItem.Create(itemNtt.Id, itemNtt.Id, itemNtt.Id, MsgItemType.RemoveInventory);
                         ntt.NetSync(ref remInv);

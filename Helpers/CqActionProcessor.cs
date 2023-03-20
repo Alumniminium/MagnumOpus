@@ -429,7 +429,7 @@ namespace MagnumOpus.Helpers
                         ref readonly var inv = ref ntt.Get<InventoryComponent>();
                         for (var i = 0; i < inv.Items.Length; i++)
                         {
-                            ref readonly var item = ref inv.Items[i].Get<ItemComponent>();
+                            ref readonly var item = ref inv.Items.Span[i].Get<ItemComponent>();
                             if (chkRange.Contains(item.Id))
                                 count++;
                         }
@@ -451,17 +451,17 @@ namespace MagnumOpus.Helpers
                         ref readonly var inv = ref ntt.Get<InventoryComponent>();
                         for (var i = 0; i < inv.Items.Length; i++)
                         {
-                            ref readonly var item = ref inv.Items[i].Get<ItemComponent>();
+                            ref readonly var item = ref inv.Items.Span[i].Get<ItemComponent>();
 
                             if (chkRange.Contains(item.Id))
                             {
-                                var msg = MsgItem.Create(ntt.Id, inv.Items[i].Id, inv.Items[i].Id, MsgItemType.RemoveInventory);
+                                var msg = MsgItem.Create(ntt.Id, inv.Items.Span[i].Id, inv.Items.Span[i].Id, MsgItemType.RemoveInventory);
                                 ntt.NetSync(ref msg);
                                 count++;
 
                                 var ded = new DestroyEndOfFrameComponent();
-                                inv.Items[i].Set(ref ded);
-                                inv.Items[i] = default;
+                                inv.Items.Span[i].Set(ref ded);
+                                inv.Items.Span[i] = default;
                             }
                             if (count >= chkCount)
                                 break;

@@ -104,8 +104,16 @@ namespace MagnumOpus.Networking.Packets
 
                         ref var pos = ref ntt.Get<PositionComponent>();
                         ref var vwp = ref ntt.Get<ViewportComponent>();
-                        vwp.EntitiesVisible.Clear();
-                        vwp.EntitiesVisibleLast.Clear();
+                        vwp.rwLock.EnterWriteLock();
+                        try
+                        {
+                            vwp.EntitiesVisible.Clear();
+                            vwp.EntitiesVisibleLast.Clear();
+                        }
+                        finally
+                        {
+                            vwp.rwLock.ExitWriteLock();
+                        }
                         vwp.Dirty = true;
                         pos.ChangedTick = NttWorld.Tick;
                         var reply = Create(ntt.Id, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
@@ -215,7 +223,9 @@ namespace MagnumOpus.Networking.Packets
                             ntt.NetSync(ref msg);
 
                         ref readonly var vwp = ref ntt.Get<ViewportComponent>();
+                        vwp.rwLock.EnterWriteLock();
                         vwp.EntitiesVisible.TryAdd(ent.Id, ent);
+                        vwp.rwLock.ExitWriteLock();
                         break;
                     }
                 case MsgActionType.QueryTeamMember:

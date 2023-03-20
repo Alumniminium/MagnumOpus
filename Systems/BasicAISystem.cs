@@ -28,9 +28,10 @@ namespace MagnumOpus.Systems
             {
                 if (ntt.CreatedTick + NttWorld.TargetTps * 1.5 > Tick)
                     return;
-
+                vwp.rwLock.EnterWriteLock();
                 vwp.EntitiesVisible.Clear();
                 Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
+                vwp.rwLock.ExitWriteLock();
                 if (IsLogging)
                     Logger.Debug("Waking up {ntt} with {visibleCount} visible entities", ntt, vwp.EntitiesVisible.Count);
             }
@@ -68,18 +69,26 @@ namespace MagnumOpus.Systems
 
         private static void FindNewTarget(ref ViewportComponent vwp, ref BrainComponent brn)
         {
-            foreach (var kvp in vwp.EntitiesVisible)
+            vwp.rwLock.EnterReadLock();
+            try
             {
-                var b = kvp.Value;
-                if (b.Type != EntityType.Player)
-                    continue;
+                foreach (var kvp in vwp.EntitiesVisible)
+                {
+                    var b = kvp.Value;
+                    if (b.Type != EntityType.Player)
+                        continue;
 
-                if (b.Has<DeathTagComponent>())
-                    continue;
+                    if (b.Has<DeathTagComponent>())
+                        continue;
 
-                brn.TargetId = b.Id;
-                brn.State = BrainState.Approaching;
-                break;
+                    brn.TargetId = b.Id;
+                    brn.State = BrainState.Approaching;
+                    break;
+                }
+            }
+            finally
+            {
+                vwp.rwLock.ExitReadLock();
             }
         }
 

@@ -12,7 +12,7 @@ namespace MagnumOpus.Components
         public NTT NTT;
         public long ChangedTick;
 
-        public NTT[] Items = new NTT[40];
+        public Memory<NTT> Items = new NTT[40];
 
         private uint money;
         public uint Money
@@ -49,7 +49,7 @@ namespace MagnumOpus.Components
 
             Items = new NTT[40];
             for (var i = 0; i < Items.Length; i++)
-                Items[i] = new(0, EntityType.Other);
+                Items.Span[i] = new(0, EntityType.Other);
         }
 
         public override int GetHashCode() => NTT;

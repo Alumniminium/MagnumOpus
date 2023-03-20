@@ -102,12 +102,12 @@ namespace MagnumOpus.Networking.Packets
                 var testItem = NttWorld.CreateEntity(EntityType.Item);
                 var itemComp = new ItemComponent(1001020, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
                 testItem.Set(ref itemComp);
-                inv.Items[0] = testItem;
+                inv.Items.Span[0] = testItem;
 
                 var testItem2 = NttWorld.CreateEntity(EntityType.Item);
                 var itemComp2 = new ItemComponent(1000000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
                 testItem2.Set(ref itemComp2);
-                inv.Items[1] = testItem2;
+                inv.Items.Span[1] = testItem2;
             }
 
             var vwp = new ViewportComponent(21);

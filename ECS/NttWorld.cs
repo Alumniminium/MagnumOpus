@@ -10,7 +10,7 @@ namespace MagnumOpus.ECS
 {
     public static class NttWorld
     {
-        private static readonly object _lock = new();
+        private static readonly ReaderWriterLockSlim lockObj = new();
         public static int TargetTps { get; private set; } = 60;
         private static float UpdateTime => 1f / TargetTps;
         public static int EntityCount => NTTs.Count;
@@ -74,13 +74,18 @@ namespace MagnumOpus.ECS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref NTT CreateEntityWithNetId(EntityType type, int id = 0)
         {
-            lock (_lock)
+            lockObj.EnterWriteLock();
+            try
             {
                 var ntt = new NTT(id, type);
                 NTTs.Add(ntt.Id, ntt);
                 PrometheusPush.NTTCount.Inc();
                 PrometheusPush.NTTCreations.Inc();
                 return ref CollectionsMarshal.GetValueRefOrNullRef(NTTs, id);
+            }
+            finally
+            {
+                lockObj.ExitWriteLock();
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -96,13 +101,12 @@ namespace MagnumOpus.ECS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void DestroyInternal(NTT ntt)
         {
-            lock (_lock)
-            {
-                Players.Remove(ntt);
-                ntt.Recycle();
-                ChangedThisTick.Enqueue(ntt);
-                NTTs.Remove(ntt.Id);
-            }
+            lockObj.EnterWriteLock();
+            Players.Remove(ntt);
+            ntt.Recycle();
+            ChangedThisTick.Enqueue(ntt);
+            NTTs.Remove(ntt.Id);
+            lockObj.ExitWriteLock();
 
             PrometheusPush.NTTCount.Set(EntityCount);
             PrometheusPush.NTTDestroys.Inc();

@@ -44,24 +44,31 @@ namespace MagnumOpus.ECS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly void NetSync<T>(ref T msg, bool broadcast = false) where T : unmanaged
         {
-
             if (broadcast && Has<ViewportComponent>())
             {
                 ref readonly var vwp = ref Get<ViewportComponent>();
 
-                foreach (var kvp in vwp.EntitiesVisible)
+                vwp.rwLock.EnterReadLock();
+                try
                 {
-                    var b = kvp.Value;
+                    foreach (var kvp in vwp.EntitiesVisible)
+                    {
+                        var b = kvp.Value;
 
-                    if (b.Type != EntityType.Player)
-                        continue;
+                        if (b.Type != EntityType.Player)
+                            continue;
 
-                    if (!b.Has<NetworkComponent>())
-                        continue;
+                        if (!b.Has<NetworkComponent>())
+                            continue;
 
-                    ref readonly var net = ref b.Get<NetworkComponent>();
-                    var packet = Co2Packet.Serialize(ref msg);
-                    net.SendQueue.Enqueue(packet);
+                        ref readonly var net = ref b.Get<NetworkComponent>();
+                        var packet = Co2Packet.Serialize(ref msg);
+                        net.SendQueue.Enqueue(packet);
+                    }
+                }
+                finally
+                {
+                    vwp.rwLock.ExitReadLock();
                 }
             }
             else if (Type == EntityType.Player)

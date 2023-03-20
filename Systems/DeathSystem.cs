@@ -69,14 +69,14 @@ namespace MagnumOpus.Systems
                     {
                         if (Random.Shared.NextSingle() >= 0.1f)
                         {
-                            inv.Items[i].Set<DestroyEndOfFrameComponent>();
+                            inv.Items.Span[i].Set<DestroyEndOfFrameComponent>();
                             continue;
                         }
 
-                        ref var itemComp = ref inv.Items[i].Get<ItemComponent>();
+                        ref var itemComp = ref inv.Items.Span[i].Get<ItemComponent>();
                         if (itemComp.Id == 0)
                             continue;
-                        var rdi = new RequestDropItemComponent(in inv.Items[i]);
+                        var rdi = new RequestDropItemComponent(in inv.Items.Span[i]);
                         ntt.Set(ref rdi);
                     }
                 }

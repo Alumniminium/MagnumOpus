@@ -181,83 +181,41 @@ namespace MagnumOpus.Networking.Packets
         private static void GhostChat(in NTT ntt, ref MsgText mem)
         {
             ref readonly var vwp = ref ntt.Get<ViewportComponent>();
-
-            foreach (var kvp in vwp.EntitiesVisible)
+            vwp.rwLock.EnterReadLock();
+            try
             {
-                var entity = kvp.Value;
-                ref readonly var job = ref entity.Get<ProfessionComponent>();
-
-                switch (job.Profession)
+                foreach (var kvp in vwp.EntitiesVisible)
                 {
-                    case ClasseName.WaterMaster:
-                    case ClasseName.WaterSaint:
-                    case ClasseName.WaterTaoist:
-                    case ClasseName.WaterWizard:
-                        {
-                            entity.NetSync(ref mem);
-                            break;
-                        }
+                    var entity = kvp.Value;
+                    ref readonly var job = ref entity.Get<ProfessionComponent>();
 
-                    case ClasseName.InternTrojan:
-                        break;
-                    case ClasseName.Trojan:
-                        break;
-                    case ClasseName.VeteranTrojan:
-                        break;
-                    case ClasseName.TigerTrojan:
-                        break;
-                    case ClasseName.DragonTrojan:
-                        break;
-                    case ClasseName.TrojanMaster:
-                        break;
-                    case ClasseName.InternWarrior:
-                        break;
-                    case ClasseName.Warrior:
-                        break;
-                    case ClasseName.BrassWarrior:
-                        break;
-                    case ClasseName.SilverWarrior:
-                        break;
-                    case ClasseName.GoldWarrior:
-                        break;
-                    case ClasseName.WarriorMaster:
-                        break;
-                    case ClasseName.InternArcher:
-                        break;
-                    case ClasseName.Archer:
-                        break;
-                    case ClasseName.EagleArcher:
-                        break;
-                    case ClasseName.TigerArcher:
-                        break;
-                    case ClasseName.DragonArcher:
-                        break;
-                    case ClasseName.ArcherMaster:
-                        break;
-                    case ClasseName.InternTaoist:
-                        break;
-                    case ClasseName.Taoist:
-                        break;
-                    case ClasseName.FireTaoist:
-                        break;
-                    case ClasseName.FireWizard:
-                        break;
-                    case ClasseName.FireMaster:
-                        break;
-                    case ClasseName.FireSaint:
-                        break;
-                    default:
-                        break;
+                    switch (job.Profession)
+                    {
+                        case ClasseName.WaterMaster:
+                        case ClasseName.WaterSaint:
+                        case ClasseName.WaterTaoist:
+                        case ClasseName.WaterWizard:
+                            {
+                                entity.NetSync(ref mem);
+                                break;
+                            }
+                    }
                 }
+            }
+            finally
+            {
+                vwp.rwLock.ExitReadLock();
             }
         }
 
         private static void TalkChat(in NTT ntt, ref MsgText mem)
         {
             ref readonly var vwp = ref ntt.Get<ViewportComponent>();
+            vwp.rwLock.EnterReadLock();
             foreach (var kvp in vwp.EntitiesVisible)
                 if (kvp.Key != ntt.Id)
                     kvp.Value.NetSync(ref mem);
+            vwp.rwLock.ExitReadLock();
 
             var txt = mem.Message();
             var command = txt.Replace("/", "").Split(' ')[0];

@@ -47,6 +47,7 @@ namespace MagnumOpus.Systems
                 ref var vwp = ref mob.Get<ViewportComponent>();
                 Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
                 var playerVisible = false;
+                vwp.rwLock.EnterReadLock();
                 foreach (var player in vwp.EntitiesVisible)
                 {
                     if (player.Value.Type == EntityType.Player)
@@ -56,6 +57,7 @@ namespace MagnumOpus.Systems
                         playerVisible = true;
                     }
                 }
+                vwp.rwLock.ExitReadLock();
 
                 if (playerVisible)
                 {

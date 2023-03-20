@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using MagnumOpus.Components;
@@ -9,13 +8,13 @@ namespace MagnumOpus.SpacePartitioning
     public class SpatialHash
     {
         private readonly int cellSize;
-        private readonly ConcurrentDictionary<int, List<NTT>> Hashtbl;
+        private readonly Dictionary<int, List<NTT>> Hashtbl;
         private readonly ReaderWriterLockSlim rwLock = new();
 
         public SpatialHash(int cellSize)
         {
             this.cellSize = cellSize;
-            Hashtbl = new ConcurrentDictionary<int, List<NTT>>();
+            Hashtbl = new Dictionary<int, List<NTT>>();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -25,11 +24,7 @@ namespace MagnumOpus.SpacePartitioning
             rwLock.EnterWriteLock();
             try
             {
-                Hashtbl.AddOrUpdate(hash, new List<NTT> { entity }, (key, existingList) =>
-                {
-                    existingList.Add(entity);
-                    return existingList;
-                });
+                Hashtbl.TryAdd(hash, new List<NTT> { entity });
             }
             finally
             {
@@ -79,11 +74,11 @@ namespace MagnumOpus.SpacePartitioning
                 {
                     var hash = GetHash(new Vector2(x * cellSize, y * cellSize));
 
-                    if (!Hashtbl.TryGetValue(hash, out var entities))
-                        continue;
-                    rwLock.EnterReadLock();
                     try
                     {
+                        rwLock.EnterWriteLock();
+                        if (!Hashtbl.TryGetValue(hash, out var entities))
+                            continue;
                         foreach (var ntt in entities)
                         {
                             ref readonly var pos = ref ntt.Get<PositionComponent>();
@@ -95,7 +90,7 @@ namespace MagnumOpus.SpacePartitioning
                     }
                     finally
                     {
-                        rwLock.ExitReadLock();
+                        rwLock.ExitWriteLock();
                     }
                 }
             }

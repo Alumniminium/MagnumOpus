@@ -9,9 +9,10 @@ namespace MagnumOpus.Components
     public struct ViewportComponent
     {
         public long ChangedTick;
-
-        public ConcurrentDictionary<int, NTT> EntitiesVisible;
-        public ConcurrentDictionary<int, NTT> EntitiesVisibleLast;
+        public object dictLock = new();
+        public readonly ReaderWriterLockSlim rwLock = new();
+        public Dictionary<int, NTT> EntitiesVisible;
+        public Dictionary<int, NTT> EntitiesVisibleLast;
         public RectangleF Viewport;
         internal bool Dirty;
 
@@ -22,6 +23,7 @@ namespace MagnumOpus.Components
             EntitiesVisible = new();
             EntitiesVisibleLast = new();
             Dirty = true;
+            dictLock = new();
         }
         public ViewportComponent(float viewDistance)
         {
@@ -30,6 +32,7 @@ namespace MagnumOpus.Components
             Viewport = new RectangleF(0, 0, viewDistance, viewDistance);
             ChangedTick = NttWorld.Tick;
             Dirty = true;
+            dictLock = new();
         }
     }
 }

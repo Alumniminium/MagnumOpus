@@ -10,8 +10,8 @@ namespace MagnumOpus.Helpers
         public static NTT GetInventoryItemByNetIdFrom(ref InventoryComponent inv, int netId)
         {
             for (var i = 0; i < inv.Items.Length; i++)
-                if (inv.Items[i].Id == netId)
-                    return inv.Items[i];
+                if (inv.Items.Span[i].Id == netId)
+                    return inv.Items.Span[i];
             return default;
         }
 
@@ -24,14 +24,23 @@ namespace MagnumOpus.Helpers
 
         public static bool RemoveNttFromInventory(NTT ntt, ref InventoryComponent inv, NTT item, bool destroy = false, bool netSync = false)
         {
-            var invIdx = Array.IndexOf(inv.Items, item);
+            var invIdx = -1;
+            for (var i = 0; i < inv.Items.Length; i++)
+            {
+                if (ntt == inv.Items.Span[i])
+                {
+                    invIdx = i;
+                    break;
+                }
+            }
+
             var found = invIdx != -1;
 
             if (found && destroy)
                 item.Set<DestroyEndOfFrameComponent>();
 
             if (found)
-                inv.Items[invIdx] = default;
+                inv.Items.Span[invIdx] = default;
 
             if (!netSync)
                 return found;
@@ -50,7 +59,7 @@ namespace MagnumOpus.Helpers
 
             for (var i = 0; i < inv.Items.Length; i++)
             {
-                ref readonly var comp = ref inv.Items[i].Get<ItemComponent>();
+                ref readonly var comp = ref inv.Items.Span[i].Get<ItemComponent>();
                 if (comp.Id != id)
                     continue;
 
@@ -64,7 +73,7 @@ namespace MagnumOpus.Helpers
         {
             for (var i = 0; i < inv.Items.Length; i++)
             {
-                ref var item = ref inv.Items[i];
+                ref var item = ref inv.Items.Span[i];
                 ref readonly var comp = ref item.Get<ItemComponent>();
                 if (comp.Id != id)
                     continue;
@@ -81,20 +90,17 @@ namespace MagnumOpus.Helpers
 
         public static void SortById(NTT ntt, ref InventoryComponent inv, bool netSync = false)
         {
-            // Replace the use of LINQ's OrderByDescending with an inline sorting function
-            Array.Sort(inv.Items, (x, y) => y.Get<ItemComponent>().Id.CompareTo(x.Get<ItemComponent>().Id));
-
             if (!netSync)
                 return;
 
             for (var i = 0; i < inv.Items.Length; i++)
             {
-                var packet = MsgItem.Create(inv.Items[i].Id, inv.Items[i].Id, inv.Items[i].Id, MsgItemType.RemoveInventory);
+                var packet = MsgItem.Create(inv.Items.Span[i].Id, inv.Items.Span[i].Id, inv.Items.Span[i].Id, MsgItemType.RemoveInventory);
                 ntt.NetSync(ref packet);
             }
             for (var i = 0; i < inv.Items.Length; i++)
             {
-                var packet = MsgItemInformation.Create(inv.Items[i]);
+                var packet = MsgItemInformation.Create(inv.Items.Span[i]);
                 ntt.NetSync(ref packet);
             }
         }
@@ -103,13 +109,13 @@ namespace MagnumOpus.Helpers
         {
             for (var i = 0; i < inv.Items.Length; i++)
             {
-                if (inv.Items[i] != default)
+                if (inv.Items.Span[i] != default)
                     continue;
 
-                inv.Items[i] = item;
+                inv.Items.Span[i] = item;
                 if (netSync)
                 {
-                    var packet = MsgItemInformation.Create(inv.Items[i]);
+                    var packet = MsgItemInformation.Create(inv.Items.Span[i]);
                     ntt.NetSync(ref packet);
                 }
                 return true;
@@ -121,7 +127,7 @@ namespace MagnumOpus.Helpers
         internal static int CountItems(ref InventoryComponent inv)
         {
             var itemCount = 0;
-            foreach (var item in inv.Items)
+            foreach (var item in inv.Items.Span)
                 if (item.Id != 0)
                     itemCount++;
             return itemCount;

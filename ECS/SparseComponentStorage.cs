@@ -10,29 +10,27 @@ namespace MagnumOpus.ECS
     {
         private static readonly T[] Default = new T[1];
         private static readonly Dictionary<int, T> Components = new();
-        private static readonly object lockObj = new();
+        private static readonly ReaderWriterLockSlim lockObj = new();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void AddFor(NTT ntt, ref T c)
         {
-            lock (lockObj)
-            {
-                ref var old = ref CollectionsMarshal.GetValueRefOrAddDefault(Components, ntt.Id, out var found);
-                old = c;
+            lockObj.EnterWriteLock();
+            ref var old = ref CollectionsMarshal.GetValueRefOrAddDefault(Components, ntt.Id, out var found);
+            old = c;
 
-                if (!found)
-                    NttWorld.InformChangesFor(ntt);
-            }
+            if (!found)
+                NttWorld.InformChangesFor(ntt);
+            lockObj.ExitWriteLock();
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void AddFor(NTT ntt)
         {
-            lock (lockObj)
-            {
-                ref var old = ref CollectionsMarshal.GetValueRefOrAddDefault(Components, ntt.Id, out var found);
-                if (!found)
-                    NttWorld.InformChangesFor(ntt);
-            }
+            lockObj.EnterWriteLock();
+            ref var old = ref CollectionsMarshal.GetValueRefOrAddDefault(Components, ntt.Id, out var found);
+            if (!found)
+                NttWorld.InformChangesFor(ntt);
+            lockObj.ExitWriteLock();
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool HasFor(NTT ntt) => Components.ContainsKey(ntt.Id);
@@ -43,37 +41,54 @@ namespace MagnumOpus.ECS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Remove(NTT ntt, bool notify)
         {
-            lock (lockObj)
+            lockObj.EnterWriteLock();
+            try
             {
                 if (!Components.Remove(ntt.Id))
                     return;
+                if (notify)
+                    NttWorld.InformChangesFor(ntt);
             }
-            if (notify)
-                NttWorld.InformChangesFor(ntt);
+            finally
+            {
+                lockObj.ExitWriteLock();
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ChangeOwner(NTT from, NTT to)
         {
+            lockObj.EnterWriteLock();
             if (Components.Remove(from.Id, out var c))
                 Components.TryAdd(to.Id, c);
+            lockObj.ExitWriteLock();
         }
 
         // called via reflection @ ReflectionHelper.Save<T>()
         public static void Save(string path)
         {
-            var start = Stopwatch.GetTimestamp();
-            var filename = Path.Combine(path, $"{typeof(T).Name}.json");
+            try
+            {
 
-            var json = JsonConvert.SerializeObject(Components);
-            File.WriteAllText(filename, json);
+                lockObj.EnterReadLock();
+                var start = Stopwatch.GetTimestamp();
+                var filename = Path.Combine(path, $"{typeof(T).Name}.json");
 
-            var time = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
-            FConsole.WriteLine($"Saved {typeof(T).Name} to {filename} in {time}ms");
+                var json = JsonConvert.SerializeObject(Components);
+                File.WriteAllText(filename, json);
+
+                var time = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
+                FConsole.WriteLine($"Saved {typeof(T).Name} to {filename} in {time}ms");
+            }
+            finally
+            {
+                lockObj.ExitReadLock();
+            }
         }
 
         public static void Load(string path)
         {
+            lockObj.EnterWriteLock();
             var start = Stopwatch.GetTimestamp();
             var filename = Path.Combine(path, $"{typeof(T).Name}.json");
 
@@ -88,6 +103,7 @@ namespace MagnumOpus.ECS
 
             var time = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
             FConsole.WriteLine($"Loaded {typeof(T).Name} in {time}ms");
+            lockObj.ExitWriteLock();
         }
     }
 }
