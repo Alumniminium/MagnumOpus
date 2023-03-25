@@ -6,10 +6,10 @@ namespace MagnumOpus.Helpers
 {
     public static class Constants
     {
-        public static string ServerIP;
-        public static ushort PrometheusPort;
-        public static ushort LoginPort;
-        public static ushort GamePort;
+        public static string ServerIP { get; set; } = "127.0.0.1";
+        public static ushort PrometheusPort { get; set; }
+        public static ushort LoginPort { get; set; }
+        public static ushort GamePort { get; set; }
 
         public static readonly Vector2[] DeltaPos = new Vector2[]
         {

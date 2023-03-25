@@ -522,12 +522,12 @@ namespace MagnumOpus.Helpers
                 case TaskActionType.ACTION_ITEM_DELTHIS:
                     {
                         ref var inv = ref ntt.Get<InventoryComponent>();
-                        var itemId = trigger.Id;
+                        var itemNetId = trigger.Id;
 
-                        if (!InventoryHelper.HasItemId(ref inv, itemId))
+                        if (!InventoryHelper.HasItemNetId(ref inv, itemNetId))
                             return action.id_nextfail;
 
-                        InventoryHelper.RemoveItemId(ref inv, itemId, destroy: true);
+                        InventoryHelper.RemoveNetIdFromInventory(ntt, ref inv, itemNetId, destroy: true);
 
                         return action.id_next;
                     }

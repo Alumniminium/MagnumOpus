@@ -15,19 +15,19 @@ namespace MagnumOpus.Helpers
             return default;
         }
 
-        public static bool RemoveNetIdFromInventory(NTT ntt, ref InventoryComponent inv, int netId, bool destroy = false, bool netSync = false)
+        public static bool RemoveNetIdFromInventory(NTT owner, ref InventoryComponent inv, int netId, bool destroy = false, bool netSync = false)
         {
             var itemNtt = GetInventoryItemByNetIdFrom(ref inv, netId);
-            var removed = RemoveNttFromInventory(ntt, ref inv, itemNtt, destroy, netSync);
+            var removed = RemoveNttFromInventory(owner, ref inv, itemNtt, destroy, destroy || netSync);
             return removed;
         }
 
-        public static bool RemoveNttFromInventory(NTT ntt, ref InventoryComponent inv, NTT item, bool destroy = false, bool netSync = false)
+        public static bool RemoveNttFromInventory(NTT owner, ref InventoryComponent inv, NTT item, bool destroy = false, bool netSync = false)
         {
             var invIdx = -1;
             for (var i = 0; i < inv.Items.Length; i++)
             {
-                if (ntt == inv.Items.Span[i])
+                if (item.Id == inv.Items.Span[i].Id)
                 {
                     invIdx = i;
                     break;
@@ -46,12 +46,19 @@ namespace MagnumOpus.Helpers
                 return found;
 
             var remInv = MsgItem.Create(item.Id, item.Id, item.Id, MsgItemType.RemoveInventory);
-            ntt.NetSync(ref remInv);
+            owner.NetSync(ref remInv);
 
             return found;
         }
 
         public static bool HasFreeSpace(ref InventoryComponent inv, int count = 1) => CountItemId(ref inv, 0) >= count;
+        public static bool HasItemNetId(ref InventoryComponent inv, int netId)
+        {
+            for (var i = 0; i < inv.Items.Length; i++)
+                if (inv.Items.Span[i].Id == netId)
+                    return true;
+            return false;
+        }
         public static bool HasItemId(ref InventoryComponent inv, int id) => CountItemId(ref inv, id) > 0;
         public static int CountItemId(ref InventoryComponent inv, int id)
         {
@@ -68,7 +75,6 @@ namespace MagnumOpus.Helpers
 
             return count;
         }
-
         public static bool RemoveItemId(ref InventoryComponent inv, int id, bool destroy = false)
         {
             for (var i = 0; i < inv.Items.Length; i++)
@@ -88,7 +94,7 @@ namespace MagnumOpus.Helpers
             return false;
         }
 
-        public static void SortById(NTT ntt, ref InventoryComponent inv, bool netSync = false)
+        public static void SortById(NTT owner, ref InventoryComponent inv, bool netSync = false)
         {
             if (!netSync)
                 return;
@@ -96,16 +102,16 @@ namespace MagnumOpus.Helpers
             for (var i = 0; i < inv.Items.Length; i++)
             {
                 var packet = MsgItem.Create(inv.Items.Span[i].Id, inv.Items.Span[i].Id, inv.Items.Span[i].Id, MsgItemType.RemoveInventory);
-                ntt.NetSync(ref packet);
+                owner.NetSync(ref packet);
             }
             for (var i = 0; i < inv.Items.Length; i++)
             {
                 var packet = MsgItemInformation.Create(inv.Items.Span[i]);
-                ntt.NetSync(ref packet);
+                owner.NetSync(ref packet);
             }
         }
 
-        public static bool AddItem(NTT ntt, ref InventoryComponent inv, in NTT item, bool netSync = false)
+        public static bool AddItem(NTT owner, ref InventoryComponent inv, in NTT item, bool netSync = false)
         {
             for (var i = 0; i < inv.Items.Length; i++)
             {
@@ -116,7 +122,7 @@ namespace MagnumOpus.Helpers
                 if (netSync)
                 {
                     var packet = MsgItemInformation.Create(inv.Items.Span[i]);
-                    ntt.NetSync(ref packet);
+                    owner.NetSync(ref packet);
                 }
                 return true;
             }
