@@ -54,15 +54,15 @@ namespace MagnumOpus.ECS
             TimeMetricsExporter.Set((float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
         }
 
-        public void EndUpdate(int idx)
+        public void EndUpdate(int idx, int threads)
         {
             var start = 0;
             var amount = _entitiesList.Count;
 
-            if (amount > ThreadCount * 2)
+            if (amount > threads * 2)
             {
-                var chunkSize = amount / ThreadCount;
-                var remaining = amount % ThreadCount;
+                var chunkSize = amount / threads;
+                var remaining = amount % threads;
                 start = (chunkSize * idx) + Math.Min(idx, remaining);
                 amount = chunkSize + (idx < remaining ? 1 : 0);
             }

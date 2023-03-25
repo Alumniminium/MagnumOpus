@@ -8,12 +8,12 @@ namespace MagnumOpus.ECS
         private static readonly AutoResetEvent[] _blocks;
         private static readonly AutoResetEvent _allReady = new(false);
         private static volatile int _readyThreads;
-        private static Action<int> Action;
+        private static Action<int, int> Action;
 
         static ThreadedWorker()
         {
             FConsole.WriteLine("ThreadedWorker Started");
-            Action = Thread.Sleep;
+            Action = (i, j) => { };
             _threads = new Thread[Environment.ProcessorCount];
             _blocks = new AutoResetEvent[Environment.ProcessorCount];
             for (var i = 0; i < Environment.ProcessorCount; i++)
@@ -28,7 +28,7 @@ namespace MagnumOpus.ECS
             }
         }
 
-        public static void Run(Action<int> action, int threads)
+        public static void Run(Action<int, int> action, int threads)
         {
             if (threads > Environment.ProcessorCount)
                 threads = Environment.ProcessorCount;
@@ -55,7 +55,7 @@ namespace MagnumOpus.ECS
                     _allReady.Set();
 
                 _blocks[idx].WaitOne();
-                Action.Invoke(idx);
+                Action.Invoke(idx, _threads.Length);
             }
         }
     }
