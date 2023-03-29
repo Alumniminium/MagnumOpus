@@ -11,7 +11,7 @@ namespace MagnumOpus.Enums
         None = 0,
         Physical = 2,
         Magic = 21,
-        Archer = 25,
+        Ranged = 25,
         RequestMarriage = 8,
         AcceptMarriage = 9,
         Death = 14,

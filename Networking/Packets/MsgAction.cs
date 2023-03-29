@@ -218,8 +218,7 @@ namespace MagnumOpus.Networking.Packets
                             ntt.NetSync(ref msg);
 
                         ref readonly var vwp = ref ntt.Get<ViewportComponent>();
-                        lock (vwp.rwLock)
-                            vwp.EntitiesVisible.TryAdd(ent.Id, ent);
+                        vwp.EntitiesVisible.TryAdd(ent.Id, ent);
                         break;
                     }
                 case MsgActionType.QueryTeamMember:

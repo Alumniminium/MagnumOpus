@@ -6,7 +6,6 @@ namespace MagnumOpus.ECS
         Monster,
         Npc,
         Item,
-        InvItem,
         Trap,
         Other
     }

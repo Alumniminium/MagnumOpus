@@ -1,4 +1,7 @@
 using System.Numerics;
+using MagnumOpus.AOGP;
+using MagnumOpus.AOGP.Actions;
+using MagnumOpus.AOGP.Goals;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -45,27 +48,27 @@ namespace MagnumOpus.Systems
                 return;
             }
 
-            ref readonly var target = ref NttWorld.GetEntity(brn.TargetId);
-            ref readonly var targetPos = ref target.Get<PositionComponent>();
-
-            if (target.Has<DeathTagComponent>())
+            if (brn.Plan.Count == 0)
             {
-                brn.TargetId = 0;
-                return;
+                var availableActions = new List<GOAPAction>
+                {
+                    new ApproachAction(),
+                    new AttackAction(),
+                };
+                var goal = new DefeatEnemyGoal();
+
+                brn.Plan = GOAPPlanner.Plan(ntt, availableActions, goal);
+            }
+            else
+            {
+                brn.Plan[0].Execute(ntt);
+                brn.Plan.RemoveAt(0);
             }
 
-            var distance = (int)Vector2.Distance(pos.Position, targetPos.Position);
-            if (distance > 16)
-            {
-                brn.TargetId = 0;
-                brn.State = BrainState.Idle;
-                if (IsLogging)
-                    Logger.Debug("{Entity} target {target} out of range", ntt, target);
-                return;
-            }
-
-            UpdateBrainState(distance, ref brn, ntt, pos, target, targetPos);
+            brn.State = BrainState.Sleeping;
+            brn.SleepTicks = (int)(NttWorld.TargetTps * (1 + Random.Shared.NextSingle()));
         }
+
 
         private static void FindNewTarget(ref ViewportComponent vwp, ref BrainComponent brn)
         {
@@ -79,33 +82,8 @@ namespace MagnumOpus.Systems
                     continue;
 
                 brn.TargetId = b.Id;
-                brn.State = BrainState.Approaching;
                 break;
             }
-        }
-
-        private void UpdateBrainState(int distance, ref BrainComponent brn, in NTT ntt, in PositionComponent pos, in NTT target, in PositionComponent targetPos)
-        {
-            brn.State = distance > 1 ? BrainState.Approaching : BrainState.Attacking;
-
-            if (brn.State == BrainState.Approaching)
-            {
-                var dir = CoMath.GetRawDirection(targetPos.Position, pos.Position);
-                var wlk = new WalkComponent(dir, false);
-                ntt.Set(ref wlk);
-                if (IsLogging)
-                    Logger.Debug("{Entity} walking {dir} to {target}", ntt, (Direction)dir, target);
-            }
-            else if (brn.State == BrainState.Attacking)
-            {
-                var atk = new AttackComponent(in target, MsgInteractType.Physical);
-                ntt.Set(ref atk);
-                if (IsLogging)
-                    Logger.Debug("{Entity} attacking {target}", ntt, target);
-            }
-
-            brn.State = BrainState.Sleeping;
-            brn.SleepTicks = (int)(NttWorld.TargetTps * (1 + Random.Shared.NextSingle()));
         }
     }
 }

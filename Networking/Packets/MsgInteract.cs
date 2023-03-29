@@ -82,7 +82,7 @@ namespace MagnumOpus.Networking.Packets
 
             switch (msg.Type)
             {
-                case MsgInteractType.Archer:
+                case MsgInteractType.Ranged:
                 case MsgInteractType.Physical:
                     {
                         if (ntt.Id != msg.AttackerUniqueId)

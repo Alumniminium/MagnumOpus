@@ -19,10 +19,13 @@ namespace MagnumOpus.Systems
             vwp.Viewport.Y = pos.Position.Y - (vwp.Viewport.Height / 2);
 
             vwp.EntitiesVisibleLast.Clear();
-            foreach (var e in vwp.EntitiesVisible)
-                vwp.EntitiesVisibleLast.TryAdd(e.Key, e.Value);
 
-            vwp.EntitiesVisible.Clear();
+            lock (vwp.rwLock)
+            {
+                foreach (var e in vwp.EntitiesVisible)
+                    vwp.EntitiesVisibleLast.TryAdd(e.Key, e.Value);
+                vwp.EntitiesVisible.Clear();
+            }
 
             Collections.SpatialHashs[pos.Map].Move(ntt, ref pos);
             Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
@@ -39,11 +42,11 @@ namespace MagnumOpus.Systems
                 if (b.Has<DeathTagComponent>())
                     continue;
 
-                if (b.Has<ViewportComponent>())
-                {
-                    ref readonly var bvwp = ref b.Get<ViewportComponent>();
-                    bvwp.EntitiesVisible.TryAdd(ntt.Id, ntt);
-                }
+                // if (b.Has<ViewportComponent>())
+                // {
+                //     ref readonly var bvwp = ref b.Get<ViewportComponent>();
+                //     bvwp.EntitiesVisible.TryAdd(ntt.Id, ntt);
+                // }
 
                 if (b.Has<BrainComponent>())
                 {

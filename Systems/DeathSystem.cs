@@ -14,10 +14,8 @@ namespace MagnumOpus.Systems
         {
             if (ntt.Type is EntityType.Player or EntityType.Npc or EntityType.Monster)
                 EntityDeath(in ntt, ref dtc);
-            else if (ntt.Type == EntityType.Item)
+            else if (ntt.Type is EntityType.Item)
                 ItemDeath(in ntt);
-            // else if (ntt.Type == EntityType.Trap)
-            //     TrapDeath(in ntt, ref dtc);
         }
 
         public static void EntityDeath(in NTT ntt, ref DeathTagComponent dtc)

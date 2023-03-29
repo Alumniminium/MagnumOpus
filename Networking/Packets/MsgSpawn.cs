@@ -50,7 +50,6 @@ namespace MagnumOpus.Networking.Packets
                 EntityType.Item => throw new NotImplementedException(),
                 EntityType.Trap => throw new NotImplementedException(),
                 EntityType.Other => throw new NotImplementedException(),
-                EntityType.InvItem => throw new NotImplementedException(),
                 _ => throw new NotImplementedException()
             };
         }
