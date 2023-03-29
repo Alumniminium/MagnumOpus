@@ -1,5 +1,6 @@
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
+
 namespace MagnumOpus.Systems
 {
     public sealed class DamageSystem : NttSystem<HealthComponent, DamageComponent>

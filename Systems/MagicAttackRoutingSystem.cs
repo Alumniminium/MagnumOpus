@@ -1,8 +1,6 @@
-
-
-
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
+using MagnumOpus.Enums;
 using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Systems
@@ -39,15 +37,15 @@ namespace MagnumOpus.Systems
                     break;
                 case 11: // Roar
                 case 5: // Circle
-                    var circle = new CircleTargetComponent(atk.X, atk.Y, magicType);
+                    var circle = new TargetingComponent(atk.X, atk.Y, magicType, TargetingType.Circle);
                     ntt.Set(ref circle);
                     break;
                 case 4: // Sector
-                    var sector = new SectorTargetComponent(atk.X, atk.Y, magicType);
+                    var sector = new TargetingComponent(atk.X, atk.Y, magicType, TargetingType.Sector);
                     ntt.Set(ref sector);
                     break;
                 case 14: // Line
-                    var line = new LineTargetComponent(atk.X, atk.Y, magicType);
+                    var line = new TargetingComponent(atk.X, atk.Y, magicType, TargetingType.Line);
                     ntt.Set(ref line);
                     break;
                 default:

@@ -146,10 +146,8 @@ namespace MagnumOpus.Networking.Packets
                     case ClasseName.WaterSaint:
                     case ClasseName.WaterTaoist:
                     case ClasseName.WaterWizard:
-                        {
-                            entity.NetSync(ref mem);
-                            break;
-                        }
+                        entity.NetSync(ref mem);
+                        break;
                 }
             }
         }

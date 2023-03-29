@@ -35,9 +35,7 @@ namespace MagnumOpus
                 new ViewportSystem(),
 
                 new MagicAttackRoutingSystem(),
-                new TargetFinderCircleSystem(),
-                new TargetFinderLineSystem(),
-                new TargetFinderSectorSystem(),
+                new TargetFinderSystem(),
                 new MagicAttackSystem(),
                 new AttackSystem(),
                 new DamageSystem(),

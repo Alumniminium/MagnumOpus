@@ -11,7 +11,7 @@ namespace HerstLib.IO
     public static class FConsole
     {
         public static string StdoLogPath => $"{StartTime:dd-MM-yyyy}.log";
-        private static DateTime StartTime = DateTime.UtcNow;
+        private static readonly DateTime StartTime = DateTime.UtcNow;
         // private static StreamWriter Logger = new(StdoLogPath, true);
         private static readonly BlockingCollection<string> Lines = new();
         private static readonly Thread WorkerThread;

@@ -1,6 +1,4 @@
 using MagnumOpus.Components;
-
-
 using MagnumOpus.ECS;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Squiggly;

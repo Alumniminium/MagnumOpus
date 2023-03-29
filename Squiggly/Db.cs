@@ -104,7 +104,7 @@ namespace MagnumOpus.Squiggly
                         (ushort)cqmap.mapdoc,
                         (MapFlags)cqmap.type,
                         cqmap.name.Trim(),
-                        new Tuple<ushort, ushort, ushort>((ushort)cqmap.portal0_x, (ushort)cqmap.portal0_y, (ushort)cqmap.reborn_map),
+                        ((ushort)cqmap.portal0_x, (ushort)cqmap.portal0_y, (ushort)cqmap.reborn_map),
                         cqmap.Width,
                         cqmap.Height, new Dictionary<ushort, CqPortal>()
                     );

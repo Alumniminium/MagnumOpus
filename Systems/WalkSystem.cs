@@ -1,5 +1,3 @@
-
-
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
