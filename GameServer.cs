@@ -82,7 +82,8 @@ namespace MagnumOpus
                 {
                     var sizeBytes = buffer[..2];
                     var count = net.Socket.Receive(sizeBytes.Span);
-                    if (count != 2) throw new Exception("NO DIE");
+                    if (count != 2) 
+                        throw new Exception("NO DIE");
 
                     crypto.Decrypt(sizeBytes.Span);
                     var size = BitConverter.ToUInt16(sizeBytes.Span) + 8;
@@ -91,7 +92,8 @@ namespace MagnumOpus
                     while (count < size)
                     {
                         var received = net.Socket.Receive(buffer.Span[count..size]);
-                        if (received == 0) throw new Exception("NO DIE");
+                        if (received == 0) 
+                            throw new Exception("NO DIE");
                         count += received;
                     }
                     Memory<byte> copy = new byte[size];
@@ -105,6 +107,7 @@ namespace MagnumOpus
                     net.Socket?.Close();
                     net.Socket?.Dispose();
                     ntt.Remove<NetworkComponent>();
+                    NetworkHelper.Despawn(ntt);
                     break;
                 }
             }

@@ -57,5 +57,32 @@ namespace MagnumOpus.Helpers
             foreach (var ntt in NttWorld.Players)
                 ntt.NetSync(ref msgText);
         }
+
+        internal static void Despawn(NTT ntt)
+        {
+            var despawnPacket = MsgAction.RemoveEntity(ntt.Id);
+            ntt.NetSync(ref despawnPacket, true);
+        }
+
+        internal static void SyncEquipment(NTT ntt)
+        {
+            ref readonly var eq = ref ntt.Get<EquipmentComponent>();
+
+            var packets = new MsgItemInformation[9]
+            {
+                MsgItemInformation.Create(eq.Head, MsgItemInfoAction.AddItem, MsgItemPosition.Head),
+                MsgItemInformation.Create(eq.Garment, MsgItemInfoAction.AddItem, MsgItemPosition.Garment),
+                MsgItemInformation.Create(eq.Bottle, MsgItemInfoAction.AddItem, MsgItemPosition.Bottle),
+                MsgItemInformation.Create(eq.Necklace, MsgItemInfoAction.AddItem, MsgItemPosition.Necklace),
+                MsgItemInformation.Create(eq.Ring, MsgItemInfoAction.AddItem, MsgItemPosition.Ring),
+                MsgItemInformation.Create(eq.Armor, MsgItemInfoAction.AddItem, MsgItemPosition.Armor),
+                MsgItemInformation.Create(eq.RightWeapon, MsgItemInfoAction.AddItem, MsgItemPosition.RightWeapon),
+                MsgItemInformation.Create(eq.LeftWeapon, MsgItemInfoAction.AddItem, MsgItemPosition.LeftWeapon),
+                MsgItemInformation.Create(eq.Boots, MsgItemInfoAction.AddItem, MsgItemPosition.Boots),
+            };
+
+            for (var i = 0; i < packets.Length; i++)
+                ntt.NetSync(ref packets[i]);
+        }
     }
 }
