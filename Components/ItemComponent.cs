@@ -2,9 +2,6 @@ using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 namespace MagnumOpus.Components
 {
-
-
-
     [Component(saveEnabled: true)]
     public struct ItemComponent
     {

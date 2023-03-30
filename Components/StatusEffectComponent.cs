@@ -3,9 +3,6 @@ using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
 namespace MagnumOpus.Components
 {
-
-
-
     [Component(saveEnabled: true)]
     public struct StatusEffectComponent
     {

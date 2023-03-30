@@ -3,8 +3,6 @@ using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Components;
 
-
-
 namespace MagnumOpus.Networking.Packets
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

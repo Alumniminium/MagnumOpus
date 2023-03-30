@@ -4,10 +4,10 @@ namespace MagnumOpus.ECS
 {
     public static class PrometheusPush
     {
-        public static readonly Gauge NTTCount = Metrics.CreateGauge("MAGNUMOPUS_ENTITIES", "Counter for Entities");
-        public static readonly Counter TickCount = Metrics.CreateCounter("MAGNUMOPUS_TICKS", "Counter for Ticks");
-        public static readonly Histogram TickTime = Metrics.CreateHistogram("MAGNUMOPUS_TICK", "Time taken for a tick");
-        public static readonly Counter EntityChangedCount = Metrics.CreateCounter("MAGNUMOPUS_ENTITY_CHANGED", "Counter for Entity Changed");
+        public static readonly Gauge NTTCount = Metrics.CreateGauge("MO_ENTITIES", "Counter for Entities");
+        public static readonly Counter TickCount = Metrics.CreateCounter("MO_TICKS", "Counter for Ticks");
+        public static readonly Histogram TickTime = Metrics.CreateHistogram("MO_TICK", "Time taken for a tick");
+        public static readonly Counter EntityChangedCount = Metrics.CreateCounter("MO_ENTITY_CHANGED", "Counter for Entity Changed");
 
 
         public static readonly Counter NTTCreations = Metrics.CreateCounter("MO_NTT_CREATION_COUNT", "Amount of times an NTT was created");

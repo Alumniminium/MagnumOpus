@@ -23,10 +23,7 @@ namespace MagnumOpus.Networking.Cryptography
         public int DecryptCount, EncryptCount;
 
         /// <summary>Create a default instance of Blowfish to copy from.</summary>
-        static BlowfishCipher()
-        {
-            Default = new BlowfishCipher();
-        }
+        static BlowfishCipher() => Default = new BlowfishCipher();
 
         /// <summary>
         /// Instantiates a new instance of <see cref="BlowfishCipher"/> and generates 

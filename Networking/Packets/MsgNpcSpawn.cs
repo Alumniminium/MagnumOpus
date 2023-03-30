@@ -2,8 +2,6 @@ using System.Runtime.InteropServices;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 
-
-
 namespace MagnumOpus.Networking.Packets
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 101)]
