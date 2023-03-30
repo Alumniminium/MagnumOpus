@@ -36,19 +36,6 @@ namespace MagnumOpus.Networking.Packets
         [FieldOffset(22)]
         public MsgActionType Type;
 
-        public static MsgAction RemoveEntity(int uniqueId)
-        {
-            MsgAction msgP = new()
-            {
-                Size = (ushort)sizeof(MsgAction),
-                Id = 1010,
-                Timestamp = (int)NttWorld.Tick,
-                UniqueId = uniqueId,
-                Param = uniqueId,
-                Type = MsgActionType.RemoveEntity
-            };
-            return msgP;
-        }
         public static MsgAction Create(int uniqueId, int param, ushort x, ushort y, Direction direction, MsgActionType type)
         {
             MsgAction msgP = new()
@@ -77,6 +64,20 @@ namespace MagnumOpus.Networking.Packets
                 JumpY = (ushort)jmp.Position.Y,
                 Direction = 0,
                 Type = MsgActionType.Jump
+            };
+            return msgP;
+        }
+
+        public static MsgAction RemoveEntity(int uniqueId)
+        {
+            MsgAction msgP = new()
+            {
+                Size = (ushort)sizeof(MsgAction),
+                Id = 1010,
+                Timestamp = (int)NttWorld.Tick,
+                UniqueId = uniqueId,
+                Param = uniqueId,
+                Type = MsgActionType.RemoveEntity
             };
             return msgP;
         }

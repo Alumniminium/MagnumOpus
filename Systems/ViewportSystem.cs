@@ -20,12 +20,9 @@ namespace MagnumOpus.Systems
 
             vwp.EntitiesVisibleLast.Clear();
 
-            lock (vwp.rwLock)
-            {
-                foreach (var e in vwp.EntitiesVisible)
-                    vwp.EntitiesVisibleLast.TryAdd(e.Key, e.Value);
-                vwp.EntitiesVisible.Clear();
-            }
+            foreach (var e in vwp.EntitiesVisible)
+                vwp.EntitiesVisibleLast.TryAdd(e.Key, e.Value);
+            vwp.EntitiesVisible.Clear();
 
             Collections.SpatialHashs[pos.Map].Move(ntt, ref pos);
             Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
@@ -41,12 +38,6 @@ namespace MagnumOpus.Systems
                 var b = kvp.Value;
                 if (b.Has<DeathTagComponent>())
                     continue;
-
-                // if (b.Has<ViewportComponent>())
-                // {
-                //     ref readonly var bvwp = ref b.Get<ViewportComponent>();
-                //     bvwp.EntitiesVisible.TryAdd(ntt.Id, ntt);
-                // }
 
                 if (b.Has<BrainComponent>())
                 {
@@ -64,20 +55,6 @@ namespace MagnumOpus.Systems
 
                 NetworkHelper.FullSync(in ntt, in b);
                 NetworkHelper.FullSync(in b, in b);
-
-                // if (b.Has<JumpComponent>())
-                // {
-                //     ref readonly var jmp = ref b.Get<JumpComponent>();
-                //     var packet = MsgAction.CreateJump(in b, in jmp);
-                //     ntt.NetSync(ref packet, true);
-                // }
-
-                // if (b.Has<WalkComponent>())
-                // {
-                //     ref readonly var wlk = ref b.Get<WalkComponent>();
-                //     var packet = MsgWalk.Create(b.Id, wlk.Direction, wlk.IsRunning);
-                //     ntt.NetSync(ref packet, true);
-                // }
             }
         }
     }

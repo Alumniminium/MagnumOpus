@@ -82,7 +82,7 @@ namespace MagnumOpus
                 {
                     var sizeBytes = buffer[..2];
                     var count = net.Socket.Receive(sizeBytes.Span);
-                    if (count != 2) 
+                    if (count != 2)
                         throw new Exception("NO DIE");
 
                     crypto.Decrypt(sizeBytes.Span);
