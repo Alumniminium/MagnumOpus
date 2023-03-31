@@ -56,20 +56,23 @@ namespace MagnumOpus.ECS
 
         public void EndUpdate(int idx, int threads)
         {
-            var start = 0;
-            var amount = _entitiesList.Count;
-
-            if (amount > threads * 2)
+            lock (_entitiesList)
             {
-                var chunkSize = amount / threads;
-                var remaining = amount % threads;
-                start = (chunkSize * idx) + Math.Min(idx, remaining);
-                amount = chunkSize + (idx < remaining ? 1 : 0);
-            }
-            else if (idx != 0)
-                return;
+                var start = 0;
+                var amount = _entitiesList.Count;
 
-            Update(start, amount);
+                if (amount > threads * 2)
+                {
+                    var chunkSize = amount / threads;
+                    var remaining = amount % threads;
+                    start = (chunkSize * idx) + Math.Min(idx, remaining);
+                    amount = chunkSize + (idx < remaining ? 1 : 0);
+                }
+                else if (idx != 0)
+                    return;
+
+                Update(start, amount);
+            }
         }
 
         protected abstract void Update(int start, int amount);

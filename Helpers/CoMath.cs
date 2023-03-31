@@ -21,6 +21,28 @@ namespace MagnumOpus.Helpers
             return distance <= range * range;
         }
         public static Direction GetDirection(Vector2 end, Vector2 start) => (Direction)(GetRawDirection(end, start) % 8);
+        public static Direction GetNearestDirection(Vector2 direction)
+        {
+            var angle = (float)(Math.Atan2(direction.Y, direction.X) * (180 / Math.PI));
+            angle = (angle + 360) % 360; // Normalize angle to be in the range of [0, 360)
+
+            if (angle >= 337.5 || angle < 22.5)
+                return Direction.East;
+            if (angle >= 22.5 && angle < 67.5)
+                return Direction.NorthEast;
+            if (angle >= 67.5 && angle < 112.5)
+                return Direction.North;
+            if (angle >= 112.5 && angle < 157.5)
+                return Direction.NorthWest;
+            if (angle >= 157.5 && angle < 202.5)
+                return Direction.West;
+            if (angle >= 202.5 && angle < 247.5)
+                return Direction.SouthWest;
+            if (angle >= 247.5 && angle < 292.5)
+                return Direction.South;
+            return Direction.SouthEast; // 292.5 <= angle < 337.5
+        }
+
         public static byte GetRawDirection(Vector2 end, Vector2 start)
         {
             var dir = 0;
@@ -268,6 +290,22 @@ namespace MagnumOpus.Helpers
             var radian = Math.Asin(delta.X / distance);
 
             return (float)(delta.Y > 0 ? (Math.PI / 2) - radian : Math.PI + radian + (Math.PI / 2));
+        }
+
+        internal static Vector2 DirectionToVector(Direction direction)
+        {
+            return direction switch
+            {
+                Direction.North => new Vector2(0, 1),
+                Direction.NorthEast => new Vector2(1, 1),
+                Direction.East => new Vector2(1, 0),
+                Direction.SouthEast => new Vector2(1, -1),
+                Direction.South => new Vector2(0, -1),
+                Direction.SouthWest => new Vector2(-1, -1),
+                Direction.West => new Vector2(-1, 0),
+                Direction.NorthWest => new Vector2(-1, 1),
+                _ => throw new ArgumentException($"Invalid direction: {direction}"),
+            };
         }
     }
 }

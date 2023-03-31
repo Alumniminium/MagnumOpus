@@ -11,7 +11,7 @@ namespace MagnumOpus.Components
         public readonly ReaderWriterLockSlim rwLock = new();
         public Dictionary<int, NTT> EntitiesVisible;
         public Dictionary<int, NTT> EntitiesVisibleLast;
-        public RectangleF Viewport;
+        public Rectangle Viewport;
         internal bool Dirty;
 
         [JsonConstructor]
@@ -26,7 +26,7 @@ namespace MagnumOpus.Components
         {
             EntitiesVisible = new();
             EntitiesVisibleLast = new();
-            Viewport = new RectangleF(0, 0, viewDistance, viewDistance);
+            Viewport = new Rectangle(0, 0, (int)viewDistance, (int)viewDistance);
             ChangedTick = NttWorld.Tick;
             Dirty = true;
         }

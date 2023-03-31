@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -8,7 +9,7 @@ namespace MagnumOpus.Systems
 {
     public sealed class DeathSystem : NttSystem<DeathTagComponent>
     {
-        public DeathSystem() : base("Death", threads: 2) { }
+        public DeathSystem() : base("Death", threads: Environment.ProcessorCount) { }
 
         public override void Update(in NTT ntt, ref DeathTagComponent dtc)
         {
@@ -26,9 +27,6 @@ namespace MagnumOpus.Systems
 
                 var deathMsg = MsgInteract.Create(in dtc.Killer, in ntt, MsgInteractType.Death, 0);
                 ntt.NetSync(ref deathMsg, true);
-
-                if (!ntt.Has<StatusEffectComponent>())
-                    ntt.Set(new StatusEffectComponent(in ntt));
 
                 ref var eff = ref ntt.Get<StatusEffectComponent>();
                 eff.Effects |= StatusEffect.Dead | StatusEffect.FrozenRemoveName;
@@ -81,13 +79,14 @@ namespace MagnumOpus.Systems
                 ntt.Remove<BrainComponent>();
                 ntt.Remove<WalkComponent>();
                 ntt.Remove<JumpComponent>();
+                ntt.Remove<BoidBehaviorComponent>();
             }
             else if (dtc.Tick + (NttWorld.TargetTps * 7) == NttWorld.Tick && ntt.Type == EntityType.Monster)
             {
                 ref var eff = ref ntt.Get<StatusEffectComponent>();
                 eff.Effects |= StatusEffect.Fade;
             }
-            else if (dtc.Tick + (NttWorld.TargetTps * 10) == NttWorld.Tick && ntt.Type == EntityType.Monster)
+            else if (dtc.Tick + (NttWorld.TargetTps * 10) <= NttWorld.Tick && ntt.Type == EntityType.Monster)
             {
                 ref readonly var lgc = ref ntt.Get<LifeGiverComponent>();
                 ref var spc = ref lgc.NTT.Get<SpawnerComponent>();

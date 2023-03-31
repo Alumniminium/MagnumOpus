@@ -10,7 +10,7 @@ namespace MagnumOpus.ECS
         public SystemNotifier(NttSystem[] array)
         {
             _array = array;
-            _threadCount = 2;
+            _threadCount = 8;
             _barrier = new Barrier(_threadCount + 1);
             _threads = new Thread[_threadCount];
             for (var i = 0; i < _threadCount; i++)

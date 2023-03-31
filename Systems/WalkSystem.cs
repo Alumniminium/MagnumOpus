@@ -6,20 +6,34 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Systems
 {
-    public sealed class WalkSystem : NttSystem<PositionComponent, WalkComponent, BodyComponent>
+    public sealed class WalkSystem : NttSystem<PositionComponent, WalkComponent, ViewportComponent>
     {
-        public WalkSystem() : base("Walk", threads: 2, log: false) { }
+        public WalkSystem() : base("Walk", threads: Environment.ProcessorCount, log: false) { }
 
-        public override void Update(in NTT ntt, ref PositionComponent pos, ref WalkComponent wlk, ref BodyComponent bdy)
+        public override void Update(in NTT ntt, ref PositionComponent pos, ref WalkComponent wlk, ref ViewportComponent vwp)
         {
-            bdy.ChangedTick = NttWorld.Tick;
+            var checkPos = pos.Position + Constants.DeltaPos[(int)wlk.Direction];
+
+            foreach (var kvp in vwp.EntitiesVisible)
+            {
+                var otherNtt = kvp.Value;
+
+                if (otherNtt == ntt)
+                    continue;
+
+                var otherPos = otherNtt.Get<PositionComponent>();
+
+                if (otherPos.Position == checkPos && !otherNtt.Has<DeathTagComponent>())
+                {
+                    ntt.Remove<WalkComponent>();
+                    return;
+                }
+            }
+
+            pos.Direction = wlk.Direction;
+            vwp.Dirty = true;
             pos.ChangedTick = NttWorld.Tick;
-
-            ref var vpc = ref ntt.Get<ViewportComponent>();
-            vpc.Dirty = true;
-
-            bdy.Direction = wlk.Direction;
-            pos.Position += Constants.DeltaPos[(int)wlk.Direction];
+            pos.Position = checkPos;
 
             var pkt = MsgWalk.Create(ntt.Id, (byte)wlk.Direction, wlk.IsRunning);
             ntt.NetSync(ref pkt, true);

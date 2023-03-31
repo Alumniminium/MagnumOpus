@@ -15,8 +15,8 @@ namespace MagnumOpus.Systems
 
             vwp.Dirty = false;
 
-            vwp.Viewport.X = pos.Position.X - (vwp.Viewport.Width / 2);
-            vwp.Viewport.Y = pos.Position.Y - (vwp.Viewport.Height / 2);
+            vwp.Viewport.X = (int)(pos.Position.X - (vwp.Viewport.Width / 2));
+            vwp.Viewport.Y = (int)(pos.Position.Y - (vwp.Viewport.Height / 2));
 
             vwp.EntitiesVisibleLast.Clear();
 
@@ -52,6 +52,12 @@ namespace MagnumOpus.Systems
 
                 if (vwp.EntitiesVisibleLast.ContainsKey(b.Id))
                     continue;
+
+                if (b.Has<ViewportComponent>())
+                {
+                    ref var bvwp = ref b.Get<ViewportComponent>();
+                    bvwp.Dirty = true;
+                }
 
                 NetworkHelper.FullSync(in ntt, in b);
                 NetworkHelper.FullSync(in b, in b);

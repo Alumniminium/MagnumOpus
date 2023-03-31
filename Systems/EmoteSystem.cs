@@ -5,12 +5,12 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Systems
 {
-    public sealed class EmoteSystem : NttSystem<EmoteComponent, BodyComponent>
+    public sealed class EmoteSystem : NttSystem<EmoteComponent, PositionComponent>
     {
         public EmoteSystem(bool log = false) : base("Emote", threads: 2, log) { }
         protected override bool MatchesFilter(in NTT ntt) => ntt.Type != EntityType.Item && base.MatchesFilter(in ntt);
 
-        public override void Update(in NTT ntt, ref EmoteComponent emo, ref BodyComponent bdt)
+        public override void Update(in NTT ntt, ref EmoteComponent emo, ref PositionComponent pos)
         {
             if (emo.ChangedTick != NttWorld.Tick)
                 return;
@@ -24,7 +24,7 @@ namespace MagnumOpus.Systems
                 ntt.NetSync(ref stamina);
             }
 
-            var msg = MsgAction.Create(ntt.Id, (int)emo.Emote, 0, 0, bdt.Direction, MsgActionType.ChangeAction);
+            var msg = MsgAction.Create(ntt.Id, (int)emo.Emote, 0, 0, pos.Direction, MsgActionType.ChangeAction);
             ntt.NetSync(ref msg, true);
         }
     }

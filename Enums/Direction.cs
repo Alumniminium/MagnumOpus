@@ -1,10 +1,4 @@
-﻿// -------- Yi --------
-// Project: Library File: Direction.cs 
-// Created: 08/12/2015/2015 at 11:52 AM
-// Last Edit: 08/12/2015 at 12:31 PM
-// By: Buddha
-
-namespace MagnumOpus.Enums
+﻿namespace MagnumOpus.Enums
 {
     public enum Direction : byte
     {

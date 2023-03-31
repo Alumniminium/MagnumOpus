@@ -32,7 +32,7 @@ namespace MagnumOpus.Networking.Packets
                 UniqueId = ntt.Id,
                 X = (ushort)pos.Position.X,
                 Y = (ushort)pos.Position.Y,
-                Direction = bdy.Direction,
+                Direction = pos.Direction,
                 Rgb = ColorToUInt(color),
                 Type = 104
             };
@@ -40,7 +40,6 @@ namespace MagnumOpus.Networking.Packets
         }
         public static MsgColor Create(in NTT ntt, uint color)
         {
-            ref readonly var bdy = ref ntt.Get<BodyComponent>();
             ref readonly var pos = ref ntt.Get<PositionComponent>();
 
             var packet = new MsgColor
@@ -51,7 +50,7 @@ namespace MagnumOpus.Networking.Packets
                 UniqueId = ntt.Id,
                 X = (ushort)pos.Position.X,
                 Y = (ushort)pos.Position.Y,
-                Direction = bdy.Direction,
+                Direction = pos.Direction,
                 Rgb = color,
                 Type = 104
             };

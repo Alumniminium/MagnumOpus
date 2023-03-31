@@ -9,8 +9,6 @@ namespace MagnumOpus.Components
     {
         public NTT ntt;
         public long ChangedTick;
-
-        public Direction Direction;
         private uint look = 1003;
         public uint Look
         {
@@ -26,12 +24,11 @@ namespace MagnumOpus.Components
 
         public BodyComponent() => ChangedTick = NttWorld.Tick;
 
-        public BodyComponent(in NTT ntt, uint look = 1003, Direction direction = Direction.South)
+        public BodyComponent(in NTT ntt, uint look = 1003)
         {
             this.ntt = ntt;
             ChangedTick = NttWorld.Tick;
             Look = look;
-            Direction = direction;
         }
 
         public override int GetHashCode() => ntt;

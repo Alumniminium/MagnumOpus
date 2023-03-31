@@ -38,7 +38,7 @@ namespace MagnumOpus.Squiggly
                 var pos = new PositionComponent(center, cq_spawn.mapid);
                 ntt.Set(ref pos);
 
-                var spawner = new SpawnerComponent(cq_spawn.id, in rectangle, cq_spawn.npctype, cq_spawn.maxnpc, cq_spawn.rest_secs, cq_spawn.max_per_gen);
+                var spawner = new SpawnerComponent(cq_spawn.id, in rectangle, cq_spawn.npctype, cq_spawn.maxnpc * 2, cq_spawn.rest_secs, cq_spawn.max_per_gen);
                 ntt.Set(ref spawner);
 
                 var body = new BodyComponent();

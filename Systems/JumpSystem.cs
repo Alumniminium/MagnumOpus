@@ -6,15 +6,14 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Systems
 {
-    public sealed class JumpSystem : NttSystem<PositionComponent, JumpComponent, BodyComponent>
+    public sealed class JumpSystem : NttSystem<PositionComponent, JumpComponent>
     {
         public JumpSystem() : base("Jump", threads: 2) { }
         protected override bool MatchesFilter(in NTT ntt) => ntt.Type != EntityType.Item && base.MatchesFilter(in ntt);
 
-        public override void Update(in NTT ntt, ref PositionComponent pos, ref JumpComponent jmp, ref BodyComponent bdy)
+        public override void Update(in NTT ntt, ref PositionComponent pos, ref JumpComponent jmp)
         {
             pos.ChangedTick = NttWorld.Tick;
-            bdy.ChangedTick = NttWorld.Tick;
 
             ref var vpc = ref ntt.Get<ViewportComponent>();
             vpc.Dirty = true;
@@ -35,12 +34,12 @@ namespace MagnumOpus.Systems
 
             if (jmp.CreatedTick == NttWorld.Tick)
             {
-                bdy.Direction = direction;
+                pos.Direction = direction;
                 var packet = MsgAction.CreateJump(in ntt, in jmp);
                 ntt.NetSync(ref packet, true);
 
-                PrometheusPush.JumpCount.Inc();
-                PrometheusPush.JumpDistance.Inc(distance);
+                // PrometheusPush.JumpCount.Inc();
+                // PrometheusPush.JumpDistance.Inc(distance);
                 if (IsLogging)
                     Logger.Debug("Jump started for {ntt}", ntt);
             }

@@ -43,7 +43,14 @@ namespace MagnumOpus.ECS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool HasFor(NTT ntt) => Components.ContainsKey(ntt.Id);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ref T Get(NTT ntt) => ref Components.ContainsKey(ntt.Id) ? ref CollectionsMarshal.GetValueRefOrNullRef(Components, ntt.Id) : ref Default[0];
+        public static ref T Get(NTT ntt)
+        {
+            lock (lockObj)
+            {
+                ref var t = ref CollectionsMarshal.GetValueRefOrNullRef(Components, ntt.Id);
+                return ref Unsafe.IsNullRef(ref t) ? ref Default[0] : ref t;
+            }
+        }
 
         // called via reflection @ ReflectionHelper.Remove<T>()
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

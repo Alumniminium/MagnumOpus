@@ -71,6 +71,33 @@ namespace MagnumOpus.ECS
                 net.SendQueue.Enqueue(packet);
             }
         }
+        public readonly void NetSync(byte[] msg, bool broadcast = false)
+        {
+            if (broadcast && Has<ViewportComponent>())
+            {
+                ref readonly var vwp = ref Get<ViewportComponent>();
+                foreach (var kvp in vwp.EntitiesVisible)
+                {
+                    var b = kvp.Value;
+
+                    if (b.Type != EntityType.Player)
+                        continue;
+
+                    if (!b.Has<NetworkComponent>())
+                        continue;
+
+                    ref readonly var net = ref b.Get<NetworkComponent>();
+                    net.SendQueue.Enqueue(msg);
+                }
+            }
+            else if (Type == EntityType.Player)
+            {
+                if (!Has<NetworkComponent>())
+                    return;
+                ref readonly var net = ref Get<NetworkComponent>();
+                net.SendQueue.Enqueue(msg);
+            }
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => Id;

@@ -76,14 +76,14 @@ namespace MagnumOpus
             var buffer = net.RecvBuffer;
             var crypto = net.GameCrypto;
 
-            while (true)
+            try
             {
-                try
+                while (true)
                 {
                     var sizeBytes = buffer[..2];
                     var count = net.Socket.Receive(sizeBytes.Span);
                     if (count != 2)
-                        throw new Exception("NO DIE");
+                        break;
 
                     crypto.Decrypt(sizeBytes.Span);
                     var size = BitConverter.ToUInt16(sizeBytes.Span) + 8;
@@ -92,8 +92,8 @@ namespace MagnumOpus
                     while (count < size)
                     {
                         var received = net.Socket.Receive(buffer.Span[count..size]);
-                        if (received == 0) 
-                            throw new Exception("NO DIE");
+                        if (received == 0)
+                            break;
                         count += received;
                     }
                     Memory<byte> copy = new byte[size];
@@ -101,15 +101,14 @@ namespace MagnumOpus
                     crypto.Decrypt(copy.Span[2..]);
                     net.RecvQueue.Enqueue(copy);
                 }
-                catch
-                {
-                    FConsole.WriteLine($"[GAME] Client disconnected: {net.Username}");
-                    net.Socket?.Close();
-                    net.Socket?.Dispose();
-                    ntt.Remove<NetworkComponent>();
-                    NetworkHelper.Despawn(ntt);
-                    break;
-                }
+            }
+            finally
+            {
+                FConsole.WriteLine($"[GAME] Client disconnected: {net.Username}");
+                net.Socket?.Close();
+                net.Socket?.Dispose();
+                ntt.Remove<NetworkComponent>();
+                NetworkHelper.Despawn(ntt);
             }
         }
     }

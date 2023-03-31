@@ -173,8 +173,8 @@ namespace MagnumOpus.Networking.Packets
                         if (_trace)
                             FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.Direction}");
 
-                        ref var bdy = ref ntt.Get<BodyComponent>();
-                        bdy.Direction = msg.Direction;
+                        ref var pos = ref ntt.Get<PositionComponent>();
+                        pos.Direction = msg.Direction;
                         ntt.NetSync(ref msg, true);
                         break;
                     }

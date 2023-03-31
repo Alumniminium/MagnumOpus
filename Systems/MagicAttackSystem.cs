@@ -10,11 +10,13 @@ namespace MagnumOpus.Systems
 
         public override void Update(in NTT ntt, ref TargetCollectionComponent atk)
         {
-            foreach (var target in atk.Targets)
+            var msgs = MsgMagicEffect.Create(in ntt, atk.Targets, (int)atk.MagicType.Power, (ushort)atk.MagicType.MagicType, (byte)atk.MagicType.Level);
+            foreach (var msg in msgs)
             {
-                var msg = MsgMagicEffect.Create(in ntt, in target, (int)atk.MagicType.Power, (ushort)atk.MagicType.MagicType, (byte)atk.MagicType.Level);
-                ntt.NetSync(ref msg, true);
-
+                ntt.NetSync(msg, true);
+            }
+            foreach(var target in atk.Targets)
+            {
                 var dmg = new DamageComponent(in target, in ntt, (int)atk.MagicType.Power);
                 target.Set(ref dmg);
 

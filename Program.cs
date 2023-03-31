@@ -26,6 +26,7 @@ namespace MagnumOpus
                 new MonsterRespawnSystem(),
                 new BasicAISystem(),
                 new GuardAISystem(),
+                new BoidSystem(),
                 new WalkSystem(),
                 new JumpSystem(),
                 new EmoteSystem(),

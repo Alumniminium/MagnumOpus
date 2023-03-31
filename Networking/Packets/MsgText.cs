@@ -5,6 +5,7 @@ using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
+using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -180,6 +181,10 @@ namespace MagnumOpus.Networking.Packets
                 case "eff":
                     var eff = MsgName.Create(ntt.Id, args[0], MsgNameType.RoleEffect);
                     ntt.NetSync(ref eff, true);
+                    break;
+                case "boi":
+                    var mob = EntityFactory.MakeMonster(Collections.CqMonsterType.First().Value, ntt.Get<PositionComponent>(), ntt);
+                    NetworkHelper.FullSync(in ntt, in mob);
                     break;
                 default:
                     break;

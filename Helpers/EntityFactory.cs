@@ -65,12 +65,38 @@ namespace MagnumOpus.Helpers
 
             var cqm = new CqMonsterComponent(prefab.id);
             var mpos = new PositionComponent(respawnPos, pos.Map);
-            var bdy = new BodyComponent(mob, prefab.lookface, (Direction)Random.Shared.Next(0, 9));
+            var bdy = new BodyComponent(mob, prefab.lookface);
             var hp = new HealthComponent(mob, prefab.life, prefab.life);
             var vwp = new ViewportComponent(18f);
             var inv = new InventoryComponent(mob, prefab.drop_money, 0);
             var fsp = new LifeGiverComponent(spawner);
+            var sfc = new StatusEffectComponent(mob);
 
+
+            if (prefab.lookface is not 900 or 910)
+            {
+                if (spc.GeneratorId % 9 == 0)
+                {
+                    var boi = new BoidBehaviorComponent(spc.GeneratorId, mpos.Position);
+                    mob.Set(ref boi);
+                }
+                else
+                {
+                    var brn = new BrainComponent();
+                    mob.Set(ref brn);
+                }
+            }
+            else
+            {
+                var brn = new BrainComponent();
+                mob.Set(ref brn);
+
+                if (prefab.lookface is 900 or 910)
+                {
+                    var grd = new GuardPositionComponent(new Vector2(spc.SpawnArea.X, spc.SpawnArea.Y));
+                    mob.Set(ref grd);
+                }
+            }
             var items = ItemGenerator.GetDropItemsFor(cqm.CqMonsterId);
             for (var x = 0; x < items.Count; x++)
             {
@@ -94,26 +120,17 @@ namespace MagnumOpus.Helpers
                 mob.Set(ref cq);
             }
 
-            if (prefab.lookface is 900 or 910)
-            {
-                var grd = new GuardPositionComponent(new Vector2(spc.SpawnArea.X, spc.SpawnArea.Y));
-                mob.Set(ref grd);
-            }
-
-            vwp.Viewport.X = mpos.Position.X;
-            vwp.Viewport.Y = mpos.Position.Y;
+            vwp.Viewport.X = (int)mpos.Position.X;
+            vwp.Viewport.Y = (int)mpos.Position.Y;
             vwp.Dirty = true;
             mob.Set(ref mpos);
             mob.Set(ref bdy);
             mob.Set(ref hp);
-            // mob.Set(ref ntc);
             mob.Set(ref vwp);
             mob.Set(ref inv);
             mob.Set(ref cqm);
             mob.Set(ref fsp);
-
-            var brn = new BrainComponent();
-            mob.Set(ref brn);
+            mob.Set(ref sfc);
 
             if (!Collections.SpatialHashs.ContainsKey(pos.Map))
                 Collections.SpatialHashs[pos.Map] = new SpatialHash(10);
@@ -122,6 +139,38 @@ namespace MagnumOpus.Helpers
 
             spc.Count++;
 
+            return mob;
+        }
+        public static NTT MakeMonster(cq_monstertype prefab, PositionComponent pos, NTT spawner)
+        {
+            ref var mob = ref NttWorld.CreateEntity(EntityType.Monster);
+            var respawnPos = CoMath.GetRandomPointInRect(spawner.Get<ViewportComponent>().Viewport);
+
+            var cqm = new CqMonsterComponent(prefab.id);
+            var mpos = new PositionComponent(respawnPos, pos.Map);
+            var bdy = new BodyComponent(mob, prefab.lookface);
+            var hp = new HealthComponent(mob, prefab.life, prefab.life);
+            var vwp = new ViewportComponent(18f);
+            var inv = new InventoryComponent(mob, prefab.drop_money, 0);
+            var fsp = new LifeGiverComponent(spawner);
+            var boi = new BoidBehaviorComponent(spawner.Id, mpos.Position);
+
+            vwp.Viewport.X = (int)mpos.Position.X;
+            vwp.Viewport.Y = (int)mpos.Position.Y;
+            vwp.Dirty = true;
+            mob.Set(ref mpos);
+            mob.Set(ref bdy);
+            mob.Set(ref hp);
+            mob.Set(ref boi);
+            mob.Set(ref vwp);
+            mob.Set(ref inv);
+            mob.Set(ref cqm);
+            mob.Set(ref fsp);
+
+            if (!Collections.SpatialHashs.ContainsKey(pos.Map))
+                Collections.SpatialHashs[pos.Map] = new SpatialHash(10);
+            Collections.SpatialHashs[pos.Map].Add(mob, ref pos);
+            pos.ChangedTick = NttWorld.Tick;
             return mob;
         }
     }

@@ -18,43 +18,40 @@ namespace MagnumOpus.Networking.Packets
         public int TargetCount;
         public fixed int Targets[180];
 
-        // public static IEnumerable<byte[]> Create(in PixelEntity attacker, IEnumerable<(in PixelEntity, int)> targetEnumerable)
-        // {
-        //     ref readonly var bdy = ref attacker.Get<PhysicsComponent>();
+        public static IEnumerable<byte[]> Create(in NTT attacker, IEnumerable<NTT> targetEnumerable, int damage, ushort skillId, byte skillLevel)
+        {
+            ref readonly var bdy = ref attacker.Get<BodyComponent>();
+            int maxTargets = 60;
+            var entities = targetEnumerable.ToList();
+            var packetCount = (int)Math.Max(1, Math.Ceiling((float)entities.Count / maxTargets));
+            var packets = new byte[packetCount][];
 
-        //     const int maxTargets = 60;
-        //     var targets = targetEnumerable.ToDictionary(pair => pair.Item1, pair => pair.Item2);
-        //     var packetCount = (int)Math.Max(1, Math.Ceiling((float)targets.Count / maxTargets));
-        //     var packets = new byte[packetCount][];
-        //     var entities = targets.Keys.ToArray();
-        //     var damages = targets.Values.ToArray();
-        //     for (var i = 0; i < packetCount; i++)
-        //     {
-        //         var packet = stackalloc MsgMagicEffect[1];
-        //         {
-        //             packet->Size = (ushort)(28 + 12 * Math.Min(Math.Min(targets.Count - i * maxTargets, maxTargets), targets.Count));
-        //             packet->Id = 1105;
-        //             packet->UniqId = attacker.Id;
-        //             packet->Param = (int)bdy.Direction;
-        //             packet->Type = attacker.CurrentSkill.Id;
-        //             packet->Level = attacker.CurrentSkill.Level;
-        //             packet->TargetCount = Math.Min(Math.Min(targets.Count - i * maxTargets, maxTargets), targets.Count);
-        //         };
-        //         var offset = 0;
-        //         for (var j = 0; j < Math.Min(targets.Count - i * maxTargets, maxTargets); j++)
-        //         {
-        //             packet->Targets[offset++] = entities[j + i * maxTargets].Id;
-        //             packet->Targets[offset++] = damages[j + i * maxTargets];
-        //             packet->Targets[offset++] = 0;
-        //         }
+            for (var i = 0; i < packetCount; i++)
+            {
+                var packet = stackalloc MsgMagicEffect[1];
+                {
+                    packet->Size = (ushort)(28 + 12 * Math.Min(Math.Min(entities.Count - i * maxTargets, maxTargets), entities.Count));
+                    packet->Id = 1105;
+                    packet->UniqId = attacker.Id;
+                    packet->Type = skillId;
+                    packet->Level = skillLevel;
+                    packet->TargetCount = Math.Min(Math.Min(entities.Count - i * maxTargets, maxTargets), entities.Count);
+                };
+                var offset = 0;
+                for (var j = 0; j < Math.Min(entities.Count - i * maxTargets, maxTargets); j++)
+                {
+                    packet->Targets[offset++] = entities[j + i * maxTargets].Id;
+                    packet->Targets[offset++] = damage;
+                    packet->Targets[offset++] = 0;
+                }
 
-        //         var buffer = new byte[sizeof(MsgUpdate));
-        //         fixed (byte* p = buffer)
-        //             *(MsgMagicEffect*)p = *packet;
-        //         packets[i] = buffer;
-        //     }
-        //     return packets;
-        // }
+                var buffer = new byte[packet->Size];
+                fixed (byte* p = buffer)
+                    *(MsgMagicEffect*)p = *packet;
+                packets[i] = buffer;
+            }
+            return packets;
+        }
 
         public static MsgMagicEffect Create(in NTT attacker, in NTT target, int damage, ushort skillId, byte skillLevel)
         {
