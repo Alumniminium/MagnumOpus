@@ -5,15 +5,12 @@ using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Systems
 {
-    public sealed class ViewportSystem : NttSystem<PositionComponent, ViewportComponent>
+    public sealed class ViewportSystem : NttSystem<PositionComponent, ViewportComponent, ViewportUpdateTagComponent>
     {
         public ViewportSystem() : base("Viewport", threads: Environment.ProcessorCount) { }
-        public override void Update(in NTT ntt, ref PositionComponent pos, ref ViewportComponent vwp)
+        public override void Update(in NTT ntt, ref PositionComponent pos, ref ViewportComponent vwp, ref ViewportUpdateTagComponent _)
         {
-            if (!vwp.Dirty)
-                return;
-
-            vwp.Dirty = false;
+            ntt.Remove<ViewportUpdateTagComponent>();
 
             vwp.Viewport.X = (int)(pos.Position.X - (vwp.Viewport.Width / 2));
             vwp.Viewport.Y = (int)(pos.Position.Y - (vwp.Viewport.Height / 2));
@@ -21,10 +18,9 @@ namespace MagnumOpus.Systems
             vwp.EntitiesVisibleLast.Clear();
 
             foreach (var e in vwp.EntitiesVisible)
-                vwp.EntitiesVisibleLast.TryAdd(e.Key, e.Value);
+                vwp.EntitiesVisibleLast.Add(e);
             vwp.EntitiesVisible.Clear();
 
-            Collections.SpatialHashs[pos.Map].Move(ntt, ref pos);
             Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
 
             if (IsLogging)
@@ -33,9 +29,8 @@ namespace MagnumOpus.Systems
             if (ntt.Type != EntityType.Player || vwp.EntitiesVisible.Count == 0)
                 return;
 
-            foreach (var kvp in vwp.EntitiesVisible)
+            foreach (var b in vwp.EntitiesVisible)
             {
-                var b = kvp.Value;
                 if (b.Has<DeathTagComponent>())
                     continue;
 
@@ -50,14 +45,10 @@ namespace MagnumOpus.Systems
                     }
                 }
 
-                if (vwp.EntitiesVisibleLast.ContainsKey(b.Id))
+                if (vwp.EntitiesVisibleLast.Contains(b))
                     continue;
 
-                if (b.Has<ViewportComponent>())
-                {
-                    ref var bvwp = ref b.Get<ViewportComponent>();
-                    bvwp.Dirty = true;
-                }
+                b.Set<ViewportUpdateTagComponent>();
 
                 NetworkHelper.FullSync(in ntt, in b);
                 NetworkHelper.FullSync(in b, in b);

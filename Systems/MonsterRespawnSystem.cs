@@ -50,10 +50,9 @@ namespace MagnumOpus.Systems
 
                 foreach (var player in vwp.EntitiesVisible)
                 {
-                    if (player.Value.Type == EntityType.Player)
+                    if (player.Type == EntityType.Player)
                     {
-                        ref var pvwp = ref player.Value.Get<ViewportComponent>();
-                        pvwp.Dirty = true;
+                        player.Set<ViewportUpdateTagComponent>();
                         playerVisible = true;
                     }
                 }

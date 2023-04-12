@@ -14,10 +14,8 @@ namespace MagnumOpus.Systems
         {
             var checkPos = pos.Position + Constants.DeltaPos[(int)wlk.Direction];
 
-            foreach (var kvp in vwp.EntitiesVisible)
+            foreach (var otherNtt in vwp.EntitiesVisible)
             {
-                var otherNtt = kvp.Value;
-
                 if (otherNtt == ntt)
                     continue;
 
@@ -31,8 +29,7 @@ namespace MagnumOpus.Systems
             }
 
             pos.Direction = wlk.Direction;
-            vwp.Dirty = true;
-            pos.ChangedTick = NttWorld.Tick;
+            pos.LastPosition = pos.Position;
             pos.Position = checkPos;
 
             var pkt = MsgWalk.Create(ntt.Id, (byte)wlk.Direction, wlk.IsRunning);
@@ -47,6 +44,11 @@ namespace MagnumOpus.Systems
             PrometheusPush.WalkCount.Inc();
 
             ntt.Remove<WalkComponent>();
+
+            var shc = new SpatialHashUpdateComponent(pos.Position, pos.LastPosition, pos.Map, SpacialHashUpdatType.Move);
+            ntt.Set(ref shc);
+
+            ntt.Set<ViewportUpdateTagComponent>();
         }
     }
 }

@@ -12,13 +12,6 @@ namespace MagnumOpus.Systems
 
         public override void Update(in NTT ntt, ref DestroyEndOfFrameComponent def)
         {
-            if (ntt.Has<PositionComponent>())
-            {
-                ref var pos = ref ntt.Get<PositionComponent>();
-                if (Collections.SpatialHashs.TryGetValue(pos.Map, out var hash))
-                    hash.Remove(ntt, ref pos);
-            }
-
             switch (ntt.Type)
             {
                 case EntityType.Player:

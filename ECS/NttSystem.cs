@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using HerstLib.IO;
 using Prometheus;
 using Serilog;
 using Serilog.Core;
@@ -56,23 +57,20 @@ namespace MagnumOpus.ECS
 
         public void EndUpdate(int idx, int threads)
         {
-            lock (_entitiesList)
+            var start = 0;
+            var amount = _entitiesList.Count;
+
+            if (amount > threads * 2)
             {
-                var start = 0;
-                var amount = _entitiesList.Count;
-
-                if (amount > threads * 2)
-                {
-                    var chunkSize = amount / threads;
-                    var remaining = amount % threads;
-                    start = (chunkSize * idx) + Math.Min(idx, remaining);
-                    amount = chunkSize + (idx < remaining ? 1 : 0);
-                }
-                else if (idx != 0)
-                    return;
-
-                Update(start, amount);
+                var chunkSize = amount / threads;
+                var remaining = amount % threads;
+                start = (chunkSize * idx) + Math.Min(idx, remaining);
+                amount = chunkSize + (idx < remaining ? 1 : 0);
             }
+            else if (idx != 0)
+                return;
+
+            Update(start, amount);
         }
 
         protected abstract void Update(int start, int amount);
@@ -83,14 +81,12 @@ namespace MagnumOpus.ECS
             if (!isMatch)
             {
                 if (_entities.TryRemove(ntt.Id, out _))
-                    lock (_entitiesList)
-                        _entitiesList.Remove(ntt);
+                    _entitiesList.Remove(ntt);
             }
             else
             {
                 if (_entities.TryAdd(ntt.Id, ntt))
-                    lock (_entitiesList)
-                        _entitiesList.Add(ntt);
+                    _entitiesList.Add(ntt);
             }
         }
     }

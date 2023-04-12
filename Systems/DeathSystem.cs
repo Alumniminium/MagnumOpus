@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Numerics;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -90,6 +91,11 @@ namespace MagnumOpus.Systems
             {
                 ref readonly var lgc = ref ntt.Get<LifeGiverComponent>();
                 ref var spc = ref lgc.NTT.Get<SpawnerComponent>();
+                ref readonly var pos = ref ntt.Get<PositionComponent>();
+
+                var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Remove);
+                ntt.Set(ref shr);
+
                 spc.Count--;
                 ntt.Set<DestroyEndOfFrameComponent>();
             }

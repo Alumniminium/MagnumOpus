@@ -13,14 +13,11 @@ namespace MagnumOpus.Systems
 
         public override void Update(in NTT ntt, ref PositionComponent pos, ref JumpComponent jmp)
         {
-            pos.ChangedTick = NttWorld.Tick;
-
-            ref var vpc = ref ntt.Get<ViewportComponent>();
-            vpc.Dirty = true;
-
             var direction = CoMath.GetDirection(new Vector2(jmp.Position.X, jmp.Position.Y), pos.Position);
             var distance = (int)Vector2.Distance(new Vector2(jmp.Position.X, jmp.Position.Y), pos.Position);
             var jumpTime = NttWorld.TargetTps * CoMath.GetJumpTime(distance);
+
+            pos.LastPosition = pos.Position;
 
             if (jmp.CreatedTick + jumpTime < NttWorld.Tick)
             {
@@ -43,6 +40,10 @@ namespace MagnumOpus.Systems
                 if (IsLogging)
                     Logger.Debug("Jump started for {ntt}", ntt);
             }
+
+            var shc = new SpatialHashUpdateComponent(pos.Position, pos.LastPosition, pos.Map, SpacialHashUpdatType.Move);
+            ntt.Set(ref shc);
+            ntt.Set<ViewportUpdateTagComponent>();
         }
     }
 }

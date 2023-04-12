@@ -25,7 +25,7 @@ namespace MagnumOpus.Systems
             if (ntt.Id == team.Leader.Id)
             {
                 ref readonly var pos = ref ntt.Get<PositionComponent>();
-                if (pos.ChangedTick == NttWorld.Tick)
+                if (Tick % NttWorld.TargetTps == 0)
                 {
                     var leaderPos = MsgAction.Create(ntt.Id, ntt.Id, (ushort)pos.Position.X, (ushort)pos.Position.Y, 0, MsgActionType.QueryTeamLeaderPos);
 

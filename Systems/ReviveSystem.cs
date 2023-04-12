@@ -30,7 +30,6 @@ namespace MagnumOpus.Systems
 
                 if (rebornMap != null)
                 {
-                    pos.ChangedTick = NttWorld.Tick + 1;
                     pos.Position = new Vector2(rebornMap.portal0_x, rebornMap.portal0_y);
                     pos.Map = (ushort)rebornMap.id;
                 }
@@ -63,6 +62,7 @@ namespace MagnumOpus.Systems
             ntt.Set(ref pos);
             ntt.Remove<ReviveComponent>();
             ntt.Remove<DeathTagComponent>();
+            ntt.Set<ViewportUpdateTagComponent>();
 
             if (IsLogging)
                 Logger.Debug("Revived '{0}' at {1}, {2}, {3}", NttWorld.Tick, Name, ntt, pos.Map, pos.Position.X, pos.Position.Y);

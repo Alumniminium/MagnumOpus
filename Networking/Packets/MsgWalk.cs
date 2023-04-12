@@ -61,7 +61,6 @@ namespace MagnumOpus.Networking.Packets
             if (ntt.Has<WalkComponent>())
             {
                 ref var pos = ref ntt.Get<PositionComponent>();
-                pos.ChangedTick = NttWorld.Tick;
                 var kickback = MsgAction.Create(ntt.Id, 0, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.South, MsgActionType.Kickback);
                 ntt.NetSync(ref kickback, true);
                 return;

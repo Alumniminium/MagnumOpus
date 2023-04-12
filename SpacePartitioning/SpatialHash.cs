@@ -10,7 +10,6 @@ namespace MagnumOpus.SpacePartitioning
     {
         private readonly int cellSize;
         private readonly Dictionary<int, List<NTT>> Hashtbl;
-        private readonly object rwLock = new();
 
         public SpatialHash(int cellSize)
         {
@@ -19,36 +18,30 @@ namespace MagnumOpus.SpacePartitioning
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Add(NTT entity, ref PositionComponent pos)
+        public void Add(NTT entity, Vector2 pos)
         {
-            var hash = GetHash(pos.Position);
-            lock (rwLock)
+            var hash = GetHash(pos);
+            if (!Hashtbl.TryGetValue(hash, out var list))
             {
-                if (!Hashtbl.TryGetValue(hash, out var list))
-                {
-                    list = new List<NTT>();
-                    Hashtbl.Add(hash, list);
-                }
-                list.Add(entity);
+                list = new List<NTT>();
+                Hashtbl.Add(hash, list);
             }
+            list.Add(entity);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Remove(NTT entity, ref PositionComponent pos)
+        public void Remove(NTT entity, Vector2 pos)
         {
-            var hash = GetHash(pos.Position);
-            lock (rwLock)
-            {
-                if (Hashtbl.TryGetValue(hash, out var bucket))
-                    bucket.Remove(entity);
-            }
+            var hash = GetHash(pos);
+            if (Hashtbl.TryGetValue(hash, out var bucket))
+                bucket.Remove(entity);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Move(NTT ntt, ref PositionComponent pos)
+        public void Move(NTT ntt, PositionComponent pos)
         {
-            Remove(ntt, ref pos);
-            Add(ntt, ref pos);
+            Remove(ntt, pos.LastPosition);
+            Add(ntt, pos.Position);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -68,19 +61,16 @@ namespace MagnumOpus.SpacePartitioning
                 {
                     var hash = GetHash(new Vector2(x * cellSize, y * cellSize));
 
-                    lock (rwLock)
+                    if (!Hashtbl.TryGetValue(hash, out var entities))
+                        continue;
+
+                    foreach (var ntt in entities)
                     {
-                        if (!Hashtbl.TryGetValue(hash, out var entities))
-                            continue;
+                        ref readonly var pos = ref ntt.Get<PositionComponent>();
+                        var distanceSquared = Vector2.DistanceSquared(pos.Position, new Vector2(cx, cy));
 
-                        foreach (var ntt in entities)
-                        {
-                            ref readonly var pos = ref ntt.Get<PositionComponent>();
-                            var distanceSquared = Vector2.DistanceSquared(pos.Position, new Vector2(cx, cy));
-
-                            if (distanceSquared <= 324f)
-                                vwp.EntitiesVisible.TryAdd(ntt.Id, ntt);
-                        }
+                        if (distanceSquared <= 324f)
+                            vwp.EntitiesVisible.Add(ntt);
                     }
                 }
             }

@@ -9,7 +9,7 @@ namespace MagnumOpus.Systems
     public class PacketsOut : NttSystem<NetworkComponent>
     {
         public static readonly Memory<byte> TqServer = Encoding.ASCII.GetBytes("TQServer");
-        public PacketsOut() : base("Packets Out", threads: 2) { }
+        public PacketsOut() : base("Packets Out", threads: 1) { }
         public override void Update(in NTT ntt, ref NetworkComponent net)
         {
             try

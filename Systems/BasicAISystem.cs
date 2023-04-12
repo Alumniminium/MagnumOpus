@@ -1,11 +1,9 @@
-using System.Numerics;
 using MagnumOpus.AOGP;
 using MagnumOpus.AOGP.Actions;
 using MagnumOpus.AOGP.Goals;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Helpers;
 using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Systems
@@ -72,9 +70,8 @@ namespace MagnumOpus.Systems
 
         private static void FindNewTarget(ref ViewportComponent vwp, ref BrainComponent brn)
         {
-            foreach (var kvp in vwp.EntitiesVisible)
+            foreach (var b in vwp.EntitiesVisible)
             {
-                var b = kvp.Value;
                 if (b.Type != EntityType.Player)
                     continue;
 

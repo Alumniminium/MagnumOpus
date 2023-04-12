@@ -1,3 +1,4 @@
+using System.Numerics;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -24,7 +25,9 @@ namespace MagnumOpus.Systems
             rdi.ItemNtt.Set(new LifeTimeComponent(TimeSpan.FromSeconds(30)));
             rdi.ItemNtt.Set(new ViewportComponent(18f));
 
-            Collections.SpatialHashs[pos.Map].Add(rdi.ItemNtt, ref pos);
+            var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Add);
+            rdi.ItemNtt.Set(ref shr);
+
 
             var msgDropFloor = MsgFloorItem.Create(in rdi.ItemNtt, MsgFloorItemType.Create);
             ntt.NetSync(ref msgDropFloor, true);

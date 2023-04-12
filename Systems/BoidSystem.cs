@@ -35,10 +35,8 @@ namespace MagnumOpus.Systems
             var targetSeekingWeight = 5.0f;
 
             // Calculate average alignment, cohesion, and separation
-            foreach (var kvp in vwp.EntitiesVisible)
+            foreach (var otherNtt in vwp.EntitiesVisible)
             {
-                var otherNtt = kvp.Value;
-
                 if (otherNtt == ntt)
                     continue;
 

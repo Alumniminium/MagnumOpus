@@ -22,9 +22,7 @@ namespace MagnumOpus.Systems
                 if (IsLogging)
                     Logger.Debug("{ntt} -> {seconds} seconds left", ntt, ticksLeft / NttWorld.TargetTps);
 
-                ref var pos = ref ntt.Get<PositionComponent>();
-                pos.ChangedTick = NttWorld.Tick;
-
+                ref readonly var pos = ref ntt.Get<PositionComponent>();
                 var eff = MsgName.Create((ushort)pos.Position.X, (ushort)pos.Position.Y, "downnumber" + (ticksLeft / NttWorld.TargetTps), MsgNameType.MapEffect);
                 ntt.NetSync(ref eff, true);
                 return;

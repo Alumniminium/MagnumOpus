@@ -15,7 +15,7 @@ namespace MagnumOpus.Systems
             {
                 ntt.NetSync(msg, true);
             }
-            foreach(var target in atk.Targets)
+            foreach (var target in atk.Targets)
             {
                 var dmg = new DamageComponent(in target, in ntt, (int)atk.MagicType.Power);
                 target.Set(ref dmg);

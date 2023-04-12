@@ -47,10 +47,8 @@ namespace MagnumOpus.ECS
             if (broadcast && Has<ViewportComponent>())
             {
                 ref readonly var vwp = ref Get<ViewportComponent>();
-                foreach (var kvp in vwp.EntitiesVisible)
+                foreach (var b in vwp.EntitiesVisible)
                 {
-                    var b = kvp.Value;
-
                     if (b.Type != EntityType.Player)
                         continue;
 
@@ -76,10 +74,8 @@ namespace MagnumOpus.ECS
             if (broadcast && Has<ViewportComponent>())
             {
                 ref readonly var vwp = ref Get<ViewportComponent>();
-                foreach (var kvp in vwp.EntitiesVisible)
+                foreach (var b in vwp.EntitiesVisible)
                 {
-                    var b = kvp.Value;
-
                     if (b.Type != EntityType.Player)
                         continue;
 

@@ -21,7 +21,7 @@ namespace MagnumOpus.Networking.Packets
         public static IEnumerable<byte[]> Create(in NTT attacker, IEnumerable<NTT> targetEnumerable, int damage, ushort skillId, byte skillLevel)
         {
             ref readonly var bdy = ref attacker.Get<BodyComponent>();
-            int maxTargets = 60;
+            var maxTargets = 60;
             var entities = targetEnumerable.ToList();
             var packetCount = (int)Math.Max(1, Math.Ceiling((float)entities.Count / maxTargets));
             var packets = new byte[packetCount][];

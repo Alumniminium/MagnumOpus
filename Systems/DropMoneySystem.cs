@@ -1,3 +1,4 @@
+using System.Numerics;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
@@ -29,7 +30,9 @@ namespace MagnumOpus.Systems
             var itemNtt = EntityFactory.MakeMoneyDrop(drc.Amount, ref pos);
             if (itemNtt != default)
             {
-                Collections.SpatialHashs[pos.Map].Add(itemNtt, ref pos);
+                var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Add);
+                itemNtt.Set(ref shr);
+
                 var dropMsg = MsgFloorItem.Create(itemNtt, Enums.MsgFloorItemType.Create);
                 ntt.NetSync(ref dropMsg, true);
                 if (IsLogging)

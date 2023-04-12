@@ -8,7 +8,9 @@ namespace MagnumOpus.ECS
         private static readonly AutoResetEvent[] _blocks;
         private static readonly AutoResetEvent _allReady = new(false);
         private static volatile int _readyThreads;
+        private static volatile int _numThreadsUsed;
         private static Action<int, int> Action;
+
 
         static ThreadedWorker()
         {
@@ -33,6 +35,8 @@ namespace MagnumOpus.ECS
             if (threads > Environment.ProcessorCount)
                 threads = Environment.ProcessorCount;
 
+            _numThreadsUsed = threads;
+
             Action = action;
             _allReady.Reset();
             Interlocked.Exchange(ref _readyThreads, _readyThreads - threads);
@@ -51,11 +55,11 @@ namespace MagnumOpus.ECS
             while (true)
             {
                 Interlocked.Increment(ref _readyThreads);
-                if (_readyThreads >= _threads.Length)
+                if (_readyThreads == _threads.Length)
                     _allReady.Set();
 
                 _blocks[idx].WaitOne();
-                Action.Invoke(idx, _threads.Length);
+                Action.Invoke(idx, _numThreadsUsed);
             }
         }
     }

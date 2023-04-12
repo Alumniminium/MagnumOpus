@@ -110,14 +110,14 @@ namespace MagnumOpus.Networking.Packets
                             vwp.EntitiesVisible.Clear();
                             vwp.EntitiesVisibleLast.Clear();
                         }
-                        vwp.Dirty = true;
-                        pos.ChangedTick = NttWorld.Tick;
+
                         var reply = Create(ntt.Id, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
                         ntt.NetSync(ref reply);
                         if (_trace)
                             FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {reply.X}, {reply.Y}");
 
                         NttWorld.Players.Add(ntt);
+                        ntt.Set<ViewportUpdateTagComponent>();
                         break;
                     }
                 case MsgActionType.LeaveBooth:
@@ -219,7 +219,7 @@ namespace MagnumOpus.Networking.Packets
                             ntt.NetSync(ref msg);
 
                         ref readonly var vwp = ref ntt.Get<ViewportComponent>();
-                        vwp.EntitiesVisible.TryAdd(ent.Id, ent);
+                        vwp.EntitiesVisible.Add(ent);
                         break;
                     }
                 case MsgActionType.QueryTeamMember:
@@ -245,8 +245,8 @@ namespace MagnumOpus.Networking.Packets
 
                         ref var pos = ref ntt.Get<PositionComponent>();
                         pos.Position = new Vector2(msg.JumpX, msg.JumpY);
-                        pos.ChangedTick = NttWorld.Tick;
                         ntt.NetSync(ref msg);
+                        ntt.Set<ViewportUpdateTagComponent>();
                         break;
                     }
                 case MsgActionType.GuardJump:

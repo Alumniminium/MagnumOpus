@@ -3,7 +3,9 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using HerstLib.IO;
+using MagnumOpus.Components;
 using MagnumOpus.Helpers;
+using MagnumOpus.Squiggly;
 using Newtonsoft.Json;
 
 namespace MagnumOpus.ECS
@@ -28,7 +30,7 @@ namespace MagnumOpus.ECS
         private static float TimeAcc;
         private static float UpdateTimeAcc;
 
-        private static SystemNotifier? SystemNotifier;
+        // private static SystemNotifier? SystemNotifier;
 
         private static Action? OnSecond;
         private static Action? OnEndTick;
@@ -59,7 +61,7 @@ namespace MagnumOpus.ECS
         public static void SetSystems(params NttSystem[] systems)
         {
             Systems = systems;
-            SystemNotifier = new SystemNotifier(systems);
+            // SystemNotifier = new SystemNotifier(systems);
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetTPS(int fps) => TargetTps = fps;
@@ -112,7 +114,13 @@ namespace MagnumOpus.ECS
             {
                 while (ToBeRemoved.TryDequeue(out var ntt))
                     DestroyInternal(ntt);
-                SystemNotifier?.Start();
+
+                while (ChangedThisTick.TryDequeue(out var ntt))
+                {
+                    PrometheusPush.NTTChanges.Inc();
+                    foreach (var system in Systems)
+                        system.EntityChanged(ntt);
+                }
             }
         }
         public static void Update()

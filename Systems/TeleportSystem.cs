@@ -13,7 +13,8 @@ namespace MagnumOpus.Systems
         {
             pos.Position = new Vector2(tpc.X, tpc.Y);
             pos.Map = tpc.Map;
-            pos.ChangedTick = NttWorld.Tick;
+
+            ntt.Set<ViewportUpdateTagComponent>();
 
             var tpP = MsgAction.Create(ntt.Id, tpc.Map, tpc.X, tpc.Y, Enums.Direction.South, Enums.MsgActionType.SendLocation);
             ntt.NetSync(ref tpP);

@@ -15,9 +15,8 @@ namespace MagnumOpus.Systems
         {
             var tcc = new TargetCollectionComponent(atk.MagicType);
 
-            foreach (var kvp in vwp.EntitiesVisible)
+            foreach (var b in vwp.EntitiesVisible)
             {
-                var b = kvp.Value;
                 ref readonly var bPos = ref b.Get<PositionComponent>();
 
                 if (!IsValidTarget(b, atk.MagicType))

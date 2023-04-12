@@ -1,4 +1,5 @@
-﻿using System.Runtime;
+﻿using System.Numerics;
+using System.Runtime;
 using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
@@ -32,6 +33,7 @@ namespace MagnumOpus
                 new EmoteSystem(),
                 new PortalSystem(),
                 new TeleportSystem(),
+                new SpatialHashSystem(),
 
                 new ViewportSystem(),
 
@@ -83,7 +85,8 @@ namespace MagnumOpus
                 if (pos.Position == default)
                     continue;
 
-                Collections.SpatialHashs[pos.Map].Add(worldNtt.Value, ref pos);
+                var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Add);
+                worldNtt.Value.Set(ref shr);
             }
 
             LoginServer.Start();

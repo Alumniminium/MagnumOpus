@@ -26,11 +26,10 @@ namespace MagnumOpus.Helpers
                 var posInfo = new PositionComponent(pos, map);
                 ntt.Set(ref posInfo);
 
-                if (!Collections.SpatialHashs.ContainsKey(map))
-                    Collections.SpatialHashs[map] = new SpatialHash(10);
-                Collections.SpatialHashs[map].Add(ntt, ref posInfo);
-                posInfo.ChangedTick = NttWorld.Tick;
+                var shr = new SpatialHashUpdateComponent(pos, Vector2.Zero, map, SpacialHashUpdatType.Add);
+                ntt.Set(ref shr);
 
+                ntt.Set<ViewportUpdateTagComponent>();
             }
             return ntt;
         }
@@ -50,10 +49,10 @@ namespace MagnumOpus.Helpers
             var moneyInfo = new MoneyRewardComponent(amount);
             ntt.Set(ref moneyInfo);
 
-            if (!Collections.SpatialHashs.ContainsKey(pos.Map))
-                Collections.SpatialHashs[pos.Map] = new SpatialHash(10);
-            Collections.SpatialHashs[pos.Map].Add(ntt, ref pos);
-            pos.ChangedTick = NttWorld.Tick;
+            var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Add);
+            ntt.Set(ref shr);
+
+            ntt.Set<ViewportUpdateTagComponent>();
 
             return ntt;
         }
@@ -122,7 +121,6 @@ namespace MagnumOpus.Helpers
 
             vwp.Viewport.X = (int)mpos.Position.X;
             vwp.Viewport.Y = (int)mpos.Position.Y;
-            vwp.Dirty = true;
             mob.Set(ref mpos);
             mob.Set(ref bdy);
             mob.Set(ref hp);
@@ -132,10 +130,10 @@ namespace MagnumOpus.Helpers
             mob.Set(ref fsp);
             mob.Set(ref sfc);
 
-            if (!Collections.SpatialHashs.ContainsKey(pos.Map))
-                Collections.SpatialHashs[pos.Map] = new SpatialHash(10);
-            Collections.SpatialHashs[pos.Map].Add(mob, ref pos);
-            pos.ChangedTick = NttWorld.Tick;
+            var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Add);
+            mob.Set(ref shr);
+
+            mob.Set<ViewportUpdateTagComponent>();
 
             spc.Count++;
 
@@ -157,7 +155,6 @@ namespace MagnumOpus.Helpers
 
             vwp.Viewport.X = (int)mpos.Position.X;
             vwp.Viewport.Y = (int)mpos.Position.Y;
-            vwp.Dirty = true;
             mob.Set(ref mpos);
             mob.Set(ref bdy);
             mob.Set(ref hp);
@@ -167,10 +164,10 @@ namespace MagnumOpus.Helpers
             mob.Set(ref cqm);
             mob.Set(ref fsp);
 
-            if (!Collections.SpatialHashs.ContainsKey(pos.Map))
-                Collections.SpatialHashs[pos.Map] = new SpatialHash(10);
-            Collections.SpatialHashs[pos.Map].Add(mob, ref pos);
-            pos.ChangedTick = NttWorld.Tick;
+            var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Add);
+            mob.Set(ref shr);
+
+            mob.Set<ViewportUpdateTagComponent>();
             return mob;
         }
     }
