@@ -8,16 +8,19 @@ namespace MagnumOpus.Components
     public struct BrainComponent
     {
         public BrainState State;
-        public int TargetId;
+        public NTT Target;
         public Vector2 TargetPosition;
         public int SleepTicks;
         public List<GOAPAction> Plan;
+        public List<GOAPAction> AvailableActions;
 
-        public BrainComponent()
+        public BrainComponent(params GOAPAction[] actions)
         {
             Plan = new List<GOAPAction>();
             State = BrainState.Idle;
             SleepTicks = 0;
+            TargetPosition = Vector2.Zero;
+            AvailableActions = new List<GOAPAction>(actions);
         }
     }
 }

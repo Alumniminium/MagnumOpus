@@ -8,7 +8,7 @@ namespace MagnumOpus.AOGP.Goals
         public override bool IsGoalAchieved(in NTT ntt)
         {
             ref readonly var brn = ref ntt.Get<BrainComponent>();
-            return brn.TargetId == 0;
+            return brn.Target == 0;
         }
     }
 }

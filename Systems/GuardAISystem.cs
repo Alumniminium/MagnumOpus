@@ -57,13 +57,13 @@ namespace MagnumOpus.Systems
                 if (closestEntity.Id != 0)
                 {
                     ref readonly var tpos = ref closestEntity.Get<PositionComponent>();
-                    brn.TargetId = closestEntity.Id;
+                    brn.Target = closestEntity;
                     brn.TargetPosition = tpos.Position;
                     brn.State = BrainState.Approaching;
                 }
             }
 
-            if (brn.TargetId == 0)
+            if (brn.Target == 0)
             {
                 if (pos.Position != grd.Position)
                 {
@@ -77,16 +77,16 @@ namespace MagnumOpus.Systems
             }
             else
             {
-                if (!NttWorld.EntityExists(brn.TargetId))
+                if (!NttWorld.EntityExists(brn.Target))
                 {
-                    brn.TargetId = 0;
+                    brn.Target = default;
                     return;
                 }
 
-                ref readonly var target = ref NttWorld.GetEntity(brn.TargetId);
+                ref readonly var target = ref NttWorld.GetEntity(brn.Target);
                 if (target.Has<DeathTagComponent>() || target.Type != EntityType.Monster)
                 {
-                    brn.TargetId = 0;
+                    brn.Target = default;
                     return;
                 }
 
@@ -108,7 +108,7 @@ namespace MagnumOpus.Systems
 
             if (brn.State == BrainState.Attacking)
             {
-                ref readonly var _target = ref NttWorld.GetEntity(brn.TargetId);
+                ref readonly var _target = ref NttWorld.GetEntity(brn.Target);
                 var atk = new AttackComponent(in _target, MsgInteractType.Physical);
                 ntt.Set(ref atk);
                 if (IsLogging)

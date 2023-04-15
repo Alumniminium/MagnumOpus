@@ -32,9 +32,7 @@ namespace MagnumOpus.AOGP
                 bestAction.Execute(ntt);
                 bestAction.UpdateEffects(ntt);
             }
-
             return plan;
         }
     }
-
 }

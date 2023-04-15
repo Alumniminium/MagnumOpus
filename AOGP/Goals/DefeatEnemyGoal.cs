@@ -9,10 +9,10 @@ namespace MagnumOpus.AOGP.Goals
         {
             ref readonly var brn = ref ntt.Get<BrainComponent>();
 
-            if (brn.TargetId == 0)
+            if (brn.Target == 0)
                 return false;
 
-            ref readonly var target = ref NttWorld.GetEntity(brn.TargetId);
+            ref readonly var target = ref NttWorld.GetEntity(brn.Target);
 
             return target.Has<DeathTagComponent>();
         }

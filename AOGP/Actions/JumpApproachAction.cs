@@ -1,21 +1,19 @@
 using System.Numerics;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
-using MagnumOpus.Helpers;
 
 namespace MagnumOpus.AOGP.Actions
 {
-    public class WalkApproachAction : GOAPAction
+    public class JumpApproachAction : GOAPAction
     {
-        public override int Cost { get; set; }
+        public override int Cost { get; set; } = 5;
         public override bool PreconditionsFulfilled(in NTT ntt)
         {
             ref readonly var pos = ref ntt.Get<PositionComponent>();
             ref readonly var brn = ref ntt.Get<BrainComponent>();
+            var distance = Vector2.Distance(pos.Position, NttWorld.GetEntity(brn.Target).Get<PositionComponent>().Position);
 
-            Cost = 2 + (int)Vector2.Distance(pos.Position, NttWorld.GetEntity(brn.Target).Get<PositionComponent>().Position);
-
-            return brn.Target != 0 && Vector2.Distance(pos.Position, NttWorld.GetEntity(brn.Target).Get<PositionComponent>().Position) > 1;
+            return brn.Target != 0 && distance > 12;
         }
 
         public override void Execute(in NTT ntt)
@@ -24,9 +22,9 @@ namespace MagnumOpus.AOGP.Actions
             ref readonly var brn = ref ntt.Get<BrainComponent>();
 
             var targetPos = NttWorld.GetEntity(brn.Target).Get<PositionComponent>().Position;
-            var dir = CoMath.GetRawDirection(targetPos, pos.Position);
-            var wlk = new WalkComponent(dir, false);
-            ntt.Set(ref wlk);
+
+            var jmp = new JumpComponent((ushort)targetPos.X, (ushort)targetPos.Y);
+            ntt.Set(ref jmp);
         }
 
         public override void UpdateEffects(in NTT ntt)

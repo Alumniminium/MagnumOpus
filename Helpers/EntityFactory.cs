@@ -1,8 +1,7 @@
 using System.Numerics;
+using MagnumOpus.AOGP.Actions;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
-using MagnumOpus.Enums;
-using MagnumOpus.SpacePartitioning;
 using MagnumOpus.Squiggly;
 using MagnumOpus.Squiggly.Models;
 
@@ -10,7 +9,7 @@ namespace MagnumOpus.Helpers
 {
     public static class EntityFactory
     {
-        public static NTT MakeDefaultItem(int itemId, Vector2 pos = default, int map = 0, bool randomDurability = false)
+        public static NTT MakeDefaultItem(int itemId, Vector2 position = default, int map = 0, bool randomDurability = false)
         {
             if (Collections.ItemType.TryGetValue(itemId, out var itemType) == false)
                 return default;
@@ -19,18 +18,19 @@ namespace MagnumOpus.Helpers
 
             ref var ntt = ref NttWorld.CreateEntity(EntityType.Item);
             var itemInfo = new ItemComponent(itemId, durability, itemType.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
-            ntt.Set(ref itemInfo);
 
-            if (pos != Vector2.Zero && map != 0)
+            if (position != Vector2.Zero && map != 0)
             {
-                var posInfo = new PositionComponent(pos, map);
-                ntt.Set(ref posInfo);
+                var pos = new PositionComponent(position, map);
+                var shr = new SpatialHashUpdateComponent(position, Vector2.Zero, map, SpacialHashUpdatType.Add);
 
-                var shr = new SpatialHashUpdateComponent(pos, Vector2.Zero, map, SpacialHashUpdatType.Add);
+                ntt.Set(ref pos);
                 ntt.Set(ref shr);
-
                 ntt.Set<ViewportUpdateTagComponent>();
             }
+
+            ntt.Set(ref itemInfo);
+
             return ntt;
         }
 
@@ -38,20 +38,19 @@ namespace MagnumOpus.Helpers
         {
             var itemId = ItemHelper.GetItemIdFromMoney(amount);
             var ntt = MakeDefaultItem(itemId, pos.Position, pos.Map);
+
             if (ntt == default)
                 return default;
 
             var ltc = new LifeTimeComponent(TimeSpan.FromSeconds(30));
             var vwp = new ViewportComponent(18f);
+            var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Add);
+            var moneyInfo = new MoneyRewardComponent(amount);
+
             ntt.Set(ref vwp);
             ntt.Set(ref ltc);
-
-            var moneyInfo = new MoneyRewardComponent(amount);
             ntt.Set(ref moneyInfo);
-
-            var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Add);
             ntt.Set(ref shr);
-
             ntt.Set<ViewportUpdateTagComponent>();
 
             return ntt;
@@ -70,9 +69,10 @@ namespace MagnumOpus.Helpers
             var inv = new InventoryComponent(mob, prefab.drop_money, 0);
             var fsp = new LifeGiverComponent(spawner);
             var sfc = new StatusEffectComponent(mob);
+            var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Add);
 
 
-            if (prefab.lookface is not 900 or 910)
+            if (!prefab.name.Contains("guard", StringComparison.InvariantCultureIgnoreCase))
             {
                 if (spc.GeneratorId % 9 == 0)
                 {
@@ -81,7 +81,7 @@ namespace MagnumOpus.Helpers
                 }
                 else
                 {
-                    var brn = new BrainComponent();
+                    var brn = new BrainComponent(new WalkApproachAction(), new AttackAction(), new JumpApproachAction());
                     mob.Set(ref brn);
                 }
             }
@@ -89,13 +89,10 @@ namespace MagnumOpus.Helpers
             {
                 var brn = new BrainComponent();
                 mob.Set(ref brn);
-
-                if (prefab.lookface is 900 or 910)
-                {
-                    var grd = new GuardPositionComponent(new Vector2(spc.SpawnArea.X, spc.SpawnArea.Y));
-                    mob.Set(ref grd);
-                }
+                var grd = new GuardPositionComponent(new Vector2(spc.SpawnArea.X, spc.SpawnArea.Y));
+                mob.Set(ref grd);
             }
+
             var items = ItemGenerator.GetDropItemsFor(cqm.CqMonsterId);
             for (var x = 0; x < items.Count; x++)
             {
@@ -119,8 +116,6 @@ namespace MagnumOpus.Helpers
                 mob.Set(ref cq);
             }
 
-            vwp.Viewport.X = (int)mpos.Position.X;
-            vwp.Viewport.Y = (int)mpos.Position.Y;
             mob.Set(ref mpos);
             mob.Set(ref bdy);
             mob.Set(ref hp);
@@ -129,10 +124,7 @@ namespace MagnumOpus.Helpers
             mob.Set(ref cqm);
             mob.Set(ref fsp);
             mob.Set(ref sfc);
-
-            var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Add);
             mob.Set(ref shr);
-
             mob.Set<ViewportUpdateTagComponent>();
 
             spc.Count++;
@@ -152,9 +144,8 @@ namespace MagnumOpus.Helpers
             var inv = new InventoryComponent(mob, prefab.drop_money, 0);
             var fsp = new LifeGiverComponent(spawner);
             var boi = new BoidBehaviorComponent(spawner.Id, mpos.Position);
+            var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Add);
 
-            vwp.Viewport.X = (int)mpos.Position.X;
-            vwp.Viewport.Y = (int)mpos.Position.Y;
             mob.Set(ref mpos);
             mob.Set(ref bdy);
             mob.Set(ref hp);
@@ -163,11 +154,9 @@ namespace MagnumOpus.Helpers
             mob.Set(ref inv);
             mob.Set(ref cqm);
             mob.Set(ref fsp);
-
-            var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Add);
             mob.Set(ref shr);
-
             mob.Set<ViewportUpdateTagComponent>();
+
             return mob;
         }
     }
