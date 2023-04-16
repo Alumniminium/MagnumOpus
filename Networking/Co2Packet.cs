@@ -6,7 +6,10 @@ namespace MagnumOpus.Networking
     {
         public static byte[] Serialize<T>(ref T packetStruct) where T : unmanaged
         {
-            var size = typeof(T) == typeof(MsgDHX) ? 355 : sizeof(T);
+            if (typeof(T) == typeof(MsgDHX))
+                return SerializeDHX(ref packetStruct);
+
+            var size = sizeof(T);
             var buffer = new byte[size];
 
             fixed (byte* pBuffer = buffer)
@@ -15,8 +18,21 @@ namespace MagnumOpus.Networking
                 *pPacketStruct = packetStruct;
             }
 
-            size = typeof(T) == typeof(MsgDHX) ? 355 : BitConverter.ToUInt16(buffer, 0);
+            size = BitConverter.ToUInt16(buffer, 0);
             return buffer[0..size];
+        }
+
+        public static byte[] SerializeDHX<T>(ref T packetStruct) where T : unmanaged
+        {
+            var size = sizeof(T);
+            var buffer = new byte[size];
+
+            fixed (byte* pBuffer = buffer)
+            {
+                var pPacketStruct = (T*)pBuffer;
+                *pPacketStruct = packetStruct;
+            }
+            return buffer[..355];
         }
 
 

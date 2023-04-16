@@ -13,6 +13,14 @@ namespace MagnumOpus
     {
         private static unsafe void Main()
         {
+            //handle unhanded exceptions
+            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+            {
+                var e = (Exception)args.ExceptionObject;
+                FConsole.WriteLine($"[FATAL] {e.Message}");
+                FConsole.WriteLine(e.StackTrace);
+            };
+
             Constants.PrometheusPort = ushort.TryParse(Environment.GetEnvironmentVariable("PROMETHEUS_PORT"), out var p) ? p : (ushort)1234;
             Constants.LoginPort = ushort.TryParse(Environment.GetEnvironmentVariable("LOGIN_PORT"), out var p2) ? p2 : (ushort)9958;
             Constants.GamePort = ushort.TryParse(Environment.GetEnvironmentVariable("GAME_PORT"), out var p3) ? p3 : (ushort)5816;

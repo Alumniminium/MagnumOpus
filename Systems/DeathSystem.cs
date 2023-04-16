@@ -92,6 +92,7 @@ namespace MagnumOpus.Systems
                 ref readonly var lgc = ref ntt.Get<LifeGiverComponent>();
                 ref var spc = ref lgc.NTT.Get<SpawnerComponent>();
                 ref readonly var pos = ref ntt.Get<PositionComponent>();
+                ref readonly var vwp = ref ntt.Get<ViewportComponent>();
 
                 var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Remove);
                 ntt.Set(ref shr);

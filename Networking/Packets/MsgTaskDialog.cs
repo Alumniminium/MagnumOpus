@@ -117,7 +117,7 @@ namespace MagnumOpus.Networking.Packets
             for (var i = 0; i < 32; i++)
             {
                 var action = CqProcessor.GetAction(nextId);
-                if (action == null)
+                if (action == null || action.id == 0)
                     break;
 
                 // FConsole.WriteLine($"Type: {task.type}, Data: {task.param.Trim()}, Next: {task.id_next}, Fail: {task.id_nextfail}");

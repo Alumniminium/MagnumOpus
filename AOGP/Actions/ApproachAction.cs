@@ -28,10 +28,5 @@ namespace MagnumOpus.AOGP.Actions
             var wlk = new WalkComponent(dir, false);
             ntt.Set(ref wlk);
         }
-
-        public override void UpdateEffects(in NTT ntt)
-        {
-            // No specific effects to update after execution
-        }
     }
 }

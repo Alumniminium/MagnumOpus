@@ -102,6 +102,10 @@ namespace MagnumOpus
                     net.RecvQueue.Enqueue(copy);
                 }
             }
+            catch
+            {
+                
+            }
             finally
             {
                 FConsole.WriteLine($"[GAME] Client disconnected: {net.Username}");

@@ -29,7 +29,7 @@ namespace MagnumOpus.Systems
                     }
                     if (net.UseGameCrypto)
                     {
-                        Span<byte> resized = stackalloc byte[packet.Length + 8];
+                        Span<byte> resized = new byte[packet.Length + 8];
                         packet.CopyTo(resized);
                         TqServer.Span.CopyTo(resized[^8..]);
                         net.GameCrypto.Encrypt(resized);

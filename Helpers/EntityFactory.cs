@@ -71,6 +71,8 @@ namespace MagnumOpus.Helpers
             var sfc = new StatusEffectComponent(mob);
             var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Add);
 
+            vwp.Viewport.X = (int)pos.Position.X;
+            vwp.Viewport.Y = (int)pos.Position.Y;
 
             if (!prefab.name.Contains("guard", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -81,7 +83,7 @@ namespace MagnumOpus.Helpers
                 }
                 else
                 {
-                    var brn = new BrainComponent(new WalkApproachAction(), new AttackAction(), new JumpApproachAction());
+                    var brn = new BrainComponent(new WalkApproachAction(), new AttackAction());
                     mob.Set(ref brn);
                 }
             }

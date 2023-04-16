@@ -28,26 +28,26 @@ namespace MagnumOpus.Networking.Packets
 
             for (var i = 0; i < packetCount; i++)
             {
-                var packet = stackalloc MsgMagicEffect[1];
+                var packet = new MsgMagicEffect();
                 {
-                    packet->Size = (ushort)(28 + 12 * Math.Min(Math.Min(entities.Count - i * maxTargets, maxTargets), entities.Count));
-                    packet->Id = 1105;
-                    packet->UniqId = attacker.Id;
-                    packet->Type = skillId;
-                    packet->Level = skillLevel;
-                    packet->TargetCount = Math.Min(Math.Min(entities.Count - i * maxTargets, maxTargets), entities.Count);
+                    packet.Size = (ushort)(28 + 12 * Math.Min(Math.Min(entities.Count - i * maxTargets, maxTargets), entities.Count));
+                    packet.Id = 1105;
+                    packet.UniqId = attacker.Id;
+                    packet.Type = skillId;
+                    packet.Level = skillLevel;
+                    packet.TargetCount = Math.Min(Math.Min(entities.Count - i * maxTargets, maxTargets), entities.Count);
                 };
                 var offset = 0;
                 for (var j = 0; j < Math.Min(entities.Count - i * maxTargets, maxTargets); j++)
                 {
-                    packet->Targets[offset++] = entities[j + i * maxTargets].Id;
-                    packet->Targets[offset++] = damage;
-                    packet->Targets[offset++] = 0;
+                    packet.Targets[offset++] = entities[j + i * maxTargets].Id;
+                    packet.Targets[offset++] = damage;
+                    packet.Targets[offset++] = 0;
                 }
 
-                var buffer = new byte[packet->Size];
+                var buffer = new byte[packet.Size];
                 fixed (byte* p = buffer)
-                    *(MsgMagicEffect*)p = *packet;
+                    *(MsgMagicEffect*)p = packet;
                 packets[i] = buffer;
             }
             return packets;

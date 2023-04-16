@@ -48,14 +48,8 @@ namespace MagnumOpus.Systems
                 Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
                 var playerVisible = false;
 
-                foreach (var player in vwp.EntitiesVisible)
-                {
-                    if (player.Type == EntityType.Player)
-                    {
-                        player.Set<ViewportUpdateTagComponent>();
-                        playerVisible = true;
-                    }
-                }
+                foreach (var visible in vwp.EntitiesVisible)
+                    visible.Set<ViewportUpdateTagComponent>();
 
                 if (playerVisible)
                 {

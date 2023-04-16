@@ -23,7 +23,7 @@ namespace MagnumOpus.Systems
 
             ntt.Remove<TeleportComponent>();
             if (IsLogging)
-                Logger.Debug("[{tick}] Teleported '{0}' to {1}, {2}, {3}", NttWorld.Tick, Name, ntt, tpc.Map, tpc.X, tpc.Y);
+                Logger.Debug("[{tick}] Teleported '{0}' to {1}, {2}, {3}", NttWorld.Tick, ntt, tpc.Map, tpc.X, tpc.Y);
         }
     }
 }

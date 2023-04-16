@@ -24,10 +24,5 @@ namespace MagnumOpus.AOGP.Actions
             var atk = new AttackComponent(in NttWorld.GetEntity(brn.Target), MsgInteractType.Physical);
             ntt.Set(ref atk);
         }
-
-        public override void UpdateEffects(in NTT ntt)
-        {
-            // No specific effects to update after execution
-        }
     }
 }
