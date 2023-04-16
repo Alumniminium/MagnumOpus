@@ -3,7 +3,6 @@ using MagnumOpus.AOGP.Goals;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Systems
 {
