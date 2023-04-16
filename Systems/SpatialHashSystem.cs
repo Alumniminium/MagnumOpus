@@ -12,18 +12,26 @@ namespace MagnumOpus.Systems
         {
             if (shr.Type == SpacialHashUpdatType.Remove)
             {
-                Collections.SpatialHashs[shr.Map].Remove(ntt, shr.Position);
+                Collections.SpatialHashes[shr.Map].Remove(ntt, shr.Position);
             }
             else if (shr.Type == SpacialHashUpdatType.Add)
             {
-                if (!Collections.SpatialHashs.ContainsKey(shr.Map))
-                    Collections.SpatialHashs[shr.Map] = new SpatialHash(10);
+                if (!Collections.SpatialHashes.ContainsKey(shr.Map))
+                    Collections.SpatialHashes[shr.Map] = new SpatialHash(10);
 
-                Collections.SpatialHashs[shr.Map].Add(ntt, shr.Position);
+                Collections.SpatialHashes[shr.Map].Add(ntt, shr.Position);
             }
             else
             {
-                Collections.SpatialHashs[shr.Map].Move(ntt, ntt.Get<PositionComponent>());
+                if (shr.LastMap != shr.Map)
+                {
+                    Collections.SpatialHashes[shr.LastMap].Remove(ntt, shr.LastPosition);
+                    if (!Collections.SpatialHashes.ContainsKey(shr.Map))
+                        Collections.SpatialHashes[shr.Map] = new SpatialHash(10);
+                    Collections.SpatialHashes[shr.Map].Add(ntt, shr.Position);
+                }
+                else
+                    Collections.SpatialHashes[shr.Map].Move(ntt, ntt.Get<PositionComponent>());
             }
             ntt.Remove<SpatialHashUpdateComponent>();
         }

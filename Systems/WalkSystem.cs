@@ -45,7 +45,7 @@ namespace MagnumOpus.Systems
 
             ntt.Remove<WalkComponent>();
 
-            var shc = new SpatialHashUpdateComponent(pos.Position, pos.LastPosition, pos.Map, SpacialHashUpdatType.Move);
+            var shc = new SpatialHashUpdateComponent(pos.Position, pos.LastPosition, pos.Map, pos.Map, SpacialHashUpdatType.Move);
             ntt.Set(ref shc);
 
             ntt.Set<ViewportUpdateTagComponent>();

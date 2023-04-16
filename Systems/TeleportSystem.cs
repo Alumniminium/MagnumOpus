@@ -2,15 +2,19 @@ using System.Numerics;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Networking.Packets;
+using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Systems
 {
     public sealed class TeleportSystem : NttSystem<TeleportComponent, PositionComponent>
     {
-        public TeleportSystem() : base("Teleport", threads: 2, log: true) { }
+        public TeleportSystem() : base("Teleport", threads: 1, log: true) { }
 
         public override void Update(in NTT ntt, ref TeleportComponent tpc, ref PositionComponent pos)
         {
+            var shc = new SpatialHashUpdateComponent(pos.Position, new Vector2(tpc.X, tpc.Y), pos.Map, tpc.Map, SpacialHashUpdatType.Move);
+            ntt.Set(ref shc);
+
             pos.Position = new Vector2(tpc.X, tpc.Y);
             pos.Map = tpc.Map;
 

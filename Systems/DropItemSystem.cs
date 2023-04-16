@@ -25,7 +25,7 @@ namespace MagnumOpus.Systems
             rdi.ItemNtt.Set(new LifeTimeComponent(TimeSpan.FromSeconds(30)));
             rdi.ItemNtt.Set(new ViewportComponent(18f));
 
-            var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Add);
+            var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, pos.Map, SpacialHashUpdatType.Add);
             rdi.ItemNtt.Set(ref shr);
 
 

@@ -29,7 +29,7 @@ namespace MagnumOpus.Systems
             if (brn.State == BrainState.WakingUp)
             {
                 vwp.EntitiesVisible.Clear();
-                Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
+                Collections.SpatialHashes[pos.Map].GetVisibleEntities(ref vwp);
 
                 var closestDistance = int.MaxValue;
                 var closestEntity = default(NTT);

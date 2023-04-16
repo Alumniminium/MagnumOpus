@@ -45,7 +45,7 @@ namespace MagnumOpus.Systems
                 var mob = EntityFactory.MakeMonster(cqMob, ref spc, pos, spawner);
 
                 ref var vwp = ref mob.Get<ViewportComponent>();
-                Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
+                Collections.SpatialHashes[pos.Map].GetVisibleEntities(ref vwp);
                 var playerVisible = false;
 
                 foreach (var visible in vwp.EntitiesVisible)

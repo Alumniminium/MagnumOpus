@@ -104,11 +104,10 @@ namespace MagnumOpus
             }
             catch
             {
-                
+                FConsole.WriteLine($"[GAME] Client disconnected: {net.Username}");
             }
             finally
             {
-                FConsole.WriteLine($"[GAME] Client disconnected: {net.Username}");
                 net.Socket?.Close();
                 net.Socket?.Dispose();
                 ntt.Remove<NetworkComponent>();

@@ -41,7 +41,7 @@ namespace MagnumOpus.Systems
                     Logger.Debug("Jump started for {ntt}", ntt);
             }
 
-            var shc = new SpatialHashUpdateComponent(pos.Position, pos.LastPosition, pos.Map, SpacialHashUpdatType.Move);
+            var shc = new SpatialHashUpdateComponent(pos.Position, pos.LastPosition, pos.Map, pos.Map, SpacialHashUpdatType.Move);
             ntt.Set(ref shc);
             ntt.Set<ViewportUpdateTagComponent>();
         }

@@ -94,7 +94,7 @@ namespace MagnumOpus.Systems
                 ref readonly var pos = ref ntt.Get<PositionComponent>();
                 ref readonly var vwp = ref ntt.Get<ViewportComponent>();
 
-                var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Remove);
+                var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, pos.Map, SpacialHashUpdatType.Remove);
                 ntt.Set(ref shr);
 
                 spc.Count--;
@@ -111,10 +111,5 @@ namespace MagnumOpus.Systems
 
             ntt.Set<DestroyEndOfFrameComponent>();
         }
-
-        // public static void TrapDeath(in NTT ntt, ref DeathTagComponent dtc)
-        // {
-
-        // }
     }
 }

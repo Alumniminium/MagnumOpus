@@ -22,7 +22,7 @@ namespace MagnumOpus.Helpers
             if (position != Vector2.Zero && map != 0)
             {
                 var pos = new PositionComponent(position, map);
-                var shr = new SpatialHashUpdateComponent(position, Vector2.Zero, map, SpacialHashUpdatType.Add);
+                var shr = new SpatialHashUpdateComponent(position, Vector2.Zero, map, map, SpacialHashUpdatType.Add);
 
                 ntt.Set(ref pos);
                 ntt.Set(ref shr);
@@ -44,7 +44,7 @@ namespace MagnumOpus.Helpers
 
             var ltc = new LifeTimeComponent(TimeSpan.FromSeconds(30));
             var vwp = new ViewportComponent(18f);
-            var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Add);
+            var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, pos.Map, SpacialHashUpdatType.Add);
             var moneyInfo = new MoneyRewardComponent(amount);
 
             ntt.Set(ref vwp);
@@ -69,7 +69,7 @@ namespace MagnumOpus.Helpers
             var inv = new InventoryComponent(mob, prefab.drop_money, 0);
             var fsp = new LifeGiverComponent(spawner);
             var sfc = new StatusEffectComponent(mob);
-            var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Add);
+            var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, pos.Map, SpacialHashUpdatType.Add);
 
             vwp.Viewport.X = (int)pos.Position.X;
             vwp.Viewport.Y = (int)pos.Position.Y;
@@ -146,7 +146,7 @@ namespace MagnumOpus.Helpers
             var inv = new InventoryComponent(mob, prefab.drop_money, 0);
             var fsp = new LifeGiverComponent(spawner);
             var boi = new BoidBehaviorComponent(spawner.Id, mpos.Position);
-            var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Add);
+            var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, pos.Map,SpacialHashUpdatType.Add);
 
             mob.Set(ref mpos);
             mob.Set(ref bdy);

@@ -30,7 +30,7 @@ namespace MagnumOpus.Systems
             var itemNtt = EntityFactory.MakeMoneyDrop(drc.Amount, ref pos);
             if (itemNtt != default)
             {
-                var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Add);
+                var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, pos.Map, SpacialHashUpdatType.Add);
                 itemNtt.Set(ref shr);
 
                 var dropMsg = MsgFloorItem.Create(itemNtt, Enums.MsgFloorItemType.Create);

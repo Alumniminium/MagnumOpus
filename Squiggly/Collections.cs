@@ -7,7 +7,7 @@ namespace MagnumOpus.Squiggly
 {
     public static class Collections
     {
-        internal static readonly Dictionary<int, SpatialHash> SpatialHashs = new();
+        internal static readonly Dictionary<int, SpatialHash> SpatialHashes = new();
 
         internal static ConcurrentDictionary<long, cq_action> CqAction = new();
         internal static ConcurrentDictionary<long, cq_task> CqTask = new();

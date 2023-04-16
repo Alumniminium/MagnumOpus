@@ -21,7 +21,7 @@ namespace MagnumOpus.Systems
                 vwp.EntitiesVisibleLast.Add(e);
             vwp.EntitiesVisible.Clear();
 
-            Collections.SpatialHashs[pos.Map].GetVisibleEntities(ref vwp);
+            Collections.SpatialHashes[pos.Map].GetVisibleEntities(ref vwp);
 
             if (IsLogging)
                 Logger.Debug("{ntt} has {visibleCount} visible entities", ntt, vwp.EntitiesVisible.Count);

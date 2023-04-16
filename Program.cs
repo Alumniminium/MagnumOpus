@@ -67,7 +67,7 @@ namespace MagnumOpus
 
             FConsole.WriteLine("[DATABASE] Loading...");
             NttWorld.SetSystems(systems.ToArray());
-            NttWorld.SetTPS(30);
+            NttWorld.SetTPS(60);
             ReflectionHelper.LoadComponents("_STATE_FILES");
             ref var ntt = ref NttWorld.GetEntity(0);
             ntt.Recycle();
@@ -93,7 +93,7 @@ namespace MagnumOpus
                 if (pos.Position == default)
                     continue;
 
-                var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Add);
+                var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, pos.Map, SpacialHashUpdatType.Add);
                 worldNtt.Value.Set(ref shr);
             }
 

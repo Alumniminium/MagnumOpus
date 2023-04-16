@@ -50,7 +50,7 @@ namespace MagnumOpus.Squiggly
                 var vwp = new ViewportComponent(18f);
                 ntt.Set(ref vwp);
 
-                var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Add);
+                var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, pos.Map, SpacialHashUpdatType.Add);
                 ntt.Set(ref shr);
 
             }
@@ -111,10 +111,10 @@ namespace MagnumOpus.Squiggly
                         cqmap.Height, new Dictionary<ushort, CqPortal>()
                     );
                     Collections.Maps.Add((ushort)cqmap.id, map);
-                    if (!Collections.SpatialHashs.TryGetValue((ushort)cqmap.id, out var _))
+                    if (!Collections.SpatialHashes.TryGetValue((ushort)cqmap.id, out var _))
                     {
                         var grid = new SpatialHash(10);
-                        Collections.SpatialHashs.Add((ushort)cqmap.id, grid);
+                        Collections.SpatialHashes.Add((ushort)cqmap.id, grid);
                     }
                 }
                 foreach (var dportal in db.Dmap_Portals)
@@ -154,7 +154,7 @@ namespace MagnumOpus.Squiggly
                     ntt.Set(ref npcc);
                     ntt.Set(ref vwp);
 
-                    var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, SpacialHashUpdatType.Add);
+                    var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, pos.Map, SpacialHashUpdatType.Add);
                     ntt.Set(ref shr);
                 }
             }
