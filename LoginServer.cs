@@ -10,7 +10,7 @@ namespace MagnumOpus
     public static class LoginServer
     {
         private static readonly TcpListener LoginListener = new(System.Net.IPAddress.Any, Constants.LoginPort);
-        private static readonly Thread loginThread = new(LoginServerLoop) { IsBackground = true, Priority = ThreadPriority.Highest };
+        private static readonly Thread loginThread = new(AcceptLoop) { IsBackground = true, Priority = ThreadPriority.Highest };
 
         public static void Start()
         {
@@ -19,7 +19,7 @@ namespace MagnumOpus
             loginThread.Start();
         }
 
-        private static void LoginServerLoop()
+        private static void AcceptLoop()
         {
             var ready = false;
             NttWorld.RegisterOnEndTick(() => { ready = true; });

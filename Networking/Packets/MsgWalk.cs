@@ -58,18 +58,16 @@ namespace MagnumOpus.Networking.Packets
             if (ntt.Id != msg.UniqueId)
                 FConsole.WriteLine($"[{nameof(MsgWalk)}] UID Mismatch! Packet: {msg.UniqueId}, ntt: {ntt.Id}");
 
-            if (ntt.Has<WalkComponent>())
+            ref var emo = ref ntt.Get<EmoteComponent>();
+            if (emo.Emote != Emote.Stand)
             {
-                ref var pos = ref ntt.Get<PositionComponent>();
-                var kickback = MsgAction.Create(ntt.Id, 0, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.South, MsgActionType.Kickback);
-                ntt.NetSync(ref kickback, true);
-                return;
+                emo.Emote = Emote.Stand;
+                emo.ChangedTick = NttWorld.Tick;
             }
 
             var wlk = new WalkComponent(msg.RawDirection, msg.Type == 1);
-            var emo = new EmoteComponent(Emote.Stand);
             ntt.Set(ref wlk);
-            ntt.Set(ref emo);
+
             ntt.Remove<AttackComponent>();
         }
     }

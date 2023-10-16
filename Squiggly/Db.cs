@@ -113,7 +113,7 @@ namespace MagnumOpus.Squiggly
                     Collections.Maps.Add((ushort)cqmap.id, map);
                     if (!Collections.SpatialHashes.TryGetValue((ushort)cqmap.id, out var _))
                     {
-                        var grid = new SpatialHash(10);
+                        var grid = new SpatialHash();
                         Collections.SpatialHashes.Add((ushort)cqmap.id, grid);
                     }
                 }

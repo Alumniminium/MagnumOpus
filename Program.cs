@@ -18,13 +18,13 @@ namespace MagnumOpus
             {
                 var e = (Exception)args.ExceptionObject;
                 FConsole.WriteLine($"[FATAL] {e.Message}");
-                FConsole.WriteLine(e.StackTrace);
+                FConsole.WriteLine(e.StackTrace ?? string.Empty);
             };
 
             Constants.PrometheusPort = ushort.TryParse(Environment.GetEnvironmentVariable("PROMETHEUS_PORT"), out var p) ? p : (ushort)1234;
             Constants.LoginPort = ushort.TryParse(Environment.GetEnvironmentVariable("LOGIN_PORT"), out var p2) ? p2 : (ushort)9958;
             Constants.GamePort = ushort.TryParse(Environment.GetEnvironmentVariable("GAME_PORT"), out var p3) ? p3 : (ushort)5816;
-            Constants.ServerIP = Environment.GetEnvironmentVariable("PUBLIC_IP") ?? "62.178.176.71";
+            Constants.ServerIP = Environment.GetEnvironmentVariable("PUBLIC_IP") ?? "172.16.114.1";
 
             using var server = new Prometheus.MetricServer(port: Constants.PrometheusPort);
             server.Start();
@@ -35,7 +35,7 @@ namespace MagnumOpus
                 new MonsterRespawnSystem(),
                 new BasicAISystem(),
                 new GuardAISystem(),
-                new BoidSystem(),
+                // new BoidSystem(),
                 new WalkSystem(),
                 new JumpSystem(),
                 new EmoteSystem(),
@@ -67,7 +67,7 @@ namespace MagnumOpus
 
             FConsole.WriteLine("[DATABASE] Loading...");
             NttWorld.SetSystems(systems.ToArray());
-            NttWorld.SetTPS(60);
+            NttWorld.SetTPS(30);
             ReflectionHelper.LoadComponents("_STATE_FILES");
             ref var ntt = ref NttWorld.GetEntity(0);
             ntt.Recycle();
@@ -105,7 +105,8 @@ namespace MagnumOpus
             while (true)
             {
                 NttWorld.Update();
-
+                if (NttWorld.Tick % NttWorld.TargetTps == 0)
+                    Console.WriteLine(GC.CollectionCount(0) + " " + GC.CollectionCount(1) + " " + GC.CollectionCount(2));
                 // if (Debugger.IsAttached)
                 // {
                 //     if (!Console.KeyAvailable)

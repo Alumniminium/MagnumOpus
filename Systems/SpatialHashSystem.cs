@@ -1,5 +1,6 @@
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
+using MagnumOpus.Networking.Packets;
 using MagnumOpus.SpacePartitioning;
 using MagnumOpus.Squiggly;
 
@@ -12,12 +13,14 @@ namespace MagnumOpus.Systems
         {
             if (shr.Type == SpacialHashUpdatType.Remove)
             {
+                var msg = MsgInteract.Create(ntt, ntt, Enums.MsgInteractType.Death, 0);
+                ntt.NetSync(ref msg, true);
                 Collections.SpatialHashes[shr.Map].Remove(ntt, shr.Position);
             }
             else if (shr.Type == SpacialHashUpdatType.Add)
             {
                 if (!Collections.SpatialHashes.ContainsKey(shr.Map))
-                    Collections.SpatialHashes[shr.Map] = new SpatialHash(10);
+                    Collections.SpatialHashes[shr.Map] = new SpatialHash();
 
                 Collections.SpatialHashes[shr.Map].Add(ntt, shr.Position);
             }
@@ -27,7 +30,7 @@ namespace MagnumOpus.Systems
                 {
                     Collections.SpatialHashes[shr.LastMap].Remove(ntt, shr.LastPosition);
                     if (!Collections.SpatialHashes.ContainsKey(shr.Map))
-                        Collections.SpatialHashes[shr.Map] = new SpatialHash(10);
+                        Collections.SpatialHashes[shr.Map] = new SpatialHash();
                     Collections.SpatialHashes[shr.Map].Add(ntt, shr.Position);
                 }
                 else

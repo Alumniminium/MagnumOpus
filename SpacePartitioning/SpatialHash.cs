@@ -11,7 +11,7 @@ namespace MagnumOpus.SpacePartitioning
         private readonly int cellSize;
         private readonly Dictionary<int, List<NTT>> Hashtbl;
 
-        public SpatialHash(int cellSize)
+        public SpatialHash(int cellSize = 10)
         {
             this.cellSize = cellSize;
             Hashtbl = new Dictionary<int, List<NTT>>();
@@ -84,6 +84,44 @@ namespace MagnumOpus.SpacePartitioning
             var y = (int)scaled.Y;
 
             return (x * 73856093) ^ (y * 19349663);
+        }
+    }
+    public class MapEntities
+    {
+        private readonly Dictionary<int, NTT> Entities;
+
+        public MapEntities() => Entities = new Dictionary<int, NTT>();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Add(NTT entity, Vector2 pos)
+        {
+            Entities.Add(entity.Id, entity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Remove(NTT entity, Vector2 pos)
+        {
+            Entities.Remove(entity.Id);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Move(NTT ntt, PositionComponent pos)
+        {
+            Remove(ntt, pos.LastPosition);
+            Add(ntt, pos.Position);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void GetVisibleEntities(ref ViewportComponent vwp)
+        {
+            foreach (var kvp in Entities)
+            {
+                ref readonly var pos = ref kvp.Value.Get<PositionComponent>();
+                var distanceSquared = Vector2.DistanceSquared(pos.Position, new Vector2(vwp.Viewport.X, vwp.Viewport.Y));
+
+                if (distanceSquared <= 324f)
+                    vwp.EntitiesVisible.Add(kvp.Value);
+            }
         }
     }
 }

@@ -15,35 +15,25 @@ namespace MagnumOpus.Systems
         {
             var direction = CoMath.GetDirection(new Vector2(jmp.Position.X, jmp.Position.Y), pos.Position);
             var distance = (int)Vector2.Distance(new Vector2(jmp.Position.X, jmp.Position.Y), pos.Position);
-            var jumpTime = NttWorld.TargetTps * CoMath.GetJumpTime(distance);
+            // var jumpTime = NttWorld.TargetTps * CoMath.GetJumpTime(distance);
 
             pos.LastPosition = pos.Position;
+            pos.ChangedTick = NttWorld.Tick;
+            pos.Position = jmp.Position;
 
-            if (jmp.CreatedTick + jumpTime < NttWorld.Tick)
-            {
-                pos.Position = jmp.Position;
-                ntt.Remove<JumpComponent>();
-                if (IsLogging)
-                    Logger.Debug("Jump complete for {ntt}", ntt);
-            }
-            else
-                pos.Position = Vector2.Lerp(pos.Position, jmp.Position, 2 / jumpTime);
+            pos.Direction = direction;
+            var packet = MsgAction.CreateJump(in ntt, in jmp);
+            ntt.NetSync(ref packet, true);
 
-            if (jmp.CreatedTick == NttWorld.Tick)
-            {
-                pos.Direction = direction;
-                var packet = MsgAction.CreateJump(in ntt, in jmp);
-                ntt.NetSync(ref packet, true);
-
-                // PrometheusPush.JumpCount.Inc();
-                // PrometheusPush.JumpDistance.Inc(distance);
-                if (IsLogging)
-                    Logger.Debug("Jump started for {ntt}", ntt);
-            }
+            PrometheusPush.JumpCount.Inc();
+            PrometheusPush.JumpDistance.Inc(distance);
+            if (IsLogging)
+                Logger.Debug("Jump started for {ntt}", ntt);
 
             var shc = new SpatialHashUpdateComponent(pos.Position, pos.LastPosition, pos.Map, pos.Map, SpacialHashUpdatType.Move);
             ntt.Set(ref shc);
             ntt.Set<ViewportUpdateTagComponent>();
+            ntt.Remove<JumpComponent>();
         }
     }
 }

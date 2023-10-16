@@ -30,6 +30,8 @@ namespace MagnumOpus.Systems
 
                 if (rebornMap != null)
                 {
+
+                    pos.ChangedTick = NttWorld.Tick;
                     pos.Position = new Vector2(rebornMap.portal0_x, rebornMap.portal0_y);
                     pos.Map = (ushort)rebornMap.id;
                 }
@@ -38,6 +40,7 @@ namespace MagnumOpus.Systems
                     if (IsLogging)
                         Logger.Debug("Reborn Map {0} not found", mapId);
                     pos.Map = 1002;
+                    pos.ChangedTick = NttWorld.Tick;
                     pos.Position = new Vector2(477, 380);
                 }
             }
@@ -46,6 +49,8 @@ namespace MagnumOpus.Systems
                 if (IsLogging)
                     Logger.Debug("Map {0} not found", pos.Map);
                 pos.Map = 1002;
+
+                pos.ChangedTick = NttWorld.Tick;
                 pos.Position = new Vector2(477, 380);
             }
 

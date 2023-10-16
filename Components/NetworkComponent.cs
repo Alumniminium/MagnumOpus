@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Net.Sockets;
 using MagnumOpus.ECS;
+using MagnumOpus.Enums;
 using MagnumOpus.Networking.Cryptography;
 namespace MagnumOpus.Components
 {
@@ -15,7 +16,7 @@ namespace MagnumOpus.Components
         public DiffieHellman DiffieHellman = new();
         public Memory<byte> ClientIV = new byte[8];
         public Memory<byte> ServerIV = new byte[8];
-        public ConcurrentQueue<Memory<byte>> RecvQueue = new();
+        public Dictionary<PacketId, ConcurrentQueue<Memory<byte>>> PacketQueues = new();
         public ConcurrentQueue<byte[]> SendQueue = new();
         public string Username;
 
@@ -30,6 +31,10 @@ namespace MagnumOpus.Components
             Username = string.Empty;
             Random.Shared.NextBytes(ClientIV.Span);
             Random.Shared.NextBytes(ServerIV.Span);
+
+            var packetIds = Enum.GetValues(typeof(PacketId));
+            foreach (PacketId packetId in packetIds)
+                PacketQueues[packetId] = new ConcurrentQueue<Memory<byte>>();
         }
     }
 }

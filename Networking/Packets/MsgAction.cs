@@ -104,20 +104,13 @@ namespace MagnumOpus.Networking.Packets
                             FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.X}, {msg.Y}");
 
                         ref var pos = ref ntt.Get<PositionComponent>();
-                        ref var vwp = ref ntt.Get<ViewportComponent>();
-                        lock (vwp.rwLock)
-                        {
-                            vwp.EntitiesVisible.Clear();
-                            vwp.EntitiesVisibleLast.Clear();
-                        }
-
                         var reply = Create(ntt.Id, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
                         ntt.NetSync(ref reply);
                         if (_trace)
                             FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {reply.X}, {reply.Y}");
 
                         NttWorld.Players.Add(ntt);
-                        ntt.Set<ViewportUpdateTagComponent>();
+                        ntt.Set(new TeleportComponent { Map = (ushort)pos.Map, X = (ushort)pos.Position.X, Y = (ushort)pos.Position.Y });
                         break;
                     }
                 case MsgActionType.LeaveBooth:
@@ -244,6 +237,7 @@ namespace MagnumOpus.Networking.Packets
                             FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.JumpX}, {msg.JumpY}");
 
                         ref var pos = ref ntt.Get<PositionComponent>();
+                        pos.ChangedTick = NttWorld.Tick;
                         pos.Position = new Vector2(msg.JumpX, msg.JumpY);
                         ntt.NetSync(ref msg);
                         ntt.Set<ViewportUpdateTagComponent>();

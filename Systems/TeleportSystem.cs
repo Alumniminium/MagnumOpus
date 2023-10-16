@@ -6,15 +6,18 @@ using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Systems
 {
-    public sealed class TeleportSystem : NttSystem<TeleportComponent, PositionComponent>
+    public sealed class TeleportSystem : NttSystem<TeleportComponent, PositionComponent, ViewportComponent>
     {
         public TeleportSystem() : base("Teleport", threads: 1, log: true) { }
 
-        public override void Update(in NTT ntt, ref TeleportComponent tpc, ref PositionComponent pos)
+        public override void Update(in NTT ntt, ref TeleportComponent tpc, ref PositionComponent pos, ref ViewportComponent vwp)
         {
+            vwp.EntitiesVisible.Clear();
+            vwp.EntitiesVisibleLast.Clear();
             var shc = new SpatialHashUpdateComponent(pos.Position, new Vector2(tpc.X, tpc.Y), pos.Map, tpc.Map, SpacialHashUpdatType.Move);
             ntt.Set(ref shc);
 
+            pos.ChangedTick = NttWorld.Tick;
             pos.Position = new Vector2(tpc.X, tpc.Y);
             pos.Map = tpc.Map;
 

@@ -3,6 +3,7 @@ using System.Text;
 using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
+using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
 
@@ -82,24 +83,29 @@ namespace MagnumOpus
                 {
                     var sizeBytes = buffer[..2];
                     var count = net.Socket.Receive(sizeBytes.Span);
-                    if (count != 2)
-                        break;
+
+                    if (count == 0)
+                        throw new SocketException((int)SocketError.Disconnecting);
+
+                    while (count < 2)
+                        count += net.Socket.Receive(sizeBytes.Span[count..]);
 
                     crypto.Decrypt(sizeBytes.Span);
                     var size = BitConverter.ToUInt16(sizeBytes.Span) + 8;
 
-                    count = 2;
                     while (count < size)
                     {
                         var received = net.Socket.Receive(buffer.Span[count..size]);
                         if (received == 0)
-                            break;
+                            throw new SocketException((int)SocketError.Disconnecting);
                         count += received;
                     }
                     Memory<byte> copy = new byte[size];
                     buffer[..size].CopyTo(copy);
                     crypto.Decrypt(copy.Span[2..]);
-                    net.RecvQueue.Enqueue(copy);
+
+                    var id = (PacketId)BitConverter.ToUInt16(copy.Span[2..4]);
+                    net.PacketQueues[id].Enqueue(copy);
                 }
             }
             catch

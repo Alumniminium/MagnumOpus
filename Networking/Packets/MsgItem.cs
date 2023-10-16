@@ -42,8 +42,8 @@ namespace MagnumOpus.Networking.Packets
             {
                 case MsgItemType.Ping:
                     {
-                        var tick = MsgTick.Create(in ntt);
-                        ntt.NetSync(ref tick);
+                        // var tick = MsgTick.Create(in ntt);
+                        // ntt.NetSync(ref tick);
                         ntt.NetSync(ref msg);
                         break;
                     }

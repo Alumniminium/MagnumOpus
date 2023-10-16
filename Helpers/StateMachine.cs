@@ -1,6 +1,6 @@
 namespace MagnumOpus.Helpers
 {
-    public class StateMachine<T>
+    public class StateMachine<T> where T : Enum
     {
         private readonly Dictionary<T, Dictionary<T, Action>> transitions;
         public T CurrentState { get; private set; }
