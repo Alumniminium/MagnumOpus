@@ -21,7 +21,7 @@ namespace MagnumOpus.Systems
 
                 if (rew.Amount > 1000)
                 {
-                    var moneyActionMsg = MsgAction.Create(ntt.Id, ntt.Id, 0, 0, 0, Enums.MsgActionType.GetMoney);
+                    var moneyActionMsg = MsgAction.Create(ntt.Id, rew.Amount, 0, 0, 0, Enums.MsgActionType.GetMoney);
                     ntt.NetSync(ref moneyActionMsg, true);
                 }
 

@@ -55,7 +55,7 @@ namespace MagnumOpus.Systems
 
                     if (inv.Money > 0 && Random.Shared.NextSingle() < 0.25f)
                     {
-                        var drop = new RequestDropMoneyComponent(Random.Shared.Next((int)inv.Money));
+                        var drop = new RequestDropMoneyComponent(Random.Shared.Next(1, (int)inv.Money));
                         ntt.Set(ref drop);
                     }
 

@@ -75,6 +75,7 @@ namespace MagnumOpus.Networking.Packets
                 var pro = new ProfessionComponent(ntt, ClasseName.Archer);
                 var sbc = new SpellBookComponent();
                 var eqc = new EquipmentComponent();
+                var stm = new StaminaComponent(ntt);
 
                 sbc.Spells.Add(1000, (4, 0, 0));
                 sbc.Spells.Add(1005, (4, 0, 0));
@@ -98,6 +99,7 @@ namespace MagnumOpus.Networking.Packets
                 ntt.Set(ref mana);
                 ntt.Set(ref eqc);
                 ntt.Set(ref hed);
+                ntt.Set(ref stm);
 
                 var testItem = NttWorld.CreateEntity(EntityType.Item);
                 var itemComp = new ItemComponent(1001020, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);

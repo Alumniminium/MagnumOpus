@@ -18,6 +18,12 @@ namespace MagnumOpus.Networking.Packets
         public uint Timestamp;
         public int Value;
 
+        public readonly int Money => UnqiueId;
+        public readonly int ItemUniqueId => UnqiueId;
+        public readonly int ItemSlot => Param;
+        public readonly int ShopId => UnqiueId;
+        public readonly int ShopItemId => Param;
+
         public static MsgItem Create(int uid, int value, int param, MsgItemType type)
         {
             var msg = new MsgItem
@@ -42,14 +48,14 @@ namespace MagnumOpus.Networking.Packets
             {
                 case MsgItemType.Ping:
                     {
-                        // var tick = MsgTick.Create(in ntt);
-                        // ntt.NetSync(ref tick);
+                        var tick = MsgTick.Create(in ntt);
+                        ntt.NetSync(ref tick);
                         ntt.NetSync(ref msg);
                         break;
                     }
                 case MsgItemType.DropMoney:
                     {
-                        var rdmc = new RequestDropMoneyComponent(msg.Value);
+                        var rdmc = new RequestDropMoneyComponent(msg.Money);
                         ntt.Set(ref rdmc);
 
                         ntt.NetSync(ref msg);
@@ -57,7 +63,7 @@ namespace MagnumOpus.Networking.Packets
                     }
                 case MsgItemType.RemoveInventory:
                     {
-                        ref readonly var itemNtt = ref NttWorld.GetEntity(msg.UnqiueId);
+                        ref readonly var itemNtt = ref NttWorld.GetEntity(msg.ItemUniqueId);
                         var drc = new RequestDropItemComponent(in itemNtt);
                         ntt.Set(ref drc);
 
@@ -67,9 +73,8 @@ namespace MagnumOpus.Networking.Packets
                 case MsgItemType.Use:
                 case MsgItemType.UnEquip:
                     {
-                        var itemNttId = msg.UnqiueId;
-                        var slot = msg.Param;
-                        ref readonly var itemNtt = ref NttWorld.GetEntity(itemNttId);
+                        var slot = msg.ItemSlot;
+                        ref readonly var itemNtt = ref NttWorld.GetEntity(msg.ItemUniqueId);
                         ref var item = ref itemNtt.Get<ItemComponent>();
 
                         var isArrow = ItemHelper.IsArrow(ref item);
@@ -77,12 +82,12 @@ namespace MagnumOpus.Networking.Packets
 
                         if (slot == 0 && !isArrow)
                         {
-                            var uic = new RequestItemUseComponent(itemNttId, slot);
+                            var uic = new RequestItemUseComponent(msg.ItemUniqueId, slot);
                             ntt.Set(ref uic);
                         }
                         else
                         {
-                            var rue = new RequestChangeEquipComponent(itemNttId, slot, msg.Type == MsgItemType.Use);
+                            var rue = new RequestChangeEquipComponent(msg.ItemUniqueId, slot, msg.Type == MsgItemType.Use);
                             ntt.Set(ref rue);
                         }
                         ntt.NetSync(ref msg);
@@ -91,12 +96,8 @@ namespace MagnumOpus.Networking.Packets
                 case MsgItemType.Sell:
                 case MsgItemType.Buy:
                     {
-                        var shopId = msg.UnqiueId;
-                        var itemId = msg.Param;
-
-                        var rbi = new RequestShopItemTransactionComponent(shopId, itemId, msg.Type == MsgItemType.Buy);
+                        var rbi = new RequestShopItemTransactionComponent(msg.ShopId, msg.ShopItemId, msg.Type == MsgItemType.Buy);
                         ntt.Set(ref rbi);
-
                         ntt.NetSync(ref msg);
                         break;
                     }

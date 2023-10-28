@@ -1,3 +1,4 @@
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -12,18 +13,19 @@ namespace MagnumOpus.Systems
 
         public override void Update(in NTT ntt, ref EmoteComponent emo, ref PositionComponent pos)
         {
+            if (emo.Emote == Emote.Sit && ntt.Has<StaminaComponent>())
+            {
+                ref var sta = ref ntt.Get<StaminaComponent>();
+
+                if (sta.ChangedTick + (NttWorld.TargetTps / 3) < NttWorld.Tick && sta.Stamina < sta.MaxStamina)
+                    sta.Stamina = (byte)Math.Clamp(sta.Stamina + 5, 0, sta.MaxStamina);
+            }
+
             if (emo.ChangedTick != NttWorld.Tick)
                 return;
 
             if (IsLogging)
                 Logger.Debug("{ntt} emote {emote}", ntt, emo.Emote);
-
-            if (emo.Emote == Emote.Sit)
-            {
-                // TODO: Stamina
-                var stamina = MsgUserAttrib.Create(ntt.Id, 150, MsgUserAttribType.Stamina);
-                ntt.NetSync(ref stamina);
-            }
 
             var msg = MsgAction.Create(ntt.Id, (int)emo.Emote, 0, 0, pos.Direction, MsgActionType.ChangeAction);
             ntt.NetSync(ref msg, broadcast: true);

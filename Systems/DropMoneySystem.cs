@@ -8,7 +8,7 @@ namespace MagnumOpus.Systems
 {
     public sealed class DropMoneySystem : NttSystem<PositionComponent, InventoryComponent, RequestDropMoneyComponent>
     {
-        public DropMoneySystem() : base("DropMoney", threads: 2) { }
+        public DropMoneySystem() : base("DropMoney", threads: 2, log: true) { }
 
         public override void Update(in NTT ntt, ref PositionComponent pos, ref InventoryComponent inv, ref RequestDropMoneyComponent drc)
         {
