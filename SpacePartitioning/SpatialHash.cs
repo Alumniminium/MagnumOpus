@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using MagnumOpus.Components;
@@ -69,7 +68,7 @@ namespace MagnumOpus.SpacePartitioning
                         ref readonly var pos = ref ntt.Get<PositionComponent>();
                         var distanceSquared = Vector2.DistanceSquared(pos.Position, new Vector2(cx, cy));
 
-                        if (distanceSquared <= 324f)
+                        if (distanceSquared <= 350f)
                             vwp.EntitiesVisible.Add(ntt);
                     }
                 }

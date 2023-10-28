@@ -4,8 +4,8 @@ namespace MagnumOpus.Helpers
 {
     public static class NameRegistry
     {
-        private static readonly Dictionary<string, NTT> Name2Ntt = new();
-        private static readonly Dictionary<NTT, string> Ntt2Name = new();
+        private static readonly Dictionary<string, NTT> Name2Ntt = [];
+        private static readonly Dictionary<NTT, string> Ntt2Name = [];
 
         public static void Register(in NTT entity, string name)
         {

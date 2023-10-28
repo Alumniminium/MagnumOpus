@@ -1,9 +1,4 @@
-using System;
 using System.Collections.Concurrent;
-using System.IO;
-using System.IO.Compression;
-using System.Threading;
-using System.Threading.Tasks;
 using Prometheus;
 
 namespace HerstLib.IO
@@ -13,7 +8,7 @@ namespace HerstLib.IO
         public static string StdoLogPath => $"{StartTime:dd-MM-yyyy}.log";
         private static readonly DateTime StartTime = DateTime.UtcNow;
         // private static StreamWriter Logger = new(StdoLogPath, true);
-        private static readonly BlockingCollection<string> Lines = new();
+        private static readonly BlockingCollection<string> Lines = [];
         private static readonly Thread WorkerThread;
 
         private static readonly Counter MetricsExporter = Metrics.CreateCounter("MAGNUMOPUS_IO_FCONSOLE", "Debug Log Lines Written");

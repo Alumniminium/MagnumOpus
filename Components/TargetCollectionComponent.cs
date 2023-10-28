@@ -9,11 +9,11 @@ namespace MagnumOpus.Components
         public List<NTT> Targets;
         public MagicType.Entry MagicType;
 
-        public TargetCollectionComponent() => Targets = new();
+        public TargetCollectionComponent() => Targets = [];
         public TargetCollectionComponent(MagicType.Entry magicType)
         {
             MagicType = magicType;
-            Targets = new();
+            Targets = [];
         }
     }
 }

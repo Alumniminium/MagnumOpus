@@ -1,5 +1,4 @@
 // MIT License
-using System;
 using System.Runtime.CompilerServices;
 // Switch between using floats or doubles for input position
 using FNLfloat = System.Single;

@@ -4,10 +4,10 @@ namespace MagnumOpus.ECS
 {
     public static class ReflectionHelper
     {
-        private static readonly Dictionary<Type, Action<NTT, bool>> RemoveCache = new();
-        private static readonly Dictionary<Type, Action<string>> SaveCache = new();
-        private static readonly Dictionary<Type, Action<string>> LoadCache = new();
-        private static readonly Dictionary<Type, Action<NTT, NTT>> ChangeOwnerCache = new();
+        private static readonly Dictionary<Type, Action<NTT, bool>> RemoveCache = [];
+        private static readonly Dictionary<Type, Action<string>> SaveCache = [];
+        private static readonly Dictionary<Type, Action<string>> LoadCache = [];
+        private static readonly Dictionary<Type, Action<NTT, NTT>> ChangeOwnerCache = [];
 
         static ReflectionHelper() => LoadMethods();
 

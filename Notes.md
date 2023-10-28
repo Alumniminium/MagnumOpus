@@ -1,3 +1,6 @@
+# Issues
+- GOAP is shitcode, needs to be rewritten. Garbage Collection is a mess.
+
 # Co2 Research Notes
 
 

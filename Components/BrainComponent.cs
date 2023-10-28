@@ -16,7 +16,7 @@ namespace MagnumOpus.Components
 
         public BrainComponent(params GOAPAction[] actions)
         {
-            Plan = new List<GOAPAction>();
+            Plan = [];
             State = BrainState.Idle;
             SleepTicks = 0;
             TargetPosition = Vector2.Zero;

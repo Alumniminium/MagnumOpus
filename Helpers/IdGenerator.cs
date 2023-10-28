@@ -17,7 +17,7 @@ namespace MagnumOpus.Helpers
             if (File.Exists(filename))
             {
                 var json = File.ReadAllText(filename);
-                Ids = JsonSerializer.Deserialize<Dictionary<EntityType, ConcurrentStack<int>>>(json) ?? new();
+                Ids = JsonSerializer.Deserialize<Dictionary<EntityType, ConcurrentStack<int>>>(json) ?? [];
                 return;
             }
 

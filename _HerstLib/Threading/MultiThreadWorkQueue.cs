@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Threading;
+﻿using System.Collections.Concurrent;
 
 namespace HerstLib.Threading
 {
     public class MultiThreadWorkQueue<T>
     {
         public int QueueSize => Queue.Count;
-        private readonly BlockingCollection<T> Queue = new();
+        private readonly BlockingCollection<T> Queue = [];
         private readonly Thread[] workerThreads;
         private readonly Action<T> OnExec;
 

@@ -20,12 +20,13 @@ namespace MagnumOpus.Systems
 
             if (emo.Emote == Emote.Sit)
             {
+                // TODO: Stamina
                 var stamina = MsgUserAttrib.Create(ntt.Id, 150, MsgUserAttribType.Stamina);
                 ntt.NetSync(ref stamina);
             }
 
             var msg = MsgAction.Create(ntt.Id, (int)emo.Emote, 0, 0, pos.Direction, MsgActionType.ChangeAction);
-            ntt.NetSync(ref msg, true);
+            ntt.NetSync(ref msg, broadcast: true);
         }
     }
 }

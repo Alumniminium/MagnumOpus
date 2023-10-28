@@ -18,6 +18,7 @@ namespace MagnumOpus
             {
                 var e = (Exception)args.ExceptionObject;
                 FConsole.WriteLine($"[FATAL] {e.Message}");
+                FConsole.WriteLine(e.InnerException?.Message ?? string.Empty);
                 FConsole.WriteLine(e.StackTrace ?? string.Empty);
             };
 
@@ -67,7 +68,7 @@ namespace MagnumOpus
 
             FConsole.WriteLine("[DATABASE] Loading...");
             NttWorld.SetSystems(systems.ToArray());
-            NttWorld.SetTPS(30);
+            NttWorld.SetTPS(60);
             ReflectionHelper.LoadComponents("_STATE_FILES");
             ref var ntt = ref NttWorld.GetEntity(0);
             ntt.Recycle();
@@ -105,8 +106,6 @@ namespace MagnumOpus
             while (true)
             {
                 NttWorld.Update();
-                if (NttWorld.Tick % NttWorld.TargetTps == 0)
-                    Console.WriteLine(GC.CollectionCount(0) + " " + GC.CollectionCount(1) + " " + GC.CollectionCount(2));
                 // if (Debugger.IsAttached)
                 // {
                 //     if (!Console.KeyAvailable)

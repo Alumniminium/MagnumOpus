@@ -31,6 +31,9 @@ namespace MagnumOpus.Systems
                     Logger.Debug("Waking up {ntt} with {visibleCount} visible entities", ntt, vwp.EntitiesVisible.Count);
             }
 
+            if (!vwp.EntitiesVisible.Contains(brn.Target))
+                brn.Target = default;
+
             if (brn.Target == 0)
             {
                 foreach (var b in vwp.EntitiesVisible)

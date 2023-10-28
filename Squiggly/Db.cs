@@ -108,7 +108,7 @@ namespace MagnumOpus.Squiggly
                         cqmap.name.Trim(),
                         ((ushort)cqmap.portal0_x, (ushort)cqmap.portal0_y, (ushort)cqmap.reborn_map),
                         cqmap.Width,
-                        cqmap.Height, new Dictionary<ushort, CqPortal>()
+                        cqmap.Height, []
                     );
                     Collections.Maps.Add((ushort)cqmap.id, map);
                     if (!Collections.SpatialHashes.TryGetValue((ushort)cqmap.id, out var _))

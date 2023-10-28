@@ -85,7 +85,7 @@ namespace MagnumOpus.Networking.Packets
         [PacketHandler(PacketId.MsgAction)]
         public static void Process(NTT ntt, Memory<byte> memory)
         {
-            var _trace = false;
+            var _trace = true;
             var msg = Co2Packet.Deserialize<MsgAction>(memory.Span);
 
             switch (msg.Type)

@@ -30,7 +30,7 @@ namespace MagnumOpus.Squiggly
             Ring = ring;
             Shield = shield;
             Shoes = shoes;
-            Items = new HashSet<ItemType.Entry>();
+            Items = [];
         }
     }
 }

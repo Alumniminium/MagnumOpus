@@ -2,7 +2,6 @@ using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
-using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Systems
 {

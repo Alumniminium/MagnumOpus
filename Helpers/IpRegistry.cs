@@ -4,8 +4,8 @@ namespace MagnumOpus.Helpers
 {
     public static class IpRegistry
     {
-        private static readonly Dictionary<string, NTT> IpToEntity = new();
-        private static readonly Dictionary<NTT, string> EntityToIp = new();
+        private static readonly Dictionary<string, NTT> IpToEntity = [];
+        private static readonly Dictionary<NTT, string> EntityToIp = [];
 
         public static void Register(in NTT entity, string ip)
         {

@@ -9,11 +9,11 @@ namespace MagnumOpus.ECS
     public static class SparseComponentStorage<T> where T : struct
     {
         private static readonly T[] Default = new T[1];
-        private static readonly Dictionary<int, T> Components = new();
+        private static readonly Dictionary<int, T> Components = [];
         private static readonly ReaderWriterLockSlim lockObj = new();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AddFor(NTT ntt, ref T c)
+        public static void AddFor(in NTT ntt, ref T c)
         {
             if (ntt.Id == 0)
                 return;
@@ -28,7 +28,7 @@ namespace MagnumOpus.ECS
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AddFor(NTT ntt)
+        public static void AddFor(in NTT ntt)
         {
             if (ntt.Id == 0)
                 return;
@@ -41,7 +41,7 @@ namespace MagnumOpus.ECS
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool HasFor(NTT ntt) => Components.ContainsKey(ntt.Id);
+        public static bool HasFor(in NTT ntt) => Components.ContainsKey(ntt.Id);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref T Get(NTT ntt)
         {
@@ -100,7 +100,7 @@ namespace MagnumOpus.ECS
                 return;
 
             var json = File.ReadAllText(filename);
-            var components = JsonConvert.DeserializeObject<Dictionary<int, T>>(json) ?? new();
+            var components = JsonConvert.DeserializeObject<Dictionary<int, T>>(json) ?? [];
             foreach (var kvp in components)
                 Components.Add(kvp.Key, kvp.Value);
             // JsonConvert.PopulateObject(json, Components);

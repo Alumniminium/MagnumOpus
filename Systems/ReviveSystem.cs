@@ -3,6 +3,7 @@ using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Squiggly;
 
@@ -59,8 +60,8 @@ namespace MagnumOpus.Systems
             eff.Effects &= ~StatusEffect.FrozenRemoveName;
 
             bdy.Look = MsgSpawn.DelTransform(bdy.Look);
-
             var reply = MsgAction.Create(ntt.Id, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
+            NetworkHelper.Despawn(ntt);
 
             ntt.NetSync(ref reply);
 

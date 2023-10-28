@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using HerstLib.IO;
 using Prometheus;
 using Serilog;
 using Serilog.Core;
@@ -15,7 +14,7 @@ namespace MagnumOpus.ECS
         public bool IsLogging;
         public int ThreadCount;
         internal readonly ConcurrentDictionary<int, NTT> _entities = new();
-        internal readonly List<NTT> _entitiesList = new();
+        internal readonly List<NTT> _entitiesList = [];
         private readonly Gauge TimeMetricsExporter;
         private readonly Gauge NTTCountMetricsExporter;
         internal readonly Logger Logger;

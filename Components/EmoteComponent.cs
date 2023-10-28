@@ -6,7 +6,19 @@ namespace MagnumOpus.Components
     public struct EmoteComponent
     {
         public long ChangedTick;
-        public Emote Emote;
+        private Emote _;
+        public Emote Emote
+        {
+            get => _;
+            set
+            {
+                if (value == _)
+                    return;
+
+                ChangedTick = NttWorld.Tick;
+                _ = value;
+            }
+        }
 
         public EmoteComponent() => ChangedTick = NttWorld.Tick;
         public EmoteComponent(Emote emote = Emote.Stand)

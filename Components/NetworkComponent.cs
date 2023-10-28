@@ -16,7 +16,7 @@ namespace MagnumOpus.Components
         public DiffieHellman DiffieHellman = new();
         public Memory<byte> ClientIV = new byte[8];
         public Memory<byte> ServerIV = new byte[8];
-        public Dictionary<PacketId, ConcurrentQueue<Memory<byte>>> PacketQueues = new();
+        public Dictionary<PacketId, ConcurrentQueue<Memory<byte>>> PacketQueues = [];
         public ConcurrentQueue<byte[]> SendQueue = new();
         public string Username;
 

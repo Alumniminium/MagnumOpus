@@ -1,5 +1,3 @@
-using HerstLib.IO;
-
 namespace MagnumOpus.ECS
 {
     // public static class SingleThreadedWorker

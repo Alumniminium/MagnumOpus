@@ -2,7 +2,7 @@ namespace MagnumOpus._HerstLib.IO
 {
     public class IniFile
     {
-        private readonly Dictionary<string, Dictionary<string, string>> _iniFile = new();
+        private readonly Dictionary<string, Dictionary<string, string>> _iniFile = [];
         private readonly string _path = "";
 
         public IniFile(string path) => _path = File.Exists(path) ? path : throw new FileNotFoundException();
@@ -21,7 +21,7 @@ namespace MagnumOpus._HerstLib.IO
                 if (curLine.StartsWith("["))
                 {
                     curHeader = curLine;
-                    _iniFile.Add(curHeader, new Dictionary<string, string>());
+                    _iniFile.Add(curHeader, []);
                 }
                 else
                 {
@@ -43,7 +43,7 @@ namespace MagnumOpus._HerstLib.IO
         public void SetValue(string value, string header, string key)
         {
             if (!_iniFile.ContainsKey(header))
-                _iniFile.Add(header, new());
+                _iniFile.Add(header, []);
 
             _iniFile[header][key] = value;
         }

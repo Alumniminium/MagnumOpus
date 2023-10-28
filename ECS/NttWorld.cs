@@ -3,9 +3,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using HerstLib.IO;
-using MagnumOpus.Components;
 using MagnumOpus.Helpers;
-using MagnumOpus.Squiggly;
 using Newtonsoft.Json;
 
 namespace MagnumOpus.ECS
@@ -58,11 +56,7 @@ namespace MagnumOpus.ECS
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SetSystems(params NttSystem[] systems)
-        {
-            Systems = systems;
-            // SystemNotifier = new SystemNotifier(systems);
-        }
+        public static void SetSystems(params NttSystem[] systems) => Systems = systems;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetTPS(int fps) => TargetTps = fps;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

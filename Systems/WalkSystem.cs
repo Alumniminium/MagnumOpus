@@ -30,6 +30,13 @@ namespace MagnumOpus.Systems
                 Logger.Debug("{ntt} walking {text}", ntt, text);
             }
 
+            ref var emo = ref ntt.Get<EmoteComponent>();
+            if (emo.Emote != Emote.Stand)
+            {
+                emo.Emote = Emote.Stand;
+                emo.ChangedTick = NttWorld.Tick;
+            }
+
             var shc = new SpatialHashUpdateComponent(pos.Position, pos.LastPosition, pos.Map, pos.Map, SpacialHashUpdatType.Move);
             ntt.Set(ref shc);
 

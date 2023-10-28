@@ -20,14 +20,26 @@ namespace MagnumOpus.ECS
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly void Set<T>(ref T component) where T : struct => SparseComponentStorage<T>.AddFor(this, ref component);
+        public readonly void Set<T, T2>(ref T t1, ref T2 t2) where T : struct where T2 : struct
+        {
+            SparseComponentStorage<T>.AddFor(this, ref t1);
+            SparseComponentStorage<T2>.AddFor(this, ref t2);
+        }
+        public readonly void Set<T, T2, T3>(ref T t1, ref T2 t2, ref T3 t3) where T : struct where T2 : struct where T3 : struct
+        {
+            SparseComponentStorage<T>.AddFor(in this, ref t1);
+            SparseComponentStorage<T2>.AddFor(in this, ref t2);
+            SparseComponentStorage<T3>.AddFor(in this, ref t3);
+        }
+
+        public readonly void Set<T>(ref T t) where T : struct => SparseComponentStorage<T>.AddFor(in this, ref t);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly void Set<T>(T component) where T : struct => SparseComponentStorage<T>.AddFor(this, ref component);
-        public readonly void Set<T>() where T : struct => SparseComponentStorage<T>.AddFor(this);
+        public readonly void Set<T>(T component) where T : struct => SparseComponentStorage<T>.AddFor(in this, ref component);
+        public readonly void Set<T>() where T : struct => SparseComponentStorage<T>.AddFor(in this);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly ref T Get<T>() where T : struct => ref SparseComponentStorage<T>.Get(this);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool Has<T>() where T : struct => SparseComponentStorage<T>.HasFor(this);
+        public readonly bool Has<T>() where T : struct => SparseComponentStorage<T>.HasFor(in this);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly bool Has<T, T2>() where T : struct where T2 : struct => Has<T>() && Has<T2>();
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -42,7 +54,7 @@ namespace MagnumOpus.ECS
         public readonly void Recycle() => ReflectionHelper.RecycleComponents(this);
         public readonly void ChangeOwner(NTT to) => ReflectionHelper.ChangeOwner(this, to);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly void NetSync<T>(ref T msg, bool broadcast = false) where T : unmanaged
+        public readonly void NetSync<T>(ref T msg, bool broadcast = false, bool ignoreSelf = false) where T : unmanaged
         {
             if (broadcast && Has<ViewportComponent>())
             {
@@ -55,12 +67,15 @@ namespace MagnumOpus.ECS
                     if (!b.Has<NetworkComponent>())
                         continue;
 
+                    if (ignoreSelf && b == this)
+                        continue;
+
                     ref readonly var net = ref b.Get<NetworkComponent>();
                     var packet = Co2Packet.Serialize(ref msg);
                     net.SendQueue.Enqueue(packet);
                 }
             }
-            else if (Type == EntityType.Player)
+            else if (Type == EntityType.Player && !ignoreSelf)
             {
                 if (!Has<NetworkComponent>())
                     return;
@@ -100,9 +115,9 @@ namespace MagnumOpus.ECS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object? obj) => obj is NTT nttId && nttId.Id == Id;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(NTT a, NTT b) => a.Id == b.Id;
+        public static bool operator ==(in NTT a, in NTT b) => a.Id == b.Id;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(NTT a, NTT b) => a.Id != b.Id;
+        public static bool operator !=(in NTT a, in NTT b) => a.Id != b.Id;
         public static implicit operator int(in NTT a) => a.Id;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => $"NTT {Id} ({Type})";

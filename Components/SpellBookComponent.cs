@@ -5,6 +5,6 @@ namespace MagnumOpus.Components
     public struct SpellBookComponent
     {
         public Dictionary<ushort, (ushort lvl, ushort exp, ushort cooldown)> Spells;
-        public SpellBookComponent() => Spells = new();
+        public SpellBookComponent() => Spells = [];
     }
 }

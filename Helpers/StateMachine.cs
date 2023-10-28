@@ -8,13 +8,13 @@ namespace MagnumOpus.Helpers
         public StateMachine(T initialState)
         {
             CurrentState = initialState;
-            transitions = new Dictionary<T, Dictionary<T, Action>>();
+            transitions = [];
         }
 
         public void AddTransition(T fromState, T toState, Action action)
         {
             if (!transitions.ContainsKey(fromState))
-                transitions[fromState] = new Dictionary<T, Action>();
+                transitions[fromState] = [];
             transitions[fromState][toState] = action;
         }
 

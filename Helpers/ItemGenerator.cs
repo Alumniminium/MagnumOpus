@@ -151,7 +151,7 @@ namespace MagnumOpus.Helpers
         public static List<ItemType.Entry> GetDropItemsFor(int mobId)
         {
             if (!Collections.Drops.TryGetValue(mobId, out var drops))
-                drops = new List<ItemType.Entry>();
+                drops = [];
             else
                 return drops;
 
