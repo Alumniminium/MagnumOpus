@@ -1,5 +1,6 @@
 using System.Numerics;
 using Co2Core.IO;
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -44,7 +45,7 @@ namespace MagnumOpus.Systems
                 {
                     tcc.Targets.Add(b);
                     if (IsLogging)
-                        Logger.Debug("{ntt} adding {b} to target list of {skill}:{level}", ntt, b, atk.MagicType.MagicType, atk.MagicType.Level);
+                        FConsole.WriteLine("{ntt} adding {b} to target list of {skill}:{level}", ntt, b, atk.MagicType.MagicType, atk.MagicType.Level);
                 }
             }
 

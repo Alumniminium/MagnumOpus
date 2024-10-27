@@ -1,3 +1,4 @@
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Networking.Packets;
@@ -21,7 +22,7 @@ namespace MagnumOpus.Systems
                 target.Set(ref dmg);
 
                 if (IsLogging)
-                    Logger.Debug("{ntt} attacking {target} with {skill}:{level}", ntt, target, atk.MagicType.MagicType, atk.MagicType.Level);
+                    FConsole.WriteLine("{ntt} attacking {target} with {skill}:{level}", ntt, target, atk.MagicType.MagicType, atk.MagicType.Level);
             }
             ntt.Remove<TargetCollectionComponent>();
         }

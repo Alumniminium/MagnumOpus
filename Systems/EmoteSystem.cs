@@ -25,7 +25,7 @@ namespace MagnumOpus.Systems
                 return;
 
             if (IsLogging)
-                Logger.Debug("{ntt} emote {emote}", ntt, emo.Emote);
+                FConsole.WriteLine("{ntt} emote {emote}", ntt, emo.Emote);
 
             var msg = MsgAction.Create(ntt.Id, (int)emo.Emote, 0, 0, pos.Direction, MsgActionType.ChangeAction);
             ntt.NetSync(ref msg, broadcast: true);

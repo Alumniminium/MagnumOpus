@@ -1,3 +1,4 @@
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -15,7 +16,7 @@ namespace MagnumOpus.Systems
             {
                 ntt.Remove<MagicAttackRequestComponent>();
                 if (IsLogging)
-                    Logger.Debug("{ntt} tried to use skill {atk.SkillId} but doesn't have it", ntt, atk.SkillId);
+                    FConsole.WriteLine("{ntt} tried to use skill {atk.SkillId} but doesn't have it", ntt, atk.SkillId);
                 return;
             }
 
@@ -23,7 +24,7 @@ namespace MagnumOpus.Systems
             {
                 ntt.Remove<MagicAttackRequestComponent>();
                 if (IsLogging)
-                    Logger.Debug("{ntt} tried to use skill {atk.SkillId} but it doesn't exist", ntt, atk.SkillId);
+                    FConsole.WriteLine("{ntt} tried to use skill {atk.SkillId} but it doesn't exist", ntt, atk.SkillId);
                 return;
             }
 

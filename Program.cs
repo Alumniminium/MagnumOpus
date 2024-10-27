@@ -27,8 +27,8 @@ namespace MagnumOpus
             Constants.GamePort = ushort.TryParse(Environment.GetEnvironmentVariable("GAME_PORT"), out var p3) ? p3 : (ushort)5816;
             Constants.ServerIP = Environment.GetEnvironmentVariable("PUBLIC_IP") ?? "172.16.114.1";
 
-            using var server = new Prometheus.MetricServer(port: Constants.PrometheusPort);
-            server.Start();
+            // using var server = new Prometheus.MetricServer(port: Constants.PrometheusPort);
+            // server.Start();
 
             var systems = new List<NttSystem>
             {

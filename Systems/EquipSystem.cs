@@ -1,3 +1,4 @@
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -29,13 +30,13 @@ namespace MagnumOpus.Systems
                 InventoryHelper.RemoveNttFromInventory(ntt, ref inv, item, netSync: true);
 
                 if (IsLogging)
-                    Logger.Debug("{ntt} equipped {item} to {slot}", ntt, item, change.Slot);
+                    FConsole.WriteLine("{ntt} equipped {item} to {slot}", ntt, item, change.Slot);
             }
             else
             {
                 if (!InventoryHelper.HasFreeSpace(ref inv))
                 {
-                    Logger.Error("{ntt} has no free space in inventory to unequip {item}", ntt, item);
+                    FConsole.WriteLine("{ntt} has no free space in inventory to unequip {item}", ntt, item);
                     ntt.Remove<RequestChangeEquipComponent>();
                     return;
                 }
@@ -43,7 +44,7 @@ namespace MagnumOpus.Systems
                 eq.Items[change.Slot] = default;
                 InventoryHelper.AddItem(ntt, ref inv, in item, true);
                 if (IsLogging)
-                    Logger.Debug("{ntt} unequipped {item} from {slot}", ntt, item, change.Slot);
+                    FConsole.WriteLine("{ntt} unequipped {item} from {slot}", ntt, item, change.Slot);
             }
             ntt.Remove<RequestChangeEquipComponent>();
         }

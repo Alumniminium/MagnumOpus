@@ -1,3 +1,4 @@
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -20,7 +21,7 @@ namespace MagnumOpus.Systems
                     return;
 
                 if (IsLogging)
-                    Logger.Debug("{ntt} -> {seconds} seconds left", ntt, ticksLeft / NttWorld.TargetTps);
+                    FConsole.WriteLine("{ntt} -> {seconds} seconds left", ntt, ticksLeft / NttWorld.TargetTps);
 
                 ref readonly var pos = ref ntt.Get<PositionComponent>();
                 var eff = MsgName.Create((ushort)pos.Position.X, (ushort)pos.Position.Y, "downnumber" + (ticksLeft / NttWorld.TargetTps), MsgNameType.MapEffect);
@@ -32,7 +33,7 @@ namespace MagnumOpus.Systems
             ntt.Set(ref dtc);
             ntt.Remove<LifeTimeComponent>();
             if (IsLogging)
-                Logger.Debug("{ntt} -> EXPIRED", ntt);
+                FConsole.WriteLine("{ntt} -> EXPIRED", ntt);
         }
     }
 }

@@ -48,6 +48,8 @@ namespace MagnumOpus.ECS
         public readonly bool Has<T, T2, T3, T4>() where T : struct where T2 : struct where T3 : struct where T4 : struct => Has<T, T2, T3>() && Has<T4>();
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly bool Has<T, T2, T3, T4, T5>() where T : struct where T2 : struct where T3 : struct where T4 : struct where T5 : struct => Has<T, T2, T3, T4>() && Has<T5>();
+        public readonly bool Has<T, T2, T3, T4, T5, T6>() where T : struct where T2 : struct where T3 : struct where T4 : struct where T5 : struct where T6 : struct => Has<T, T2, T3, T4>() && Has<T5, T6>();
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly void Remove<T>() => ReflectionHelper.Remove<T>(this);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

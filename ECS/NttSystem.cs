@@ -2,8 +2,6 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Prometheus;
-using Serilog;
-using Serilog.Core;
 
 namespace MagnumOpus.ECS
 {
@@ -13,31 +11,18 @@ namespace MagnumOpus.ECS
         public string Name;
         public bool IsLogging;
         public int ThreadCount;
-        internal readonly ConcurrentDictionary<int, NTT> _entities = new();
+        internal readonly ConcurrentDictionary<long, NTT> _entities = new();
         internal readonly List<NTT> _entitiesList = [];
         private readonly Gauge TimeMetricsExporter;
         private readonly Gauge NTTCountMetricsExporter;
-        internal readonly Logger Logger;
 
         protected NttSystem(string name, int threads = 1, bool log = true)
         {
             ThreadCount = threads;
             IsLogging = log;
             Name = name;
-            TimeMetricsExporter = Metrics.CreateGauge($"MAGNUMOPUS_ECS_SYSTEM_{Name.ToUpperInvariant().Replace(" ", "_")}", $"Tick time for {Name} in ms");
-            NTTCountMetricsExporter = Metrics.CreateGauge($"MAGNUMOPUS_ECS_SYSTEM_{Name.ToUpperInvariant().Replace(" ", "_")}_NTT_COUNT", $"NTT count for {Name}");
-
-            var logCfg = new LoggerConfiguration()
-                                .Enrich.WithProperty("System", name)
-                                .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss}[{Properties}] {Message}{NewLine}{Exception}")
-                                // .WriteTo.GrafanaLoki("http://loki.her.st")
-                                .WriteTo.File($"{DateTime.UtcNow:dd-MM-yyyy}.log");
-            if (IsLogging)
-                logCfg.MinimumLevel.Debug();
-            else
-                logCfg.MinimumLevel.Information();
-
-            Logger = logCfg.CreateLogger();
+            TimeMetricsExporter = Metrics.CreateGauge($"WEBSOCKETSERVICE_ECS_SYSTEM_{Name.ToUpperInvariant().Replace(" ", "_")}", $"Tick time for {Name} in ms");
+            NTTCountMetricsExporter = Metrics.CreateGauge($"WEBSOCKETSERVICE_ECS_SYSTEM_{Name.ToUpperInvariant().Replace(" ", "_")}_NTT_COUNT", $"NTT count for {Name}");
         }
 
         public void BeginUpdate()
@@ -49,7 +34,9 @@ namespace MagnumOpus.ECS
                 TimeMetricsExporter.Set((float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
                 return;
             }
-            ThreadedWorker.Run(EndUpdate, ThreadCount);
+            // ThreadedWorker.Run(EndUpdate, ThreadCount);
+
+            Update(0, _entities.Count);
             NTTCountMetricsExporter.Set(_entities.Count);
             TimeMetricsExporter.Set((float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
         }
@@ -183,5 +170,27 @@ namespace MagnumOpus.ECS
             }
         }
         public abstract void Update(in NTT ntt, ref T c1, ref T2 c2, ref T3 c3, ref T4 c4, ref T5 c5);
+    }
+    public abstract class NttSystem<T, T2, T3, T4, T5, T6> : NttSystem where T : struct where T2 : struct where T3 : struct where T4 : struct where T5 : struct where T6 : struct
+    {
+        protected NttSystem(string name, int threads = 1, bool log = false) : base(name, threads, log) { }
+        protected override bool MatchesFilter(in NTT nttId) => nttId.Has<T, T2, T3, T4, T5, T6>() && base.MatchesFilter(in nttId);
+
+        protected override void Update(int start, int amount)
+        {
+            var span = CollectionsMarshal.AsSpan(_entitiesList).Slice(start, amount);
+            for (var i = 0; i < span.Length; i++)
+            {
+                ref readonly var ntt = ref span[i];
+                ref var c1 = ref ntt.Get<T>();
+                ref var c2 = ref ntt.Get<T2>();
+                ref var c3 = ref ntt.Get<T3>();
+                ref var c4 = ref ntt.Get<T4>();
+                ref var c5 = ref ntt.Get<T5>();
+                ref var c6 = ref ntt.Get<T6>();
+                Update(in ntt, ref c1, ref c2, ref c3, ref c4, ref c5, ref c6);
+            }
+        }
+        public abstract void Update(in NTT ntt, ref T c1, ref T2 c2, ref T3 c3, ref T4 c4, ref T5 c5, ref T6 c6);
     }
 }

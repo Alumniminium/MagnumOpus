@@ -1,4 +1,5 @@
 using System.Numerics;
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -51,7 +52,7 @@ namespace MagnumOpus.Systems
                     closestDistance = distance;
                     closestEntity = b;
                     if (IsLogging)
-                        Logger.Debug("{ntt} found {b} distance {dist}", ntt, b, distance);
+                        FConsole.WriteLine("{ntt} found {b} distance {dist}", ntt, b, distance);
                 }
 
                 if (closestEntity.Id != 0)
@@ -103,7 +104,7 @@ namespace MagnumOpus.Systems
                 ntt.Set(ref wlk);
 
                 if (IsLogging)
-                    Logger.Debug("{ntt} walking towards {target}", ntt, brn.TargetPosition);
+                    FConsole.WriteLine("{ntt} walking towards {target}", ntt, brn.TargetPosition);
             }
 
             if (brn.State == BrainState.Attacking)
@@ -112,7 +113,7 @@ namespace MagnumOpus.Systems
                 var atk = new AttackComponent(in _target, MsgInteractType.Physical);
                 ntt.Set(ref atk);
                 if (IsLogging)
-                    Logger.Debug("{ntt} attacking {target}", ntt, _target);
+                    FConsole.WriteLine("{ntt} attacking {target}", ntt, _target);
             }
 
             brn.State = BrainState.Sleeping;

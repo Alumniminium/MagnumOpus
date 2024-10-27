@@ -1,3 +1,4 @@
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -27,7 +28,7 @@ namespace MagnumOpus.Systems
             NttWorld.Destroy(ntt);
 
             if (IsLogging)
-                Logger.Debug("Destroyed {ntt}", ntt);
+                FConsole.WriteLine("Destroyed {ntt}", ntt);
         }
     }
 }

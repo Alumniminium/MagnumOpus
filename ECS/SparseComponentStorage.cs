@@ -41,7 +41,7 @@ namespace MagnumOpus.ECS
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool HasFor(in NTT ntt) => Components.ContainsKey(ntt.Id);
+        public static bool HasFor(in NTT ntt) => Components?.ContainsKey(ntt.Id) ?? false;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref T Get(NTT ntt)
         {

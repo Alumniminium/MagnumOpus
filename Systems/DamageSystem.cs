@@ -1,3 +1,4 @@
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 
@@ -18,7 +19,7 @@ namespace MagnumOpus.Systems
                 var dtc = new DeathTagComponent(dmg.Attacker);
                 ntt.Set(ref dtc);
                 if (IsLogging)
-                    Logger.Debug("{ntt} died after receiving {dmg} damage", ntt, dmg.Damage);
+                    FConsole.WriteLine("{ntt} died after receiving {dmg} damage", ntt, dmg.Damage);
             }
 
             if (!dmg.Attacker.Has<ExpRewardComponent>())
@@ -26,7 +27,7 @@ namespace MagnumOpus.Systems
                 var expReward = new ExpRewardComponent((ushort)actualDamage);
                 dmg.Attacker.Set(ref expReward);
                 if (IsLogging)
-                    Logger.Debug("{attacker} received {exp} experience", dmg.Attacker, actualDamage);
+                    FConsole.WriteLine("{attacker} received {exp} experience", dmg.Attacker, actualDamage);
             }
             else
             {

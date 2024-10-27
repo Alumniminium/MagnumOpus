@@ -1,3 +1,4 @@
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Squiggly;
@@ -18,7 +19,7 @@ namespace MagnumOpus.Systems
             if (entry == null)
             {
                 if (IsLogging)
-                    Logger.Debug("No Dmap Portal found at {0}, {1} on map {2}", ptc.X, ptc.Y, mapId);
+                    FConsole.WriteLine("No Dmap Portal found at {0}, {1} on map {2}", ptc.X, ptc.Y, mapId);
                 ntt.Remove<PortalComponent>();
 
                 var backupTpc = new TeleportComponent(477, 380, 1002);
@@ -30,7 +31,7 @@ namespace MagnumOpus.Systems
             if (passway == null)
             {
                 if (IsLogging)
-                    Logger.Debug("No Passway found for {0} on map {1}", entry.PortalId, mapId);
+                    FConsole.WriteLine("No Passway found for {0} on map {1}", entry.PortalId, mapId);
                 ntt.Remove<PortalComponent>();
 
                 var backupTpc = new TeleportComponent(477, 380, 1002);
@@ -42,7 +43,7 @@ namespace MagnumOpus.Systems
             if (exit == null)
             {
                 if (IsLogging)
-                    Logger.Debug("No Exit Portal for {0} on map {1}", passway.passway_mapid, passway.passway_mapportal);
+                    FConsole.WriteLine("No Exit Portal for {0} on map {1}", passway.passway_mapid, passway.passway_mapportal);
                 ntt.Remove<PortalComponent>();
 
                 var backupTpc = new TeleportComponent(477, 380, 1002);
@@ -54,7 +55,7 @@ namespace MagnumOpus.Systems
             ntt.Set(ref tpc);
 
             if (IsLogging)
-                Logger.Debug("Teleporting {0} to {1} at {2}, {3}", ntt.Id, exit.MapId, exit.X, exit.Y);
+                FConsole.WriteLine("Teleporting {0} to {1} at {2}, {3}", ntt.Id, exit.MapId, exit.X, exit.Y);
 
             ntt.Remove<PortalComponent>();
         }

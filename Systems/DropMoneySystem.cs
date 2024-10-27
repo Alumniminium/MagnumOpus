@@ -1,4 +1,5 @@
 using System.Numerics;
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
@@ -16,7 +17,7 @@ namespace MagnumOpus.Systems
             {
                 ntt.Remove<RequestDropMoneyComponent>();
                 if (IsLogging)
-                    Logger.Debug("{ntt} tried to drop {amount} money, but only has {money}", ntt, drc.Amount, inv.Money);
+                    FConsole.WriteLine("{ntt} tried to drop {amount} money, but only has {money}", ntt, drc.Amount, inv.Money);
                 return;
             }
 
@@ -35,10 +36,10 @@ namespace MagnumOpus.Systems
                 var dropMsg = MsgFloorItem.Create(itemNtt, Enums.MsgFloorItemType.Create);
                 ntt.NetSync(ref dropMsg, true);
                 if (IsLogging)
-                    Logger.Debug("{ntt} dropped {amount} money at {pos}", ntt, drc.Amount, pos.Position);
+                    FConsole.WriteLine("{ntt} dropped {amount} money at {pos}", ntt, drc.Amount, pos.Position);
             }
             else if (IsLogging)
-                Logger.Debug("Failed to create money drop for {ntt}. Amount: {Amount}, Position: {pos}, Map: {Map}", ntt, drc.Amount, pos.Position, pos.Map);
+                FConsole.WriteLine("Failed to create money drop for {ntt}. Amount: {Amount}, Position: {pos}, Map: {Map}", ntt, drc.Amount, pos.Position, pos.Map);
 
             ntt.Remove<RequestDropMoneyComponent>();
         }

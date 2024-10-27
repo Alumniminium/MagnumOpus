@@ -54,7 +54,7 @@ namespace HerstLib.IO
             // GC.Collect();
         }
 
-        public static void WriteLine(string line) => Lines.Add($"{line}{Environment.NewLine}");
+        public static void WriteLine(string line, params object[] objects) => Lines.Add($"{line}{Environment.NewLine}");
         public static void WriteSingleLine(string line) => Lines.Add($"{line.Replace(Environment.NewLine, " ")}{Environment.NewLine}");
         public static void Write(string text) => Lines.Add(text);
         public static void WriteLine(Exception e) => Lines.Add($"{e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}{e.InnerException}{Environment.NewLine}");

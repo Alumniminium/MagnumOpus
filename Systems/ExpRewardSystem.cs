@@ -1,3 +1,4 @@
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Networking.Packets;
@@ -17,7 +18,7 @@ namespace MagnumOpus.Systems
             {
                 ntt.Remove<ExpRewardComponent>();
                 if (IsLogging)
-                    Logger.Debug("{ntt} gained {exp} exp, now at {current}/{next} (level: {lvl})", ntt, rew.Experience, lvl.Experience, lvl.ExperienceToNextLevel, lvl.Level);
+                    FConsole.WriteLine("{ntt} gained {exp} exp, now at {current}/{next} (level: {lvl})", ntt, rew.Experience, lvl.Experience, lvl.ExperienceToNextLevel, lvl.Level);
                 return;
             }
 
@@ -44,7 +45,7 @@ namespace MagnumOpus.Systems
             ntt.NetSync(ref lvlActionMsg, true);
 
             if (IsLogging)
-                Logger.Debug("{ntt} gained {exp} exp and leveled to {lvl}, now at {current}/{next} (level: {lvl})", ntt, rew.Experience, lvl.Level, lvl.Experience, lvl.ExperienceToNextLevel, lvl.Level);
+                FConsole.WriteLine("{ntt} gained {exp} exp and leveled to {lvl}, now at {current}/{next} (level: {lvl})", ntt, rew.Experience, lvl.Level, lvl.Experience, lvl.ExperienceToNextLevel, lvl.Level);
 
             ntt.Remove<ExpRewardComponent>();
         }

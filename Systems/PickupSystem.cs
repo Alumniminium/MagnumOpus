@@ -1,3 +1,4 @@
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
@@ -47,7 +48,7 @@ namespace MagnumOpus.Systems
             ntt.NetSync(ref delFloorMsg, true);
 
             if (IsLogging)
-                Logger.Debug("{0} picked up {1}", ntt, pic.Item);
+                FConsole.WriteLine("{0} picked up {1}", ntt, pic.Item);
             ntt.Remove<PickupRequestComponent>();
         }
     }

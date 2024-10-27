@@ -1,4 +1,5 @@
 using System.Numerics;
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Networking.Packets;
@@ -31,7 +32,7 @@ namespace MagnumOpus.Systems
             ntt.Remove<TeleportComponent>();
 
             if (IsLogging)
-                Logger.Debug("[{tick}] Teleported '{0}' to {1}, {2}, {3}", NttWorld.Tick, ntt, tpc.Map, tpc.X, tpc.Y);
+                FConsole.WriteLine("[{tick}] Teleported '{0}' to {1}, {2}, {3}", NttWorld.Tick, ntt, tpc.Map, tpc.X, tpc.Y);
         }
     }
 }

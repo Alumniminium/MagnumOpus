@@ -68,7 +68,7 @@ namespace MagnumOpus.Systems
                         ntt.NetSync(ref msg);
 
                         if (IsLogging)
-                            Logger.Debug("{0} bought {1} for {2:C} and now has {3:C}", ntt.Id, txc.ItemId, itemEntry.Price, inv.Money);
+                            FConsole.WriteLine("{0} bought {1} for {2:C} and now has {3:C}", ntt.Id, txc.ItemId, itemEntry.Price, inv.Money);
                         PrometheusPush.ServerIncome.Inc(itemEntry.Price);
                         PrometheusPush.ShopIncome.Inc(itemEntry.Price);
                         PrometheusPush.ShopPurchases.Inc();
@@ -90,7 +90,7 @@ namespace MagnumOpus.Systems
                         var remInv = MsgItem.Create(itemNtt.Id, itemNtt.Id, itemNtt.Id, MsgItemType.RemoveInventory);
                         ntt.NetSync(ref remInv);
                         if (IsLogging)
-                            Logger.Debug("{0} sold {1} for {2} and now has {3:C}", ntt.Id, txc.ItemId, money, inv.Money);
+                            FConsole.WriteLine("{0} sold {1} for {2} and now has {3:C}", ntt.Id, txc.ItemId, money, inv.Money);
 
                         PrometheusPush.ServerExpenses.Inc(money);
                         PrometheusPush.ShopExpenses.Inc(money);

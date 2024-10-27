@@ -1,4 +1,5 @@
 using System.Text;
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -24,8 +25,8 @@ namespace MagnumOpus.Systems
                     var id = BitConverter.ToInt16(packet[2..4]);
                     if (IsLogging)
                     {
-                        Logger.Debug(packet.Dump());
-                        Logger.Debug("Sending {id}/{id} (Size: {Length}) to {ntt}...", ((PacketId)id).ToString(), id, packet.Length, ntt);
+                        FConsole.WriteLine(packet.Dump());
+                        FConsole.WriteLine("Sending {id}/{id} (Size: {Length}) to {ntt}...", ((PacketId)id).ToString(), id, packet.Length, ntt);
                     }
                     if (net.UseGameCrypto)
                     {

@@ -1,4 +1,5 @@
 using System.Numerics;
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
@@ -28,7 +29,7 @@ namespace MagnumOpus.Systems
             PrometheusPush.JumpCount.Inc();
             PrometheusPush.JumpDistance.Inc(distance);
             if (IsLogging)
-                Logger.Debug("Jump started for {ntt}", ntt);
+                FConsole.WriteLine("Jump started for {ntt}", ntt);
 
             var shc = new SpatialHashUpdateComponent(pos.Position, pos.LastPosition, pos.Map, pos.Map, SpacialHashUpdatType.Move);
             ntt.Set(ref shc);

@@ -1,7 +1,9 @@
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Squiggly;
+using Microsoft.Extensions.Logging;
 
 namespace MagnumOpus.Systems
 {
@@ -18,7 +20,7 @@ namespace MagnumOpus.Systems
             if (!Collections.ItemType.TryGetValue(itemComp.Id, out var entry))
             {
                 if (IsLogging)
-                    Logger.Error("Item {item} not found in ItemType", item);
+                    FConsole.WriteLine("Item {item} not found in ItemType", item);
                 ntt.Remove<RequestItemUseComponent>();
                 return;
             }
@@ -45,7 +47,7 @@ namespace MagnumOpus.Systems
                 InventoryHelper.RemoveNttFromInventory(ntt, ref inv, item, destroy: true, netSync: true);
 
             if (IsLogging)
-                Logger.Debug("{0} used {1} ({2})", ntt, item, itemComp.Id);
+                FConsole.WriteLine("{0} used {1} ({2})", ntt, item, itemComp.Id);
             ntt.Remove<RequestItemUseComponent>();
         }
     }

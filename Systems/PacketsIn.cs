@@ -1,4 +1,5 @@
 using System.Reflection;
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -33,7 +34,7 @@ namespace MagnumOpus.Systems
                 if (kvp.Value.TryDequeue(out var packet))
                 {
                     if (IsLogging)
-                        Logger.Debug("[{tick}] Processing {packet} from {ntt}", NttWorld.Tick, kvp.Key, ntt);
+                        FConsole.WriteLine("[{tick}] Processing {packet} from {ntt}", NttWorld.Tick, kvp.Key, ntt);
 
                     PacketHandlers[kvp.Key].Invoke(ntt, packet);
                 }

@@ -39,7 +39,7 @@ namespace MagnumOpus.Systems
                 else
                 {
                     if (IsLogging)
-                        Logger.Debug("Reborn Map {0} not found", mapId);
+                        FConsole.WriteLine("Reborn Map {0} not found", mapId);
                     pos.Map = 1002;
                     pos.ChangedTick = NttWorld.Tick;
                     pos.Position = new Vector2(477, 380);
@@ -48,7 +48,7 @@ namespace MagnumOpus.Systems
             else
             {
                 if (IsLogging)
-                    Logger.Debug("Map {0} not found", pos.Map);
+                    FConsole.WriteLine("Map {0} not found", pos.Map);
                 pos.Map = 1002;
 
                 pos.ChangedTick = NttWorld.Tick;
@@ -71,7 +71,7 @@ namespace MagnumOpus.Systems
             ntt.Set<ViewportUpdateTagComponent>();
 
             if (IsLogging)
-                Logger.Debug("Revived '{0}' at {1}, {2}, {3}", NttWorld.Tick, Name, ntt, pos.Map, pos.Position.X, pos.Position.Y);
+                FConsole.WriteLine("Revived '{0}' at {1}, {2}, {3}", NttWorld.Tick, Name, ntt, pos.Map, pos.Position.X, pos.Position.Y);
         }
     }
 }

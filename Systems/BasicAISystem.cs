@@ -1,3 +1,4 @@
+using HerstLib.IO;
 using MagnumOpus.AOGP;
 using MagnumOpus.AOGP.Goals;
 using MagnumOpus.Components;
@@ -28,7 +29,7 @@ namespace MagnumOpus.Systems
                 ntt.Set<ViewportUpdateTagComponent>();
 
                 if (IsLogging)
-                    Logger.Debug("Waking up {ntt} with {visibleCount} visible entities", ntt, vwp.EntitiesVisible.Count);
+                    FConsole.WriteLine("Waking up {ntt} with {visibleCount} visible entities", ntt, vwp.EntitiesVisible.Count);
             }
 
             if (!vwp.EntitiesVisible.Contains(brn.Target))

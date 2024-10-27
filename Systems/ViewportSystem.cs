@@ -1,3 +1,4 @@
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
@@ -24,7 +25,7 @@ namespace MagnumOpus.Systems
             Collections.SpatialHashes[pos.Map].GetVisibleEntities(ref vwp);
 
             if (IsLogging)
-                Logger.Debug("{ntt} has {visibleCount} visible entities", ntt, vwp.EntitiesVisible.Count);
+                FConsole.WriteLine("{ntt} has {visibleCount} visible entities", ntt, vwp.EntitiesVisible.Count);
 
             if (ntt.Type != EntityType.Player || vwp.EntitiesVisible.Count == 0)
                 return;
@@ -41,7 +42,7 @@ namespace MagnumOpus.Systems
                     {
                         brn.State = Enums.BrainState.WakingUp;
                         if (IsLogging)
-                            Logger.Debug("{ntt} is waking up '{b}' due to distance", ntt, b);
+                            FConsole.WriteLine("{ntt} is waking up '{b}' due to distance", ntt, b);
                     }
                 }
 

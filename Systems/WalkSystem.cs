@@ -1,3 +1,4 @@
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -27,7 +28,7 @@ namespace MagnumOpus.Systems
             {
                 var text = $"Map: {pos.Map} -> {wlk.Direction} -> {pos.Position}";
                 NetworkHelper.SendMsgTo(in ntt, text, MsgTextType.TopLeft);
-                Logger.Debug("{ntt} walking {text}", ntt, text);
+                FConsole.WriteLine("{ntt} walking {text}", ntt, text);
             }
 
             ref var emo = ref ntt.Get<EmoteComponent>();

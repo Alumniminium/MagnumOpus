@@ -37,7 +37,7 @@ namespace MagnumOpus.Systems
             }
 
             if (IsLogging)
-                Logger.Debug("{ntt} respawning {num} of {mob} on map {map}", spawner, spc.GenPerTimer, cqMob.name, cqMap);
+                FConsole.WriteLine("{ntt} respawning {num} of {mob} on map {map}", spawner, spc.GenPerTimer, cqMob.name, cqMap);
 
 
             for (var i = 0; i < spc.GenPerTimer; i++)
@@ -59,7 +59,7 @@ namespace MagnumOpus.Systems
 
                 if (IsLogging)
                 {
-                    Logger.Debug("{ntt} spawned {mob} at {pos}", mob, cqMob.name, pos.Position);
+                    FConsole.WriteLine("{ntt} spawned {mob} at {pos}", mob, cqMob.name, pos.Position);
                     var msgTalk = MsgText.Create(in spawner, "Respawning " + cqMob.name + " at " + pos.Position.X + ", " + pos.Position.Y);
                     spawner.NetSync(ref msgTalk, true);
                 }

@@ -1,4 +1,5 @@
 using System.Numerics;
+using HerstLib.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
@@ -15,7 +16,7 @@ namespace MagnumOpus.Systems
             if (!InventoryHelper.RemoveNetIdFromInventory(ntt, ref inv, rdi.ItemNtt.Id, netSync: true))
             {
                 if (IsLogging)
-                    Logger.Debug("{ntt} tried to drop an Item he does not have in his Inventory at {pos}", ntt, pos.Position);
+                    FConsole.WriteLine("{ntt} tried to drop an Item he does not have in his Inventory at {pos}", ntt, pos.Position);
                 ntt.Remove<RequestDropItemComponent>();
                 return;
             }
@@ -33,7 +34,7 @@ namespace MagnumOpus.Systems
 
             ref readonly var item = ref rdi.ItemNtt.Get<ItemComponent>();
             if (IsLogging)
-                Logger.Debug("{ntt} dropped {item} at {pos}", ntt, item.Id, pos.Position);
+                FConsole.WriteLine("{ntt} dropped {item} at {pos}", ntt, item.Id, pos.Position);
 
             ntt.Remove<RequestDropItemComponent>();
         }
