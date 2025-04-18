@@ -6,7 +6,7 @@ namespace MagnumOpus.Helpers
 {
     public static class Constants
     {
-        public static string ServerIP { get; set; } = "127.0.0.1";
+        public static string ServerIP { get; set; } = "192.168.0.209";
         public static ushort PrometheusPort { get; set; }
         public static ushort LoginPort { get; set; }
         public static ushort GamePort { get; set; }

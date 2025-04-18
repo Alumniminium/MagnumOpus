@@ -11,7 +11,7 @@ namespace MagnumOpus
 {
     public static class GameServer
     {
-        private static readonly TcpListener listener = new(System.Net.IPAddress.Any, Constants.GamePort);
+        private static readonly TcpListener listener = new(System.Net.IPAddress.Any, Constants.GamePort); 
         private static readonly Thread thread = new(GameServerLoop) { IsBackground = true, Priority = ThreadPriority.Highest };
 
         public static void Start()

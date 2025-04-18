@@ -10,7 +10,6 @@ namespace MagnumOpus.ECS
 {
     public static class NttWorld
     {
-        private static readonly ReaderWriterLockSlim lockObj = new();
         public static int TargetTps { get; private set; } = 60;
         private static float UpdateTime => 1f / TargetTps;
         public static int EntityCount => NTTs.Count;
@@ -22,13 +21,11 @@ namespace MagnumOpus.ECS
         private static readonly ConcurrentQueue<NTT> ToBeRemoved = new();
         public static readonly ConcurrentQueue<NTT> ChangedThisTick = new();
 
-        private static NttSystem[] Systems = Array.Empty<NttSystem>();
+        private static NttSystem[] Systems = [];
         public static long Tick { get; private set; }
         private static long TickBeginTime;
         private static float TimeAcc;
         private static float UpdateTimeAcc;
-
-        // private static SystemNotifier? SystemNotifier;
 
         private static Action? OnSecond;
         private static Action? OnEndTick;
@@ -70,14 +67,11 @@ namespace MagnumOpus.ECS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref NTT CreateEntityWithNetId(EntityType type, int id = 0)
         {
-            lock (lockObj)
-            {
-                var ntt = new NTT(id, type);
-                NTTs.Add(ntt.Id, ntt);
-                PrometheusPush.NTTCount.Inc();
-                PrometheusPush.NTTCreations.Inc();
-                return ref CollectionsMarshal.GetValueRefOrNullRef(NTTs, id);
-            }
+            var ntt = new NTT(id, type);
+            NTTs.Add(ntt.Id, ntt);
+            PrometheusPush.NTTCount.Inc();
+            PrometheusPush.NTTCreations.Inc();
+            return ref CollectionsMarshal.GetValueRefOrNullRef(NTTs, id);
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref NTT GetEntity(int nttId) => ref NTTs.ContainsKey(nttId) ? ref CollectionsMarshal.GetValueRefOrNullRef(NTTs, nttId) : ref Default[0];
@@ -104,17 +98,14 @@ namespace MagnumOpus.ECS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void UpdateNTTs()
         {
-            lock (lockObj)
-            {
-                while (ToBeRemoved.TryDequeue(out var ntt))
-                    DestroyInternal(ntt);
+            while (ToBeRemoved.TryDequeue(out var ntt))
+                DestroyInternal(ntt);
 
-                while (ChangedThisTick.TryDequeue(out var ntt))
-                {
-                    PrometheusPush.NTTChanges.Inc();
-                    foreach (var system in Systems)
-                        system.EntityChanged(ntt);
-                }
+            while (ChangedThisTick.TryDequeue(out var ntt))
+            {
+                PrometheusPush.NTTChanges.Inc();
+                foreach (var system in Systems)
+                    system.EntityChanged(ntt);
             }
         }
         public static void Update()
