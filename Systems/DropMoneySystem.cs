@@ -17,14 +17,14 @@ namespace MagnumOpus.Systems
             {
                 ntt.Remove<RequestDropMoneyComponent>();
                 if (IsLogging)
-                    FConsole.WriteLine("{ntt} tried to drop {amount} money, but only has {money}", ntt, drc.Amount, inv.Money);
+                    FConsole.WriteLine($"{ntt} tried to drop {drc.Amount} money, but only has {inv.Money}");
                 return;
             }
 
             inv.Money -= (uint)drc.Amount;
 
-            PrometheusPush.MoneyCount.Inc();
-            PrometheusPush.MoneyTotal.Inc(drc.Amount);
+            PrometheusPush.MoneyDropCount.Inc();
+            PrometheusPush.MoneyDropTotal.Inc(drc.Amount);
             PrometheusPush.ServerExpenses.Inc(drc.Amount);
 
             var itemNtt = EntityFactory.MakeMoneyDrop(drc.Amount, ref pos);
@@ -36,10 +36,10 @@ namespace MagnumOpus.Systems
                 var dropMsg = MsgFloorItem.Create(itemNtt, Enums.MsgFloorItemType.Create);
                 ntt.NetSync(ref dropMsg, true);
                 if (IsLogging)
-                    FConsole.WriteLine("{ntt} dropped {amount} money at {pos}", ntt, drc.Amount, pos.Position);
+                    FConsole.WriteLine($"{ntt} dropped {drc.Amount} money at {pos.Position}");
             }
             else if (IsLogging)
-                FConsole.WriteLine("Failed to create money drop for {ntt}. Amount: {Amount}, Position: {pos}, Map: {Map}", ntt, drc.Amount, pos.Position, pos.Map);
+                FConsole.WriteLine($"Failed to create money drop for {ntt}. Amount: {drc.Amount}, Position: {pos.Position}, Map: {pos.Map}");
 
             ntt.Remove<RequestDropMoneyComponent>();
         }

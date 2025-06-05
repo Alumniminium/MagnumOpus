@@ -1,9 +1,10 @@
 using System.Collections.Concurrent;
+using System.Text.RegularExpressions;
 using Prometheus;
 
 namespace HerstLib.IO
 {
-    public static class FConsole
+    public static partial class FConsole
     {
         public static string StdoLogPath => $"{StartTime:dd-MM-yyyy}.log";
         private static readonly DateTime StartTime = DateTime.UtcNow;
@@ -54,7 +55,29 @@ namespace HerstLib.IO
             // GC.Collect();
         }
 
-        public static void WriteLine(string line, params object[] objects) => Lines.Add($"{line}{Environment.NewLine}");
+        public static void WriteLine(string line, params object[] objects)
+        {
+            try
+            {
+                var matches = ArgMatcher().Matches(line);
+                var requiredCount = 0;
+                if (matches.Count > 0)
+                    requiredCount = matches.Cast<Match>().Select(m => int.Parse(m.Groups[1].Value)).DefaultIfEmpty(-1).Max() + 1;
+
+                if (matches.Count == 0 || objects.Length >= requiredCount)
+                {
+                    Lines.Add($"{line}{Environment.NewLine}");
+                    return;
+                }
+
+                Lines.Add($"{line}{Environment.NewLine}");
+            }
+            catch (FormatException ex)
+            {
+                Lines.Add($"[FormatException] {ex.Message}{Environment.NewLine}");
+            }
+        }
+
         public static void WriteSingleLine(string line) => Lines.Add($"{line.Replace(Environment.NewLine, " ")}{Environment.NewLine}");
         public static void Write(string text) => Lines.Add(text);
         public static void WriteLine(Exception e) => Lines.Add($"{e.Message}{Environment.NewLine}{e.StackTrace}{Environment.NewLine}{e.InnerException}{Environment.NewLine}");
@@ -67,5 +90,8 @@ namespace HerstLib.IO
             // Logger.Close();
             WorkerThread.Join();
         }
+
+        [GeneratedRegex(@"\{(\d+)\}")]
+        private static partial Regex ArgMatcher();
     }
 }

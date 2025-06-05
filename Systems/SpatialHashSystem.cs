@@ -8,7 +8,7 @@ namespace MagnumOpus.Systems
 {
     public sealed class SpatialHashSystem : NttSystem<SpatialHashUpdateComponent>
     {
-        public SpatialHashSystem() : base("Remove Spatial Hash", threads: 1) { }
+        public SpatialHashSystem() : base("Remove Spatial Hash", threads: Environment.ProcessorCount / 4) { }
         public override void Update(in NTT ntt, ref SpatialHashUpdateComponent shr)
         {
             if (shr.Type == SpacialHashUpdatType.Remove)

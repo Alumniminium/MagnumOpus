@@ -32,16 +32,24 @@ namespace MagnumOpus.ECS
 
         public static void Run(Action<int, int> action, int threads)
         {
+            if (threads <= 1)
+            {
+                action(0, 1);
+                return;
+            }
+
             if (threads > Environment.ProcessorCount)
                 threads = Environment.ProcessorCount;
 
             _numThreadsUsed = threads;
-
             Action = action;
+            
             _allReady.Reset();
-            Interlocked.Exchange(ref _readyThreads, _readyThreads - threads);
+            Interlocked.Exchange(ref _readyThreads, 0);
+            
             for (var i = 0; i < threads; i++)
                 _blocks[i].Set();
+                
             _allReady.WaitOne();
         }
 
@@ -54,12 +62,17 @@ namespace MagnumOpus.ECS
             var idx = (int)id;
             while (true)
             {
-                Interlocked.Increment(ref _readyThreads);
-                if (_readyThreads == _threads.Length)
-                    _allReady.Set();
-
                 _blocks[idx].WaitOne();
-                Action.Invoke(idx, _numThreadsUsed);
+                
+                try
+                {
+                    Action.Invoke(idx, _numThreadsUsed);
+                }
+                finally
+                {
+                    if (Interlocked.Increment(ref _readyThreads) == _numThreadsUsed)
+                        _allReady.Set();
+                }
             }
         }
     }

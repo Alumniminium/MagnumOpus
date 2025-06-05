@@ -8,7 +8,7 @@ namespace MagnumOpus.Systems
 {
     public sealed class TeleportSystem : NttSystem<TeleportComponent, PositionComponent, ViewportComponent>
     {
-        public TeleportSystem() : base("Teleport", threads: 1, log: true) { }
+        public TeleportSystem() : base("Teleport", threads: Environment.ProcessorCount / 4, log: true) { }
 
         public override void Update(in NTT ntt, ref TeleportComponent tpc, ref PositionComponent pos, ref ViewportComponent vwp)
         {

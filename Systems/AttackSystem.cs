@@ -8,7 +8,7 @@ namespace MagnumOpus.Systems
 {
     public sealed class AttackSystem : NttSystem<AttackComponent, PositionComponent>
     {
-        public AttackSystem() : base("Attack", threads: 2) { }
+        public AttackSystem() : base("Attack", threads: Environment.ProcessorCount / 2) { }
 
         public override void Update(in NTT ntt, ref AttackComponent atk, ref PositionComponent pos)
         {

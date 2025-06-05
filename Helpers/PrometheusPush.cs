@@ -31,8 +31,8 @@ namespace MagnumOpus.ECS
         #region Drop Metrics
         public static readonly Counter MeteorDropsCount = Metrics.CreateCounter("MO_DROPS_METEOR", "Amount of Meteors dropped");
         public static readonly Counter DragonballDropsCount = Metrics.CreateCounter("MO_DROPS_DRAGONBALL", "Amount of Dragonballs dropped");
-        public static readonly Counter MoneyCount = Metrics.CreateCounter("MO_DROPS_MONEY", "Amount of Money dropped");
-        public static readonly Counter MoneyTotal = Metrics.CreateCounter("MO_DROPS_MONEY_TOTAL", "Total Amount of Money dropped");
+        public static readonly Counter MoneyDropCount = Metrics.CreateCounter("MO_DROPS_MONEY", "Amount of Money dropped");
+        public static readonly Counter MoneyDropTotal = Metrics.CreateCounter("MO_DROPS_MONEY_TOTAL", "Total Amount of Money dropped");
         public static readonly Counter HealthPotionsCount = Metrics.CreateCounter("MO_DROPS_HEALTH_POTIONS", "Amount of Health Potions dropped");
         public static readonly Counter ManaPotionsCount = Metrics.CreateCounter("MO_DROPS_MANA_POTIONS", "Amount of Mana Potions dropped");
 

@@ -18,13 +18,18 @@ namespace MagnumOpus.ECS
             if (ntt.Id == 0)
                 return;
 
-            lock (lockObj)
+            lockObj.EnterWriteLock();
+            try
             {
                 ref var old = ref CollectionsMarshal.GetValueRefOrAddDefault(Components, ntt.Id, out var found);
                 old = c;
 
                 if (!found)
                     NttWorld.InformChangesFor(ntt);
+            }
+            finally
+            {
+                lockObj.ExitWriteLock();
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -33,22 +38,43 @@ namespace MagnumOpus.ECS
             if (ntt.Id == 0)
                 return;
 
-            lock (lockObj)
+            lockObj.EnterWriteLock();
+            try
             {
                 ref var old = ref CollectionsMarshal.GetValueRefOrAddDefault(Components, ntt.Id, out var found);
                 if (!found)
                     NttWorld.InformChangesFor(ntt);
             }
+            finally
+            {
+                lockObj.ExitWriteLock();
+            }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool HasFor(in NTT ntt) => Components?.ContainsKey(ntt.Id) ?? false;
+        public static bool HasFor(in NTT ntt)
+        {
+            lockObj.EnterReadLock();
+            try
+            {
+                return Components?.ContainsKey(ntt.Id) ?? false;
+            }
+            finally
+            {
+                lockObj.ExitReadLock();
+            }
+        }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref T Get(NTT ntt)
         {
-            lock (lockObj)
+            lockObj.EnterReadLock();
+            try
             {
                 ref var t = ref CollectionsMarshal.GetValueRefOrNullRef(Components, ntt.Id);
                 return ref Unsafe.IsNullRef(ref t) ? ref Default[0] : ref t;
+            }
+            finally
+            {
+                lockObj.ExitReadLock();
             }
         }
 
@@ -59,22 +85,32 @@ namespace MagnumOpus.ECS
             if (ntt.Id == 0)
                 return;
 
-            lock (lockObj)
+            lockObj.EnterWriteLock();
+            try
             {
                 if (!Components.Remove(ntt.Id))
                     return;
                 if (notify)
                     NttWorld.InformChangesFor(ntt);
             }
+            finally
+            {
+                lockObj.ExitWriteLock();
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ChangeOwner(NTT from, NTT to)
         {
-            lock (lockObj)
+            lockObj.EnterWriteLock();
+            try
             {
                 if (Components.Remove(from.Id, out var c))
                     Components.TryAdd(to.Id, c);
+            }
+            finally
+            {
+                lockObj.ExitWriteLock();
             }
         }
 

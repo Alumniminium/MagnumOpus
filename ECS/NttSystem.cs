@@ -34,29 +34,41 @@ namespace MagnumOpus.ECS
                 TimeMetricsExporter.Set((float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
                 return;
             }
-            // ThreadedWorker.Run(EndUpdate, ThreadCount);
 
-            Update(0, _entities.Count);
+            if (ThreadCount > 1 && _entitiesList.Count > ThreadCount * 2)
+            {
+                ThreadedWorker.Run(EndUpdate, ThreadCount);
+            }
+            else
+            {
+                Update(0, _entitiesList.Count);
+            }
+            
             NTTCountMetricsExporter.Set(_entities.Count);
             TimeMetricsExporter.Set((float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
         }
 
         public void EndUpdate(int idx, int threads)
         {
-            var start = 0;
-            var amount = _entitiesList.Count;
-
-            if (amount > threads * 2)
+            var totalEntities = _entitiesList.Count;
+            
+            // For small workloads, only thread 0 processes everything
+            if (totalEntities <= threads * 2)
             {
-                var chunkSize = amount / threads;
-                var remaining = amount % threads;
-                start = (chunkSize * idx) + Math.Min(idx, remaining);
-                amount = chunkSize + (idx < remaining ? 1 : 0);
-            }
-            else if (idx != 0)
+                if (idx == 0)
+                    Update(0, totalEntities);
                 return;
+            }
 
-            Update(start, amount);
+            // Calculate work distribution ensuring all entities are processed
+            var baseChunkSize = totalEntities / threads;
+            var extraEntities = totalEntities % threads;
+            
+            // First 'extraEntities' threads get one extra entity
+            var chunkSize = baseChunkSize + (idx < extraEntities ? 1 : 0);
+            var start = (baseChunkSize * idx) + Math.Min(idx, extraEntities);
+            
+            Update(start, chunkSize);
         }
 
         protected abstract void Update(int start, int amount);

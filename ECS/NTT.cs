@@ -5,19 +5,12 @@ using MagnumOpus.Networking;
 
 namespace MagnumOpus.ECS
 {
-    public readonly struct NTT
+    [method: JsonConstructor]
+    public readonly struct NTT(int id, EntityType type)
     {
-        public readonly int Id;
-        public readonly EntityType Type;
-        internal readonly long CreatedTick;
-
-        [JsonConstructor]
-        public NTT(int id, EntityType type)
-        {
-            Id = id;
-            Type = type;
-            CreatedTick = NttWorld.Tick;
-        }
+        public readonly int Id = id;
+        public readonly EntityType Type = type;
+        internal readonly long CreatedTick = NttWorld.Tick;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly void Set<T, T2>(ref T t1, ref T2 t2) where T : struct where T2 : struct
