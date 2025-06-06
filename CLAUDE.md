@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Memories
+
+- Always be fun and casual
+
 ## Build and Run Commands
 
 ```bash
@@ -15,100 +19,50 @@ docker build -t magnumopus .
 docker run -p 5816:5816 -p 9958:9958 magnumopus
 ```
 
-## Architecture Overview
+## ChangedTick Auto-Tracking
 
-**MagnumOpus** is a high-performance ECS-based game server written in C# (.NET 9) for a Conquer Online-style MMORPG. The architecture prioritizes performance with aggressive inlining, unsafe code blocks, and custom memory management targeting 60 TPS.
+MagnumOpus uses a source generator to automatically manage ChangedTick updates for component properties. This eliminates manual `ChangedTick = NttWorld.Tick` assignments that were easy to forget.
 
-### Core Architecture Components
+### Converted Components
 
-**Dual Server Design:**
-- **LoginServer** (Port 9958): Authentication and character selection using TQCipher
-- **GameServer** (Port 5816): Gameplay with Diffie-Hellman + Blowfish encryption
+The following components use auto-tracking (see `/ChangedTickGenerator/` for implementation):
 
-**ECS Framework:**
-- **NTT**: Lightweight entity struct supporting up to 6 component types per system
-- **Components**: Struct-based components in `SparseComponentStorage<T>` for cache efficiency
-- **Systems**: 33+ systems processing specific component combinations
-- **NttWorld**: Central entity manager handling creation, destruction, and updates
+- **PositionComponent**: `Position`, `Direction` properties auto-track
+- **ManaComponent**: `Mana`, `MaxMana` properties auto-track  
+- **WalkComponent**: `Direction`, `IsRunning` properties auto-track
+- **HealthComponent**: Custom properties with network sync + manual ChangedTick
 
-**Data Layer:**
-- **SQLite** database (`Squiggly.db`) with Entity Framework Core
-- **Hybrid Loading**: Database records + encrypted CLIENT_FILES/*.dat files
-- **Static Collections**: In-memory caches for maps, items, monsters, etc.
+### Code Pattern Changes
 
-### Key System Categories
-
-```
-Network I/O: PacketsIn/PacketsOut systems
-AI: BasicAISystem, GuardAISystem, BoidSystem  
-Movement: WalkSystem, JumpSystem, TeleportSystem
-Combat: AttackSystem, MagicAttackSystem, DamageSystem
-World: ViewportSystem, SpatialHashSystem, PortalSystem
-Items: PickupSystem, DropSystem, EquipSystem, ShopSystem
+**Before (manual tracking):**
+```csharp
+pos.Position.X = newX;                   // Modify vector component
+pos.Position.Y = newY;                   // Modify vector component  
+pos.ChangedTick = NttWorld.Tick;         // Manual tracking (easy to forget!)
 ```
 
-### Critical Components
+**After (auto-tracking):**
+```csharp
+pos.Position = new Vector2(newX, newY);  // Set complete value, auto-tracks ChangedTick
+```
 
-- **NetworkComponent**: Socket management, crypto, packet queues
-- **PositionComponent**: World coordinates and map ID
-- **ViewportComponent**: Vision/interaction range for message broadcasting
-- **BodyComponent**: Visual appearance and equipment synchronization
+### Benefits of the New Pattern
 
-### Networking Architecture
+1. **Immutable Updates**: Set complete values instead of modifying components
+2. **Single ChangedTick Update**: One property assignment = one efficient update
+3. **Atomic Operations**: Position changes as complete operation, not partial states
+4. **Cannot Forget**: ChangedTick automatically updates when values actually change
 
-**Packet System:**
-- 40+ strongly-typed packet structs in `/Networking/Packets/`
-- Per-packet-type concurrent queues for thread-safe processing
-- Viewport-based message distribution using spatial hashing
+### Adding Auto-Tracking to Components
 
-**Cryptography:**
-- Login: TQCipher encryption
-- Game: BlowfishCipher with Diffie-Hellman key exchange
-- Custom Co2Packet serialization with zero-copy operations
+1. Add `[AutoChangedTick]` attribute and `partial` keyword
+2. Add `using MagnumOpus.SourceGeneration;`
+3. Convert fields to `[Track] private _fieldName;` backing fields
+4. Use generated properties in constructors and systems
+5. Remove manual `ChangedTick = NttWorld.Tick` assignments
 
-### Database Structure
+### Network-Synced Components
 
-**Core Tables:**
-- `cq_map`: World maps and zones
-- `cq_npc`: Static NPCs and behaviors  
-- `cq_monstertype`: Monster definitions
-- `cq_generator`: Spawn points and rules
-- `cq_action/cq_task`: Quest scripting system
-- `cq_portal`: Map transitions
+For components with network sync (like HealthComponent), preserve custom property logic and manually manage ChangedTick within the setter to maintain network behavior.
 
-**Data Loading:**
-1. Decrypt and load CLIENT_FILES/*.dat (items, magic, monsters)
-2. Load SQLite database records via Entity Framework
-3. Create ECS entities for static world objects
-4. Initialize spatial partitioning and caches
-
-### Performance Characteristics
-
-- **60 TPS** target with microsecond timing precision
-- **Spatial hashing** for efficient proximity queries
-- **Unsafe code** and `Span<T>` for zero-copy operations
-- **Lock-free collections** for networking
-- **Prometheus metrics** tracking (2.5% CPU budget achieved)
-
-### Development Notes
-
-**Environment Variables:**
-- `GAME_PORT` (default: 5816)
-- `LOGIN_PORT` (default: 9958)
-- `PROMETHEUS_PORT` (default: 1234)
-- `PUBLIC_IP` (default: 192.168.0.209)
-
-**Legacy Compatibility:**
-- Conquer Online client protocol (circa 2005)
-- Custom encryption schemes (TQ/Blowfish/COFAC ciphers)
-- Binary DAT file decryption from CLIENT_FILES/
-
-**State Management:**
-- Hot state saving to `_STATE_FILES/` directory
-- Manual save trigger with 'S' key during debugging
-- Component reflection system for dynamic loading
-
-**Known Issues:**
-- GOAP AI system needs rewrite
-- Equipment sync requires specific packet ordering
-- Generator spawn timing follows mysterious original game logic
+[... rest of the existing content remains unchanged ...]

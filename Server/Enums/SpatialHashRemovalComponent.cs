@@ -1,0 +1,14 @@
+using System.Numerics;
+using MagnumOpus.ECS;
+namespace MagnumOpus.Components
+{
+    [Component(saveEnabled: false)]
+    public struct SpatialHashUpdateComponent(Vector2 pos, Vector2 lastPos, int map, int lastMap, SpacialHashUpdatType type)
+    {
+        public Vector2 Position = pos;
+        public Vector2 LastPosition = lastPos;
+        public int LastMap = lastMap;
+        public int Map = map;
+        public SpacialHashUpdatType Type = type;
+    }
+}
