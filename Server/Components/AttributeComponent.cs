@@ -25,6 +25,9 @@ namespace MagnumOpus.Components
         [NetworkSync(MsgUserAttribType.StatPoints)]
         public ushort StatPoints;
 
+        // Test field to trigger generation
+        private int _testField;
+
         public AttributeComponent(in NTT ntt)
         {
             NTT = ntt;

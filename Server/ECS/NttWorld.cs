@@ -68,7 +68,8 @@ namespace MagnumOpus.ECS
         public static ref NTT CreateEntityWithNetId(EntityType type, int id = 0)
         {
             var ntt = new NTT(id, type);
-            NTTs.Add(ntt.Id, ntt);
+            lock (NTTs)
+                NTTs.Add(ntt.Id, ntt);
             PrometheusPush.NTTCount.Inc();
             PrometheusPush.NTTCreations.Inc();
             return ref CollectionsMarshal.GetValueRefOrNullRef(NTTs, id);

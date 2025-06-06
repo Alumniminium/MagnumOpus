@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using HerstLib.Memory;
+using System.Collections.Concurrent;
 
 namespace MagnumOpus.SpacePartitioning
 {
@@ -10,8 +11,7 @@ namespace MagnumOpus.SpacePartitioning
     {
         private const float VISIBILITY_DISTANCE_SQUARED = 350f;
         private readonly int cellSize = cellSize;
-        private readonly Dictionary<int, List<NTT>> Hashtbl = new Dictionary<int, List<NTT>>();
-        private static readonly Pool<List<NTT>> ListPool = new(() => new List<NTT>(), list => list.Clear(), 100);
+        private readonly ConcurrentDictionary<int, List<NTT>> Hashtbl = [];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(NTT entity, Vector2 pos)
@@ -19,8 +19,8 @@ namespace MagnumOpus.SpacePartitioning
             var hash = GetHash(pos);
             if (!Hashtbl.TryGetValue(hash, out var list))
             {
-                list = ListPool.Get();
-                Hashtbl.Add(hash, list);
+                list = [];
+                Hashtbl.TryAdd(hash, list);
             }
             list.Add(entity);
         }
@@ -33,10 +33,7 @@ namespace MagnumOpus.SpacePartitioning
             {
                 bucket.Remove(entity);
                 if (bucket.Count == 0)
-                {
-                    Hashtbl.Remove(hash);
-                    ListPool.Return(bucket);
-                }
+                    Hashtbl.TryRemove(hash, out var _);
             }
         }
 
@@ -89,7 +86,7 @@ namespace MagnumOpus.SpacePartitioning
             var x = (int)scaled.X;
             var y = (int)scaled.Y;
 
-            return (x * 73856093) ^ (y * 19349663);
+            return Math.Abs((x * 73856093) ^ (y * 19349663));
         }
     }
     public class MapEntities
