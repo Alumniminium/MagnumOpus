@@ -1,10 +1,11 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
+using NttECS.ECS;
 
 namespace MagnumOpus.Networking.Packets;
 
@@ -22,7 +23,7 @@ public unsafe struct MsgAction
 {
     [FieldOffset(0)]
     public MsgHeader Header;
-    [FieldOffset(2)]
+    [FieldOffset(4)]
     public int Timestamp;
     [FieldOffset(8)]
     public int UniqueId;
@@ -105,16 +106,21 @@ public unsafe struct MsgAction
             case MsgActionType.SendLocation:
                 {
                     if (_trace)
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.X}, {msg.Y}");
+                        FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id} -> {msg.X}, {msg.Y}");
 
                     ref var pos = ref ntt.Get<PositionComponent>();
                     var reply = Create(ntt.Id, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
                     ntt.NetSync(ref reply);
                     if (_trace)
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {reply.X}, {reply.Y}");
+                        FConsole.WriteLine($"[GAME] Outgoing {msg.Type}: {ntt.Id} -> {reply.X}, {reply.Y}");
 
-                    NttWorld.Players.Add(ntt);
-                    ntt.Set(new TeleportComponent { Map = (ushort)pos.Map, X = (ushort)pos.Position.X, Y = (ushort)pos.Position.Y });
+                    // Add to players list for the first time
+                    if (!NttWorld.Players.Contains(ntt))
+                    {
+                        NttWorld.Players.Add(ntt);
+                        // Only trigger viewport update on first login, not teleport
+                        ntt.Set<ViewportUpdateTagComponent>();
+                    }
                     break;
                 }
             case MsgActionType.LeaveBooth:
@@ -123,7 +129,7 @@ public unsafe struct MsgAction
             case MsgActionType.SendProficiencies:
                 {
                     if (_trace)
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id}");
+                        FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id}");
 
                     ntt.NetSync(ref msg);
                     break;
@@ -131,7 +137,7 @@ public unsafe struct MsgAction
             case MsgActionType.SendItems:
                 {
                     if (_trace)
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id}");
+                        FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id}");
 
                     ref var inv = ref ntt.Get<InventoryComponent>();
 
@@ -144,7 +150,7 @@ public unsafe struct MsgAction
             case MsgActionType.SendSpells:
                 {
                     if (_trace)
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id}");
+                        FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id}");
 
                     ref readonly var sbc = ref ntt.Get<SpellBookComponent>();
                     foreach (var spell in sbc.Spells)
@@ -158,7 +164,7 @@ public unsafe struct MsgAction
             case MsgActionType.ChangeFace:
                 {
                     if (_trace)
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id}");
+                        FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id}");
 
                     ref var head = ref ntt.Get<HeadComponent>();
                     head.FaceId = (ushort)msg.Param;
@@ -168,7 +174,7 @@ public unsafe struct MsgAction
             case MsgActionType.ChangeFacing:
                 {
                     if (_trace)
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.Direction}");
+                        FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id} -> {msg.Direction}");
 
                     ref var pos = ref ntt.Get<PositionComponent>();
                     pos.Direction = msg.Direction;
@@ -178,7 +184,7 @@ public unsafe struct MsgAction
             case MsgActionType.ChangeAction:
                 {
                     if (_trace)
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.Param}");
+                        FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id} -> {msg.Param}");
 
                     var emo = new EmoteComponent((Emote)msg.Param);
                     ntt.Set(ref emo);
@@ -187,7 +193,7 @@ public unsafe struct MsgAction
             case MsgActionType.Jump:
                 {
                     if (_trace)
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.JumpX}, {msg.JumpY}");
+                        FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id} -> {msg.JumpX}, {msg.JumpY}");
 
                     var jmp = new JumpComponent(msg.JumpX, msg.JumpY);
                     var emo = new EmoteComponent(Emote.Stand);
@@ -198,7 +204,7 @@ public unsafe struct MsgAction
             case MsgActionType.EnterPortalChangeMap:
                 {
                     if (_trace)
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.Param}");
+                        FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id} -> {msg.Param}");
 
                     var tpc = new PortalComponent(msg.X, msg.Y);
                     ntt.Set(ref tpc);
@@ -207,7 +213,7 @@ public unsafe struct MsgAction
             case MsgActionType.QueryEntity:
                 {
                     if (_trace)
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.Param}");
+                        FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id} -> {msg.Param}");
 
                     ref readonly var ent = ref NttWorld.GetEntity(msg.Param);
                     if (ent.Id != 0)
@@ -222,7 +228,7 @@ public unsafe struct MsgAction
             case MsgActionType.QueryTeamMember:
                 {
                     if (_trace)
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.Param}");
+                        FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id} -> {msg.Param}");
 
                     ref readonly var ent = ref NttWorld.GetEntity(msg.Param);
                     if (ent.Id != 0)
@@ -238,7 +244,7 @@ public unsafe struct MsgAction
             case MsgActionType.TeleportReply:
                 {
                     if (_trace)
-                        FConsole.WriteLine($"[GAME] {msg.Type}: {ntt.Id} -> {msg.JumpX}, {msg.JumpY}");
+                        FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id} -> {msg.JumpX}, {msg.JumpY}");
 
                     ref var pos = ref ntt.Get<PositionComponent>();
                     pos.Position = new Vector2(msg.JumpX, msg.JumpY);
@@ -249,7 +255,7 @@ public unsafe struct MsgAction
             case MsgActionType.GuardJump:
                 {
                     if (_trace)
-                        FConsole.WriteLine($"[GAME] {msg.Type} : {ntt.Id} -> {msg.JumpX}, {msg.JumpY}");
+                        FConsole.WriteLine($"[GAME] Incomming {msg.Type} : {ntt.Id} -> {msg.JumpX}, {msg.JumpY}");
 
                     ntt.NetSync(ref msg);
                     break;

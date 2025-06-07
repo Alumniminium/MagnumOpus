@@ -1,8 +1,10 @@
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
+using MagnumOpus.Helpers;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -15,7 +17,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the DestroySystem with limited threading for cleanup operations.
         /// </summary>
-        public DestroySystem() : base("Destroy", threads: 2, log: false) { }
+        public DestroySystem() : base("Destroy", threads: 1, log: false) { }
 
         /// <summary>
         /// Performs final cleanup for entities marked for destruction, sending despawn packets and removing from world.
@@ -24,17 +26,15 @@ namespace MagnumOpus.Systems
         /// <param name="def">Destroy end of frame component (marker for destruction)</param>
         public override void Update(in NTT ntt, ref DestroyEndOfFrameComponent def)
         {
-            switch (ntt.Type)
+            if (ntt.IsPlayer() || ntt.IsMonster())
             {
-                case EntityType.Player:
-                case EntityType.Monster:
-                    var despawnPacket = MsgAction.RemoveEntity(ntt.Id);
-                    ntt.NetSync(ref despawnPacket, true);
-                    break;
-                case EntityType.Item:
-                    var deletePacket = MsgFloorItem.Create(in ntt, MsgFloorItemType.Delete);
-                    ntt.NetSync(ref deletePacket, true);
-                    break;
+                var despawnPacket = MsgAction.RemoveEntity(ntt.Id);
+                ntt.NetSync(ref despawnPacket, true);
+            }
+            else if (ntt.IsItem())
+            {
+                var deletePacket = MsgFloorItem.Create(in ntt, MsgFloorItemType.Delete);
+                ntt.NetSync(ref deletePacket, true);
             }
 
             NttWorld.Destroy(ntt);

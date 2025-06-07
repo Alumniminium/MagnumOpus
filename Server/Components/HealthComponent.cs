@@ -1,10 +1,11 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
+using NttECS.ECS;
 
 namespace MagnumOpus.Components
 {
-    [Component(saveEnabled: true)]
+    [Component(SaveEnabled: true)]
     public struct HealthComponent(in NTT ntt, int health = 100, int maxHealth = 100)
     {
         public long ChangedTick = NttWorld.Tick;

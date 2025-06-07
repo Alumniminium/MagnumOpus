@@ -1,8 +1,9 @@
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Squiggly;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -19,7 +20,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the ViewportSystem with multi-threaded processing capabilities.
         /// </summary>
-        public ViewportSystem() : base("Viewport", threads: Environment.ProcessorCount) { }
+        public ViewportSystem() : base("Viewport", threads: 1) { }
         
         /// <summary>
         /// Updates an entity's viewport, calculates visible entities, and handles AI activation.
@@ -34,7 +35,7 @@ namespace MagnumOpus.Systems
         /// </example>
         public override void Update(in NTT ntt, ref PositionComponent pos, ref ViewportComponent vwp, ref ViewportUpdateTagComponent _)
         {
-            ntt.Remove<ViewportUpdateTagComponent>();
+            // ntt.Remove<ViewportUpdateTagComponent>();
 
             var viewport = vwp.Viewport;
             viewport.X = (int)(pos.Position.X - (viewport.Width / 2));
@@ -52,7 +53,7 @@ namespace MagnumOpus.Systems
             if (IsLogging)
                 FConsole.WriteLine("{ntt} has {visibleCount} visible entities", ntt, vwp.EntitiesVisible.Count);
 
-            if (ntt.Type != EntityType.Player)
+            if (!ntt.IsPlayer())
                 return;
 
             foreach (var visibleEntity in vwp.EntitiesVisible)
@@ -77,7 +78,7 @@ namespace MagnumOpus.Systems
                 visibleEntity.Set<ViewportUpdateTagComponent>();
 
                 NetworkHelper.FullSync(in ntt, in visibleEntity);
-                NetworkHelper.FullSync(in visibleEntity, in visibleEntity);
+                NetworkHelper.FullSync(in visibleEntity, in ntt);
             }
         }
     }

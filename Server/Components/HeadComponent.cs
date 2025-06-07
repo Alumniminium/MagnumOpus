@@ -2,10 +2,11 @@ using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
+using NttECS.ECS;
 
 namespace MagnumOpus.Components
 {
-    [Component(saveEnabled: true)]
+    [Component(SaveEnabled: true)]
     public struct HeadComponent(in NTT ntt, ushort face = 6, ushort hair = 310)
     {
         public NTT NTT = ntt;

@@ -1,8 +1,10 @@
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
+using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.SpacePartitioning;
 using MagnumOpus.Squiggly;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -15,8 +17,8 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the SpatialHashSystem with multi-threaded processing for spatial updates.
         /// </summary>
-        public SpatialHashSystem() : base("Remove Spatial Hash", threads: Environment.ProcessorCount / 4) { }
-        
+        public SpatialHashSystem() : base("Remove Spatial Hash", threads: 1 / 4) { }
+
         /// <summary>
         /// Processes spatial hash updates including entity additions, removals, and map transfers.
         /// </summary>

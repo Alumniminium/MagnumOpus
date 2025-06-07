@@ -2,11 +2,11 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Numerics;
 using Co2Core.Security.Cryptography;
-using HerstLib.IO;
-using MagnumOpus._HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using MagnumOpus.Helpers;
 using MagnumOpus.SpacePartitioning;
 using MagnumOpus.Squiggly.Models;
 
@@ -33,7 +33,7 @@ namespace MagnumOpus.Squiggly
                 var center = new Vector2((int)spawnMin.X + (width / 2), (int)spawnMin.Y + (height / 2));
                 var rectangle = new Rectangle((int)spawnMin.X, (int)spawnMin.Y, (int)width, (int)height);
 
-                ref var ntt = ref NttWorld.CreateEntity(EntityType.Other);
+                ref var ntt = ref NttWorld.CreateEntity(IdGenerator.GetOtherId());
 
                 var pos = new PositionComponent(center, cq_spawn.mapid);
                 ntt.Set(ref pos);
@@ -144,7 +144,7 @@ namespace MagnumOpus.Squiggly
                         cqNpc.mapid, cqNpc.sort, cqNpc.@base, cqNpc.type, cqNpc.lookface, cqNpc.name.Trim(), cqNpc.task0, cqNpc.task1,
                         cqNpc.task2, cqNpc.task3, cqNpc.task4, cqNpc.task5, cqNpc.task6, cqNpc.task7);
 
-                    var ntt = NttWorld.CreateEntityWithNetId(EntityType.Npc, (int)cqNpc.id);
+                    var ntt = NttWorld.CreateEntityWithNetId((int)cqNpc.id);
                     var pos = new PositionComponent(new Vector2(cqNpc.cellx, cqNpc.celly), cqNpc.mapid);
                     var bdy = new BodyComponent(in ntt, cqNpc.lookface);
                     var npcc = new NpcComponent(npc.Base, npc.Type, npc.Sort);

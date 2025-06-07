@@ -2,7 +2,7 @@ using MagnumOpus.ECS;
 
 namespace MagnumOpus.Components
 {
-    [Component(saveEnabled: true)]
+    [Component(SaveEnabled: true)]
     public struct RebornComponent(byte count = 0)
     {
         public long ChangedTick = NttWorld.Tick;

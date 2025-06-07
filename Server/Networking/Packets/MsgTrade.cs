@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
-using HerstLib.IO;
-using MagnumOpus.ECS;
+using MagnumOpus.IO;
 using MagnumOpus.Enums;
+using NttECS.ECS;
 
 namespace MagnumOpus.Networking.Packets
 {

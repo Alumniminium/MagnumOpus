@@ -1,8 +1,10 @@
 using System.Numerics;
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Networking.Packets;
+using MagnumOpus.Helpers;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -15,7 +17,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the TeleportSystem with limited threading and debug logging enabled.
         /// </summary>
-        public TeleportSystem() : base("Teleport", threads: Environment.ProcessorCount / 4, log: true) { }
+        public TeleportSystem() : base("Teleport", threads: 1 / 4, log: true) { }
 
         /// <summary>
         /// Processes an entity's teleportation request, updating position and notifying clients.
@@ -45,7 +47,7 @@ namespace MagnumOpus.Systems
             ntt.Remove<TeleportComponent>();
 
             if (IsLogging)
-                FConsole.WriteLine("[{tick}] Teleported '{0}' to {1}, {2}, {3}", NttWorld.Tick, ntt, tpc.Map, tpc.X, tpc.Y);
+                FConsole.WriteLine("[{0}] Teleported '{1}' to {2}, {3}, {4}", NttWorld.Tick, ntt.Id, tpc.Map, tpc.X, tpc.Y);
         }
     }
 }

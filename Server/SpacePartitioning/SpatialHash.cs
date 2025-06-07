@@ -1,15 +1,15 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using System.Collections.Concurrent;
+using NttECS.ECS;
 
 namespace MagnumOpus.SpacePartitioning
 {
     internal class BucketList
     {
-        public readonly List<NTT> Entities = new();
+        public readonly List<NTT> Entities = [];
         public readonly ReaderWriterLockSlim Lock = new(LockRecursionPolicy.NoRecursion);
     }
 
@@ -118,7 +118,7 @@ namespace MagnumOpus.SpacePartitioning
     {
         private readonly Dictionary<int, NTT> Entities;
 
-        public MapEntities() => Entities = new Dictionary<int, NTT>();
+        public MapEntities() => Entities = [];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(NTT entity, Vector2 pos)

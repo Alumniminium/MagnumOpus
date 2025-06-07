@@ -2,10 +2,11 @@ using System.Runtime.InteropServices;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using Newtonsoft.Json;
+using NttECS.ECS;
 
 namespace MagnumOpus.Components
 {
-    [Component(saveEnabled: true)]
+    [Component(SaveEnabled: true)]
     public struct EquipmentComponent
     {
         public Dictionary<MsgItemPosition, NTT> Items;

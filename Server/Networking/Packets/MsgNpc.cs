@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
-using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using NttECS.ECS;
 
 namespace MagnumOpus.Networking.Packets
 {

@@ -1,6 +1,7 @@
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -13,7 +14,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the DamageSystem with half the available CPU cores for processing.
         /// </summary>
-        public DamageSystem() : base("Damage", threads: Environment.ProcessorCount / 2) { }
+        public DamageSystem() : base("Damage", threads: 1) { }
 
         /// <summary>
         /// Applies damage to an entity, handles death conditions, and awards experience to attackers.

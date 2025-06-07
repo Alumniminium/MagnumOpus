@@ -2,7 +2,7 @@ using System.Numerics;
 using MagnumOpus.ECS;
 namespace MagnumOpus.Components
 {
-    [Component(saveEnabled: true)]
+    [Component(SaveEnabled: true)]
     public struct BoidBehaviorComponent(int flock, Vector2 target)
     {
         public int Flock = flock;

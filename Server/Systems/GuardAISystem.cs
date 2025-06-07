@@ -1,10 +1,11 @@
 using System.Numerics;
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Squiggly;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -16,14 +17,14 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the GuardAISystem with full multi-threaded processing capabilities.
         /// </summary>
-        public GuardAISystem() : base("Guard AI", threads: Environment.ProcessorCount) { }
-        
+        public GuardAISystem() : base("Guard AI", threads: 1) { }
+
         /// <summary>
         /// Filters entities to only process guard monsters.
         /// </summary>
         /// <param name="ntt">Entity to check for guard AI processing eligibility</param>
         /// <returns>True if entity is a monster with guard behavior</returns>
-        protected override bool MatchesFilter(in NTT ntt) => ntt.Type == EntityType.Monster && base.MatchesFilter(in ntt);
+        protected override bool MatchesFilter(in NTT ntt) => ntt.IsMonster() && base.MatchesFilter(in ntt);
 
         /// <summary>
         /// Processes guard AI behavior including target detection, approaching, attacking, and returning to guard position.
@@ -57,9 +58,6 @@ namespace MagnumOpus.Systems
 
                 foreach (var visibleEntity in vwp.EntitiesVisible)
                 {
-                    if (visibleEntity.Type != EntityType.Monster)
-                        continue;
-
                     if (visibleEntity.Has<GuardPositionComponent>() || visibleEntity.Has<DeathTagComponent>())
                         continue;
 
@@ -105,7 +103,7 @@ namespace MagnumOpus.Systems
                 }
 
                 ref readonly var target = ref NttWorld.GetEntity(brn.Target);
-                if (target.Has<DeathTagComponent>() || target.Type != EntityType.Monster)
+                if (target.Has<DeathTagComponent>())
                 {
                     brn.Target = default;
                     return;

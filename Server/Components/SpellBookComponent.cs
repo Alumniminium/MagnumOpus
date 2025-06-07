@@ -1,7 +1,7 @@
 using MagnumOpus.ECS;
 namespace MagnumOpus.Components
 {
-    [Component(saveEnabled: true)]
+    [Component(SaveEnabled: true)]
     public struct SpellBookComponent
     {
         public Dictionary<ushort, (ushort lvl, ushort exp, ushort cooldown)> Spells;

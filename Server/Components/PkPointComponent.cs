@@ -2,7 +2,7 @@ using MagnumOpus.ECS;
 
 namespace MagnumOpus.Components
 {
-    [Component(saveEnabled: true)]
+    [Component(SaveEnabled: true)]
     public struct PkPointComponent(byte points, TimeSpan decreaseTime)
     {
         public long ChangedTick = NttWorld.Tick;

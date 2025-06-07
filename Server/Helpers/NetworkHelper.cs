@@ -3,6 +3,7 @@ using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
+using NttECS.ECS;
 
 namespace MagnumOpus.Helpers
 {
@@ -27,30 +28,30 @@ namespace MagnumOpus.Helpers
         /// </example>
         public static void FullSync(in NTT to, in NTT ntt)
         {
-            if (to.Type != EntityType.Player)
+            if (!to.IsPlayer())
                 return;
-            if (ntt.Type == EntityType.Npc)
+            if (ntt.IsNpc())
             {
                 var spawnPacket = MsgNpcSpawn.Create(ntt);
                 to.NetSync(ref spawnPacket);
             }
-            else if (ntt.Type is EntityType.Player or EntityType.Monster)
+            else if (ntt.IsPlayer() || ntt.IsMonster())
             {
                 var spawnPacket = MsgSpawn.Create(ntt);
                 to.NetSync(ref spawnPacket);
 
-                if (ntt.CreatedTick != NttWorld.Tick)
-                    return;
+                // Skip spawn effect for entities created in previous ticks
+                // TODO: Find alternative way to check if entity was just created
 
                 var spawnEffectMsg = MsgName.Create(ntt.Id, "MBStandard", MsgNameType.RoleEffect);
                 to.NetSync(ref spawnEffectMsg);
             }
-            else if (ntt.Type == EntityType.Item)
+            else if (ntt.IsItem())
             {
                 var spawnPacket = MsgFloorItem.Create(in ntt, MsgFloorItemType.Create);
                 to.NetSync(ref spawnPacket);
             }
-            else if (ntt.Type == EntityType.Other)
+            else if (ntt.IsOther())
             {
                 if (ntt.Has<BodyComponent>())
                 {
@@ -76,12 +77,12 @@ namespace MagnumOpus.Helpers
         /// </example>
         internal static void SendMsgTo(in NTT to, string text, MsgTextType channel)
         {
-            if (to.Type != EntityType.Player)
+            if (!to.IsPlayer())
                 return;
             var messagePacket = MsgText.Create(in to, text, channel);
             to.NetSync(ref messagePacket);
         }
-        
+
         /// <summary>
         /// Broadcasts a text message to all connected players.
         /// Useful for server-wide announcements and system messages.

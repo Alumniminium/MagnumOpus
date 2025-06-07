@@ -1,9 +1,11 @@
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Squiggly;
+using MagnumOpus.Helpers;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -16,7 +18,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the ShopSystem with limited threading for transaction processing.
         /// </summary>
-        public ShopSystem() : base("Shop", threads: 2) { }
+        public ShopSystem() : base("Shop", threads: 1) { }
 
         /// <summary>
         /// Processes shop transactions, handling both item purchases and sales with appropriate validation and economy tracking.
@@ -72,7 +74,7 @@ namespace MagnumOpus.Systems
                     if (transaction.Buy)
                     {
                         inventory.Money -= itemTypeData.Price;
-                        ref var newItemEntity = ref NttWorld.CreateEntity(EntityType.Item);
+                        ref var newItemEntity = ref NttWorld.CreateEntity(IdGenerator.GetItemId());
                         var newItemComponent = new ItemComponent(transaction.ItemId, itemTypeData.Amount, itemTypeData.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
                         newItemEntity.Set(ref newItemComponent);
                         inventory.Items.Span[slotIndex] = newItemEntity;

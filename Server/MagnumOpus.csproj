@@ -37,4 +37,8 @@
       <HintPath>Co2Core.dll</HintPath>
     </Reference>
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NttECS\NttECS.csproj" />
+  </ItemGroup>
 </Project>

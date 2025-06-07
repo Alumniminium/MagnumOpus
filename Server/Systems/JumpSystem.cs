@@ -1,9 +1,10 @@
 using System.Numerics;
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -16,14 +17,14 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the JumpSystem with limited threading for jump processing.
         /// </summary>
-        public JumpSystem() : base("Jump", threads: 2) { }
-        
+        public JumpSystem() : base("Jump", threads: 1) { }
+
         /// <summary>
         /// Filters out item entities from jump processing since they cannot jump.
         /// </summary>
         /// <param name="ntt">Entity to check for jump processing eligibility</param>
         /// <returns>True if entity can jump (not an item)</returns>
-        protected override bool MatchesFilter(in NTT ntt) => ntt.Type != EntityType.Item && base.MatchesFilter(in ntt);
+        protected override bool MatchesFilter(in NTT ntt) => !ntt.IsItem() && base.MatchesFilter(in ntt);
 
         /// <summary>
         /// Processes an entity's jump request, updating position and notifying relevant systems.

@@ -1,9 +1,11 @@
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.AOGP;
 using MagnumOpus.AOGP.Goals;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using MagnumOpus.Helpers;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -16,14 +18,14 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the BasicAISystem with full multi-threaded processing capabilities.
         /// </summary>
-        public BasicAISystem() : base("Basic AI", threads: Environment.ProcessorCount) { }
-        
+        public BasicAISystem() : base("Basic AI", threads: 1) { }
+
         /// <summary>
         /// Filters entities to only process living monsters that are not guards.
         /// </summary>
         /// <param name="ntt">Entity to check for AI processing eligibility</param>
         /// <returns>True if entity is a living monster without guard behavior</returns>
-        protected override bool MatchesFilter(in NTT ntt) => ntt.Type == EntityType.Monster && !ntt.Has<DeathTagComponent>() && !ntt.Has<GuardPositionComponent>() && base.MatchesFilter(in ntt);
+        protected override bool MatchesFilter(in NTT ntt) => ntt.IsMonster() && !ntt.Has<DeathTagComponent>() && !ntt.Has<GuardPositionComponent>() && base.MatchesFilter(in ntt);
 
         /// <summary>
         /// Processes AI behavior including state management, target acquisition, and action planning.
@@ -59,7 +61,7 @@ namespace MagnumOpus.Systems
             {
                 foreach (var visibleEntity in vwp.EntitiesVisible)
                 {
-                    if (visibleEntity.Type != EntityType.Player)
+                    if (!visibleEntity.IsPlayer())
                         continue;
 
                     if (visibleEntity.Has<DeathTagComponent>())

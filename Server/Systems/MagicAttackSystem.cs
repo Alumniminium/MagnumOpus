@@ -1,7 +1,9 @@
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Networking.Packets;
+using MagnumOpus.Helpers;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -14,7 +16,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the MagicAttackSystem with limited threading for spell execution.
         /// </summary>
-        public MagicAttackSystem() : base("Magic Attack", threads: 2) { }
+        public MagicAttackSystem() : base("Magic Attack", threads: 1) { }
 
         /// <summary>
         /// Executes magic attacks against all targets in the collection, applying damage and visual effects.

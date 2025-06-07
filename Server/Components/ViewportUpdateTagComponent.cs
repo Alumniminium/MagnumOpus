@@ -1,9 +1,8 @@
 using MagnumOpus.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components;
+
+[Component]
+public readonly struct ViewportUpdateTagComponent
 {
-    [Component(saveEnabled: true)]
-    public readonly struct ViewportUpdateTagComponent
-    {
-    }
 }

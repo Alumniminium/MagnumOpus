@@ -19,9 +19,6 @@ namespace MagnumOpus.Networking
         /// <returns>Byte array containing serialized packet data trimmed to actual packet size</returns>
         public static byte[] Serialize<T>(ref T packetStruct) where T : unmanaged
         {
-            if (typeof(T) == typeof(MsgDHX))
-                return SerializeDHX(ref packetStruct);
-
             var size = sizeof(T);
             var buffer = new byte[size];
 
@@ -33,26 +30,6 @@ namespace MagnumOpus.Networking
 
             size = BitConverter.ToUInt16(buffer, 0);
             return buffer[0..size];
-        }
-
-        /// <summary>
-        /// Specialized serializer for DiffieHellman exchange packets with fixed 355-byte output size.
-        /// DHX packets require specific size handling due to cryptographic key exchange protocol requirements.
-        /// </summary>
-        /// <typeparam name="T">DHX packet structure type</typeparam>
-        /// <param name="packetStruct">DHX packet structure to serialize</param>
-        /// <returns>Fixed 355-byte array containing DHX packet data</returns>
-        public static byte[] SerializeDHX<T>(ref T packetStruct) where T : unmanaged
-        {
-            var size = sizeof(T);
-            var buffer = new byte[size];
-
-            fixed (byte* pBuffer = buffer)
-            {
-                var pPacketStruct = (T*)pBuffer;
-                *pPacketStruct = packetStruct;
-            }
-            return buffer[..355];
         }
 
 

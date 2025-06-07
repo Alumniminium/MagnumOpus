@@ -1,8 +1,10 @@
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
+using MagnumOpus.Helpers;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -11,14 +13,14 @@ namespace MagnumOpus.Systems
     /// Broadcasts emote changes to nearby players for visual synchronization.
     /// </summary>
     /// <param name="log">Enable debug logging for emote changes</param>
-    public sealed class EmoteSystem(bool log = false) : NttSystem<EmoteComponent, PositionComponent>("Emote", threads: 2, log)
+    public sealed class EmoteSystem(bool log = false) : NttSystem<EmoteComponent, PositionComponent>("Emote", threads: 1, log)
     {
         /// <summary>
         /// Filters out item entities from emote processing since they cannot emote.
         /// </summary>
         /// <param name="ntt">Entity to check for emote processing eligibility</param>
         /// <returns>True if entity can emote (not an item)</returns>
-        protected override bool MatchesFilter(in NTT ntt) => ntt.Type != EntityType.Item && base.MatchesFilter(in ntt);
+        protected override bool MatchesFilter(in NTT ntt) => !ntt.IsItem() && base.MatchesFilter(in ntt);
 
         /// <summary>
         /// Processes entity emotes, handles stamina regeneration for sitting, and broadcasts emote changes.

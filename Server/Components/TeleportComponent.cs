@@ -1,7 +1,7 @@
 using MagnumOpus.ECS;
 namespace MagnumOpus.Components
 {
-    [Component(saveEnabled: true)]
+    [Component(SaveEnabled: true)]
     public struct TeleportComponent(ushort x, ushort y, ushort map)
     {
         public ushort Map = map;

@@ -4,7 +4,7 @@ using MagnumOpus.Enums;
 
 namespace MagnumOpus.Components
 {
-    [Component(saveEnabled: true)]
+    [Component(SaveEnabled: true)]
     public struct PositionComponent(Vector2 position, int map)
     {
         public long ChangedTick = NttWorld.Tick;

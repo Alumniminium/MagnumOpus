@@ -4,6 +4,7 @@ using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -16,7 +17,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the DeathSystem with full multi-threaded processing capabilities.
         /// </summary>
-        public DeathSystem() : base("Death", threads: Environment.ProcessorCount) { }
+        public DeathSystem() : base("Death", threads: 1) { }
 
         /// <summary>
         /// Processes death for different entity types, routing to appropriate death handlers.
@@ -25,9 +26,9 @@ namespace MagnumOpus.Systems
         /// <param name="dtc">Death tag component containing death timing and killer information</param>
         public override void Update(in NTT ntt, ref DeathTagComponent dtc)
         {
-            if (ntt.Type is EntityType.Player or EntityType.Npc or EntityType.Monster)
+            if (ntt.IsPlayer() || ntt.IsNpc() || ntt.IsMonster())
                 EntityDeath(in ntt, ref dtc);
-            else if (ntt.Type is EntityType.Item)
+            else if (ntt.IsItem())
                 ItemDeath(in ntt);
         }
 
@@ -49,7 +50,7 @@ namespace MagnumOpus.Systems
                 ref var statusEffects = ref ntt.Get<StatusEffectComponent>();
                 statusEffects.Effects |= StatusEffect.Dead | StatusEffect.FrozenRemoveName;
 
-                if (ntt.Type == EntityType.Player)
+                if (ntt.IsPlayer())
                 {
                     ref var body = ref ntt.Get<BodyComponent>();
                     var ghostLook = body.Look % 10000 is 2001 or 2002 ? MsgSpawn.AddTransform(body.Look, 99) : MsgSpawn.AddTransform(body.Look, 98);
@@ -99,12 +100,12 @@ namespace MagnumOpus.Systems
                 ntt.Remove<JumpComponent>();
                 ntt.Remove<BoidBehaviorComponent>();
             }
-            else if (dtc.Tick + (NttWorld.TargetTps * 7) == NttWorld.Tick && ntt.Type == EntityType.Monster)
+            else if (dtc.Tick + (NttWorld.TargetTps * 7) == NttWorld.Tick && ntt.IsMonster())
             {
                 ref var statusEffects = ref ntt.Get<StatusEffectComponent>();
                 statusEffects.Effects |= StatusEffect.Fade;
             }
-            else if (dtc.Tick + (NttWorld.TargetTps * 10) <= NttWorld.Tick && ntt.Type == EntityType.Monster)
+            else if (dtc.Tick + (NttWorld.TargetTps * 10) <= NttWorld.Tick && ntt.IsMonster())
             {
                 ref readonly var lifeGiver = ref ntt.Get<LifeGiverComponent>();
                 ref var spawner = ref lifeGiver.NTT.Get<SpawnerComponent>();

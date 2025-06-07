@@ -2,7 +2,7 @@ using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 namespace MagnumOpus.Components
 {
-    [Component(saveEnabled: true)]
+    [Component(SaveEnabled: true)]
     public struct ItemComponent
     {
         public int Id;

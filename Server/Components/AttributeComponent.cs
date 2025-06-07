@@ -1,10 +1,11 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
+using NttECS.ECS;
 
 namespace MagnumOpus.Components
 {
-    [Component(saveEnabled: true)]
+    [Component(SaveEnabled: true)]
     public struct AttributeComponent(in NTT ntt)
     {
         public NTT NTT = ntt;

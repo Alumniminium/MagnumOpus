@@ -25,8 +25,8 @@ namespace MagnumOpus.Networking.Packets
             {
                 Size = (ushort)sizeof(MsgAccountResponse),
                 Id = 1055,
-                AuthCode = 2,
-                ClientId = key2,
+                ClientId = key1,
+                AuthCode = key2,
                 Port = port
             };
 

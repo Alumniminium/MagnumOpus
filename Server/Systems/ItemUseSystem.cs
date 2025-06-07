@@ -1,8 +1,9 @@
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Squiggly;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -15,7 +16,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the ItemUseSystem with limited threading for item usage processing.
         /// </summary>
-        public ItemUseSystem() : base("Item Use", threads: 2) { }
+        public ItemUseSystem() : base("Item Use", threads: 1) { }
 
         /// <summary>
         /// Processes item usage requests, applying effects and removing consumable items from inventory.

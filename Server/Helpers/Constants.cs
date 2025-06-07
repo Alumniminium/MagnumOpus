@@ -13,18 +13,18 @@ namespace MagnumOpus.Helpers
         /// <summary>
         /// Server IP address for client connections and service binding.
         /// </summary>
-        public static string ServerIP { get; set; } = "192.168.0.209";
-        
+        public static string ServerIP { get; set; } = "192.168.69.1";
+
         /// <summary>
         /// Port number for Prometheus metrics endpoint.
         /// </summary>
         public static ushort PrometheusPort { get; set; }
-        
+
         /// <summary>
         /// Port number for login server connections.
         /// </summary>
         public static ushort LoginPort { get; set; }
-        
+
         /// <summary>
         /// Port number for game server connections.
         /// </summary>

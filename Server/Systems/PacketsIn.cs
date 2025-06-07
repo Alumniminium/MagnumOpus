@@ -1,9 +1,11 @@
 using System.Reflection;
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using MagnumOpus.Helpers;
 using MagnumOpus.Networking;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -13,7 +15,7 @@ namespace MagnumOpus.Systems
     /// </summary>
     public class PacketsIn : NttSystem<NetworkComponent>
     {
-        public static readonly Dictionary<PacketId, Action<NTT, Memory<byte>>> PacketHandlers = new();
+        public static readonly Dictionary<PacketId, Action<NTT, Memory<byte>>> PacketHandlers = [];
 
         /// <summary>
         /// Initializes PacketsIn system with single-threaded processing and discovers packet handlers via reflection.
@@ -48,7 +50,15 @@ namespace MagnumOpus.Systems
                     if (IsLogging)
                         FConsole.WriteLine("[{tick}] Processing {packet} from {ntt}", NttWorld.Tick, packetQueue.Key, ntt);
 
-                    PacketHandlers[packetQueue.Key].Invoke(ntt, packetData);
+                    if (PacketHandlers.TryGetValue(packetQueue.Key, out var handler))
+                    {
+                        handler.Invoke(ntt, packetData);
+                    }
+                    else
+                    {
+                        FConsole.WriteLine($"[GAME] Unknown packet {packetQueue.Key} ({(int)packetQueue.Key}) from {ntt.Id}, no handler registered");
+                        FConsole.WriteLine(packetData.Dump());
+                    }
                 }
             }
         }

@@ -2,7 +2,7 @@ using MagnumOpus.ECS;
 
 namespace MagnumOpus.Components
 {
-    [Component(saveEnabled: true)]
+    [Component(SaveEnabled: true)]
     public struct ProfComponent(ushort skillId, ushort level, ushort experience, ushort experienceToNextLevel)
     {
         public long ChangedTick = NttWorld.Tick;

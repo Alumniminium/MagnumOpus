@@ -2,7 +2,9 @@ using System.Runtime.InteropServices;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using MagnumOpus.Helpers;
 using MagnumOpus.Squiggly;
+using NttECS.ECS;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -52,16 +54,20 @@ namespace MagnumOpus.Networking.Packets
         /// <returns>Configured spawn packet for the entity</returns>
         public static MsgSpawn Create(in NTT ntt)
         {
-            return ntt.Type switch
-            {
-                EntityType.Player => CreatePlayer(ntt),
-                EntityType.Monster => CreateMonster(ntt),
-                EntityType.Npc => throw new NotImplementedException(),
-                EntityType.Item => throw new NotImplementedException(),
-                EntityType.Trap => throw new NotImplementedException(),
-                EntityType.Other => throw new NotImplementedException(),
-                _ => throw new NotImplementedException()
-            };
+            if (ntt.IsPlayer())
+                return CreatePlayer(ntt);
+            else if (ntt.IsMonster())
+                return CreateMonster(ntt);
+            else if (ntt.IsNpc())
+                throw new NotImplementedException("NPC spawn not implemented");
+            else if (ntt.IsItem())
+                throw new NotImplementedException("Item spawn not implemented");
+            else if (ntt.IsTrap())
+                throw new NotImplementedException("Trap spawn not implemented");
+            else if (ntt.IsOther())
+                throw new NotImplementedException("Other spawn not implemented");
+            else
+                throw new NotImplementedException("Unknown entity type");
         }
 
         /// <summary>
@@ -182,7 +188,7 @@ namespace MagnumOpus.Networking.Packets
         /// <param name="transformId">Transform effect identifier</param>
         /// <returns>Modified appearance value with transform applied</returns>
         public static uint AddTransform(uint look, long transformId) => (uint)((transformId * 10000000L) + (look % 10000000L));
-        
+
         /// <summary>
         /// Removes visual transformation effects from an entity's appearance, returning to base look.
         /// </summary>

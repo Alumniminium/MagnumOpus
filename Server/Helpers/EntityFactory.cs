@@ -1,9 +1,10 @@
 using System.Numerics;
-using MagnumOpus.AOGP.Actions;
 using MagnumOpus.Components;
+using MagnumOpus.AOGP.Actions;
 using MagnumOpus.ECS;
 using MagnumOpus.Squiggly;
 using MagnumOpus.Squiggly.Models;
+using NttECS.ECS;
 
 namespace MagnumOpus.Helpers
 {
@@ -28,7 +29,7 @@ namespace MagnumOpus.Helpers
 
             var durability = randomDurability ? (ushort)(1 + (Random.Shared.NextSingle() * itemType.AmountLimit)) : itemType.AmountLimit;
 
-            ref var ntt = ref NttWorld.CreateEntity(EntityType.Item);
+            ref var ntt = ref NttWorld.CreateEntity(IdGenerator.GetItemId());
             var itemInfo = new ItemComponent(itemId, durability, itemType.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
 
             if (position != Vector2.Zero && map != 0)
@@ -85,7 +86,7 @@ namespace MagnumOpus.Helpers
         /// <returns>Created monster entity with full component setup</returns>
         public static NTT MakeMonster(cq_monstertype prefab, ref SpawnerComponent spc, PositionComponent pos, NTT spawner)
         {
-            ref var mob = ref NttWorld.CreateEntity(EntityType.Monster);
+            ref var mob = ref NttWorld.CreateEntity(IdGenerator.GetMonsterId());
             var respawnPos = CoMath.GetRandomPointInRect(in spc.SpawnArea);
 
             var cqm = new CqMonsterComponent(prefab.id);
@@ -172,7 +173,7 @@ namespace MagnumOpus.Helpers
         /// <returns>Created monster entity with boid behavior</returns>
         public static NTT MakeMonster(cq_monstertype prefab, PositionComponent pos, NTT spawner)
         {
-            ref var mob = ref NttWorld.CreateEntity(EntityType.Monster);
+            ref var mob = ref NttWorld.CreateEntity(IdGenerator.GetMonsterId());
             var respawnPos = CoMath.GetRandomPointInRect(spawner.Get<ViewportComponent>().Viewport);
 
             var cqm = new CqMonsterComponent(prefab.id);
@@ -183,7 +184,7 @@ namespace MagnumOpus.Helpers
             var inv = new InventoryComponent(mob, prefab.drop_money, 0);
             var fsp = new LifeGiverComponent(spawner);
             var boi = new BoidBehaviorComponent(spawner.Id, mpos.Position);
-            var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, pos.Map,SpacialHashUpdatType.Add);
+            var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, pos.Map, SpacialHashUpdatType.Add);
 
             mob.Set(ref mpos);
             mob.Set(ref bdy);

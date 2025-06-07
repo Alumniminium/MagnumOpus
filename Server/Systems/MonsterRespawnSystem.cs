@@ -1,10 +1,11 @@
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Squiggly;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -17,7 +18,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the MonsterRespawnSystem with limited threading for spawner processing.
         /// </summary>
-        public MonsterRespawnSystem() : base("Mob Respawn", threads: 2) { }
+        public MonsterRespawnSystem() : base("Mob Respawn", threads: 1) { }
 
         /// <summary>
         /// Processes monster spawners, creating new monsters when timers expire and population limits allow.

@@ -1,9 +1,10 @@
 using System.Text;
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -13,13 +14,11 @@ namespace MagnumOpus.Systems
     /// </summary>
     public class PacketsOut : NttSystem<NetworkComponent>
     {
-        public static readonly Memory<byte> TqServer = Encoding.ASCII.GetBytes("TQServer");
-        
         /// <summary>
         /// Initializes PacketsOut system with limited threading for packet transmission.
         /// </summary>
-        public PacketsOut() : base("Packets Out", threads: 2) { }
-        
+        public PacketsOut() : base("Packets Out", threads: 1) { }
+
         /// <summary>
         /// Processes outgoing packet queue, applying appropriate encryption and sending data to clients.
         /// </summary>
@@ -42,19 +41,8 @@ namespace MagnumOpus.Systems
                         FConsole.WriteLine(packetData.Dump());
                         FConsole.WriteLine("Sending {id}/{id} (Size: {Length}) to {ntt}...", ((PacketId)packetId).ToString(), packetId, packetData.Length, ntt);
                     }
-                    if (networkComponent.UseGameCrypto)
-                    {
-                        Span<byte> encryptedPacket = new byte[packetData.Length + 8];
-                        packetData.CopyTo(encryptedPacket);
-                        TqServer.Span.CopyTo(encryptedPacket[^8..]);
-                        networkComponent.GameCrypto.Encrypt(encryptedPacket);
-                        networkComponent.Socket.Send(encryptedPacket);
-                    }
-                    else
-                    {
-                        networkComponent.AuthCrypto.Encrypt(packetData);
-                        networkComponent.Socket.Send(packetData);
-                    }
+                    networkComponent.Crypto.Encrypt(packetData, packetData.Length);
+                    networkComponent.Socket.Send(packetData);
                 }
             }
             catch

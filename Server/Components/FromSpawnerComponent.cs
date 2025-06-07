@@ -1,7 +1,8 @@
 using MagnumOpus.ECS;
+using NttECS.ECS;
 namespace MagnumOpus.Components
 {
-    [Component(saveEnabled: true)]
+    [Component(SaveEnabled: true)]
     public struct LifeGiverComponent(in NTT spawnerId)
     {
         public NTT NTT = spawnerId;

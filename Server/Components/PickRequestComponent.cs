@@ -1,9 +1,9 @@
 using MagnumOpus.ECS;
-namespace MagnumOpus.Components
+using NttECS.ECS;
+namespace MagnumOpus.Components;
+
+[Component]
+public struct PickupRequestComponent(in NTT item)
 {
-    [Component]
-    public struct PickupRequestComponent(in NTT item)
-    {
-        public NTT Item = item;
-    }
+    public NTT Item = item;
 }

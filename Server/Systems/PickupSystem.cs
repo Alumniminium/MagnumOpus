@@ -1,8 +1,9 @@
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -15,7 +16,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the PickupSystem with limited threading for pickup processing.
         /// </summary>
-        public PickupSystem() : base("Pickup", threads: 2) { }
+        public PickupSystem() : base("Pickup", threads: 1) { }
 
         /// <summary>
         /// Processes pickup requests, transferring money or items to inventory and cleaning up ground entities.

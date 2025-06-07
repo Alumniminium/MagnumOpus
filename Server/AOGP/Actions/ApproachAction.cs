@@ -2,6 +2,7 @@ using System.Numerics;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
+using NttECS.ECS;
 
 namespace MagnumOpus.AOGP.Actions
 {

@@ -4,7 +4,7 @@ using MagnumOpus.Helpers;
 
 namespace MagnumOpus.Components
 {
-    [Component(saveEnabled: true)]
+    [Component(SaveEnabled: true)]
     public struct EmoteComponent(Emote emote = Emote.Stand)
     {
         public long ChangedTick = NttWorld.Tick;
@@ -13,7 +13,14 @@ namespace MagnumOpus.Components
         public Emote Emote
         {
             readonly get => _emote;
-            set => NetworkSyncHelper.UpdateField(ref this, ref _emote, value);
+            set
+            {
+                if (_emote != value)
+                {
+                    _emote = value;
+                    ChangedTick = NttWorld.Tick;
+                }
+            }
         }
     }
 }

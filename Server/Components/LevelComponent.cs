@@ -1,10 +1,11 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
+using NttECS.ECS;
 
 namespace MagnumOpus.Components
 {
-    [Component(saveEnabled: true)]
+    [Component(SaveEnabled: true)]
     public struct LevelComponent(in NTT ntt, byte level = 1, uint experience = 0, uint experienceToNextLevel = 120)
     {
         public NTT NTT = ntt;

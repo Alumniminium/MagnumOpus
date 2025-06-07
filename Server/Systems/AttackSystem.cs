@@ -2,7 +2,9 @@ using System.Numerics;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -15,7 +17,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the AttackSystem with half the available CPU cores for processing.
         /// </summary>
-        public AttackSystem() : base("Attack", threads: Environment.ProcessorCount / 2) { }
+        public AttackSystem() : base("Attack", threads: 1) { }
 
         /// <summary>
         /// Processes an entity's attack against their target, handling damage and validation.
@@ -53,7 +55,7 @@ namespace MagnumOpus.Systems
                         atk.SleepTicks = NttWorld.TargetTps;
                         // TODO: calculate damage
                         var damage = Random.Shared.Next(1, 10);
-                        if (ntt.Type == EntityType.Player)
+                        if (ntt.Has<NetworkComponent>())
                             damage *= 2;
                         if (ntt.Has<GuardPositionComponent>())
                             damage *= 10;

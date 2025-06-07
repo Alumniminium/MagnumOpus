@@ -1,11 +1,12 @@
 using System.Globalization;
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Squiggly;
 using MagnumOpus.Squiggly.Models;
+using NttECS.ECS;
 
 namespace MagnumOpus.Helpers
 {
@@ -21,14 +22,14 @@ namespace MagnumOpus.Helpers
         /// <param name="npcId">NPC identifier to lookup</param>
         /// <returns>NPC entity or null if not found</returns>
         public static cq_npc? GetNpc(int npcId) => Collections.CqNpc.TryGetValue(npcId, out var npc) ? npc : default;
-        
+
         /// <summary>
         /// Retrieves a task entity by ID from the database collection.
         /// </summary>
         /// <param name="taskId">Task identifier to lookup</param>
         /// <returns>Task entity or null if not found</returns>
         public static cq_task? GetTask(long taskId) => Collections.CqTask.TryGetValue(taskId, out var task) ? task : default;
-        
+
         /// <summary>
         /// Retrieves an action entity by ID from the database collection.
         /// </summary>
@@ -36,7 +37,7 @@ namespace MagnumOpus.Helpers
         /// <returns>Action entity or null if not found</returns>
         public static cq_action? GetAction(long actionId) => Collections.CqAction.TryGetValue(actionId, out var action) ? action : default;
     }
-    
+
     /// <summary>
     /// Processes Conquer Online action scripts including conditional logic, attribute manipulation, and game event handling.
     /// Implements the original TQ action system with attribute operations, boolean checks, and script execution.
@@ -412,7 +413,7 @@ namespace MagnumOpus.Helpers
                         if (InventoryHelper.CountItemId(ref inv, itemId) > 0)
                             return action.id_nextfail;
 
-                        ref var itemNtt = ref NttWorld.CreateEntity(EntityType.Item);
+                        ref var itemNtt = ref NttWorld.CreateEntity(IdGenerator.GetItemId());
 
                         var dura = (ushort)Random.Shared.Next(0, entry.AmountLimit);
                         var itemComp = new ItemComponent(itemId, dura, entry.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -527,7 +528,7 @@ namespace MagnumOpus.Helpers
                             return action.id_nextfail;
                         }
 
-                        ref var itemNtt = ref NttWorld.CreateEntity(EntityType.Item);
+                        ref var itemNtt = ref NttWorld.CreateEntity(IdGenerator.GetItemId());
                         var item = new ItemComponent(itemId, itemType.Amount, itemType.AmountLimit, 0, 0, 0, 0, 0, 0, RebornItemEffect.None, 0);
                         itemNtt.Set(ref item);
                         InventoryHelper.AddItem(ntt, ref inv, in itemNtt, netSync: true);

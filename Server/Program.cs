@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 using System.Runtime;
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;

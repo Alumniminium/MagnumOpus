@@ -1,9 +1,10 @@
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -21,7 +22,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the WalkSystem with multi-threaded processing capabilities.
         /// </summary>
-        public WalkSystem() : base("Walk", threads: Environment.ProcessorCount, log: false) { }
+        public WalkSystem() : base("Walk", threads: 1, log: false) { }
 
         /// <summary>
         /// Processes a single entity's walk request, updating position and notifying relevant systems.
@@ -39,7 +40,7 @@ namespace MagnumOpus.Systems
             PrometheusPush.WalkCount.Inc();
 
             var newPosition = pos.Position + Constants.DeltaPos[(int)wlk.Direction];
-            
+
             pos.Direction = wlk.Direction;
             pos.LastPosition = pos.Position;
             pos.Position = newPosition;

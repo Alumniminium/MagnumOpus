@@ -1,5 +1,5 @@
 using System.Text;
-using HerstLib.IO;
+using MagnumOpus.IO;
 using Co2Core.IO;
 using MagnumOpus.Enums;
 using MagnumOpus.Squiggly;

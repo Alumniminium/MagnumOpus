@@ -1,6 +1,6 @@
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Networking.Packets;
+using NttECS.ECS;
 
 namespace MagnumOpus.Networking.Cryptography
 {

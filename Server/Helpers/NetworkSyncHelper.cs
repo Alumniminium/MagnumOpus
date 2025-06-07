@@ -1,6 +1,6 @@
-using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
+using NttECS.ECS;
 
 namespace MagnumOpus.Helpers
 {
@@ -29,52 +29,10 @@ namespace MagnumOpus.Helpers
             // Update field value
             field = newValue;
 
-            // Update ChangedTick using reflection (minimal one-time cost)
-            UpdateChangedTick(ref component);
-
             // Send network packet if entity is valid
             if (ntt.Id != 0)
             {
                 SendNetworkPacket(ntt, msgType, newValue);
-            }
-        }
-
-        /// <summary>
-        /// Updates a non-network field and automatically handles ChangedTick updates.
-        /// Used by non-network properties to provide automatic ChangedTick management.
-        /// </summary>
-        public static void UpdateField<TComponent, TValue>(
-            ref TComponent component,
-            ref TValue field,
-            TValue newValue)
-            where TComponent : struct
-        {
-            // Check if value actually changed
-            if (EqualityComparer<TValue>.Default.Equals(field, newValue))
-                return;
-
-            // Update field value
-            field = newValue;
-
-            // Update ChangedTick using reflection (minimal one-time cost)
-            UpdateChangedTick(ref component);
-        }
-
-        /// <summary>
-        /// Updates the ChangedTick field on a component using reflection.
-        /// Uses boxing/unboxing for struct modification - optimized for infrequent calls.
-        /// </summary>
-        /// <typeparam name="TComponent">The component type to update</typeparam>
-        /// <param name="component">The component instance to modify</param>
-        private static void UpdateChangedTick<TComponent>(ref TComponent component) where TComponent : struct
-        {
-            var componentType = typeof(TComponent);
-            var changedTickField = componentType.GetField("ChangedTick");
-            if (changedTickField != null)
-            {
-                var boxedComponent = (object)component;
-                changedTickField.SetValue(boxedComponent, NttWorld.Tick);
-                component = (TComponent)boxedComponent;
             }
         }
 

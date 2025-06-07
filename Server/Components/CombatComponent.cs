@@ -3,7 +3,7 @@ using MagnumOpus.Helpers;
 
 namespace MagnumOpus.Components
 {
-    [Component(saveEnabled: true)]
+    [Component(SaveEnabled: true)]
     public partial struct CombatComponent
     {
         private int _minAttack;
@@ -13,40 +13,40 @@ namespace MagnumOpus.Components
         private int _magicResist;
         private int _dodge;
 
-        public int MinAttack 
-        { 
+        public int MinAttack
+        {
             readonly get => _minAttack;
-            set => NetworkSyncHelper.UpdateField(ref this, ref _minAttack, value);
+            set => ComponentChangeTracker.UpdateField(ref this, ref _minAttack, value);
         }
 
-        public int MaxAttack 
-        { 
+        public int MaxAttack
+        {
             readonly get => _maxAttack;
-            set => NetworkSyncHelper.UpdateField(ref this, ref _maxAttack, value);
+            set => ComponentChangeTracker.UpdateField(ref this, ref _maxAttack, value);
         }
 
-        public int Defense 
-        { 
+        public int Defense
+        {
             readonly get => _defense;
-            set => NetworkSyncHelper.UpdateField(ref this, ref _defense, value);
+            set => ComponentChangeTracker.UpdateField(ref this, ref _defense, value);
         }
 
-        public int MagicAttack 
-        { 
+        public int MagicAttack
+        {
             readonly get => _magicAttack;
-            set => NetworkSyncHelper.UpdateField(ref this, ref _magicAttack, value);
+            set => ComponentChangeTracker.UpdateField(ref this, ref _magicAttack, value);
         }
 
-        public int MagicResist 
-        { 
+        public int MagicResist
+        {
             readonly get => _magicResist;
-            set => NetworkSyncHelper.UpdateField(ref this, ref _magicResist, value);
+            set => ComponentChangeTracker.UpdateField(ref this, ref _magicResist, value);
         }
 
-        public int Dodge 
-        { 
+        public int Dodge
+        {
             readonly get => _dodge;
-            set => NetworkSyncHelper.UpdateField(ref this, ref _dodge, value);
+            set => ComponentChangeTracker.UpdateField(ref this, ref _dodge, value);
         }
 
         public CombatComponent() { }

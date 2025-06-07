@@ -1,10 +1,10 @@
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
-using MagnumOpus.Networking.Cryptography;
 using MagnumOpus.Networking.Packets;
+using NttECS.ECS;
 
 namespace MagnumOpus.Networking
 {
@@ -26,7 +26,26 @@ namespace MagnumOpus.Networking
         {
             try
             {
-                var packetType = (PacketId)BitConverter.ToUInt16(packet.Span[2..]);
+                // Validate packet has enough bytes for packet ID
+                if (packet.Length < 4)
+                {
+                    FConsole.WriteLine($"[LOGIN] Packet too short ({packet.Length} bytes), disconnecting client");
+                    NttWorld.Destroy(ntt);
+                    return;
+                }
+
+                var packetTypeRaw = BitConverter.ToUInt16(packet.Span[2..]);
+                
+                // Check if this is a valid PacketId enum value
+                if (!Enum.IsDefined(typeof(PacketId), packetTypeRaw))
+                {
+                    FConsole.WriteLine($"[LOGIN] Invalid packet ID {packetTypeRaw} (0x{packetTypeRaw:X4}), likely cipher desync - disconnecting client");
+                    FConsole.WriteLine(packet.Dump());
+                    NttWorld.Destroy(ntt);
+                    return;
+                }
+
+                var packetType = (PacketId)packetTypeRaw;
 
                 switch (packetType)
                 {
@@ -34,11 +53,10 @@ namespace MagnumOpus.Networking
                         {
                             var msgAccount = Co2Packet.Deserialize<MsgAccount>(packet.Span);
                             var username = msgAccount.GetUsername();
-                            RivestCipher5.Decrypt(msgAccount.Password, 16);
-                            var password = msgAccount.GetPassword();
+                            var password = msgAccount.GetPassword(); // Skip password decryption for now
                             var server = msgAccount.GetServer();
 
-                            FConsole.WriteLine($"[LOGIN/1051] Account: {username}, Pass: {password}, Server: {server}");
+                            FConsole.WriteLine($"[LOGIN/1051] Account: {username}, Pass: {password}, Server: {server} - Sending to Game Server on IP: {Constants.ServerIP}, Port: {Constants.GamePort}");
 
                             var response = MsgAccountResponse.Create(Constants.ServerIP, Constants.GamePort, ntt.Id, ntt.Id);
                             ref var net = ref ntt.Get<NetworkComponent>();
@@ -55,14 +73,15 @@ namespace MagnumOpus.Networking
                         }
                     default:
                         {
-                            FConsole.WriteLine($"[LOGIN/{(int)packetType}/{packetType}] Unknown packet");
+                            FConsole.WriteLine($"[LOGIN/{(int)packetType}/{packetType}] Unknown packet (valid ID but no handler)");
                             FConsole.WriteLine(packet.Dump());
                             break;
                         }
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                FConsole.WriteLine($"[LOGIN] Error processing packet: {ex.Message}");
                 NttWorld.Destroy(ntt);
             }
         }

@@ -1,10 +1,11 @@
 using System.Numerics;
 using Co2Core.IO;
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -17,7 +18,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the TargetFinderSystem with limited threading for targeting calculations.
         /// </summary>
-        public TargetFinderSystem() : base("Radius Targets", threads: 2) { }
+        public TargetFinderSystem() : base("Radius Targets", threads: 1) { }
 
         /// <summary>
         /// Processes targeting requests to find entities within spell area-of-effect shapes.
@@ -92,7 +93,7 @@ namespace MagnumOpus.Systems
         /// <returns>True if entity is a valid target for the spell</returns>
         private static bool IsValidTarget(in NTT targetEntity, in MagicType.Entry magicTypeEntry)
         {
-            if (targetEntity.Type == EntityType.Player && magicTypeEntry.Crime != 0)
+            if (targetEntity.IsPlayer() && magicTypeEntry.Crime != 0)
                 return false; // TODO: Check if player is in PK mode
 
             if (targetEntity.Has<DeathTagComponent>())

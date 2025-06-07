@@ -1,9 +1,10 @@
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -16,7 +17,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the TeamSystem with limited threading for team processing.
         /// </summary>
-        public TeamSystem() : base("Team", threads: 2) { }
+        public TeamSystem() : base("Team", threads: 1) { }
 
         /// <summary>
         /// Processes team operations including creation, leader updates, and experience distribution with bonuses.

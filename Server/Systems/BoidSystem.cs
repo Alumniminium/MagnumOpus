@@ -3,6 +3,7 @@ using System.Numerics;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -17,7 +18,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the BoidSystem with full multi-threaded processing capabilities.
         /// </summary>
-        public BoidSystem() : base("Boid", threads: Environment.ProcessorCount) { }
+        public BoidSystem() : base("Boid", threads: 1) { }
 
         /// <summary>
         /// Processes boid flocking behavior including alignment, cohesion, separation, and target seeking.

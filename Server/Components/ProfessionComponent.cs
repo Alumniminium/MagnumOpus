@@ -1,10 +1,11 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
+using NttECS.ECS;
 
 namespace MagnumOpus.Components
 {
-    [Component(saveEnabled: true)]
+    [Component(SaveEnabled: true)]
     public struct ProfessionComponent(in NTT ntt, ClasseName profession = ClasseName.Trojan)
     {
         public NTT NTT = ntt;

@@ -1,5 +1,5 @@
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
+using NttECS.ECS;
 
 namespace MagnumOpus.AOGP.Goals
 {

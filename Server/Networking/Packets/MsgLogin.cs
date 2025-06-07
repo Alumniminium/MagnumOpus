@@ -1,9 +1,11 @@
 using System.Runtime.InteropServices;
 using System.Text;
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using MagnumOpus.Helpers;
+using NttECS.ECS;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -15,9 +17,9 @@ namespace MagnumOpus.Networking.Packets
         [FieldOffset(2)]
         public ushort Id;
         [FieldOffset(4)]
-        public ulong Token;
-        [FieldOffset(4)]
-        public uint UniqueId;
+        public int Token;
+        [FieldOffset(8)]
+        public int UniqueId;
         [FieldOffset(12)]
         public ushort ClientVersion;
         [FieldOffset(14)]
@@ -41,6 +43,9 @@ namespace MagnumOpus.Networking.Packets
             PrometheusPush.LoginCount.Inc();
 
             ref var net = ref ntt.Get<NetworkComponent>();
+            net.Crypto.GenerateAltKey((int)msg.Token, (int)msg.Token);
+
+            FConsole.WriteLine($"[GAME] GameCrypto initialized - UniqueId: {msg.UniqueId}, Token: {(uint)msg.Token}");
 
             var found = false;
             foreach (var kvp in NttWorld.NTTs)
@@ -51,11 +56,7 @@ namespace MagnumOpus.Networking.Packets
                 if (oldNtc.Name == net.Username)
                 {
                     oldNtt.ChangeOwner(ntt);
-                    // ntt.Remove<NetworkComponent>();
-                    // ntt.Set<DestroyEndOfFrameComponent>();
                     found = true;
-                    // ntt.Id = oldNtt.Id;
-                    FConsole.WriteLine($"Found NTT with Id: {oldNtt.Id}!");
                     break;
                 }
             }
@@ -101,12 +102,12 @@ namespace MagnumOpus.Networking.Packets
                 ntt.Set(ref hed);
                 ntt.Set(ref stm);
 
-                var testItem = NttWorld.CreateEntity(EntityType.Item);
+                var testItem = NttWorld.CreateEntity(IdGenerator.GetItemId());
                 var itemComp = new ItemComponent(1001020, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
                 testItem.Set(ref itemComp);
                 inv.Items.Span[0] = testItem;
 
-                var testItem2 = NttWorld.CreateEntity(EntityType.Item);
+                var testItem2 = NttWorld.CreateEntity(IdGenerator.GetItemId());
                 var itemComp2 = new ItemComponent(1000000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
                 testItem2.Set(ref itemComp2);
                 inv.Items.Span[1] = testItem2;
@@ -114,6 +115,8 @@ namespace MagnumOpus.Networking.Packets
 
             var vwp = new ViewportComponent(21);
             ntt.Set(ref vwp);
+            ntt.Set<PlayerComponent>();
+            ntt.Set<ViewportUpdateTagComponent>(); // Trigger initial viewport calculation
 
             var ok = MsgText.Create("SYSTEM", "ALLUSERS", "ANSWER_OK", MsgTextType.LoginInformation);
             var info = MsgCharacter.Create(ntt);

@@ -1,9 +1,10 @@
 using System.Numerics;
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -16,7 +17,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the DropMoneySystem with limited threading and debug logging enabled.
         /// </summary>
-        public DropMoneySystem() : base("DropMoney", threads: 2, log: true) { }
+        public DropMoneySystem() : base("DropMoney", threads: 1, log: true) { }
 
         /// <summary>
         /// Processes money drop requests, removing currency from inventory and creating ground money entities.

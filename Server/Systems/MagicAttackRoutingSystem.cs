@@ -1,8 +1,9 @@
-using HerstLib.IO;
+using MagnumOpus.IO;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Squiggly;
+using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
@@ -15,7 +16,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the MagicAttackRoutingSystem with limited threading for spell routing.
         /// </summary>
-        public MagicAttackRoutingSystem() : base("Attack Router", threads: 2) { }
+        public MagicAttackRoutingSystem() : base("Attack Router", threads: 1) { }
 
         /// <summary>
         /// Routes magic attack requests to appropriate targeting systems based on spell type and area of effect.
