@@ -8,62 +8,68 @@ using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
-    /// <summary>
-    /// Manages monster spawner entities that periodically create new monsters based on timer and population limits.
-    /// Handles spawner validation, monster creation, and AI activation when players are visible.
-    /// </summary>
     public sealed class MonsterRespawnSystem : NttSystem<SpawnerComponent, PositionComponent>
     {
-        /// <summary>
-        /// Initializes the MonsterRespawnSystem with limited threading for spawner processing.
-        /// </summary>
         public MonsterRespawnSystem() : base("Mob Respawn", threads: 1, log: false) { }
 
-        /// <summary>
-        /// Processes monster spawners, creating new monsters when timers expire and population limits allow.
-        /// </summary>
-        /// <param name="spawnerEntity">The spawner entity</param>
-        /// <param name="spawnerComponent">Spawner component containing timing and monster data</param>
-        /// <param name="position">Position component for spawn location</param>
+        // Manages monster spawner entities that periodically create new monsters based on timer
+        // and population limits. Validates spawner data and map existence, creates monsters using
+        // EntityFactory, updates spatial hashes for visibility, and activates AI when players are
+        // nearby. Spawners respect max count limits and timing intervals for balanced gameplay.
         public override void Update(in NTT spawnerEntity, ref SpawnerComponent spawnerComponent, ref PositionComponent position)
         {
+            // === CHECK SPAWN TIMING ===
+            // Only process spawner when timer has elapsed
             if (spawnerComponent.RunTick > NttWorld.Tick)
                 return;
 
+            // Reset timer for next spawn cycle
             spawnerComponent.RunTick += NttWorld.TargetTps * spawnerComponent.TimerSeconds;
 
+            // === VALIDATE POPULATION LIMITS ===
+            // Don't spawn if at maximum capacity
             if (spawnerComponent.Count >= spawnerComponent.MaxCount)
                 return;
 
+            // === VALIDATE SPAWNER DATA ===
+            // Check if monster type exists in database
             if (!Collections.CqMonsterType.TryGetValue(spawnerComponent.MonsterId, out var monsterTypeData))
             {
                 spawnerEntity.Set<DestroyEndOfFrameComponent>();
-                FConsole.WriteLine($"CQ_GENERATOR NPC TYPE {spawnerComponent.MonsterId} invalid!");
+                FConsole.WriteLine("CQ_GENERATOR NPC TYPE {id} invalid!", spawnerComponent.MonsterId);
                 return;
             }
 
+            // Check if map exists and is valid
             if (!Collections.Maps.TryGetValue(position.Map, out var mapData))
             {
                 spawnerEntity.Set<DestroyEndOfFrameComponent>();
-                FConsole.WriteLine($"CQ_GENERATOR ID {spawnerComponent.GeneratorId} invalid map {position.Map}");
+                FConsole.WriteLine("CQ_GENERATOR ID {id} invalid map {map}", 
+                    spawnerComponent.GeneratorId, position.Map);
                 return;
             }
 
             if (IsLogging)
-                FConsole.WriteLine("{ntt} respawning {num} of {mob} on map {map}", spawnerEntity, spawnerComponent.GenPerTimer, monsterTypeData.name, mapData);
+                FConsole.WriteLine("{ntt} spawning {count} {monster} on map {map}", 
+                    spawnerEntity, spawnerComponent.GenPerTimer, monsterTypeData.name, mapData);
 
-
+            // === SPAWN MONSTERS ===
+            // Create monsters up to the per-timer limit
             for (var i = 0; i < spawnerComponent.GenPerTimer; i++)
             {
                 var newMonster = EntityFactory.MakeMonster(monsterTypeData, ref spawnerComponent, position, spawnerEntity);
 
+                // Update spatial visibility for the new monster
                 ref var viewport = ref newMonster.Get<ViewportComponent>();
                 Collections.SpatialHashes[position.Map].GetVisibleEntities(ref viewport);
-                var playerVisible = false;
 
+                // Mark all visible entities for viewport updates
                 foreach (var visibleEntity in viewport.EntitiesVisible)
                     visibleEntity.Set<ViewportUpdateTagComponent>();
 
+                // Note: playerVisible logic appears incomplete - currently always false
+                // TODO: Actually check if players are visible to activate AI
+                var playerVisible = false;
                 if (playerVisible)
                 {
                     ref var brainComponent = ref newMonster.Get<BrainComponent>();
@@ -72,10 +78,13 @@ namespace MagnumOpus.Systems
 
                 if (IsLogging)
                 {
-                    FConsole.WriteLine("{ntt} spawned {mob} at {pos}", newMonster, monsterTypeData.name, position.Position);
-                    var spawnMessage = MsgText.Create(in spawnerEntity, "Respawning " + monsterTypeData.name + " at " + position.Position.X + ", " + position.Position.Y);
+                    FConsole.WriteLine("{monster} spawned at {pos}", newMonster, position.Position);
+                    var spawnMessage = MsgText.Create(in spawnerEntity, 
+                        $"Respawning {monsterTypeData.name} at {position.Position.X}, {position.Position.Y}");
                     spawnerEntity.NetSync(ref spawnMessage, true);
                 }
+
+                // Stop spawning if we've reached maximum capacity
                 if (spawnerComponent.Count >= spawnerComponent.MaxCount)
                     break;
             }

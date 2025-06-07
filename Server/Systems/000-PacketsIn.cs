@@ -8,19 +8,14 @@ using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
-    /// <summary>
-    /// Processes incoming network packets by routing them to appropriate handler methods based on packet type.
-    /// Uses reflection to automatically discover and register packet handlers with PacketHandlerAttribute.
-    /// </summary>
     public class PacketsIn : NttSystem<NetworkComponent>
     {
         public static readonly Dictionary<PacketId, Action<NTT, Memory<byte>>> PacketHandlers = [];
 
-        /// <summary>
-        /// Initializes PacketsIn system with single-threaded processing and discovers packet handlers via reflection.
-        /// </summary>
         public PacketsIn() : base("PacketsIn", threads: 1, log: false)
         {
+            // === DISCOVER AND REGISTER PACKET HANDLERS ===
+            // Use reflection to find all methods with PacketHandlerAttribute
             foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
             {
                 foreach (var method in type.GetMethods(BindingFlags.Static | BindingFlags.Public))
@@ -29,36 +24,40 @@ namespace MagnumOpus.Systems
                     if (attributes.Length == 0)
                         continue;
 
+                    // Register packet handler with its packet ID
                     var attribute = (PacketHandlerAttribute)attributes[0];
-                    PacketHandlers.Add(attribute.Id, (Action<NTT, Memory<byte>>)Delegate.CreateDelegate(typeof(Action<NTT, Memory<byte>>), method));
+                    var handler = (Action<NTT, Memory<byte>>)Delegate.CreateDelegate(typeof(Action<NTT, Memory<byte>>), method);
+                    PacketHandlers.Add(attribute.Id, handler);
                 }
             }
         }
 
-        /// <summary>
-        /// Processes queued incoming packets for an entity by invoking appropriate packet handlers.
-        /// </summary>
-        /// <param name="ntt">The entity receiving packets</param>
-        /// <param name="networkComponent">Network component containing packet queues</param>
+        // Processes incoming network packets by routing them to appropriate handler methods based
+        // on packet type. The system uses reflection during initialization to automatically discover
+        // and register packet handlers with PacketHandlerAttribute. Each frame, it dequeues packets
+        // from entity network queues and invokes the corresponding handler method.
         public override void Update(in NTT ntt, ref NetworkComponent networkComponent)
         {
+            // === PROCESS QUEUED PACKETS ===
+            // Check each packet type queue for incoming packets
             foreach (var packetQueue in networkComponent.PacketQueues)
             {
-                if (packetQueue.Value.TryDequeue(out var packetData))
-                {
-                    if (IsLogging)
-                        FConsole.WriteLine("[{tick}] Processing {packet} from {ntt}", NttWorld.Tick, packetQueue.Key, ntt);
+                if (!packetQueue.Value.TryDequeue(out var packetData))
+                    continue;
 
-                    if (PacketHandlers.TryGetValue(packetQueue.Key, out var handler))
-                    {
-                        handler.Invoke(ntt, packetData);
-                    }
-                    else
-                    {
-                        FConsole.WriteLine($"[GAME] Unknown packet {packetQueue.Key} ({(int)packetQueue.Key}) from {ntt.Id}, no handler registered");
-                        FConsole.WriteLine(packetData.Dump());
-                    }
+                if (IsLogging)
+                    FConsole.WriteLine("[{tick}] Processing {packet} from {ntt}", NttWorld.Tick, packetQueue.Key, ntt);
+
+                // Route packet to registered handler
+                if (PacketHandlers.TryGetValue(packetQueue.Key, out var handler))
+                {
+                    handler.Invoke(ntt, packetData);
+                    return;
                 }
+
+                // Log unknown packet types for debugging
+                FConsole.WriteLine("[GAME] Unknown packet {packet} ({id}) from {ntt}, no handler registered", packetQueue.Key, (int)packetQueue.Key, ntt.Id);
+                FConsole.WriteLine(packetData.Dump());
             }
         }
     }

@@ -7,46 +7,47 @@ using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
-    /// <summary>
-    /// Handles entity teleportation between locations and maps.
-    /// Manages position updates, spatial hash transfers, and client synchronization for seamless teleportation.
-    /// </summary>
     public sealed class TeleportSystem : NttSystem<TeleportComponent, PositionComponent, ViewportComponent>
     {
-        /// <summary>
-        /// Initializes the TeleportSystem with limited threading and debug logging enabled.
-        /// </summary>
         public TeleportSystem() : base("Teleport", threads: 1 / 4, log: false) { }
 
-        /// <summary>
-        /// Processes an entity's teleportation request, updating position and notifying clients.
-        /// </summary>
-        /// <param name="ntt">The entity being teleported</param>
-        /// <param name="tpc">Teleport component containing destination coordinates and map</param>
-        /// <param name="pos">Entity's position component to update</param>
-        /// <param name="vwp">Viewport component for visibility management</param>
+        // Handles entity teleportation between locations and maps. Manages position updates,
+        // spatial hash transfers, and client synchronization for seamless teleportation. Sends
+        // despawn packet to current location, updates entity position and map, then sends location
+        // and map status packets to synchronize the client with the new environment.
         public override void Update(in NTT ntt, ref TeleportComponent tpc, ref PositionComponent pos, ref ViewportComponent vwp)
         {
+            // === UPDATE SPATIAL SYSTEMS ===
+            // Prepare spatial hash and viewport updates for position change
             var spatialUpdate = new SpatialHashUpdateComponent(pos.Position, new Vector2(tpc.X, tpc.Y), pos.Map, tpc.Map, SpacialHashUpdatType.Move);
             var viewportUpdate = new ViewportUpdateTagComponent();
             ntt.Set(ref viewportUpdate, ref spatialUpdate);
 
+            // === UPDATE ENTITY POSITION ===
+            // Set new coordinates and map instantly
             pos.Position = new Vector2(tpc.X, tpc.Y);
             pos.Map = tpc.Map;
 
-            ntt.Set<ViewportUpdateTagComponent>();
-
+            // === CLIENT SYNCHRONIZATION ===
+            // Send despawn packet to remove entity from old location
             var despawnPacket = MsgAction.Create(ntt.Id, ntt.Id, 0, 0, 0, Enums.MsgActionType.RemoveEntity);
-            ntt.NetSync(ref despawnPacket, true, true);
+            ntt.NetSync(ref despawnPacket, broadcast: true, ignoreSelf: false);
+
+            // Send new location to client
             var teleportPacket = MsgAction.Create(ntt.Id, tpc.Map, tpc.X, tpc.Y, Enums.Direction.South, Enums.MsgActionType.SendLocation);
             ntt.NetSync(ref teleportPacket);
+
+            // Update client map status
             var mapStatusPacket = MsgMapStatus.Create(tpc.Map, (uint)Enums.MapFlags.None);
             ntt.NetSync(ref mapStatusPacket);
 
+            // === FINALIZE TELEPORT ===
+            // Trigger additional viewport updates and cleanup
+            ntt.Set<ViewportUpdateTagComponent>();
             ntt.Remove<TeleportComponent>();
 
             if (IsLogging)
-                FConsole.WriteLine("[{0}] Teleported '{1}' to {2}, {3}, {4}", NttWorld.Tick, ntt.Id, tpc.Map, tpc.X, tpc.Y);
+                FConsole.WriteLine("{ntt} teleported to map {map} at {x}, {y}", ntt, tpc.Map, tpc.X, tpc.Y);
         }
     }
 }

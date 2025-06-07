@@ -9,34 +9,25 @@ using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
-    /// <summary>
-    /// Handles player revival after death, restoring health and teleporting to respawn locations.
-    /// Manages death status cleanup, appearance restoration, and spawn location database lookups.
-    /// </summary>
     public sealed class ReviveSystem : NttSystem<ReviveComponent, HealthComponent, PositionComponent, BodyComponent, StatusEffectComponent>
     {
-        /// <summary>
-        /// Initializes the ReviveSystem with limited threading for revival processing.
-        /// </summary>
         public ReviveSystem() : base("Revive", threads: 1, log: false) { }
 
-        /// <summary>
-        /// Processes player revival, restoring health and teleporting to appropriate respawn location.
-        /// </summary>
-        /// <param name="ntt">The entity being revived</param>
-        /// <param name="reviveComponent">Revive component containing timing information</param>
-        /// <param name="healthComponent">Health component to restore</param>
-        /// <param name="position">Position component for respawn location</param>
-        /// <param name="bodyComponent">Body component for appearance restoration</param>
-        /// <param name="statusEffects">Status effect component to clear death effects</param>
+        // Handles player revival after death, restoring health and teleporting to respawn locations.
+        // Manages death status cleanup, appearance restoration, and spawn location database lookups.
+        // Uses map database to find respawn points or defaults to Twin City if lookup fails.
         public override void Update(in NTT ntt, ref ReviveComponent reviveComponent, ref HealthComponent healthComponent, ref PositionComponent position, ref BodyComponent bodyComponent, ref StatusEffectComponent statusEffects)
         {
             if (reviveComponent.ReviveTick < NttWorld.Tick)
                 return;
 
-            FConsole.WriteLine($"[{nameof(ReviveSystem)}]: Revive on Map {position.Map}");
+            if (IsLogging)
+                FConsole.WriteLine("[{system}]: Revive on Map {map}", nameof(ReviveSystem), position.Map);
 
+            // === RESTORE HEALTH ===
             healthComponent.Health = healthComponent.MaxHealth;
+
+            // === DETERMINE RESPAWN LOCATION ===
             using var databaseContext = new SquigglyContext();
             var currentMap = databaseContext.cq_map.Find((long)position.Map);
 
@@ -47,42 +38,48 @@ namespace MagnumOpus.Systems
 
                 if (respawnMap != null)
                 {
-                    position.Position = new Vector2(respawnMap.portal0_x, respawnMap.portal0_y);  // Auto-tracked
+                    // Use configured respawn location
+                    position.Position = new Vector2(respawnMap.portal0_x, respawnMap.portal0_y);
                     position.Map = (ushort)respawnMap.id;
                 }
                 else
                 {
+                    // Fallback to Twin City if respawn map not found
                     if (IsLogging)
-                        FConsole.WriteLine("Reborn Map {0} not found", currentMapId);
+                        FConsole.WriteLine("Reborn Map {map} not found", currentMapId);
                     position.Map = 1002;
-                    position.Position = new Vector2(477, 380);  // Auto-tracked
+                    position.Position = new Vector2(477, 380);
                 }
             }
             else
             {
+                // Fallback to Twin City if current map not found
                 if (IsLogging)
-                    FConsole.WriteLine("Map {0} not found", position.Map);
+                    FConsole.WriteLine("Map {map} not found", position.Map);
                 position.Map = 1002;
-                position.Position = new Vector2(477, 380);  // Auto-tracked
+                position.Position = new Vector2(477, 380);
             }
 
-            healthComponent.Health = healthComponent.MaxHealth;
+            // === CLEAR DEATH STATUS EFFECTS ===
             statusEffects.Effects &= ~StatusEffect.Dead;
             statusEffects.Effects &= ~StatusEffect.FrozenRemoveName;
 
+            // === RESTORE APPEARANCE ===
             bodyComponent.Look = MsgSpawn.DelTransform(bodyComponent.Look);
+
+            // === NETWORK SYNCHRONIZATION ===
             var locationMessage = MsgAction.Create(ntt.Id, position.Map, (ushort)position.Position.X, (ushort)position.Position.Y, Direction.North, MsgActionType.SendLocation);
             NetworkHelper.Despawn(ntt);
-
             ntt.NetSync(ref locationMessage);
 
+            // === FINALIZE REVIVAL ===
             ntt.Set(ref position);
             ntt.Remove<ReviveComponent>();
             ntt.Remove<DeathTagComponent>();
             ntt.Set<ViewportUpdateTagComponent>();
 
             if (IsLogging)
-                FConsole.WriteLine("Revived '{0}' at {1}, {2}, {3}", NttWorld.Tick, Name, ntt, position.Map, position.Position.X, position.Position.Y);
+                FConsole.WriteLine("Revived {player} at map {map}, pos ({x}, {y})", ntt, position.Map, position.Position.X, position.Position.Y);
         }
     }
 }

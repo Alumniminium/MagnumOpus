@@ -28,11 +28,7 @@ namespace MagnumOpus.Systems
             {
                 // Not enough experience for level up - just log the gain and cleanup
                 if (IsLogging)
-                {
-                    FConsole.WriteLine("{ntt} gained {exp} exp, now at {current}/{next} (level: {lvl})",
-                        ntt, expGained, levelComponent.Experience,
-                        levelComponent.ExperienceToNextLevel, levelComponent.Level);
-                }
+                    FConsole.WriteLine("{ntt} gained {exp} exp, now at {current}/{next} (level: {lvl})", ntt, expGained, levelComponent.Experience, levelComponent.ExperienceToNextLevel, levelComponent.Level);
 
                 ntt.Remove<ExpRewardComponent>();
                 return;

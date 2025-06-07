@@ -6,67 +6,69 @@ using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
-    /// <summary>
-    /// Routes magic attack requests to appropriate targeting systems based on spell action type.
-    /// Validates spell availability and creates targeting components for area effects, healing, and line attacks.
-    /// </summary>
     public sealed class MagicAttackRoutingSystem : NttSystem<MagicAttackRequestComponent, SpellBookComponent, PositionComponent>
     {
-        /// <summary>
-        /// Initializes the MagicAttackRoutingSystem with limited threading for spell routing.
-        /// </summary>
         public MagicAttackRoutingSystem() : base("Attack Router", threads: 1, log: false) { }
 
-        /// <summary>
-        /// Routes magic attack requests to appropriate targeting systems based on spell type and area of effect.
-        /// </summary>
-        /// <param name="ntt">The entity casting the spell</param>
-        /// <param name="magicAttackRequest">Magic attack request component specifying the spell and target</param>
-        /// <param name="spellBook">Spell book component containing available spells</param>
-        /// <param name="position">Position component for spell origin point</param>
+        // Routes magic attack requests to appropriate targeting systems based on spell action type.
+        // Validates spell availability in spellbook and magic type database, then creates targeting
+        // components for different spell patterns: healing (self-target), area effects (circle/roar),
+        // directional attacks (sector), and line attacks. Each spell type uses specialized targeting.
         public override void Update(in NTT ntt, ref MagicAttackRequestComponent magicAttackRequest, ref SpellBookComponent spellBook, ref PositionComponent position)
         {
+            // === VALIDATE SPELL IN SPELLBOOK ===
             if (!spellBook.Spells.TryGetValue((ushort)magicAttackRequest.SkillId, out var spellData))
             {
-                ntt.Remove<MagicAttackRequestComponent>();
                 if (IsLogging)
-                    FConsole.WriteLine("{ntt} tried to use skill {skillId} but doesn't have it", ntt, magicAttackRequest.SkillId);
+                    FConsole.WriteLine("{ntt} tried to use skill {skill} but doesn't have it", ntt, magicAttackRequest.SkillId);
+
+                ntt.Remove<MagicAttackRequestComponent>();
                 return;
             }
 
-            if (!Collections.MagicType.TryGetValue((magicAttackRequest.SkillId * 10) + spellData.lvl, out var magicTypeEntry))
+            // === VALIDATE SPELL IN MAGIC TYPE DATABASE ===
+            var magicTypeId = (magicAttackRequest.SkillId * 10) + spellData.lvl;
+            if (!Collections.MagicType.TryGetValue(magicTypeId, out var magicTypeEntry))
             {
-                ntt.Remove<MagicAttackRequestComponent>();
                 if (IsLogging)
-                    FConsole.WriteLine("{ntt} tried to use skill {skillId} but it doesn't exist", ntt, magicAttackRequest.SkillId);
+                    FConsole.WriteLine("{ntt} tried to use skill {skill} but magic type doesn't exist", ntt, magicAttackRequest.SkillId);
+
+                ntt.Remove<MagicAttackRequestComponent>();
                 return;
             }
 
+            // === ROUTE TO APPROPRIATE TARGETING SYSTEM ===
             switch (magicTypeEntry.ActionSort)
             {
-                case 2: // heal self
+                case 2: // Heal self - direct target
                     var targetCollection = new TargetCollectionComponent(magicTypeEntry);
                     var targetEntity = NttWorld.GetEntity(magicAttackRequest.TargetId);
                     targetCollection.Targets.Add(targetEntity);
                     ntt.Set(ref targetCollection);
                     break;
-                case 11: // Roar
-                case 5: // Circle
+
+                case 11: // Roar - area effect around caster
+                case 5:  // Circle - area effect at target location
                     var circleTargeting = new TargetingComponent(magicAttackRequest.X, magicAttackRequest.Y, magicTypeEntry, TargetingType.Circle);
                     ntt.Set(ref circleTargeting);
                     break;
-                case 4: // Sector
+
+                case 4: // Sector - cone/wedge attack
                     var sectorTargeting = new TargetingComponent(magicAttackRequest.X, magicAttackRequest.Y, magicTypeEntry, TargetingType.Sector);
                     ntt.Set(ref sectorTargeting);
                     break;
-                case 14: // Line
+
+                case 14: // Line - linear attack
                     var lineTargeting = new TargetingComponent(magicAttackRequest.X, magicAttackRequest.Y, magicTypeEntry, TargetingType.Line);
                     ntt.Set(ref lineTargeting);
                     break;
+
                 default:
+                    // Unknown action sort - no targeting needed
                     break;
             }
 
+            // Clean up the magic attack request
             ntt.Remove<MagicAttackRequestComponent>();
         }
     }

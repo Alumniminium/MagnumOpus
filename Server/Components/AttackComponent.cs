@@ -11,6 +11,6 @@ namespace MagnumOpus.Components
     {
         public NTT Target = target;
         public MsgInteractType AttackType = attackType;
-        public long SleepTicks;
+        public long CooldownTicks;
     }
 }

@@ -35,7 +35,12 @@ namespace MagnumOpus.Systems
 
             // === CREATE GROUND MONEY ENTITY ===
             var moneyEntity = EntityFactory.MakeMoneyDrop(drc.Amount, ref pos);
-            if (moneyEntity != default)
+            if (moneyEntity == default)
+            {
+                if (IsLogging)
+                    FConsole.WriteLine("Failed to create money drop for {ntt}. Amount: {amount}, Position: {pos}, Map: {map}", ntt, drc.Amount, pos.Position, pos.Map);
+            }
+            else
             {
                 // Add to spatial hash for efficient queries
                 var spatialUpdate = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, pos.Map, SpacialHashUpdatType.Add);
@@ -47,11 +52,6 @@ namespace MagnumOpus.Systems
 
                 if (IsLogging)
                     FConsole.WriteLine("{ntt} dropped {amount} money at {pos}", ntt, drc.Amount, pos.Position);
-            }
-            else if (IsLogging)
-            {
-                FConsole.WriteLine("Failed to create money drop for {ntt}. Amount: {amount}, Position: {pos}, Map: {map}",
-                    ntt, drc.Amount, pos.Position, pos.Map);
             }
 
             // Clean up the drop request component

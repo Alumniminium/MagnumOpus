@@ -59,15 +59,41 @@ namespace MagnumOpus.IO
         {
             try
             {
-                var matches = ArgMatcher().Matches(line);
-                var requiredCount = 0;
-                if (matches.Count > 0)
-                    requiredCount = matches.Cast<Match>().Select(m => int.Parse(m.Groups[1].Value)).DefaultIfEmpty(-1).Max() + 1;
-
-                if (matches.Count == 0 || objects.Length >= requiredCount)
+                // Handle both numbered placeholders {0}, {1} and named placeholders {caster}, {target}
+                var numberedMatches = ArgMatcher().Matches(line);
+                var namedMatches = NamedArgMatcher().Matches(line);
+                
+                if (numberedMatches.Count == 0 && namedMatches.Count == 0)
                 {
                     Lines.Add($"{line}{Environment.NewLine}");
                     return;
+                }
+
+                if (numberedMatches.Count > 0)
+                {
+                    // Handle numbered placeholders {0}, {1}, {2}, etc.
+                    var requiredCount = numberedMatches.Cast<Match>().Select(m => int.Parse(m.Groups[1].Value)).DefaultIfEmpty(-1).Max() + 1;
+                    if (objects.Length >= requiredCount)
+                    {
+                        var formattedLine = string.Format(line, objects);
+                        Lines.Add($"{formattedLine}{Environment.NewLine}");
+                        return;
+                    }
+                }
+                else if (namedMatches.Count > 0)
+                {
+                    // Handle named placeholders {caster}, {target}, etc.
+                    if (objects.Length >= namedMatches.Count)
+                    {
+                        var formattedLine = line;
+                        for (int i = 0; i < namedMatches.Count && i < objects.Length; i++)
+                        {
+                            var placeholder = namedMatches[i].Value;
+                            formattedLine = formattedLine.Replace(placeholder, objects[i]?.ToString() ?? "null");
+                        }
+                        Lines.Add($"{formattedLine}{Environment.NewLine}");
+                        return;
+                    }
                 }
 
                 Lines.Add($"{line}{Environment.NewLine}");
@@ -93,5 +119,8 @@ namespace MagnumOpus.IO
 
         [GeneratedRegex(@"\{(\d+)\}")]
         private static partial Regex ArgMatcher();
+        
+        [GeneratedRegex(@"\{([a-zA-Z_][a-zA-Z0-9_]*)\}")]
+        private static partial Regex NamedArgMatcher();
     }
 }
