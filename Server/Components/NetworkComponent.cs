@@ -6,6 +6,13 @@ using NttECS.ECS;
 namespace MagnumOpus.Components;
 
 [Component]
+/// <summary>
+/// Core networking component that manages client connection state and packet processing.
+/// Contains socket connection, cryptography for secure communication, packet queues organized
+/// by type, send queue for outgoing data, and username for identification. Not saved to database
+/// (no SaveEnabled). Used by PacketsOut system for network transmission and extension methods
+/// for player identification. Essential for all client-server communication.
+/// </summary>
 public struct NetworkComponent
 {
     public Socket Socket;

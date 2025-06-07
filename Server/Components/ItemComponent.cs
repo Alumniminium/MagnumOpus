@@ -3,6 +3,13 @@ using NttECS.ECS;
 namespace MagnumOpus.Components;
 
 [Component(SaveEnabled: true)]
+/// <summary>
+/// Core item data component containing all item properties and enhancement information.
+/// Stores item ID, durability (current/max), upgrades (Plus, Bless, Enchant), gems,
+/// reborn effects, and stack amounts. Used by multiple systems for item operations:
+/// EquipSystem for equipment handling, ShopSystem for transactions, ItemUseSystem for
+/// consumables, DropItemSystem for ground items. Essential for all item-related gameplay.
+/// </summary>
 public struct ItemComponent
 {
     public int Id;

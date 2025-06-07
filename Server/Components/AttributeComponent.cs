@@ -5,6 +5,12 @@ using NttECS.ECS;
 namespace MagnumOpus.Components
 {
     [Component(SaveEnabled: true)]
+    /// <summary>
+    /// Core player character attributes component that manages primary stats (Strength, Agility, 
+    /// Vitality, Spirit) and available stat points. Each attribute change is automatically 
+    /// network-synchronized to clients. StatPoints are consumed when players allocate them 
+    /// to increase their attributes through the character development interface.
+    /// </summary>
     public struct AttributeComponent(in NTT ntt)
     {
         public NTT NTT = ntt;
@@ -17,31 +23,31 @@ namespace MagnumOpus.Components
         public ushort Strength
         {
             readonly get => _strength;
-            set => NetworkSyncHelper.UpdateSyncedField(ref this, ref _strength, value, MsgUserAttribType.Strength, NTT);
+            set => NetworkHelper.UpdateSyncedField(ref this, ref _strength, value, MsgUserAttribType.Strength, NTT);
         }
 
         public ushort Agility
         {
             readonly get => _agility;
-            set => NetworkSyncHelper.UpdateSyncedField(ref this, ref _agility, value, MsgUserAttribType.Agility, NTT);
+            set => NetworkHelper.UpdateSyncedField(ref this, ref _agility, value, MsgUserAttribType.Agility, NTT);
         }
 
         public ushort Vitality
         {
             readonly get => _vitality;
-            set => NetworkSyncHelper.UpdateSyncedField(ref this, ref _vitality, value, MsgUserAttribType.Vitality, NTT);
+            set => NetworkHelper.UpdateSyncedField(ref this, ref _vitality, value, MsgUserAttribType.Vitality, NTT);
         }
 
         public ushort Spirit
         {
             readonly get => _spirit;
-            set => NetworkSyncHelper.UpdateSyncedField(ref this, ref _spirit, value, MsgUserAttribType.Spirit, NTT);
+            set => NetworkHelper.UpdateSyncedField(ref this, ref _spirit, value, MsgUserAttribType.Spirit, NTT);
         }
 
         public ushort StatPoints
         {
             readonly get => _statPoints;
-            set => NetworkSyncHelper.UpdateSyncedField(ref this, ref _statPoints, value, MsgUserAttribType.StatPoints, NTT);
+            set => NetworkHelper.UpdateSyncedField(ref this, ref _statPoints, value, MsgUserAttribType.StatPoints, NTT);
         }
 
         public override readonly int GetHashCode() => NTT.Id;

@@ -1,19 +1,25 @@
 using Co2Core.IO;
 using NttECS.ECS;
 
-namespace MagnumOpus.Components
-{
-    [Component]
-    public struct TargetCollectionComponent
-    {
-        public List<NTT> Targets;
-        public MagicType.Entry MagicType;
+namespace MagnumOpus.Components;
 
-        public TargetCollectionComponent() => Targets = [];
-        public TargetCollectionComponent(MagicType.Entry magicType)
-        {
-            MagicType = magicType;
-            Targets = [];
-        }
+[Component]
+/// <summary>
+/// Magic spell target collection component storing entities affected by area-of-effect spells.
+/// Contains list of target entities and magic type data for spell processing. Not saved to
+/// database (no SaveEnabled). Used in the magic casting pipeline to collect valid targets
+/// before applying spell effects. Part of the magic system's target resolution and spell
+/// application workflow for multi-target spells and area effects.
+/// </summary>
+public struct TargetCollectionComponent
+{
+    public List<NTT> Targets;
+    public MagicType.Entry MagicType;
+
+    public TargetCollectionComponent() => Targets = [];
+    public TargetCollectionComponent(MagicType.Entry magicType)
+    {
+        MagicType = magicType;
+        Targets = [];
     }
 }

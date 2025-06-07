@@ -19,7 +19,7 @@ namespace MagnumOpus.ECS
         public static readonly Counter EntityChangedCount = Metrics.CreateCounter("MO_ENTITY_CHANGED", "Counter for Entity Changed");
 
 
-        
+
         /// <summary>Total entities created during server lifetime</summary>
         public static readonly Counter NTTCreations = Metrics.CreateCounter("MO_NTT_CREATION_COUNT", "Amount of times an NTT was created");
         /// <summary>Total entities destroyed during server lifetime</summary>
@@ -37,7 +37,7 @@ namespace MagnumOpus.ECS
         #endregion
 
 
-        
+
         #region Economy Metrics
         /// <summary>Number of items purchased from shops</summary>
         public static readonly Counter ShopPurchases = Metrics.CreateCounter("MO_DROPS_SHOP_PURCHASE", "Amount of Shop Purchases");
@@ -47,13 +47,13 @@ namespace MagnumOpus.ECS
         public static readonly Counter ShopIncome = Metrics.CreateCounter("MO_SHOP_INCOME", "Amount of Money earned by the Shop");
         /// <summary>Total money paid by shops for player sales</summary>
         public static readonly Counter ShopExpenses = Metrics.CreateCounter("MO_SHOP_EXPENSES", "Amount of Money spent by the Shop");
-        
+
         /// <summary>Total money gained by server economy</summary>
         public static readonly Counter ServerIncome = Metrics.CreateCounter("MO_SERVER_INCOME", "Amount of Money earned by the Server");
         /// <summary>Total money removed from server economy</summary>
         public static readonly Counter ServerExpenses = Metrics.CreateCounter("MO_SERVER_EXPENSES", "Amount of Money spent by the Server");
         #endregion
-        
+
         #region Drop Metrics
         /// <summary>Number of meteor items dropped</summary>
         public static readonly Counter MeteorDropsCount = Metrics.CreateCounter("MO_DROPS_METEOR", "Amount of Meteors dropped");

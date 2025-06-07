@@ -34,7 +34,7 @@ namespace MagnumOpus.Helpers
         /// <param name="ntt">Entity to lookup</param>
         /// <returns>Tuple containing success flag and IP address</returns>
         public static (bool found, string ip) GetIp(in NTT ntt) => EntityToIp.TryGetValue(ntt, out var ip) ? ((bool found, string ip))(true, ip) : ((bool found, string ip))(false, string.Empty);
-        
+
         /// <summary>
         /// Retrieves the entity associated with an IP address.
         /// </summary>

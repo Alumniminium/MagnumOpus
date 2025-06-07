@@ -43,7 +43,7 @@ namespace MagnumOpus.Helpers
         /// <param name="start">Starting position</param>
         /// <returns>8-directional enum value</returns>
         public static Direction GetDirection(Vector2 end, Vector2 start) => (Direction)(GetRawDirection(end, start) % 8);
-        
+
         /// <summary>
         /// Converts a directional vector to the nearest 8-directional enum using angle calculation.
         /// </summary>

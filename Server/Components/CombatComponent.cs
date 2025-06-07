@@ -4,6 +4,12 @@ using NttECS.Helpers;
 namespace MagnumOpus.Components;
 
 [Component(SaveEnabled: true)]
+/// <summary>
+/// Combat statistics component that stores offensive and defensive capabilities of entities.
+/// Contains attack ranges (min/max), defense values, magic attack/resist, and dodge rating.
+/// Uses auto-tracking for efficient change detection. Referenced by GOAP planner for combat
+/// decision-making but no active systems currently process this component directly.
+/// </summary>
 public partial struct CombatComponent
 {
     private int _minAttack;

@@ -34,7 +34,7 @@ namespace MagnumOpus.Helpers
         /// <param name="ntt">Entity to lookup</param>
         /// <returns>Tuple containing success flag and entity name</returns>
         public static (bool found, string name) GetName(in NTT ntt) => Ntt2Name.TryGetValue(ntt, out var name) ? ((bool found, string name))(true, name) : ((bool found, string name))(false, string.Empty);
-        
+
         /// <summary>
         /// Retrieves the entity associated with a name.
         /// </summary>

@@ -55,72 +55,72 @@ namespace MagnumOpus.Helpers
         /// <returns>Unique ID for the player</returns>
         /// <exception cref="IndexOutOfRangeException">Thrown when no IDs are available</exception>
         public static int GetPlayerId() => PlayerIds.TryPop(out var id) ? id : throw new IndexOutOfRangeException("Player IDs exhausted");
-        
+
         /// <summary>
         /// Allocates a unique ID for a monster entity.
         /// </summary>
         /// <returns>Unique ID for the monster</returns>
         /// <exception cref="IndexOutOfRangeException">Thrown when no IDs are available</exception>
         public static int GetMonsterId() => MonsterIds.TryPop(out var id) ? id : throw new IndexOutOfRangeException("Monster IDs exhausted");
-        
+
         /// <summary>
         /// Allocates a unique ID for an NPC entity.
         /// </summary>
         /// <returns>Unique ID for the NPC</returns>
         /// <exception cref="IndexOutOfRangeException">Thrown when no IDs are available</exception>
         public static int GetNpcId() => NpcIds.TryPop(out var id) ? id : throw new IndexOutOfRangeException("NPC IDs exhausted");
-        
+
         /// <summary>
         /// Allocates a unique ID for an item entity.
         /// </summary>
         /// <returns>Unique ID for the item</returns>
         /// <exception cref="IndexOutOfRangeException">Thrown when no IDs are available</exception>
         public static int GetItemId() => ItemIds.TryPop(out var id) ? id : throw new IndexOutOfRangeException("Item IDs exhausted");
-        
+
         /// <summary>
         /// Allocates a unique ID for a trap entity.
         /// </summary>
         /// <returns>Unique ID for the trap</returns>
         /// <exception cref="IndexOutOfRangeException">Thrown when no IDs are available</exception>
         public static int GetTrapId() => TrapIds.TryPop(out var id) ? id : throw new IndexOutOfRangeException("Trap IDs exhausted");
-        
+
         /// <summary>
         /// Allocates a unique ID for an "other" type entity.
         /// </summary>
         /// <returns>Unique ID for the other entity</returns>
         /// <exception cref="IndexOutOfRangeException">Thrown when no IDs are available</exception>
         public static int GetOtherId() => OtherIds.TryPop(out var id) ? id : throw new IndexOutOfRangeException("Other IDs exhausted");
-        
+
         /// <summary>
         /// Returns a player ID back to the pool for reuse.
         /// </summary>
         /// <param name="id">ID to return to the pool</param>
         public static void ReturnPlayerId(int id) => PlayerIds.Push(id);
-        
+
         /// <summary>
         /// Returns a monster ID back to the pool for reuse.
         /// </summary>
         /// <param name="id">ID to return to the pool</param>
         public static void ReturnMonsterId(int id) => MonsterIds.Push(id);
-        
+
         /// <summary>
         /// Returns an NPC ID back to the pool for reuse.
         /// </summary>
         /// <param name="id">ID to return to the pool</param>
         public static void ReturnNpcId(int id) => NpcIds.Push(id);
-        
+
         /// <summary>
         /// Returns an item ID back to the pool for reuse.
         /// </summary>
         /// <param name="id">ID to return to the pool</param>
         public static void ReturnItemId(int id) => ItemIds.Push(id);
-        
+
         /// <summary>
         /// Returns a trap ID back to the pool for reuse.
         /// </summary>
         /// <param name="id">ID to return to the pool</param>
         public static void ReturnTrapId(int id) => TrapIds.Push(id);
-        
+
         /// <summary>
         /// Returns an "other" ID back to the pool for reuse.
         /// </summary>
@@ -152,7 +152,7 @@ namespace MagnumOpus.Helpers
             var time = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
             FConsole.WriteLine($"Saved {nameof(IdGenerator)} to {filename} in {time}ms");
         }
-        
+
         private class IdGeneratorState
         {
             public ConcurrentStack<int>? NpcIds { get; set; }

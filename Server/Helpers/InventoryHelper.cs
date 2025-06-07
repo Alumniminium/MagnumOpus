@@ -86,7 +86,7 @@ namespace MagnumOpus.Helpers
         /// <param name="count">Number of free slots required</param>
         /// <returns>True if enough free space is available</returns>
         public static bool HasFreeSpace(ref InventoryComponent inv, int count = 1) => CountItemId(ref inv, 0) >= count;
-        
+
         /// <summary>
         /// Checks if inventory contains an item with the specified network ID.
         /// </summary>
@@ -107,7 +107,7 @@ namespace MagnumOpus.Helpers
         /// <param name="id">Item ID to search for</param>
         /// <returns>True if any item with the ID is found</returns>
         public static bool HasItemId(ref InventoryComponent inv, int id) => CountItemId(ref inv, id) > 0;
-        
+
         /// <summary>
         /// Counts the number of items with the specified item ID in inventory.
         /// </summary>
