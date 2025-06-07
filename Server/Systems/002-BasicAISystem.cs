@@ -8,36 +8,23 @@ using NttECS.ECS;
 
 namespace MagnumOpus.Systems
 {
-    /// <summary>
-    /// Handles basic AI behavior for monsters using GOAP (Goal-Oriented Action Planning).
-    /// Manages target acquisition, action planning, and execution cycles for non-guard monsters.
-    /// </summary>
     public sealed class BasicAISystem : NttSystem<PositionComponent, ViewportComponent, BrainComponent>
     {
-        /// <summary>
-        /// Initializes the BasicAISystem with full multi-threaded processing capabilities.
-        /// </summary>
         public BasicAISystem() : base("Basic AI", threads: 1, log: false) { }
 
-        /// <summary>
-        /// Filters entities to only process living monsters that are not guards.
-        /// </summary>
-        /// <param name="ntt">Entity to check for AI processing eligibility</param>
-        /// <returns>True if entity is a living monster without guard behavior</returns>
         protected override bool MatchesFilter(in NTT ntt) => ntt.IsMonster() && !ntt.Has<DeathTagComponent>() && !ntt.Has<GuardPositionComponent>() && base.MatchesFilter(in ntt);
 
-        /// <summary>
-        /// Processes AI behavior including state management, target acquisition, and action planning.
-        /// </summary>
-        /// <param name="ntt">The monster entity being processed</param>
-        /// <param name="pos">Position component for location-based decisions</param>
-        /// <param name="vwp">Viewport component for target detection</param>
-        /// <param name="brn">Brain component containing AI state and planning data</param>
+        // Manages AI behavior for monsters using Goal-Oriented Action Planning (GOAP). The system handles
+        // different brain states (idle, sleeping, waking up) and performs target acquisition by scanning
+        // for visible players. When a target is found, it creates a plan using GOAP and executes actions
+        // one at a time. After each action, the monster sleeps for a random duration (1-2 seconds).
         public override void Update(in NTT ntt, ref PositionComponent pos, ref ViewportComponent vwp, ref BrainComponent brn)
         {
+            // Skip processing for idle monsters
             if (brn.State == BrainState.Idle)
                 return;
 
+            // Handle sleep state - count down sleep timer
             if (brn.State == BrainState.Sleeping)
             {
                 brn.SleepTicks--;
@@ -45,19 +32,24 @@ namespace MagnumOpus.Systems
                     return;
             }
 
+            // Handle wake up - request viewport update to see surroundings
             if (brn.State == BrainState.WakingUp)
             {
                 ntt.Set<ViewportUpdateTagComponent>();
-
+                
                 if (IsLogging)
-                    FConsole.WriteLine("Waking up {ntt} with {visibleCount} visible entities", ntt, vwp.EntitiesVisible.Count);
+                    FConsole.WriteLine("Waking up {ntt} with {visibleCount} visible entities", 
+                        ntt, vwp.EntitiesVisible.Count);
             }
 
+            // Validate current target is still visible
             if (!vwp.EntitiesVisible.Contains(brn.Target))
                 brn.Target = default;
 
+            // Find a new target if we don't have one
             if (brn.Target == 0)
             {
+                // Scan for visible players to target
                 foreach (var visibleEntity in vwp.EntitiesVisible)
                 {
                     if (!visibleEntity.IsPlayer())
@@ -69,6 +61,8 @@ namespace MagnumOpus.Systems
                     brn.Target = visibleEntity;
                     break;
                 }
+                
+                // No valid targets found - go idle
                 if (brn.Target == 0)
                 {
                     brn.State = BrainState.Idle;
@@ -76,17 +70,21 @@ namespace MagnumOpus.Systems
                 }
             }
 
+            // Execute GOAP planning and actions
             if (brn.Plan.Count == 0)
             {
+                // Create new plan to defeat the target
                 var goal = new DefeatEnemyGoal();
                 brn.Plan = GOAPPlanner.Plan(ntt, brn.AvailableActions, goal);
             }
             else
             {
+                // Execute next action in the plan
                 brn.Plan[0].Execute(ntt);
                 brn.Plan.RemoveAt(0);
             }
 
+            // Put monster to sleep for 1-2 seconds after action
             brn.State = BrainState.Sleeping;
             brn.SleepTicks = (int)(NttWorld.TargetTps * (1 + Random.Shared.NextSingle()));
         }

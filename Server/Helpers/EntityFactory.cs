@@ -4,6 +4,7 @@ using MagnumOpus.AOGP.Actions;
 using MagnumOpus.Squiggly;
 using MagnumOpus.Squiggly.Models;
 using NttECS.ECS;
+using MagnumOpus.ECS;
 
 namespace MagnumOpus.Helpers
 {
@@ -70,6 +71,10 @@ namespace MagnumOpus.Helpers
             ntt.Set(ref moneyInfo);
             ntt.Set(ref shr);
             ntt.Set<ViewportUpdateTagComponent>();
+
+            PrometheusPush.MoneyDropCount.Inc();
+            PrometheusPush.MoneyDropTotal.Inc(amount);
+            PrometheusPush.ServerExpenses.Inc(amount);
 
             return ntt;
         }

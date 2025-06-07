@@ -185,7 +185,7 @@ namespace MagnumOpus.Helpers
         /// <param name="owner">Entity that owns the inventory</param>
         /// <param name="inv">Inventory component to modify</param>
         /// <param name="item">Item entity to add</param>
-        /// <param name="netSync">Whether to send addition packet to client</param>
+        /// <param name="netSync">Whether to send a packet to client to add the item to inventory</param>
         /// <returns>True if item was successfully added</returns>
         public static bool AddItem(NTT owner, ref InventoryComponent inv, in NTT item, bool netSync = false)
         {

@@ -19,21 +19,21 @@ namespace MagnumOpus.Helpers
         /// <param name="item">Item component to check</param>
         /// <returns>True if item durability is zero</returns>
         public static bool IsBroken(ref ItemComponent item) => item.CurrentDurability == 0;
-        
+
         /// <summary>
         /// Determines if an item should never drop when player dies (high plus items).
         /// </summary>
         /// <param name="item">Item component to check</param>
         /// <returns>True if item is protected from death drops</returns>
         public static bool IsNeverDropWhenDead(ref ItemComponent item) => /*item.Monopoly == 3 || item..Monopoly == 3 || item..Monopoly == 9 || */ item.Plus > 5;
-        
+
         /// <summary>
         /// Extracts the level requirement from an item's ID.
         /// </summary>
         /// <param name="item">Item component to analyze</param>
         /// <returns>Item level requirement</returns>
         public static int GetLevel(ref ItemComponent item) => item.Id / 10 % 100;
-        
+
         /// <summary>
         /// Extracts the level requirement from an item type ID.
         /// </summary>
@@ -51,14 +51,14 @@ namespace MagnumOpus.Helpers
             item.Id = item.Id / 1000 * 1000 + level * 10 + item.Id % 10;
             return ref item;
         }
-        
+
         /// <summary>
         /// Extracts the quality level from an item's ID.
         /// </summary>
         /// <param name="item">Item component to analyze</param>
         /// <returns>Item quality level (0-9)</returns>
         public static int GetQuality(ref ItemComponent item) => item.Id % 10;
-        
+
         /// <summary>
         /// Extracts the quality level from an item type ID.
         /// </summary>
