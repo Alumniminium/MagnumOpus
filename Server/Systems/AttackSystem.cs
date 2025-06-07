@@ -6,10 +6,23 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Systems
 {
+    /// <summary>
+    /// Handles combat mechanics including physical and ranged attacks.
+    /// Manages attack timing, distance validation, damage calculation, and target validation.
+    /// </summary>
     public sealed class AttackSystem : NttSystem<AttackComponent, PositionComponent>
     {
+        /// <summary>
+        /// Initializes the AttackSystem with half the available CPU cores for processing.
+        /// </summary>
         public AttackSystem() : base("Attack", threads: Environment.ProcessorCount / 2) { }
 
+        /// <summary>
+        /// Processes an entity's attack against their target, handling damage and validation.
+        /// </summary>
+        /// <param name="ntt">The attacking entity</param>
+        /// <param name="atk">Attack component containing target and attack configuration</param>
+        /// <param name="pos">Attacker's position for distance calculations</param>
         public override void Update(in NTT ntt, ref AttackComponent atk, ref PositionComponent pos)
         {
             if (atk.SleepTicks > 0)
@@ -24,9 +37,8 @@ namespace MagnumOpus.Systems
                 return;
             }
 
-            // TODO: Implement
-            ref readonly var targetPos = ref atk.Target.Get<PositionComponent>();
-            var distance = Vector2.Distance(pos.Position, targetPos.Position);
+            ref readonly var targetPosition = ref atk.Target.Get<PositionComponent>();
+            var distance = Vector2.Distance(pos.Position, targetPosition.Position);
 
             switch (atk.AttackType)
             {
@@ -45,10 +57,10 @@ namespace MagnumOpus.Systems
                             damage *= 2;
                         if (ntt.Has<GuardPositionComponent>())
                             damage *= 10;
-                        var dmg = new DamageComponent(in atk.Target, in ntt, damage);
-                        atk.Target.Set(ref dmg);
-                        var atkPacket = MsgInteract.Create(in ntt, in atk.Target, MsgInteractType.Physical, damage);
-                        ntt.NetSync(ref atkPacket, true);
+                        var damageComponent = new DamageComponent(in atk.Target, in ntt, damage);
+                        atk.Target.Set(ref damageComponent);
+                        var attackPacket = MsgInteract.Create(in ntt, in atk.Target, MsgInteractType.Physical, damage);
+                        ntt.NetSync(ref attackPacket, true);
 
                         break;
                     }
@@ -63,11 +75,11 @@ namespace MagnumOpus.Systems
                         atk.SleepTicks = NttWorld.TargetTps;
                         // TODO: calculate damage
                         var damage = Random.Shared.Next(1, 10);
-                        var dmg = new DamageComponent(in atk.Target, in ntt, damage);
-                        atk.Target.Set(ref dmg);
+                        var damageComponent = new DamageComponent(in atk.Target, in ntt, damage);
+                        atk.Target.Set(ref damageComponent);
 
-                        var atkPacket = MsgInteract.Create(in ntt, in atk.Target, MsgInteractType.Ranged, damage / 2);
-                        ntt.NetSync(ref atkPacket, true);
+                        var attackPacket = MsgInteract.Create(in ntt, in atk.Target, MsgInteractType.Ranged, damage / 2);
+                        ntt.NetSync(ref attackPacket, true);
 
                         break;
                     }

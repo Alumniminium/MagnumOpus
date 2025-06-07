@@ -1,5 +1,10 @@
 namespace MagnumOpus.Networking.Cryptography
 {
+    /// <summary>
+    /// RC5 cipher implementation for legacy password encryption in Conquer Online protocol.
+    /// Uses a fixed 16-byte key with 12 rounds of encryption for backward compatibility with client systems.
+    /// Provides block cipher operations on 64-bit data blocks with unsafe memory access for performance.
+    /// </summary>
     public static unsafe class RivestCipher5
     {
         public const uint RC5PW32 = 0xB7E15163;
@@ -43,8 +48,11 @@ namespace MagnumOpus.Networking.Cryptography
         }
 
         /// <summary>
-        /// Encrypts data with the RC5 algorithm.
+        /// Encrypts data using RC5 algorithm with fixed key and 12 rounds.
+        /// Data length must be a multiple of 64 bits (8 bytes) for proper block operation.
         /// </summary>
+        /// <param name="aBuf">Memory buffer containing data to encrypt in-place</param>
+        /// <param name="aLength">Length of data to encrypt (must be multiple of 8)</param>
         public static void Encrypt(ref Memory<byte> aBuf, int aLength)
         {
             if (aLength % 8 != 0)
@@ -70,8 +78,11 @@ namespace MagnumOpus.Networking.Cryptography
         }
 
         /// <summary>
-        /// Decrypts data with the RC5 algorithm.
+        /// Decrypts data using RC5 algorithm with fixed key and 12 rounds.
+        /// Data length must be a multiple of 64 bits (8 bytes) for proper block operation.
         /// </summary>
+        /// <param name="buf">Pointer to buffer containing encrypted data to decrypt in-place</param>
+        /// <param name="aLength">Length of data to decrypt (must be multiple of 8)</param>
         public static void Decrypt(byte* buf, int aLength)
         {
             if ((aLength & 7) != 0)

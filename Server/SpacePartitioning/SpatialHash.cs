@@ -2,27 +2,37 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using MagnumOpus.Components;
 using MagnumOpus.ECS;
-using HerstLib.Memory;
+using MagnumOpus.Helpers;
 using System.Collections.Concurrent;
 
 namespace MagnumOpus.SpacePartitioning
 {
+    internal class BucketList
+    {
+        public readonly List<NTT> Entities = new();
+        public readonly ReaderWriterLockSlim Lock = new(LockRecursionPolicy.NoRecursion);
+    }
+
     public class SpatialHash(int cellSize = 10)
     {
-        private const float VISIBILITY_DISTANCE_SQUARED = 350f;
         private readonly int cellSize = cellSize;
-        private readonly ConcurrentDictionary<int, List<NTT>> Hashtbl = [];
+        private readonly ConcurrentDictionary<int, BucketList> Hashtbl = [];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(NTT entity, Vector2 pos)
         {
             var hash = GetHash(pos);
-            if (!Hashtbl.TryGetValue(hash, out var list))
+            var bucket = Hashtbl.GetOrAdd(hash, _ => new BucketList());
+
+            bucket.Lock.EnterWriteLock();
+            try
             {
-                list = [];
-                Hashtbl.TryAdd(hash, list);
+                bucket.Entities.Add(entity);
             }
-            list.Add(entity);
+            finally
+            {
+                bucket.Lock.ExitWriteLock();
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -31,9 +41,17 @@ namespace MagnumOpus.SpacePartitioning
             var hash = GetHash(pos);
             if (Hashtbl.TryGetValue(hash, out var bucket))
             {
-                bucket.Remove(entity);
-                if (bucket.Count == 0)
-                    Hashtbl.TryRemove(hash, out var _);
+                bucket.Lock.EnterWriteLock();
+                try
+                {
+                    bucket.Entities.Remove(entity);
+                    if (bucket.Entities.Count == 0)
+                        Hashtbl.TryRemove(hash, out var _);
+                }
+                finally
+                {
+                    bucket.Lock.ExitWriteLock();
+                }
             }
         }
 
@@ -61,19 +79,26 @@ namespace MagnumOpus.SpacePartitioning
                 {
                     var hash = GetHash(new Vector2(x * cellSize, y * cellSize));
 
-                    if (!Hashtbl.TryGetValue(hash, out var entities))
+                    if (!Hashtbl.TryGetValue(hash, out var bucket))
                         continue;
 
-                    foreach (var ntt in entities)
+                    bucket.Lock.EnterReadLock();
+                    try
                     {
-                        if (vwp.EntitiesVisible.Contains(ntt))
-                            continue;
+                        foreach (var ntt in bucket.Entities)
+                        {
+                            if (vwp.EntitiesVisible.Contains(ntt))
+                                continue;
 
-                        ref readonly var pos = ref ntt.Get<PositionComponent>();
-                        var distanceSquared = Vector2.DistanceSquared(pos.Position, new Vector2(cx, cy));
+                            ref readonly var pos = ref ntt.Get<PositionComponent>();
 
-                        if (distanceSquared <= VISIBILITY_DISTANCE_SQUARED)
-                            vwp.EntitiesVisible.Add(ntt);
+                            if (CoMath.InScreen(pos.Position.X, pos.Position.Y, cx, cy))
+                                vwp.EntitiesVisible.Add(ntt);
+                        }
+                    }
+                    finally
+                    {
+                        bucket.Lock.ExitReadLock();
                     }
                 }
             }
@@ -86,7 +111,7 @@ namespace MagnumOpus.SpacePartitioning
             var x = (int)scaled.X;
             var y = (int)scaled.Y;
 
-            return Math.Abs((x * 73856093) ^ (y * 19349663));
+            return (x * 73856093) ^ (y * 19349663);
         }
     }
     public class MapEntities
@@ -120,9 +145,10 @@ namespace MagnumOpus.SpacePartitioning
             foreach (var kvp in Entities)
             {
                 ref readonly var pos = ref kvp.Value.Get<PositionComponent>();
-                var distanceSquared = Vector2.DistanceSquared(pos.Position, new Vector2(vwp.Viewport.X, vwp.Viewport.Y));
+                var cx = vwp.Viewport.X + (vwp.Viewport.Width / 2);
+                var cy = vwp.Viewport.Y + (vwp.Viewport.Height / 2);
 
-                if (distanceSquared <= 324f)
+                if (CoMath.InScreen(pos.Position.X, pos.Position.Y, cx, cy))
                     vwp.EntitiesVisible.Add(kvp.Value);
             }
         }

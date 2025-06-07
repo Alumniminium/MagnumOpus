@@ -2,7 +2,11 @@ using Org.BouncyCastle.Math;
 
 namespace MagnumOpus.Networking.Cryptography
 {
-
+    /// <summary>
+    /// DiffieHellman key exchange implementation for establishing shared secrets with Conquer Online clients.
+    /// Uses BouncyCastle's BigInteger implementation for cryptographic operations with predefined parameters.
+    /// Enables secure session key establishment without transmitting private keys over the network.
+    /// </summary>
     public sealed class DiffieHellman
     {
         private const string DefaultGenerator = "05";
@@ -33,23 +37,37 @@ namespace MagnumOpus.Networking.Cryptography
             PublicKey = Generator.ModPow(PrivateKey, Modulus);
         }
 
-        /// <summary>Computes the public key for sending to the client.</summary>
+        /// <summary>
+        /// Computes the public key for transmission to the client during key exchange.
+        /// Generates a new probable prime and calculates the public key using modular exponentiation.
+        /// </summary>
         public void ComputePublicKey()
         {
             Modulus = BigInteger.ProbablePrime(256, new Random());
             PublicKey = Generator.ModPow(Modulus, PrimeRoot);
         }
 
-        /// <summary>Computes the private key given the client response.</summary>
-        /// <param name="clientKeyString">Client key from the exchange</param>
-        /// <returns>Bytes representing the private key for Blowfish Cipher.</returns>
+        /// <summary>
+        /// Computes the shared private key using the client's public key from the exchange.
+        /// The resulting private key becomes the shared secret for symmetric encryption.
+        /// </summary>
+        /// <param name="clientKeyString">Hexadecimal string representation of client's public key</param>
         public void ComputePrivateKey(string clientKeyString)
         {
             BigInteger clientKey = new(clientKeyString, 16);
             PrivateKey = clientKey.ModPow(Modulus, PrimeRoot);
         }
 
+        /// <summary>
+        /// Gets the public key as a hexadecimal string for transmission to the client.
+        /// </summary>
+        /// <returns>Hexadecimal string representation of the public key</returns>
         public string GetPublicKey() => PublicKey.ToString(16);
+        
+        /// <summary>
+        /// Gets the computed private key as a byte array for use with symmetric ciphers.
+        /// </summary>
+        /// <returns>Byte array representation of the shared private key</returns>
         public byte[] GetPrivateKey() => PrivateKey.ToByteArrayUnsigned();
     }
 }

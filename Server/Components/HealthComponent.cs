@@ -1,47 +1,29 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Networking.Packets;
+using MagnumOpus.Helpers;
 
 namespace MagnumOpus.Components
 {
     [Component(saveEnabled: true)]
-    public struct HealthComponent
+    public struct HealthComponent(in NTT ntt, int health = 100, int maxHealth = 100)
     {
         public long ChangedTick = NttWorld.Tick;
-        public NTT NTT;
-        
-        public int Health;
-        public int MaxHealth;
+        public NTT NTT = ntt;
+        private int _health = health;
+        private int _maxHealth = maxHealth;
 
-        public HealthComponent(in NTT ntt, ushort health, ushort maxHealth)
-        {
-            NTT = ntt;
-            Health = health;
-            MaxHealth = maxHealth;
+        public int Health 
+        { 
+            readonly get => _health;
+            set => NetworkSyncHelper.UpdateSyncedField(ref this, ref _health, value, MsgUserAttribType.Health, NTT);
         }
 
-        public void SetHealth(int value)
-        {
-            if (Health != value)
-            {
-                Health = value;
-                ChangedTick = NttWorld.Tick;
-                var packet = MsgUserAttrib.Create(NTT.Id, (uint)Health, MsgUserAttribType.Health);
-                NTT.NetSync(ref packet, true);
-            }
-        }
-
-        public void SetMaxHealth(int value)
-        {
-            if (MaxHealth != value)
-            {
-                MaxHealth = value;
-                ChangedTick = NttWorld.Tick;
-                var packet = MsgUserAttrib.Create(NTT.Id, (uint)MaxHealth, MsgUserAttribType.MaxHealth);
-                NTT.NetSync(ref packet, true);
-            }
+        public int MaxHealth 
+        { 
+            readonly get => _maxHealth;
+            set => NetworkSyncHelper.UpdateSyncedField(ref this, ref _maxHealth, value, MsgUserAttribType.MaxHealth, NTT);
         }
         
-        public override int GetHashCode() => NTT;
+        public override readonly int GetHashCode() => NTT.Id;
     }
 }

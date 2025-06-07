@@ -167,6 +167,12 @@ namespace MagnumOpus.Networking.Packets
             switch (command)
             {
                 case "cc":
+                    if (args.Length < 3)
+                    {
+                        var msg = Create(in ntt, "Usage: /cc <x> <y> <map>");
+                        ntt.NetSync(ref msg);
+                        return;
+                    }
                     ref var pos = ref ntt.Get<PositionComponent>();
                     var newX = ushort.Parse(args[0]);
                     var newY = ushort.Parse(args[1]);

@@ -1,30 +1,22 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Networking.Packets;
+using MagnumOpus.Helpers;
+
 namespace MagnumOpus.Components
 {
     [Component(saveEnabled: true)]
-    public struct ProfessionComponent
+    public struct ProfessionComponent(in NTT ntt, ClasseName profession = ClasseName.Trojan)
     {
-        public NTT NTT;
-        private ClasseName profession;
+        public NTT NTT = ntt;
+        public long ChangedTick = NttWorld.Tick;
+        private ClasseName _profession = profession;
 
-        public ClasseName Profession
-        {
-            get => profession; set
-            {
-                profession = value;
-                var packet = MsgUserAttrib.Create(NTT, (uint)value, MsgUserAttribType.Class);
-                NTT.NetSync(ref packet, true);
-            }
+        public ClasseName Profession 
+        { 
+            readonly get => _profession;
+            set => NetworkSyncHelper.UpdateSyncedField(ref this, ref _profession, value, MsgUserAttribType.Class, NTT);
         }
 
-        public ProfessionComponent(in NTT ntt, ClasseName profession)
-        {
-            NTT = ntt;
-            Profession = profession;
-        }
-
-        public override int GetHashCode() => NTT.Id;
+        public override readonly int GetHashCode() => NTT.Id;
     }
 }

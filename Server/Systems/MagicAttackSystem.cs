@@ -5,24 +5,36 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Systems
 {
+    /// <summary>
+    /// Executes magic attacks against collected targets, applying damage and sending visual effects to clients.
+    /// Processes spell effects after targeting systems have determined affected entities.
+    /// </summary>
     public sealed class MagicAttackSystem : NttSystem<TargetCollectionComponent>
     {
+        /// <summary>
+        /// Initializes the MagicAttackSystem with limited threading for spell execution.
+        /// </summary>
         public MagicAttackSystem() : base("Magic Attack", threads: 2) { }
 
-        public override void Update(in NTT ntt, ref TargetCollectionComponent atk)
+        /// <summary>
+        /// Executes magic attacks against all targets in the collection, applying damage and visual effects.
+        /// </summary>
+        /// <param name="ntt">The entity casting the spell</param>
+        /// <param name="targetCollection">Target collection component containing affected entities and spell data</param>
+        public override void Update(in NTT ntt, ref TargetCollectionComponent targetCollection)
         {
-            var msgs = MsgMagicEffect.Create(in ntt, atk.Targets, (int)atk.MagicType.Power, (ushort)atk.MagicType.MagicType, (byte)atk.MagicType.Level);
-            foreach (var msg in msgs)
+            var effectMessages = MsgMagicEffect.Create(in ntt, targetCollection.Targets, (int)targetCollection.MagicType.Power, (ushort)targetCollection.MagicType.MagicType, (byte)targetCollection.MagicType.Level);
+            foreach (var effectMessage in effectMessages)
             {
-                ntt.NetSync(msg, true);
+                ntt.NetSync(effectMessage, true);
             }
-            foreach (var target in atk.Targets)
+            foreach (var targetEntity in targetCollection.Targets)
             {
-                var dmg = new DamageComponent(in target, in ntt, (int)atk.MagicType.Power);
-                target.Set(ref dmg);
+                var damageComponent = new DamageComponent(in targetEntity, in ntt, (int)targetCollection.MagicType.Power);
+                targetEntity.Set(ref damageComponent);
 
                 if (IsLogging)
-                    FConsole.WriteLine("{ntt} attacking {target} with {skill}:{level}", ntt, target, atk.MagicType.MagicType, atk.MagicType.Level);
+                    FConsole.WriteLine("{ntt} attacking {target} with {skill}:{level}", ntt, targetEntity, targetCollection.MagicType.MagicType, targetCollection.MagicType.Level);
             }
             ntt.Remove<TargetCollectionComponent>();
         }

@@ -17,7 +17,7 @@ namespace MagnumOpus.Components
         public int CustomTextId;
         public byte StackAmount
         {
-            get => (byte)(CustomTextId % 10000000);
+            readonly get => (byte)(CustomTextId % 10000000);
             set
             {
                 var amount = CustomTextId % 10000000;

@@ -5,19 +5,45 @@ using MagnumOpus.Networking;
 
 namespace MagnumOpus.ECS
 {
+    /// <summary>
+    /// Core entity identifier and interface for the Entity Component System.
+    /// Provides a lightweight handle for accessing, modifying, and synchronizing entity components across the game world.
+    /// NTT stands for "Named Typed Thing" - the fundamental unit of the ECS architecture.
+    /// </summary>
+    /// <param name="id">Unique identifier for this entity</param>
+    /// <param name="type">Type classification of this entity</param>
     [method: JsonConstructor]
     public readonly struct NTT(int id, EntityType type)
     {
+        /// <summary>Unique identifier for this entity across the entire game world</summary>
         public readonly int Id = id;
+        /// <summary>Type classification determining entity behavior and processing</summary>
         public readonly EntityType Type = type;
+        /// <summary>Game tick when this entity was created for lifecycle tracking</summary>
         internal readonly long CreatedTick = NttWorld.Tick;
 
+        /// <summary>
+        /// Sets two components on this entity simultaneously for efficient batch operations.
+        /// </summary>
+        /// <typeparam name="T">First component type</typeparam>
+        /// <typeparam name="T2">Second component type</typeparam>
+        /// <param name="t1">First component data</param>
+        /// <param name="t2">Second component data</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly void Set<T, T2>(ref T t1, ref T2 t2) where T : struct where T2 : struct
         {
             SparseComponentStorage<T>.AddFor(this, ref t1);
             SparseComponentStorage<T2>.AddFor(this, ref t2);
         }
+        /// <summary>
+        /// Sets three components on this entity simultaneously for efficient batch operations.
+        /// </summary>
+        /// <typeparam name="T">First component type</typeparam>
+        /// <typeparam name="T2">Second component type</typeparam>
+        /// <typeparam name="T3">Third component type</typeparam>
+        /// <param name="t1">First component data</param>
+        /// <param name="t2">Second component data</param>
+        /// <param name="t3">Third component data</param>
         public readonly void Set<T, T2, T3>(ref T t1, ref T2 t2, ref T3 t3) where T : struct where T2 : struct where T3 : struct
         {
             SparseComponentStorage<T>.AddFor(in this, ref t1);
@@ -25,12 +51,38 @@ namespace MagnumOpus.ECS
             SparseComponentStorage<T3>.AddFor(in this, ref t3);
         }
 
+        /// <summary>
+        /// Sets a component on this entity by reference for optimal performance.
+        /// </summary>
+        /// <typeparam name="T">Component type to set</typeparam>
+        /// <param name="t">Component data to set</param>
         public readonly void Set<T>(ref T t) where T : struct => SparseComponentStorage<T>.AddFor(in this, ref t);
+        
+        /// <summary>
+        /// Sets a component on this entity by value.
+        /// </summary>
+        /// <typeparam name="T">Component type to set</typeparam>
+        /// <param name="component">Component data to set</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly void Set<T>(T component) where T : struct => SparseComponentStorage<T>.AddFor(in this, ref component);
+        
+        /// <summary>
+        /// Sets a default-initialized component on this entity (marker component).
+        /// </summary>
+        /// <typeparam name="T">Component type to set with default values</typeparam>
         public readonly void Set<T>() where T : struct => SparseComponentStorage<T>.AddFor(in this);
+        /// <summary>
+        /// Gets a mutable reference to a component on this entity for direct modification.
+        /// </summary>
+        /// <typeparam name="T">Component type to retrieve</typeparam>
+        /// <returns>Mutable reference to the component data</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly ref T Get<T>() where T : struct => ref SparseComponentStorage<T>.Get(this);
+        /// <summary>
+        /// Checks if this entity has a specific component type.
+        /// </summary>
+        /// <typeparam name="T">Component type to check for</typeparam>
+        /// <returns>True if entity has the component</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly bool Has<T>() where T : struct => SparseComponentStorage<T>.HasFor(in this);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -43,11 +95,31 @@ namespace MagnumOpus.ECS
         public readonly bool Has<T, T2, T3, T4, T5>() where T : struct where T2 : struct where T3 : struct where T4 : struct where T5 : struct => Has<T, T2, T3, T4>() && Has<T5>();
         public readonly bool Has<T, T2, T3, T4, T5, T6>() where T : struct where T2 : struct where T3 : struct where T4 : struct where T5 : struct where T6 : struct => Has<T, T2, T3, T4>() && Has<T5, T6>();
 
+        /// <summary>
+        /// Removes a component from this entity.
+        /// </summary>
+        /// <typeparam name="T">Component type to remove</typeparam>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly void Remove<T>() => ReflectionHelper.Remove<T>(this);
+        /// <summary>
+        /// Recycles all components from this entity back to object pools for memory efficiency.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly void Recycle() => ReflectionHelper.RecycleComponents(this);
+        
+        /// <summary>
+        /// Transfers ownership of all components from this entity to another entity.
+        /// </summary>
+        /// <param name="to">Target entity to receive component ownership</param>
         public readonly void ChangeOwner(NTT to) => ReflectionHelper.ChangeOwner(this, to);
+        /// <summary>
+        /// Synchronizes a network message to this entity or broadcasts it to nearby players.
+        /// Handles both direct player messaging and area-of-effect broadcasting based on viewport.
+        /// </summary>
+        /// <typeparam name="T">Network message type (must be unmanaged)</typeparam>
+        /// <param name="msg">Message to synchronize</param>
+        /// <param name="broadcast">Whether to broadcast to all visible entities</param>
+        /// <param name="ignoreSelf">Whether to exclude this entity from broadcast</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly void NetSync<T>(ref T msg, bool broadcast = false, bool ignoreSelf = false) where T : unmanaged
         {
@@ -79,6 +151,11 @@ namespace MagnumOpus.ECS
                 net.SendQueue.Enqueue(packet);
             }
         }
+        /// <summary>
+        /// Synchronizes a pre-serialized network message to this entity or broadcasts it to nearby players.
+        /// </summary>
+        /// <param name="msg">Pre-serialized message bytes</param>
+        /// <param name="broadcast">Whether to broadcast to all visible entities</param>
         public readonly void NetSync(byte[] msg, bool broadcast = false)
         {
             if (broadcast && Has<ViewportComponent>())
@@ -104,6 +181,7 @@ namespace MagnumOpus.ECS
                 net.SendQueue.Enqueue(msg);
             }
         }
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode() => Id;

@@ -7,10 +7,17 @@ using MagnumOpus.Networking;
 
 namespace MagnumOpus.Systems
 {
+    /// <summary>
+    /// Processes incoming network packets by routing them to appropriate handler methods based on packet type.
+    /// Uses reflection to automatically discover and register packet handlers with PacketHandlerAttribute.
+    /// </summary>
     public class PacketsIn : NttSystem<NetworkComponent>
     {
         public static readonly Dictionary<PacketId, Action<NTT, Memory<byte>>> PacketHandlers = new();
 
+        /// <summary>
+        /// Initializes PacketsIn system with single-threaded processing and discovers packet handlers via reflection.
+        /// </summary>
         public PacketsIn() : base("PacketsIn", threads: 1, log: false)
         {
             foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
@@ -27,16 +34,21 @@ namespace MagnumOpus.Systems
             }
         }
 
-        public override void Update(in NTT ntt, ref NetworkComponent net)
+        /// <summary>
+        /// Processes queued incoming packets for an entity by invoking appropriate packet handlers.
+        /// </summary>
+        /// <param name="ntt">The entity receiving packets</param>
+        /// <param name="networkComponent">Network component containing packet queues</param>
+        public override void Update(in NTT ntt, ref NetworkComponent networkComponent)
         {
-            foreach (var kvp in net.PacketQueues)
+            foreach (var packetQueue in networkComponent.PacketQueues)
             {
-                if (kvp.Value.TryDequeue(out var packet))
+                if (packetQueue.Value.TryDequeue(out var packetData))
                 {
                     if (IsLogging)
-                        FConsole.WriteLine("[{tick}] Processing {packet} from {ntt}", NttWorld.Tick, kvp.Key, ntt);
+                        FConsole.WriteLine("[{tick}] Processing {packet} from {ntt}", NttWorld.Tick, packetQueue.Key, ntt);
 
-                    PacketHandlers[kvp.Key].Invoke(ntt, packet);
+                    PacketHandlers[packetQueue.Key].Invoke(ntt, packetData);
                 }
             }
         }

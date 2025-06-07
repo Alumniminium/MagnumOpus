@@ -7,93 +7,106 @@ using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Systems
 {
+    /// <summary>
+    /// Handles shop transactions including item purchases and sales with inventory management and economy tracking.
+    /// Validates shop availability, item pricing, and manages money transfers with durability-based sell prices.
+    /// </summary>
     public sealed class ShopSystem : NttSystem<InventoryComponent, RequestShopItemTransactionComponent>
     {
+        /// <summary>
+        /// Initializes the ShopSystem with limited threading for transaction processing.
+        /// </summary>
         public ShopSystem() : base("Shop", threads: 2) { }
 
-        public override void Update(in NTT ntt, ref InventoryComponent inv, ref RequestShopItemTransactionComponent txc)
+        /// <summary>
+        /// Processes shop transactions, handling both item purchases and sales with appropriate validation and economy tracking.
+        /// </summary>
+        /// <param name="ntt">The entity making the transaction</param>
+        /// <param name="inventory">Inventory component for item and money management</param>
+        /// <param name="transaction">Transaction component specifying the shop operation</param>
+        public override void Update(in NTT ntt, ref InventoryComponent inventory, ref RequestShopItemTransactionComponent transaction)
         {
-            var itemId = txc.ItemId;
+            var targetItemId = transaction.ItemId;
 
-            if (!txc.Buy)
+            if (!transaction.Buy)
             {
-                ref readonly var itemNtt = ref NttWorld.GetEntity(itemId);
-                ref readonly var itemComp = ref itemNtt.Get<ItemComponent>();
-                itemId = itemComp.Id;
+                ref readonly var itemEntity = ref NttWorld.GetEntity(targetItemId);
+                ref readonly var itemComponent = ref itemEntity.Get<ItemComponent>();
+                targetItemId = itemComponent.Id;
             }
 
-            if (!Collections.Shops.TryGetValue(txc.ShopId, out var shopEntry))
+            if (!Collections.Shops.TryGetValue(transaction.ShopId, out var shopData))
             {
-                FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.Id} tried to {(txc.Buy ? "buy" : "sell")} from shop {txc.ShopId} but it doesn't exist in Shops.dat");
+                FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.Id} tried to {(transaction.Buy ? "buy" : "sell")} from shop {transaction.ShopId} but it doesn't exist in Shops.dat");
                 ntt.Remove<RequestShopItemTransactionComponent>();
                 return;
             }
 
-            if (!shopEntry.Items.Contains(itemId) && txc.Buy)
+            if (!shopData.Items.Contains(targetItemId) && transaction.Buy)
             {
-                FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.Id} tried to {(txc.Buy ? "buy" : "sell")} {itemId} but it doesn't exist in the shop {txc.ShopId}");
+                FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.Id} tried to {(transaction.Buy ? "buy" : "sell")} {targetItemId} but it doesn't exist in the shop {transaction.ShopId}");
                 ntt.Remove<RequestShopItemTransactionComponent>();
                 return;
             }
 
-            if (!Collections.ItemType.TryGetValue(itemId, out var itemEntry))
+            if (!Collections.ItemType.TryGetValue(targetItemId, out var itemTypeData))
             {
-                FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.Id} tried to {(txc.Buy ? "buy" : "sell")} {itemId} but it doesn't exist in ItemType.dat");
+                FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.Id} tried to {(transaction.Buy ? "buy" : "sell")} {targetItemId} but it doesn't exist in ItemType.dat");
                 ntt.Remove<RequestShopItemTransactionComponent>();
                 return;
             }
 
-            if (inv.Money < itemEntry.Price && txc.Buy)
+            if (inventory.Money < itemTypeData.Price && transaction.Buy)
             {
-                FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.Id} tried to buy {itemId} with {inv.Money:C} but it costs {itemEntry.Price:C}");
+                FConsole.WriteLine($"[{nameof(ShopSystem)}]: {ntt.Id} tried to buy {targetItemId} with {inventory.Money:C} but it costs {itemTypeData.Price:C}");
                 ntt.Remove<RequestShopItemTransactionComponent>();
                 return;
             }
 
 
-            for (var i = 0; i < inv.Items.Length; i++)
+            for (var slotIndex = 0; slotIndex < inventory.Items.Length; slotIndex++)
             {
-                ref readonly var itemComp = ref inv.Items.Span[i].Get<ItemComponent>();
-                if ((itemComp.Id == 0 && txc.Buy) || (itemComp.Id == itemId && !txc.Buy))
+                ref readonly var slotItemComponent = ref inventory.Items.Span[slotIndex].Get<ItemComponent>();
+                if ((slotItemComponent.Id == 0 && transaction.Buy) || (slotItemComponent.Id == targetItemId && !transaction.Buy))
                 {
-                    if (txc.Buy)
+                    if (transaction.Buy)
                     {
-                        inv.Money -= itemEntry.Price;
-                        ref var itemNtt = ref NttWorld.CreateEntity(EntityType.Item);
-                        var newItemComp = new ItemComponent(txc.ItemId, itemEntry.Amount, itemEntry.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
-                        itemNtt.Set(ref newItemComp);
-                        inv.Items.Span[i] = itemNtt;
+                        inventory.Money -= itemTypeData.Price;
+                        ref var newItemEntity = ref NttWorld.CreateEntity(EntityType.Item);
+                        var newItemComponent = new ItemComponent(transaction.ItemId, itemTypeData.Amount, itemTypeData.AmountLimit, 0, 0, 0, 0, 0, 0, 0, 0);
+                        newItemEntity.Set(ref newItemComponent);
+                        inventory.Items.Span[slotIndex] = newItemEntity;
 
-                        var msg = MsgItemInformation.Create(itemNtt);
-                        ntt.NetSync(ref msg);
+                        var itemInfoMessage = MsgItemInformation.Create(newItemEntity);
+                        ntt.NetSync(ref itemInfoMessage);
 
                         if (IsLogging)
-                            FConsole.WriteLine("{0} bought {1} for {2:C} and now has {3:C}", ntt.Id, txc.ItemId, itemEntry.Price, inv.Money);
-                        PrometheusPush.ServerIncome.Inc(itemEntry.Price);
-                        PrometheusPush.ShopIncome.Inc(itemEntry.Price);
+                            FConsole.WriteLine("{0} bought {1} for {2:C} and now has {3:C}", ntt.Id, transaction.ItemId, itemTypeData.Price, inventory.Money);
+                        PrometheusPush.ServerIncome.Inc(itemTypeData.Price);
+                        PrometheusPush.ShopIncome.Inc(itemTypeData.Price);
                         PrometheusPush.ShopPurchases.Inc();
                     }
                     else
                     {
-                        Collections.ItemType.TryGetValue(itemComp.Id, out var Info);
+                        Collections.ItemType.TryGetValue(slotItemComponent.Id, out var sellItemInfo);
 
-                        var money = Info.Price / 3;
-                        money = (uint)((double)money * ((float)itemComp.CurrentDurability / itemComp.MaximumDurability));
-                        inv.Money += money;
+                        var sellPrice = sellItemInfo.Price / 3;
+                        sellPrice = (uint)((double)sellPrice * ((float)slotItemComponent.CurrentDurability / slotItemComponent.MaximumDurability));
+                        inventory.Money += sellPrice;
 
-                        ref var itemNtt = ref NttWorld.GetEntity(txc.ItemId);
-                        var def = new DestroyEndOfFrameComponent();
-                        itemNtt.Set(ref def);
+                        ref var soldItemEntity = ref NttWorld.GetEntity(transaction.ItemId);
+                        var destroyComponent = new DestroyEndOfFrameComponent();
+                        soldItemEntity.Set(ref destroyComponent);
 
-                        inv.Items.Span[i] = default;
+                        inventory.Items.Span[slotIndex] = default;
 
-                        var remInv = MsgItem.Create(itemNtt.Id, itemNtt.Id, itemNtt.Id, MsgItemType.RemoveInventory);
-                        ntt.NetSync(ref remInv);
+                        var removeInventoryMessage = MsgItem.Create(soldItemEntity.Id, soldItemEntity.Id, soldItemEntity.Id, MsgItemType.RemoveInventory);
+                        ntt.NetSync(ref removeInventoryMessage);
                         if (IsLogging)
-                            FConsole.WriteLine("{0} sold {1} for {2} and now has {3:C}", ntt.Id, txc.ItemId, money, inv.Money);
+                            FConsole.WriteLine("{0} sold {1} for {2} and now has {3:C}", ntt.Id, transaction.ItemId, sellPrice, inventory.Money);
 
-                        PrometheusPush.ServerExpenses.Inc(money);
-                        PrometheusPush.ShopExpenses.Inc(money);
+                        PrometheusPush.ServerExpenses.Inc(sellPrice);
+                        PrometheusPush.ShopExpenses.Inc(sellPrice);
                         PrometheusPush.ShopSales.Inc();
                     }
                     break;

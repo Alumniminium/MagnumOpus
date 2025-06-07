@@ -7,8 +7,20 @@ using MagnumOpus.Squiggly.Models;
 
 namespace MagnumOpus.Helpers
 {
+    /// <summary>
+    /// Factory class for creating game entities including items, money drops, and monsters with proper component setup.
+    /// Handles entity initialization, component attachment, and spatial hash management for game world objects.
+    /// </summary>
     public static class EntityFactory
     {
+        /// <summary>
+        /// Creates a default item entity with specified properties and optional world placement.
+        /// </summary>
+        /// <param name="itemId">Item type identifier from item database</param>
+        /// <param name="position">World position for item placement (optional)</param>
+        /// <param name="map">Map identifier for world placement (optional)</param>
+        /// <param name="randomDurability">Whether to randomize item durability</param>
+        /// <returns>Created item entity or default if item type not found</returns>
         public static NTT MakeDefaultItem(int itemId, Vector2 position = default, int map = 0, bool randomDurability = false)
         {
             if (Collections.ItemType.TryGetValue(itemId, out var itemType) == false)
@@ -34,6 +46,12 @@ namespace MagnumOpus.Helpers
             return ntt;
         }
 
+        /// <summary>
+        /// Creates a money drop entity on the ground with limited lifetime and pickup mechanics.
+        /// </summary>
+        /// <param name="amount">Amount of money to drop</param>
+        /// <param name="pos">Position component defining drop location</param>
+        /// <returns>Created money drop entity or default if creation failed</returns>
         public static NTT MakeMoneyDrop(int amount, ref PositionComponent pos)
         {
             var itemId = ItemHelper.GetItemIdFromMoney(amount);
@@ -56,6 +74,15 @@ namespace MagnumOpus.Helpers
             return ntt;
         }
 
+        /// <summary>
+        /// Creates a monster entity from database template with AI behavior, inventory, and spawner association.
+        /// Configures different AI types based on monster name and spawner properties.
+        /// </summary>
+        /// <param name="prefab">Monster template from database</param>
+        /// <param name="spc">Spawner component for spawn area and counting</param>
+        /// <param name="pos">Position component for map placement</param>
+        /// <param name="spawner">Spawner entity that created this monster</param>
+        /// <returns>Created monster entity with full component setup</returns>
         public static NTT MakeMonster(cq_monstertype prefab, ref SpawnerComponent spc, PositionComponent pos, NTT spawner)
         {
             ref var mob = ref NttWorld.CreateEntity(EntityType.Monster);
@@ -71,8 +98,10 @@ namespace MagnumOpus.Helpers
             var sfc = new StatusEffectComponent(mob);
             var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, pos.Map, SpacialHashUpdatType.Add);
 
-            vwp.Viewport.X = (int)pos.Position.X;
-            vwp.Viewport.Y = (int)pos.Position.Y;
+            var viewport = vwp.Viewport;
+            viewport.X = (int)pos.Position.X;
+            viewport.Y = (int)pos.Position.Y;
+            vwp.Viewport = viewport;
 
             if (!prefab.name.Contains("guard", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -133,6 +162,14 @@ namespace MagnumOpus.Helpers
 
             return mob;
         }
+        /// <summary>
+        /// Creates a monster entity with boid flocking behavior for group movement patterns.
+        /// Simplified monster creation for special spawning scenarios.
+        /// </summary>
+        /// <param name="prefab">Monster template from database</param>
+        /// <param name="pos">Position component for map placement</param>
+        /// <param name="spawner">Spawner entity that created this monster</param>
+        /// <returns>Created monster entity with boid behavior</returns>
         public static NTT MakeMonster(cq_monstertype prefab, PositionComponent pos, NTT spawner)
         {
             ref var mob = ref NttWorld.CreateEntity(EntityType.Monster);

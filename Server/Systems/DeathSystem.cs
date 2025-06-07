@@ -7,10 +7,22 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Systems
 {
+    /// <summary>
+    /// Handles entity death processing including visual effects, item drops, and cleanup.
+    /// Manages different death behaviors for players, monsters, NPCs, and items.
+    /// </summary>
     public sealed class DeathSystem : NttSystem<DeathTagComponent>
     {
+        /// <summary>
+        /// Initializes the DeathSystem with full multi-threaded processing capabilities.
+        /// </summary>
         public DeathSystem() : base("Death", threads: Environment.ProcessorCount) { }
 
+        /// <summary>
+        /// Processes death for different entity types, routing to appropriate death handlers.
+        /// </summary>
+        /// <param name="ntt">The entity that has died</param>
+        /// <param name="dtc">Death tag component containing death timing and killer information</param>
         public override void Update(in NTT ntt, ref DeathTagComponent dtc)
         {
             if (ntt.Type is EntityType.Player or EntityType.Npc or EntityType.Monster)
@@ -19,23 +31,29 @@ namespace MagnumOpus.Systems
                 ItemDeath(in ntt);
         }
 
+        /// <summary>
+        /// Handles death processing for living entities including visual effects, item drops, and eventual cleanup.
+        /// Manages the full death lifecycle from initial death to final despawn for monsters.
+        /// </summary>
+        /// <param name="ntt">The dying entity</param>
+        /// <param name="dtc">Death tag component with timing and killer data</param>
         public static void EntityDeath(in NTT ntt, ref DeathTagComponent dtc)
         {
             if (dtc.Tick == NttWorld.Tick)
             {
                 ref readonly var pos = ref ntt.Get<PositionComponent>();
 
-                var deathMsg = MsgInteract.Create(in dtc.Killer, in ntt, MsgInteractType.Death, 0);
-                ntt.NetSync(ref deathMsg, true);
+                var deathMessage = MsgInteract.Create(in dtc.Killer, in ntt, MsgInteractType.Death, 0);
+                ntt.NetSync(ref deathMessage, true);
 
-                ref var eff = ref ntt.Get<StatusEffectComponent>();
-                eff.Effects |= StatusEffect.Dead | StatusEffect.FrozenRemoveName;
+                ref var statusEffects = ref ntt.Get<StatusEffectComponent>();
+                statusEffects.Effects |= StatusEffect.Dead | StatusEffect.FrozenRemoveName;
 
                 if (ntt.Type == EntityType.Player)
                 {
-                    ref var bdy = ref ntt.Get<BodyComponent>();
-                    var ghostLook = bdy.Look % 10000 is 2001 or 2002 ? MsgSpawn.AddTransform(bdy.Look, 99) : MsgSpawn.AddTransform(bdy.Look, 98);
-                    bdy.Look = ghostLook;
+                    ref var body = ref ntt.Get<BodyComponent>();
+                    var ghostLook = body.Look % 10000 is 2001 or 2002 ? MsgSpawn.AddTransform(body.Look, 99) : MsgSpawn.AddTransform(body.Look, 98);
+                    body.Look = ghostLook;
                 }
 
                 if (ntt.Has<CqActionComponent>())
@@ -51,25 +69,25 @@ namespace MagnumOpus.Systems
                 }
                 if (ntt.Has<InventoryComponent>())
                 {
-                    ref var inv = ref ntt.Get<InventoryComponent>();
+                    ref var inventory = ref ntt.Get<InventoryComponent>();
 
-                    if (inv.Money > 0 && Random.Shared.NextSingle() < 0.25f)
+                    if (inventory.Money > 0 && Random.Shared.NextSingle() < 0.25f)
                     {
-                        var drop = new RequestDropMoneyComponent(Random.Shared.Next(1, (int)inv.Money));
-                        ntt.Set(ref drop);
+                        var moneyDrop = new RequestDropMoneyComponent(Random.Shared.Next(1, (int)inventory.Money));
+                        ntt.Set(ref moneyDrop);
                     }
 
-                    InventoryHelper.SortById(ntt, ref inv);
-                    var itemCount = InventoryHelper.CountItems(ref inv);
+                    InventoryHelper.SortById(ntt, ref inventory);
+                    var itemCount = InventoryHelper.CountItems(ref inventory);
                     for (var i = 0; i < itemCount; i++)
                     {
                         if (Random.Shared.NextSingle() >= 0.1f)
                         {
-                            ref var itemComp = ref inv.Items.Span[i].Get<ItemComponent>();
-                            if (itemComp.Id == 0)
+                            ref var itemComponent = ref inventory.Items.Span[i].Get<ItemComponent>();
+                            if (itemComponent.Id == 0)
                                 continue;
-                            var rdi = new RequestDropItemComponent(in inv.Items.Span[i]);
-                            ntt.Set(ref rdi);
+                            var itemDrop = new RequestDropItemComponent(in inventory.Items.Span[i]);
+                            ntt.Set(ref itemDrop);
                         }
                     }
                 }
@@ -83,24 +101,27 @@ namespace MagnumOpus.Systems
             }
             else if (dtc.Tick + (NttWorld.TargetTps * 7) == NttWorld.Tick && ntt.Type == EntityType.Monster)
             {
-                ref var eff = ref ntt.Get<StatusEffectComponent>();
-                eff.Effects |= StatusEffect.Fade;
+                ref var statusEffects = ref ntt.Get<StatusEffectComponent>();
+                statusEffects.Effects |= StatusEffect.Fade;
             }
             else if (dtc.Tick + (NttWorld.TargetTps * 10) <= NttWorld.Tick && ntt.Type == EntityType.Monster)
             {
-                ref readonly var lgc = ref ntt.Get<LifeGiverComponent>();
-                ref var spc = ref lgc.NTT.Get<SpawnerComponent>();
-                ref readonly var pos = ref ntt.Get<PositionComponent>();
-                ref readonly var vwp = ref ntt.Get<ViewportComponent>();
+                ref readonly var lifeGiver = ref ntt.Get<LifeGiverComponent>();
+                ref var spawner = ref lifeGiver.NTT.Get<SpawnerComponent>();
+                ref readonly var position = ref ntt.Get<PositionComponent>();
 
-                var shr = new SpatialHashUpdateComponent(pos.Position, Vector2.Zero, pos.Map, pos.Map, SpacialHashUpdatType.Remove);
-                ntt.Set(ref shr);
+                var spatialRemoval = new SpatialHashUpdateComponent(position.Position, Vector2.Zero, position.Map, position.Map, SpacialHashUpdatType.Remove);
+                ntt.Set(ref spatialRemoval);
 
-                spc.Count--;
+                spawner.Count--;
                 ntt.Set<DestroyEndOfFrameComponent>();
             }
         }
 
+        /// <summary>
+        /// Handles death processing for item entities, sending despawn packets and marking for destruction.
+        /// </summary>
+        /// <param name="ntt">The item entity to process death for</param>
         public static void ItemDeath(in NTT ntt)
         {
             var despawn = MsgFloorItem.Create(in ntt, MsgFloorItemType.Delete);

@@ -6,17 +6,31 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Systems
 {
+    /// <summary>
+    /// Handles entity teleportation between locations and maps.
+    /// Manages position updates, spatial hash transfers, and client synchronization for seamless teleportation.
+    /// </summary>
     public sealed class TeleportSystem : NttSystem<TeleportComponent, PositionComponent, ViewportComponent>
     {
+        /// <summary>
+        /// Initializes the TeleportSystem with limited threading and debug logging enabled.
+        /// </summary>
         public TeleportSystem() : base("Teleport", threads: Environment.ProcessorCount / 4, log: true) { }
 
+        /// <summary>
+        /// Processes an entity's teleportation request, updating position and notifying clients.
+        /// </summary>
+        /// <param name="ntt">The entity being teleported</param>
+        /// <param name="tpc">Teleport component containing destination coordinates and map</param>
+        /// <param name="pos">Entity's position component to update</param>
+        /// <param name="vwp">Viewport component for visibility management</param>
         public override void Update(in NTT ntt, ref TeleportComponent tpc, ref PositionComponent pos, ref ViewportComponent vwp)
         {
-            var shc = new SpatialHashUpdateComponent(pos.Position, new Vector2(tpc.X, tpc.Y), pos.Map, tpc.Map, SpacialHashUpdatType.Move);
-            var vpu = new ViewportUpdateTagComponent();
-            ntt.Set(ref vpu, ref shc);
+            var spatialUpdate = new SpatialHashUpdateComponent(pos.Position, new Vector2(tpc.X, tpc.Y), pos.Map, tpc.Map, SpacialHashUpdatType.Move);
+            var viewportUpdate = new ViewportUpdateTagComponent();
+            ntt.Set(ref viewportUpdate, ref spatialUpdate);
 
-            pos.Position = new Vector2(tpc.X, tpc.Y);  // Auto-tracked property updates ChangedTick
+            pos.Position = new Vector2(tpc.X, tpc.Y);
             pos.Map = tpc.Map;
 
             ntt.Set<ViewportUpdateTagComponent>();

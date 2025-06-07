@@ -3,11 +3,9 @@ using MagnumOpus.ECS;
 namespace MagnumOpus.Components
 {
     [Component(saveEnabled: true)]
-    public partial struct RebornComponent
+    public struct RebornComponent(byte count = 0)
     {
         public long ChangedTick = NttWorld.Tick;
-        private byte _count;
-
-        public RebornComponent() { }
+        public byte Count = count;
     }
 }

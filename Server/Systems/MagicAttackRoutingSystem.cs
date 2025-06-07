@@ -6,48 +6,62 @@ using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Systems
 {
+    /// <summary>
+    /// Routes magic attack requests to appropriate targeting systems based on spell action type.
+    /// Validates spell availability and creates targeting components for area effects, healing, and line attacks.
+    /// </summary>
     public sealed class MagicAttackRoutingSystem : NttSystem<MagicAttackRequestComponent, SpellBookComponent, PositionComponent>
     {
+        /// <summary>
+        /// Initializes the MagicAttackRoutingSystem with limited threading for spell routing.
+        /// </summary>
         public MagicAttackRoutingSystem() : base("Attack Router", threads: 2) { }
 
-        public override void Update(in NTT ntt, ref MagicAttackRequestComponent atk, ref SpellBookComponent sbc, ref PositionComponent pos)
+        /// <summary>
+        /// Routes magic attack requests to appropriate targeting systems based on spell type and area of effect.
+        /// </summary>
+        /// <param name="ntt">The entity casting the spell</param>
+        /// <param name="magicAttackRequest">Magic attack request component specifying the spell and target</param>
+        /// <param name="spellBook">Spell book component containing available spells</param>
+        /// <param name="position">Position component for spell origin point</param>
+        public override void Update(in NTT ntt, ref MagicAttackRequestComponent magicAttackRequest, ref SpellBookComponent spellBook, ref PositionComponent position)
         {
-            if (!sbc.Spells.TryGetValue((ushort)atk.SkillId, out var spell))
+            if (!spellBook.Spells.TryGetValue((ushort)magicAttackRequest.SkillId, out var spellData))
             {
                 ntt.Remove<MagicAttackRequestComponent>();
                 if (IsLogging)
-                    FConsole.WriteLine("{ntt} tried to use skill {atk.SkillId} but doesn't have it", ntt, atk.SkillId);
+                    FConsole.WriteLine("{ntt} tried to use skill {skillId} but doesn't have it", ntt, magicAttackRequest.SkillId);
                 return;
             }
 
-            if (!Collections.MagicType.TryGetValue((atk.SkillId * 10) + spell.lvl, out var magicType))
+            if (!Collections.MagicType.TryGetValue((magicAttackRequest.SkillId * 10) + spellData.lvl, out var magicTypeEntry))
             {
                 ntt.Remove<MagicAttackRequestComponent>();
                 if (IsLogging)
-                    FConsole.WriteLine("{ntt} tried to use skill {atk.SkillId} but it doesn't exist", ntt, atk.SkillId);
+                    FConsole.WriteLine("{ntt} tried to use skill {skillId} but it doesn't exist", ntt, magicAttackRequest.SkillId);
                 return;
             }
 
-            switch (magicType.ActionSort)
+            switch (magicTypeEntry.ActionSort)
             {
                 case 2: // heal self
-                    var tcc = new TargetCollectionComponent(magicType);
-                    var target = NttWorld.GetEntity(atk.TargetId);
-                    tcc.Targets.Add(target);
-                    ntt.Set(ref tcc);
+                    var targetCollection = new TargetCollectionComponent(magicTypeEntry);
+                    var targetEntity = NttWorld.GetEntity(magicAttackRequest.TargetId);
+                    targetCollection.Targets.Add(targetEntity);
+                    ntt.Set(ref targetCollection);
                     break;
                 case 11: // Roar
                 case 5: // Circle
-                    var circle = new TargetingComponent(atk.X, atk.Y, magicType, TargetingType.Circle);
-                    ntt.Set(ref circle);
+                    var circleTargeting = new TargetingComponent(magicAttackRequest.X, magicAttackRequest.Y, magicTypeEntry, TargetingType.Circle);
+                    ntt.Set(ref circleTargeting);
                     break;
                 case 4: // Sector
-                    var sector = new TargetingComponent(atk.X, atk.Y, magicType, TargetingType.Sector);
-                    ntt.Set(ref sector);
+                    var sectorTargeting = new TargetingComponent(magicAttackRequest.X, magicAttackRequest.Y, magicTypeEntry, TargetingType.Sector);
+                    ntt.Set(ref sectorTargeting);
                     break;
                 case 14: // Line
-                    var line = new TargetingComponent(atk.X, atk.Y, magicType, TargetingType.Line);
-                    ntt.Set(ref line);
+                    var lineTargeting = new TargetingComponent(magicAttackRequest.X, magicAttackRequest.Y, magicTypeEntry, TargetingType.Line);
+                    ntt.Set(ref lineTargeting);
                     break;
                 default:
                     break;

@@ -7,39 +7,53 @@ using MagnumOpus.Helpers;
 
 namespace MagnumOpus.Systems
 {
+    /// <summary>
+    /// Handles outgoing network packet transmission with encryption and proper protocol formatting.
+    /// Manages both authentication and game-level cryptography based on connection state.
+    /// </summary>
     public class PacketsOut : NttSystem<NetworkComponent>
     {
         public static readonly Memory<byte> TqServer = Encoding.ASCII.GetBytes("TQServer");
+        
+        /// <summary>
+        /// Initializes PacketsOut system with limited threading for packet transmission.
+        /// </summary>
         public PacketsOut() : base("Packets Out", threads: 2) { }
-        public override void Update(in NTT ntt, ref NetworkComponent net)
+        
+        /// <summary>
+        /// Processes outgoing packet queue, applying appropriate encryption and sending data to clients.
+        /// </summary>
+        /// <param name="ntt">The entity sending packets</param>
+        /// <param name="networkComponent">Network component containing send queue and encryption state</param>
+        public override void Update(in NTT ntt, ref NetworkComponent networkComponent)
         {
             try
             {
-                while (net.SendQueue.TryDequeue(out var buffer))
+                while (networkComponent.SendQueue.TryDequeue(out var packetBuffer))
                 {
-                    var packet = buffer.AsSpan();
+                    var packetData = packetBuffer.AsSpan();
 
-                    if (packet.Length < 4)
+                    if (packetData.Length < 4)
                         continue;
 
-                    var id = BitConverter.ToInt16(packet[2..4]);
+                    var packetId = BitConverter.ToInt16(packetData[2..4]);
                     if (IsLogging)
                     {
-                        FConsole.WriteLine(packet.Dump());
-                        FConsole.WriteLine("Sending {id}/{id} (Size: {Length}) to {ntt}...", ((PacketId)id).ToString(), id, packet.Length, ntt);
+                        FConsole.WriteLine(packetData.Dump());
+                        FConsole.WriteLine("Sending {id}/{id} (Size: {Length}) to {ntt}...", ((PacketId)packetId).ToString(), packetId, packetData.Length, ntt);
                     }
-                    if (net.UseGameCrypto)
+                    if (networkComponent.UseGameCrypto)
                     {
-                        Span<byte> resized = new byte[packet.Length + 8];
-                        packet.CopyTo(resized);
-                        TqServer.Span.CopyTo(resized[^8..]);
-                        net.GameCrypto.Encrypt(resized);
-                        net.Socket.Send(resized);
+                        Span<byte> encryptedPacket = new byte[packetData.Length + 8];
+                        packetData.CopyTo(encryptedPacket);
+                        TqServer.Span.CopyTo(encryptedPacket[^8..]);
+                        networkComponent.GameCrypto.Encrypt(encryptedPacket);
+                        networkComponent.Socket.Send(encryptedPacket);
                     }
                     else
                     {
-                        net.AuthCrypto.Encrypt(packet);
-                        net.Socket.Send(packet);
+                        networkComponent.AuthCrypto.Encrypt(packetData);
+                        networkComponent.Socket.Send(packetData);
                     }
                 }
             }

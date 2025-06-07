@@ -1,37 +1,35 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
+
 namespace MagnumOpus.Components
 {
     [Component(saveEnabled: true)]
-    public struct HeadComponent
+    public struct HeadComponent(in NTT ntt, ushort face = 6, ushort hair = 310)
     {
-        public NTT NTT;
-        public long ChangedTick;
+        public NTT NTT = ntt;
+        public long ChangedTick = NttWorld.Tick;
+        private ushort _hair = hair;
+        private ushort _face = face;
 
-        private ushort hair;
-        public ushort FaceId;
-
-        internal ushort Hair
+        public ushort FaceId
         {
-            get => hair; set
+            readonly get => _face;
+            set
             {
-                hair = value;
-                ChangedTick = NttWorld.Tick;
-                var packet = MsgUserAttrib.Create(NTT, hair, MsgUserAttribType.HairStyle);
-                NTT.NetSync(ref packet, true);
+                _face = value;
+                var packet = MsgCharacter.Create(NTT);
+                NTT.NetSync(ref packet);
             }
         }
 
-        public HeadComponent() => ChangedTick = NttWorld.Tick;
-        public HeadComponent(in NTT ntt, ushort face = 6, ushort hair = 310)
+        public ushort Hair
         {
-            NTT = ntt;
-            ChangedTick = NttWorld.Tick;
-            Hair = hair;
-            FaceId = face;
+            readonly get => _hair;
+            set => NetworkSyncHelper.UpdateSyncedField(ref this, ref _hair, value, MsgUserAttribType.HairStyle, NTT);
         }
 
-        public override int GetHashCode() => NTT.Id;
+        public override readonly int GetHashCode() => NTT.Id;
     }
 }

@@ -3,51 +3,63 @@ using MagnumOpus.Components;
 using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Squiggly;
-using Microsoft.Extensions.Logging;
 
 namespace MagnumOpus.Systems
 {
+    /// <summary>
+    /// Handles item usage including consumables for health/mana restoration and items with custom action scripts.
+    /// Processes item effects, removes consumed items from inventory, and executes custom item behaviors.
+    /// </summary>
     public sealed class ItemUseSystem : NttSystem<InventoryComponent, RequestItemUseComponent>
     {
+        /// <summary>
+        /// Initializes the ItemUseSystem with limited threading for item usage processing.
+        /// </summary>
         public ItemUseSystem() : base("Item Use", threads: 2) { }
 
-        public override void Update(in NTT ntt, ref InventoryComponent inv, ref RequestItemUseComponent use)
+        /// <summary>
+        /// Processes item usage requests, applying effects and removing consumable items from inventory.
+        /// </summary>
+        /// <param name="ntt">The entity using the item</param>
+        /// <param name="inventory">Inventory component containing the item</param>
+        /// <param name="itemUseRequest">Request item use component specifying which item to use</param>
+        public override void Update(in NTT ntt, ref InventoryComponent inventory, ref RequestItemUseComponent itemUseRequest)
         {
-            var destroy = false;
-            ref var item = ref NttWorld.GetEntity(use.ItemNetId);
-            ref var itemComp = ref item.Get<ItemComponent>();
+            var shouldDestroy = false;
+            ref var itemEntity = ref NttWorld.GetEntity(itemUseRequest.ItemNetId);
+            ref var itemComponent = ref itemEntity.Get<ItemComponent>();
 
-            if (!Collections.ItemType.TryGetValue(itemComp.Id, out var entry))
+            if (!Collections.ItemType.TryGetValue(itemComponent.Id, out var itemTypeEntry))
             {
                 if (IsLogging)
-                    FConsole.WriteLine("Item {item} not found in ItemType", item);
+                    FConsole.WriteLine("Item {item} not found in ItemType", itemEntity);
                 ntt.Remove<RequestItemUseComponent>();
                 return;
             }
 
-            if (entry.Action > 0)
+            if (itemTypeEntry.Action > 0)
             {
-                long next = entry.Action;
-                while ((next = CqActionProcessor.Process(in ntt, in item, CqProcessor.GetAction(next))) != 0) ;
+                long nextAction = itemTypeEntry.Action;
+                while ((nextAction = CqActionProcessor.Process(in ntt, in itemEntity, CqProcessor.GetAction(nextAction))) != 0) ;
             }
-            else if (entry.Life > 0)
+            else if (itemTypeEntry.Life > 0)
             {
-                ref var hlt = ref ntt.Get<HealthComponent>();
-                hlt.Health = Math.Clamp(hlt.Health + entry.Life, 0, hlt.MaxHealth);
-                destroy = true;
+                ref var healthComponent = ref ntt.Get<HealthComponent>();
+                healthComponent.Health = Math.Clamp(healthComponent.Health + itemTypeEntry.Life, 0, healthComponent.MaxHealth);
+                shouldDestroy = true;
             }
-            else if (entry.Mana > 0)
+            else if (itemTypeEntry.Mana > 0)
             {
-                ref var mna = ref ntt.Get<ManaComponent>();
-                mna.Mana = (ushort)Math.Clamp(mna.Mana + entry.Mana, 0, mna.MaxMana);
-                destroy = true;
+                ref var manaComponent = ref ntt.Get<ManaComponent>();
+                manaComponent.Mana = (ushort)Math.Clamp(manaComponent.Mana + itemTypeEntry.Mana, 0, manaComponent.MaxMana);
+                shouldDestroy = true;
             }
 
-            if (destroy)
-                InventoryHelper.RemoveNttFromInventory(ntt, ref inv, item, destroy: true, netSync: true);
+            if (shouldDestroy)
+                InventoryHelper.RemoveNttFromInventory(ntt, ref inventory, itemEntity, destroy: true, netSync: true);
 
             if (IsLogging)
-                FConsole.WriteLine("{0} used {1} ({2})", ntt, item, itemComp.Id);
+                FConsole.WriteLine("{0} used {1} ({2})", ntt, itemEntity, itemComponent.Id);
             ntt.Remove<RequestItemUseComponent>();
         }
     }

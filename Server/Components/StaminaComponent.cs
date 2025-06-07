@@ -1,37 +1,24 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Networking.Packets;
+using MagnumOpus.Helpers;
+
 namespace MagnumOpus.Components
 {
     [Component(saveEnabled: true)]
-    public struct StaminaComponent
+    public struct StaminaComponent(in NTT entityId, byte stamina = 100, byte maxStamina = 100)
     {
-        public NTT NTT;
-        public long ChangedTick;
+        public NTT NTT = entityId;
+        public long ChangedTick = NttWorld.Tick;
+        private byte _stamina = stamina;
 
-        private byte _stamina;
-        public byte Stamina
-        {
-            get => _stamina;
-            set
-            {
-                _stamina = value;
-                ChangedTick = NttWorld.Tick;
-                var packet = MsgUserAttrib.Create(NTT.Id, _stamina, MsgUserAttribType.Stamina);
-                NTT.NetSync(ref packet);
-            }
+        public byte MaxStamina = maxStamina;
+
+        public byte Stamina 
+        { 
+            readonly get => _stamina;
+            set => NetworkSyncHelper.UpdateSyncedField(ref this, ref _stamina, value, MsgUserAttribType.Stamina, NTT);
         }
 
-        public byte MaxStamina { get; internal set; }
-
-        public StaminaComponent(in NTT entityId)
-        {
-            NTT = entityId;
-            ChangedTick = NttWorld.Tick;
-            Stamina = 0;
-            MaxStamina = 100;
-        }
-
-        public override int GetHashCode() => NTT.Id;
+        public override readonly int GetHashCode() => NTT.Id;
     }
 }

@@ -10,7 +10,7 @@ namespace MagnumOpus.Networking.Cryptography
         private readonly Memory<byte> K1 = new byte[0x200];
         private readonly Memory<byte> K2 = new byte[0x200];
         private ushort DecryptCounter, EncryptCounter;
-        private static readonly byte[] seed = new byte[] { 0x9D, 0x0F, 0xFA, 0x13, 0x62, 0x79, 0x5C, 0x6D };
+        private static readonly byte[] seed = [0x9D, 0x0F, 0xFA, 0x13, 0x62, 0x79, 0x5C, 0x6D];
 
         static TQCipher()
         {

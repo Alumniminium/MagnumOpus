@@ -7,10 +7,24 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Systems
 {
+    /// <summary>
+    /// Handles equipment changes including equipping and unequipping items between inventory and equipment slots.
+    /// Manages item transfers, slot validation, and inventory space requirements for equipment operations.
+    /// </summary>
     public sealed class EquipSystem : NttSystem<InventoryComponent, EquipmentComponent, RequestChangeEquipComponent>
     {
+        /// <summary>
+        /// Initializes the EquipSystem with limited threading for equipment processing.
+        /// </summary>
         public EquipSystem() : base("Equip", threads: 2) { }
 
+        /// <summary>
+        /// Processes equipment change requests, handling both equipping and unequipping operations.
+        /// </summary>
+        /// <param name="ntt">The entity changing equipment</param>
+        /// <param name="inv">Inventory component for item storage</param>
+        /// <param name="eq">Equipment component containing equipped items</param>
+        /// <param name="change">Request change equip component specifying the operation</param>
         public override void Update(in NTT ntt, ref InventoryComponent inv, ref EquipmentComponent eq, ref RequestChangeEquipComponent change)
         {
             ref var item = ref NttWorld.GetEntity(change.ItemNetId);
@@ -18,15 +32,15 @@ namespace MagnumOpus.Systems
             if (change.Equip)
             {
                 // TODO: If current weapon is bow and new weapon is not bow, unequip arrows
-                var oldEq = eq.Items[change.Slot];
+                var previouslyEquipped = eq.Items[change.Slot];
 
-                if (oldEq != default)
-                    InventoryHelper.AddItem(ntt, ref inv, oldEq, netSync: true);
+                if (previouslyEquipped != default)
+                    InventoryHelper.AddItem(ntt, ref inv, previouslyEquipped, netSync: true);
 
                 eq.Items[change.Slot] = item;
 
-                var msg = MsgItem.Create(item.Id, item.Id, (int)change.Slot, MsgItemType.SetEquipPosition);
-                ntt.NetSync(ref msg);
+                var equipPacket = MsgItem.Create(item.Id, item.Id, (int)change.Slot, MsgItemType.SetEquipPosition);
+                ntt.NetSync(ref equipPacket);
                 InventoryHelper.RemoveNttFromInventory(ntt, ref inv, item, netSync: true);
 
                 if (IsLogging)

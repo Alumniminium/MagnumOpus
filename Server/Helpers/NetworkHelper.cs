@@ -6,8 +6,25 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Helpers
 {
+    /// <summary>
+    /// Provides network synchronization utilities for entity spawning and messaging.
+    /// Handles entity visibility updates and communication between players.
+    /// </summary>
     public static class NetworkHelper
     {
+        /// <summary>
+        /// Synchronizes a target entity's full state to a receiving entity, handling spawn packets and effects.
+        /// Only players can receive synchronization data. Different entity types send different spawn packets.
+        /// </summary>
+        /// <param name="to">The receiving entity (must be a player)</param>
+        /// <param name="ntt">The target entity to synchronize</param>
+        /// <example>
+        /// // Sync a new player to an existing player's viewport
+        /// NetworkHelper.FullSync(existingPlayer, newPlayer);
+        /// 
+        /// // Sync a monster to a player when it enters their view
+        /// NetworkHelper.FullSync(player, monster);
+        /// </example>
         public static void FullSync(in NTT to, in NTT ntt)
         {
             if (to.Type != EntityType.Player)
@@ -43,21 +60,62 @@ namespace MagnumOpus.Helpers
             }
         }
 
+        /// <summary>
+        /// Sends a text message to a specific player entity.
+        /// Non-player entities cannot receive messages and will be ignored.
+        /// </summary>
+        /// <param name="to">The target player entity to receive the message</param>
+        /// <param name="text">The message content to send</param>
+        /// <param name="channel">The message channel/type for display formatting</param>
+        /// <example>
+        /// // Send debug info to a player
+        /// NetworkHelper.SendMsgTo(player, "Debug: Position updated", MsgTextType.TopLeft);
+        /// 
+        /// // Send system message to a player
+        /// NetworkHelper.SendMsgTo(player, "Welcome to the server!", MsgTextType.Center);
+        /// </example>
         internal static void SendMsgTo(in NTT to, string text, MsgTextType channel)
         {
             if (to.Type != EntityType.Player)
                 return;
-            var msgText = MsgText.Create(in to, text, channel);
-            to.NetSync(ref msgText);
+            var messagePacket = MsgText.Create(in to, text, channel);
+            to.NetSync(ref messagePacket);
         }
+        
+        /// <summary>
+        /// Broadcasts a text message to all connected players.
+        /// Useful for server-wide announcements and system messages.
+        /// </summary>
+        /// <param name="text">The message content to broadcast</param>
+        /// <param name="channel">The message channel/type for display formatting</param>
+        /// <param name="from">The sender name to display (defaults to "SYSTEM")</param>
+        /// <example>
+        /// // Server maintenance announcement
+        /// NetworkHelper.BroadcastMsg("Server restart in 5 minutes", MsgTextType.Center);
+        /// 
+        /// // Event notification
+        /// NetworkHelper.BroadcastMsg("Guild war has started!", MsgTextType.Talk, "EVENT");
+        /// </example>
         internal static void BroadcastMsg(string text, MsgTextType channel, string from = "SYSTEM")
         {
-            var msgText = MsgText.Create(from, "ALLUSERS", text, channel);
+            var broadcastPacket = MsgText.Create(from, "ALLUSERS", text, channel);
 
-            foreach (var ntt in NttWorld.Players)
-                ntt.NetSync(ref msgText);
+            foreach (var player in NttWorld.Players)
+                player.NetSync(ref broadcastPacket);
         }
 
+        /// <summary>
+        /// Removes an entity from all player viewports by sending despawn packets.
+        /// Notifies all nearby players that the entity should be removed from their client.
+        /// </summary>
+        /// <param name="ntt">The entity to despawn from player viewports</param>
+        /// <example>
+        /// // Remove a monster when it dies
+        /// NetworkHelper.Despawn(monsterEntity);
+        /// 
+        /// // Remove a player when they disconnect
+        /// NetworkHelper.Despawn(disconnectedPlayer);
+        /// </example>
         internal static void Despawn(NTT ntt)
         {
             var despawnPacket = MsgAction.RemoveEntity(ntt.Id);

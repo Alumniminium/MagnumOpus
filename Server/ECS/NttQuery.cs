@@ -2,8 +2,18 @@ using System.Runtime.CompilerServices;
 
 namespace MagnumOpus.ECS
 {
+    /// <summary>
+    /// High-performance entity query system providing type-safe component filtering with foreach enumeration support.
+    /// Offers compile-time optimized queries for entities with specific component combinations up to 6 component types.
+    /// </summary>
     public static class NttQuery
     {
+        /// <summary>
+        /// Enumerator for querying entities with exactly one component type.
+        /// Provides efficient foreach iteration over matching entities.
+        /// </summary>
+        /// <typeparam name="T">Required component type for entity matching</typeparam>
+        /// <param name="dict">Entity dictionary to enumerate</param>
         [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
         public struct QueryEnumerator<T>(Dictionary<int, NTT> dict) where T : struct
         {
@@ -21,7 +31,7 @@ namespace MagnumOpus.ECS
             }
 
             public readonly NTT Current => _enumerator.Current.Value;
-            public QueryEnumerator<T> GetEnumerator() => this;
+            public readonly QueryEnumerator<T> GetEnumerator() => this;
         }
 
         [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -41,7 +51,7 @@ namespace MagnumOpus.ECS
             }
 
             public readonly NTT Current => _enumerator.Current.Value;
-            public QueryEnumerator<T1, T2> GetEnumerator() => this;
+            public readonly QueryEnumerator<T1, T2> GetEnumerator() => this;
         }
 
         [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -61,7 +71,7 @@ namespace MagnumOpus.ECS
             }
 
             public readonly NTT Current => _enumerator.Current.Value;
-            public QueryEnumerator<T1, T2, T3> GetEnumerator() => this;
+            public readonly QueryEnumerator<T1, T2, T3> GetEnumerator() => this;
         }
 
         [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -81,7 +91,7 @@ namespace MagnumOpus.ECS
             }
 
             public readonly NTT Current => _enumerator.Current.Value;
-            public QueryEnumerator<T1, T2, T3, T4> GetEnumerator() => this;
+            public readonly QueryEnumerator<T1, T2, T3, T4> GetEnumerator() => this;
         }
 
         [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -101,7 +111,7 @@ namespace MagnumOpus.ECS
             }
 
             public readonly NTT Current => _enumerator.Current.Value;
-            public QueryEnumerator<T1, T2, T3, T4, T5> GetEnumerator() => this;
+            public readonly QueryEnumerator<T1, T2, T3, T4, T5> GetEnumerator() => this;
         }
 
         [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -121,9 +131,14 @@ namespace MagnumOpus.ECS
             }
 
             public readonly NTT Current => _enumerator.Current.Value;
-            public QueryEnumerator<T1, T2, T3, T4, T5, T6> GetEnumerator() => this;
+            public readonly QueryEnumerator<T1, T2, T3, T4, T5, T6> GetEnumerator() => this;
         }
 
+        /// <summary>
+        /// Creates a query for entities with exactly one component type.
+        /// </summary>
+        /// <typeparam name="T">Required component type</typeparam>
+        /// <returns>Enumerator for foreach iteration over matching entities</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static QueryEnumerator<T> Query<T>() where T : struct => new(NttWorld.NTTs);
 

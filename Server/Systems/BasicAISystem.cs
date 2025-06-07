@@ -7,11 +7,31 @@ using MagnumOpus.Enums;
 
 namespace MagnumOpus.Systems
 {
+    /// <summary>
+    /// Handles basic AI behavior for monsters using GOAP (Goal-Oriented Action Planning).
+    /// Manages target acquisition, action planning, and execution cycles for non-guard monsters.
+    /// </summary>
     public sealed class BasicAISystem : NttSystem<PositionComponent, ViewportComponent, BrainComponent>
     {
+        /// <summary>
+        /// Initializes the BasicAISystem with full multi-threaded processing capabilities.
+        /// </summary>
         public BasicAISystem() : base("Basic AI", threads: Environment.ProcessorCount) { }
+        
+        /// <summary>
+        /// Filters entities to only process living monsters that are not guards.
+        /// </summary>
+        /// <param name="ntt">Entity to check for AI processing eligibility</param>
+        /// <returns>True if entity is a living monster without guard behavior</returns>
         protected override bool MatchesFilter(in NTT ntt) => ntt.Type == EntityType.Monster && !ntt.Has<DeathTagComponent>() && !ntt.Has<GuardPositionComponent>() && base.MatchesFilter(in ntt);
 
+        /// <summary>
+        /// Processes AI behavior including state management, target acquisition, and action planning.
+        /// </summary>
+        /// <param name="ntt">The monster entity being processed</param>
+        /// <param name="pos">Position component for location-based decisions</param>
+        /// <param name="vwp">Viewport component for target detection</param>
+        /// <param name="brn">Brain component containing AI state and planning data</param>
         public override void Update(in NTT ntt, ref PositionComponent pos, ref ViewportComponent vwp, ref BrainComponent brn)
         {
             if (brn.State == BrainState.Idle)
@@ -37,15 +57,15 @@ namespace MagnumOpus.Systems
 
             if (brn.Target == 0)
             {
-                foreach (var b in vwp.EntitiesVisible)
+                foreach (var visibleEntity in vwp.EntitiesVisible)
                 {
-                    if (b.Type != EntityType.Player)
+                    if (visibleEntity.Type != EntityType.Player)
                         continue;
 
-                    if (b.Has<DeathTagComponent>())
+                    if (visibleEntity.Has<DeathTagComponent>())
                         continue;
 
-                    brn.Target = b;
+                    brn.Target = visibleEntity;
                     break;
                 }
                 if (brn.Target == 0)

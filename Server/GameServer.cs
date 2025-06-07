@@ -45,8 +45,20 @@ namespace MagnumOpus
                     var dhx = MsgDHX.Create(net.ClientIV, net.ServerIV, Networking.Cryptography.DiffieHellman.P, Networking.Cryptography.DiffieHellman.G, net.DiffieHellman.GetPublicKey());
                     ntt.NetSync(ref dhx);
 
-                    var count = net.Socket.Receive(net.RecvBuffer.Span);
-                    var packet = net.RecvBuffer[..count];
+                    // Use dedicated buffer for DH key exchange packet
+                    var dhBuffer = new byte[1024];
+                    var count = net.Socket.Receive(dhBuffer);
+                    
+                    if (count == 0 || count > 1024)
+                    {
+                        FConsole.WriteLine($"[GAME] Invalid DH packet size {count}, disconnecting");
+                        net.Socket?.Close();
+                        NttWorld.Destroy(ntt);
+                        continue;
+                    }
+                    
+                    Memory<byte> packet = new byte[count];
+                    dhBuffer.AsSpan(0, count).CopyTo(packet.Span);
                     net.GameCrypto.Decrypt(packet.Span);
 
                     var packetSpan = packet.Span;
@@ -74,43 +86,72 @@ namespace MagnumOpus
         private static void GameClientLoop(NTT ntt)
         {
             ref var net = ref ntt.Get<NetworkComponent>();
-            var buffer = net.RecvBuffer;
             var crypto = net.GameCrypto;
 
             try
             {
                 while (true)
                 {
-                    var sizeBytes = buffer[..2];
-                    var count = net.Socket.Receive(sizeBytes.Span);
-
-                    if (count == 0)
-                        throw new SocketException((int)SocketError.Disconnecting);
-
-                    while (count < 2)
-                        count += net.Socket.Receive(sizeBytes.Span[count..]);
-
-                    crypto.Decrypt(sizeBytes.Span);
-                    var size = BitConverter.ToUInt16(sizeBytes.Span) + 8;
-
-                    while (count < size)
+                    // Read packet size (first 2 bytes) into dedicated buffer
+                    var sizeBuffer = new byte[2];
+                    var received = 0;
+                    
+                    while (received < 2)
                     {
-                        var received = net.Socket.Receive(buffer.Span[count..size]);
-                        if (received == 0)
-                            throw new SocketException((int)SocketError.Disconnecting);
-                        count += received;
+                        var count = net.Socket.Receive(sizeBuffer.AsSpan(received));
+                        if (count == 0)
+                        {
+                            FConsole.WriteLine($"[GAME] Client disconnected during size read: {net.Username}");
+                            return;
+                        }
+                        received += count;
                     }
-                    Memory<byte> copy = new byte[size];
-                    buffer[..size].CopyTo(copy);
-                    crypto.Decrypt(copy.Span[2..]);
 
-                    var id = (PacketId)BitConverter.ToUInt16(copy.Span[2..4]);
-                    net.PacketQueues[id].Enqueue(copy);
+                    crypto.Decrypt(sizeBuffer);
+                    var size = BitConverter.ToUInt16(sizeBuffer) + 8;
+
+                    // Validate packet size to prevent buffer overflow
+                    if (size > 4096 || size < 8)
+                    {
+                        FConsole.WriteLine($"[GAME] Invalid packet size {size} from {net.Username}, disconnecting");
+                        return;
+                    }
+
+                    // Allocate dedicated buffer for this packet (eliminates race condition)
+                    var packetBuffer = new byte[size];
+                    
+                    // Copy size bytes to start of packet buffer
+                    sizeBuffer.CopyTo(packetBuffer.AsSpan(0, 2));
+                    
+                    // Read remaining packet data into dedicated buffer
+                    received = 2;
+                    while (received < size)
+                    {
+                        var count = net.Socket.Receive(packetBuffer.AsSpan(received));
+                        if (count == 0)
+                        {
+                            FConsole.WriteLine($"[GAME] Client disconnected during packet read: {net.Username}");
+                            return;
+                        }
+                        received += count;
+                    }
+
+                    // Decrypt payload (skip first 2 bytes which are already decrypted)
+                    crypto.Decrypt(packetBuffer.AsSpan(2));
+
+                    // Extract packet ID and queue packet
+                    var id = (PacketId)BitConverter.ToUInt16(packetBuffer.AsSpan(2, 2));
+                    
+                    // Create final packet copy for queue (ensures thread safety)
+                    Memory<byte> finalPacket = new byte[size];
+                    packetBuffer.CopyTo(finalPacket);
+                    
+                    net.PacketQueues[id].Enqueue(finalPacket);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                FConsole.WriteLine($"[GAME] Client disconnected: {net.Username}");
+                FConsole.WriteLine($"[GAME] Client error for {net.Username}: {ex.Message}");
             }
             finally
             {

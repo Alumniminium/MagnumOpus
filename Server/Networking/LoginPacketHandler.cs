@@ -8,8 +8,20 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Networking
 {
+    /// <summary>
+    /// Specialized packet handler for login server connections and authentication.
+    /// Processes account authentication, server selection, and client file verification during login flow.
+    /// Handles password decryption and session establishment for transitioning clients to game server.
+    /// </summary>
     public static unsafe class LoginPacketHandler
     {
+        /// <summary>
+        /// Processes incoming login packets and routes them to appropriate handlers based on packet type.
+        /// Handles account authentication (MsgConnect) and client validation (MsgLogin) packets.
+        /// Automatically destroys the client connection on any processing errors for security.
+        /// </summary>
+        /// <param name="ntt">Network entity representing the client connection</param>
+        /// <param name="packet">Raw packet data received from client</param>
         internal static void Process(in NTT ntt, in Memory<byte> packet)
         {
             try

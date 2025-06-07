@@ -7,77 +7,89 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Systems
 {
+    /// <summary>
+    /// Manages team functionality including team creation, leader position updates, and experience sharing.
+    /// Handles team bonuses for Water Taoists and married couples with level-based experience caps.
+    /// </summary>
     public sealed class TeamSystem : NttSystem<TeamComponent>
     {
+        /// <summary>
+        /// Initializes the TeamSystem with limited threading for team processing.
+        /// </summary>
         public TeamSystem() : base("Team", threads: 2) { }
 
-        public override void Update(in NTT ntt, ref TeamComponent team)
+        /// <summary>
+        /// Processes team operations including creation, leader updates, and experience distribution with bonuses.
+        /// </summary>
+        /// <param name="ntt">The team member entity</param>
+        /// <param name="teamComponent">Team component containing member and leadership data</param>
+        public override void Update(in NTT ntt, ref TeamComponent teamComponent)
         {
-            if (team.CreatedTick == NttWorld.Tick)
+            if (teamComponent.CreatedTick == NttWorld.Tick)
             {
-                var msg = MsgTeam.CreateTeam(in ntt);
-                var msgJoin = MsgTeamUpdate.JoinLeave(in ntt, MsgTeamMemberAction.AddMember);
-                ntt.NetSync(ref msg);
-                ntt.NetSync(ref msgJoin);
-                ref var eff = ref ntt.Get<StatusEffectComponent>();
-                eff.Effects |= StatusEffect.TeamLeader;
+                var teamCreateMessage = MsgTeam.CreateTeam(in ntt);
+                var joinMessage = MsgTeamUpdate.JoinLeave(in ntt, MsgTeamMemberAction.AddMember);
+                ntt.NetSync(ref teamCreateMessage);
+                ntt.NetSync(ref joinMessage);
+                ref var statusEffects = ref ntt.Get<StatusEffectComponent>();
+                statusEffects.Effects |= StatusEffect.TeamLeader;
             }
-            if (ntt.Id == team.Leader.Id)
+            if (ntt.Id == teamComponent.Leader.Id)
             {
-                ref readonly var pos = ref ntt.Get<PositionComponent>();
-                if (Tick % pos.ChangedTick == 0)
+                ref readonly var position = ref ntt.Get<PositionComponent>();
+                if (Tick % position.ChangedTick == 0)
                 {
-                    var leaderPos = MsgAction.Create(ntt.Id, ntt.Id, (ushort)pos.Position.X, (ushort)pos.Position.Y, 0, MsgActionType.QueryTeamLeaderPos);
+                    var leaderPositionMessage = MsgAction.Create(ntt.Id, ntt.Id, (ushort)position.Position.X, (ushort)position.Position.Y, 0, MsgActionType.QueryTeamLeaderPos);
 
                     // member 0 is the leader
-                    for (var i = 1; i < team.MemberCount + 1; i++)
+                    for (var memberIndex = 1; memberIndex < teamComponent.MemberCount + 1; memberIndex++)
                     {
-                        var member = team.Members[i];
-                        if (member.Id == ntt.Id)
+                        var teamMember = teamComponent.Members[memberIndex];
+                        if (teamMember.Id == ntt.Id)
                             continue;
 
-                        member.NetSync(ref leaderPos);
+                        teamMember.NetSync(ref leaderPositionMessage);
                     }
 
-                    var leaderMoveMsg = $"[{nameof(TeamSystem)}] {ntt.Id} moved to {pos.Position}";
-                    NetworkHelper.SendMsgTo(in ntt, leaderMoveMsg, MsgTextType.TopLeft);
-                    FConsole.WriteLine(leaderMoveMsg);
+                    var leaderMoveText = $"[{nameof(TeamSystem)}] {ntt.Id} moved to {position.Position}";
+                    NetworkHelper.SendMsgTo(in ntt, leaderMoveText, MsgTextType.TopLeft);
+                    FConsole.WriteLine(leaderMoveText);
                 }
             }
 
             if (ntt.Has<ExpRewardComponent>())
             {
-                ref var rew = ref ntt.Get<ExpRewardComponent>();
-                ref var ntc = ref ntt.Get<NameTagComponent>();
-                ref var lvl = ref ntt.Get<LevelComponent>();
+                ref var experienceReward = ref ntt.Get<ExpRewardComponent>();
+                ref var nameTag = ref ntt.Get<NameTagComponent>();
+                ref var levelComponent = ref ntt.Get<LevelComponent>();
 
-                var sharedExp = rew.Experience / team.MemberCount;
+                var sharedExperience = experienceReward.Experience / teamComponent.MemberCount;
 
-                if (sharedExp > lvl.Level * 300)  // TQ exp cap
-                    sharedExp = lvl.Level * 300; // 
+                if (sharedExperience > levelComponent.Level * 300)  // TQ exp cap
+                    sharedExperience = levelComponent.Level * 300; // 
 
-                for (var i = 0; i < team.MemberCount; i++)
+                for (var memberIndex = 0; memberIndex < teamComponent.MemberCount; memberIndex++)
                 {
-                    var member = team.Members[i];
+                    var teamMember = teamComponent.Members[memberIndex];
 
-                    if (member.Id == ntt.Id)
+                    if (teamMember.Id == ntt.Id)
                         continue;
 
-                    ref readonly var pro = ref member.Get<ProfessionComponent>();
-                    ref readonly var mrg = ref member.Get<MarriageComponent>();
+                    ref readonly var profession = ref teamMember.Get<ProfessionComponent>();
+                    ref readonly var marriage = ref teamMember.Get<MarriageComponent>();
 
-                    if ((int)pro.Profession is > 132 and < 136) // Water Taoiust
-                        sharedExp *= 2;                    // Bonus Exp
+                    if ((int)profession.Profession is > 132 and < 136) // Water Taoiust
+                        sharedExperience *= 2;                    // Bonus Exp
 
-                    if (mrg.SpouseId == ntt.Id) // Marriage bonus
-                        sharedExp *= 2;         // 
+                    if (marriage.SpouseId == ntt.Id) // Marriage bonus
+                        sharedExperience *= 2;         // 
 
-                    var sexp = new ExpRewardComponent(sharedExp);
-                    member.Set(ref sexp);
+                    var memberExperienceReward = new ExpRewardComponent(sharedExperience);
+                    teamMember.Set(ref memberExperienceReward);
 
-                    var expShareMsg = $"{ntc.Name} shared {sharedExp} experience with you!";
-                    NetworkHelper.SendMsgTo(in member, expShareMsg, MsgTextType.TopLeft);
-                    FConsole.WriteLine($"[{nameof(TeamSystem)}] {member.Id} -> {expShareMsg}");
+                    var experienceShareMessage = $"{nameTag.Name} shared {sharedExperience} experience with you!";
+                    NetworkHelper.SendMsgTo(in teamMember, experienceShareMessage, MsgTextType.TopLeft);
+                    FConsole.WriteLine($"[{nameof(TeamSystem)}] {teamMember.Id} -> {experienceShareMessage}");
                 }
             }
         }

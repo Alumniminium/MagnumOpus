@@ -9,64 +9,80 @@ using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Systems
 {
+    /// <summary>
+    /// Handles player revival after death, restoring health and teleporting to respawn locations.
+    /// Manages death status cleanup, appearance restoration, and spawn location database lookups.
+    /// </summary>
     public sealed class ReviveSystem : NttSystem<ReviveComponent, HealthComponent, PositionComponent, BodyComponent, StatusEffectComponent>
     {
+        /// <summary>
+        /// Initializes the ReviveSystem with limited threading for revival processing.
+        /// </summary>
         public ReviveSystem() : base("Revive", threads: 2) { }
 
-        public override void Update(in NTT ntt, ref ReviveComponent rev, ref HealthComponent hlt, ref PositionComponent pos, ref BodyComponent bdy, ref StatusEffectComponent eff)
+        /// <summary>
+        /// Processes player revival, restoring health and teleporting to appropriate respawn location.
+        /// </summary>
+        /// <param name="ntt">The entity being revived</param>
+        /// <param name="reviveComponent">Revive component containing timing information</param>
+        /// <param name="healthComponent">Health component to restore</param>
+        /// <param name="position">Position component for respawn location</param>
+        /// <param name="bodyComponent">Body component for appearance restoration</param>
+        /// <param name="statusEffects">Status effect component to clear death effects</param>
+        public override void Update(in NTT ntt, ref ReviveComponent reviveComponent, ref HealthComponent healthComponent, ref PositionComponent position, ref BodyComponent bodyComponent, ref StatusEffectComponent statusEffects)
         {
-            if (rev.ReviveTick < NttWorld.Tick)
+            if (reviveComponent.ReviveTick < NttWorld.Tick)
                 return;
 
-            FConsole.WriteLine($"[{nameof(ReviveSystem)}]: Revive on Map {pos.Map}");
+            FConsole.WriteLine($"[{nameof(ReviveSystem)}]: Revive on Map {position.Map}");
 
-            hlt.Health = hlt.MaxHealth;
-            using var ctx = new SquigglyContext();
-            var map = ctx.cq_map.Find((long)pos.Map);
+            healthComponent.Health = healthComponent.MaxHealth;
+            using var databaseContext = new SquigglyContext();
+            var currentMap = databaseContext.cq_map.Find((long)position.Map);
 
-            if (map != null)
+            if (currentMap != null)
             {
-                var mapId = pos.Map;
-                var rebornMap = ctx.cq_map.FirstOrDefault(x => x.id == map.reborn_map);
+                var currentMapId = position.Map;
+                var respawnMap = databaseContext.cq_map.FirstOrDefault(x => x.id == currentMap.reborn_map);
 
-                if (rebornMap != null)
+                if (respawnMap != null)
                 {
-                    pos.Position = new Vector2(rebornMap.portal0_x, rebornMap.portal0_y);  // Auto-tracked
-                    pos.Map = (ushort)rebornMap.id;
+                    position.Position = new Vector2(respawnMap.portal0_x, respawnMap.portal0_y);  // Auto-tracked
+                    position.Map = (ushort)respawnMap.id;
                 }
                 else
                 {
                     if (IsLogging)
-                        FConsole.WriteLine("Reborn Map {0} not found", mapId);
-                    pos.Map = 1002;
-                    pos.Position = new Vector2(477, 380);  // Auto-tracked
+                        FConsole.WriteLine("Reborn Map {0} not found", currentMapId);
+                    position.Map = 1002;
+                    position.Position = new Vector2(477, 380);  // Auto-tracked
                 }
             }
             else
             {
                 if (IsLogging)
-                    FConsole.WriteLine("Map {0} not found", pos.Map);
-                pos.Map = 1002;
-                pos.Position = new Vector2(477, 380);  // Auto-tracked
+                    FConsole.WriteLine("Map {0} not found", position.Map);
+                position.Map = 1002;
+                position.Position = new Vector2(477, 380);  // Auto-tracked
             }
 
-            hlt.Health = hlt.MaxHealth;
-            eff.Effects &= ~StatusEffect.Dead;
-            eff.Effects &= ~StatusEffect.FrozenRemoveName;
+            healthComponent.Health = healthComponent.MaxHealth;
+            statusEffects.Effects &= ~StatusEffect.Dead;
+            statusEffects.Effects &= ~StatusEffect.FrozenRemoveName;
 
-            bdy.Look = MsgSpawn.DelTransform(bdy.Look);
-            var reply = MsgAction.Create(ntt.Id, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
+            bodyComponent.Look = MsgSpawn.DelTransform(bodyComponent.Look);
+            var locationMessage = MsgAction.Create(ntt.Id, position.Map, (ushort)position.Position.X, (ushort)position.Position.Y, Direction.North, MsgActionType.SendLocation);
             NetworkHelper.Despawn(ntt);
 
-            ntt.NetSync(ref reply);
+            ntt.NetSync(ref locationMessage);
 
-            ntt.Set(ref pos);
+            ntt.Set(ref position);
             ntt.Remove<ReviveComponent>();
             ntt.Remove<DeathTagComponent>();
             ntt.Set<ViewportUpdateTagComponent>();
 
             if (IsLogging)
-                FConsole.WriteLine("Revived '{0}' at {1}, {2}, {3}", NttWorld.Tick, Name, ntt, pos.Map, pos.Position.X, pos.Position.Y);
+                FConsole.WriteLine("Revived '{0}' at {1}, {2}, {3}", NttWorld.Tick, Name, ntt, position.Map, position.Position.X, position.Position.Y);
         }
     }
 }

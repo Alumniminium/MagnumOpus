@@ -4,8 +4,17 @@ using MagnumOpus.Enums;
 
 namespace MagnumOpus.Helpers
 {
+    /// <summary>
+    /// Mathematical utility functions for game mechanics including geometry, pathfinding, and spatial calculations.
+    /// Provides Conquer Online specific algorithms for movement, targeting, and area-of-effect calculations.
+    /// </summary>
     public static class CoMath
     {
+        /// <summary>
+        /// Generates a random point within the specified rectangle bounds.
+        /// </summary>
+        /// <param name="rect">Rectangle defining the boundary area</param>
+        /// <returns>Random point within the rectangle</returns>
         public static Vector2 GetRandomPointInRect(in Rectangle rect)
         {
             var randX = Random.Shared.Next(rect.X, rect.X + rect.Width + 1);
@@ -13,6 +22,13 @@ namespace MagnumOpus.Helpers
             return new Vector2(randX, randY);
         }
 
+        /// <summary>
+        /// Determines if two points are within the specified range using squared distance calculation for performance.
+        /// </summary>
+        /// <param name="start">Starting position</param>
+        /// <param name="end">Target position</param>
+        /// <param name="range">Maximum distance threshold</param>
+        /// <returns>True if points are within range</returns>
         public static bool InRange(Vector2 start, Vector2 end, double range)
         {
             var deltaX = end.X - start.X;
@@ -20,7 +36,19 @@ namespace MagnumOpus.Helpers
             var distance = (deltaX * deltaX) + (deltaY * deltaY);
             return distance <= range * range;
         }
+        /// <summary>
+        /// Gets the 8-directional movement direction from start to end position.
+        /// </summary>
+        /// <param name="end">Target position</param>
+        /// <param name="start">Starting position</param>
+        /// <returns>8-directional enum value</returns>
         public static Direction GetDirection(Vector2 end, Vector2 start) => (Direction)(GetRawDirection(end, start) % 8);
+        
+        /// <summary>
+        /// Converts a directional vector to the nearest 8-directional enum using angle calculation.
+        /// </summary>
+        /// <param name="direction">Direction vector to convert</param>
+        /// <returns>Nearest 8-directional enum value</returns>
         public static Direction GetNearestDirection(Vector2 direction)
         {
             var angle = (float)(Math.Atan2(direction.Y, direction.X) * (180 / Math.PI));
@@ -43,6 +71,13 @@ namespace MagnumOpus.Helpers
             return Direction.SouthEast; // 292.5 <= angle < 337.5
         }
 
+        /// <summary>
+        /// Calculates raw directional value using Conquer Online's tangent-based direction algorithm.
+        /// Uses slope calculations with predefined tangent thresholds for 8-directional movement.
+        /// </summary>
+        /// <param name="end">Target position</param>
+        /// <param name="start">Starting position</param>
+        /// <returns>Raw direction value (0-15 range)</returns>
         public static byte GetRawDirection(Vector2 end, Vector2 start)
         {
             var dir = 0;
@@ -123,6 +158,12 @@ namespace MagnumOpus.Helpers
             return (byte)dir;
         }
 
+        /// <summary>
+        /// Calculates jump animation time based on distance using Conquer Online's jump timing formula.
+        /// Provides realistic jump duration scaling from 0.7s to 1.3s based on distance.
+        /// </summary>
+        /// <param name="distance">Jump distance in tiles</param>
+        /// <returns>Jump animation time in seconds</returns>
         public static float GetJumpTime(int distance)
         {
             var time = 0.0f;
@@ -185,6 +226,14 @@ namespace MagnumOpus.Helpers
             return time;
         }
 
+        /// <summary>
+        /// Determines if a target position is within a sector (cone) area-of-effect from origin to click point.
+        /// </summary>
+        /// <param name="pos">Origin position of the sector</param>
+        /// <param name="click">Direction point defining sector center</param>
+        /// <param name="check">Position to test for inclusion in sector</param>
+        /// <param name="widthRadians">Sector width in radians</param>
+        /// <returns>True if target position is within the sector</returns>
         public static bool InSector(Vector2 pos, Vector2 click, Vector2 check, float widthRadians)
         {
             double aimRad = GetRadian(pos, click);
@@ -196,6 +245,15 @@ namespace MagnumOpus.Helpers
             return false;
         }
 
+        /// <summary>
+        /// Tests if a target point lies on a line from start to end within specified range using DDA algorithm.
+        /// Uses Digital Differential Analyzer for precise line-based targeting calculations.
+        /// </summary>
+        /// <param name="start">Line starting position</param>
+        /// <param name="end">Line ending position</param>
+        /// <param name="range">Maximum line length</param>
+        /// <param name="target">Position to test for line intersection</param>
+        /// <returns>True if target lies on the line path</returns>
         public static bool DdaLine(Vector2 start, Vector2 end, uint range, Vector2 target)
         {
             if (start == end)
@@ -210,8 +268,15 @@ namespace MagnumOpus.Helpers
         }
 
         /// <summary>
-        /// Return all points on that line. (From TQ)
+        /// Digital Differential Analyzer implementation for line rasterization and target detection.
+        /// Returns all points on the line path from TQ's original algorithm.
         /// </summary>
+        /// <param name="x0">Starting X coordinate</param>
+        /// <param name="y0">Starting Y coordinate</param>
+        /// <param name="x1">Ending X coordinate</param>
+        /// <param name="y1">Ending Y coordinate</param>
+        /// <param name="target">Target position to find on line</param>
+        /// <returns>True if target position is found on the line</returns>
         private static bool DdaLineEx(int x0, int y0, int x1, int y1, ref Vector2 target)
         {
             if (x0 == x1 && y0 == y1)
@@ -277,6 +342,12 @@ namespace MagnumOpus.Helpers
             return false;
         }
 
+        /// <summary>
+        /// Calculates angle in radians between two positions for directional calculations.
+        /// </summary>
+        /// <param name="source">Starting position</param>
+        /// <param name="target">Target position</param>
+        /// <returns>Angle in radians from source to target</returns>
         private static float GetRadian(Vector2 source, Vector2 target)
         {
             if (!(source.X != target.X || source.Y != target.Y))
@@ -292,6 +363,35 @@ namespace MagnumOpus.Helpers
             return (float)(delta.Y > 0 ? (Math.PI / 2) - radian : Math.PI + radian + (Math.PI / 2));
         }
 
+        /// <summary>
+        /// Determines if two positions are within screen distance (18 tiles in both X and Y directions).
+        /// Based on Conquer Online's official screen system specification.
+        /// </summary>
+        /// <param name="x1">X coordinate of first position</param>
+        /// <param name="y1">Y coordinate of first position</param>
+        /// <param name="x2">X coordinate of second position</param>
+        /// <param name="y2">Y coordinate of second position</param>
+        /// <returns>True if positions are within screen distance</returns>
+        public static bool InScreen(float x1, float y1, float x2, float y2)
+        {
+            const int SCREEN_DISTANCE = 18;
+            return Math.Abs(x1 - x2) <= SCREEN_DISTANCE && Math.Abs(y1 - y2) <= SCREEN_DISTANCE;
+        }
+
+        /// <summary>
+        /// Determines if two positions are within screen distance (18 tiles in both X and Y directions).
+        /// </summary>
+        public static bool InScreen(Vector2 pos1, Vector2 pos2)
+        {
+            return InScreen(pos1.X, pos1.Y, pos2.X, pos2.Y);
+        }
+
+        /// <summary>
+        /// Converts a direction enum to a unit vector for movement calculations.
+        /// </summary>
+        /// <param name="direction">8-directional enum value</param>
+        /// <returns>Unit vector representing the direction</returns>
+        /// <exception cref="ArgumentException">Thrown for invalid direction values</exception>
         internal static Vector2 DirectionToVector(Direction direction)
         {
             return direction switch

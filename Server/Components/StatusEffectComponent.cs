@@ -1,34 +1,22 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Networking.Packets;
+using MagnumOpus.Helpers;
+
 namespace MagnumOpus.Components
 {
     [Component(saveEnabled: true)]
-    public struct StatusEffectComponent
+    public struct StatusEffectComponent(in NTT entityId, StatusEffect effects = StatusEffect.None)
     {
-        public NTT NTT;
-        public long ChangedTick;
+        public NTT NTT = entityId;
+        public long ChangedTick = NttWorld.Tick;
+        private StatusEffect _effects = effects;
 
-        private StatusEffect _effects;
-        public StatusEffect Effects
-        {
-            get => _effects;
-            set
-            {
-                _effects = value;
-                ChangedTick = NttWorld.Tick;
-                var packet = MsgUserAttrib.Create(NTT.Id, (uint)_effects, MsgUserAttribType.StatusEffect);
-                NTT.NetSync(ref packet, true);
-            }
+        public StatusEffect Effects 
+        { 
+            readonly get => _effects;
+            set => NetworkSyncHelper.UpdateSyncedField(ref this, ref _effects, value, MsgUserAttribType.StatusEffect, NTT);
         }
 
-        public StatusEffectComponent(in NTT entityId)
-        {
-            NTT = entityId;
-            ChangedTick = NttWorld.Tick;
-            Effects = StatusEffect.None;
-        }
-
-        public override int GetHashCode() => NTT.Id;
+        public override readonly int GetHashCode() => NTT.Id;
     }
 }

@@ -39,8 +39,11 @@ namespace MagnumOpus
                 IpRegistry.Register(player, ipendpoint.Split(':')[0]);
                 FConsole.WriteLine($"[LOGIN] Client connected: {client.Client.RemoteEndPoint}");
 
-                var count = net.Socket.Receive(net.RecvBuffer.Span[..52]);
-                var packet = net.RecvBuffer[..count];
+                // Use dedicated buffer for initial login packet
+                var initialBuffer = new byte[52];
+                var count = net.Socket.Receive(initialBuffer);
+                Memory<byte> packet = new byte[count];
+                initialBuffer.AsSpan(0, count).CopyTo(packet.Span);
                 net.AuthCrypto.Decrypt(packet.Span, packet.Span);
 
                 LoginPacketHandler.Process(in player, in packet);
@@ -56,19 +59,41 @@ namespace MagnumOpus
             {
                 while (net.Socket.Connected)
                 {
-                    var count = net.Socket.Receive(net.RecvBuffer.Span);
+                    // Use dedicated buffer for each packet to avoid reuse issues
+                    var packetBuffer = new byte[1024]; // Login packets are typically small
+                    var count = net.Socket.Receive(packetBuffer);
+                    
                     if (count == 0)
+                    {
+                        FConsole.WriteLine($"[LOGIN] Client disconnected gracefully");
                         break;
-                    var packet = net.RecvBuffer[..count];
+                    }
+                    
+                    // Validate packet size
+                    if (count > 1024 || count < 4)
+                    {
+                        FConsole.WriteLine($"[LOGIN] Invalid packet size {count}, disconnecting client");
+                        break;
+                    }
+                    
+                    // Create packet memory with exact size
+                    Memory<byte> packet = new byte[count];
+                    packetBuffer.AsSpan(0, count).CopyTo(packet.Span);
+                    
+                    // Decrypt in-place on the dedicated packet buffer
                     net.AuthCrypto.Decrypt(packet.Span, packet.Span);
+                    
                     LoginPacketHandler.Process(in player, in packet);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                FConsole.WriteLine($"[LOGIN] Client disconnected");
-                net.Socket.Close();
-                net.Socket.Dispose();
+                FConsole.WriteLine($"[LOGIN] Client error: {ex.Message}");
+            }
+            finally
+            {
+                net.Socket?.Close();
+                net.Socket?.Dispose();
             }
         }
     }

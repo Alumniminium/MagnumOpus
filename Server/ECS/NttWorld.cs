@@ -8,10 +8,17 @@ using Newtonsoft.Json;
 
 namespace MagnumOpus.ECS
 {
+    /// <summary>
+    /// Central world manager for the Entity Component System, handling entity lifecycle, systems coordination, and game loop timing.
+    /// Manages entity creation, destruction, system updates, and maintains consistent tick-based simulation at target framerate.
+    /// </summary>
     public static class NttWorld
     {
+        /// <summary>Target ticks per second for consistent simulation timing</summary>
         public static int TargetTps { get; private set; } = 60;
+        /// <summary>Time duration for each update tick in seconds</summary>
         private static float UpdateTime => 1f / TargetTps;
+        /// <summary>Current number of active entities in the world</summary>
         public static int EntityCount => NTTs.Count;
 
         private static readonly NTT[] Default = new NTT[1];
@@ -52,15 +59,39 @@ namespace MagnumOpus.ECS
             FConsole.WriteLine($"Loaded NttWorld in {time}ms");
         }
 
+        /// <summary>
+        /// Registers the array of systems to process entities each tick.
+        /// </summary>
+        /// <param name="systems">Array of systems to register for entity processing</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetSystems(params NttSystem[] systems) => Systems = systems;
+        
+        /// <summary>
+        /// Sets the target ticks per second for consistent simulation timing.
+        /// </summary>
+        /// <param name="fps">Target frames/ticks per second</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetTPS(int fps) => TargetTps = fps;
+        
+        /// <summary>
+        /// Registers a callback to be invoked every second.
+        /// </summary>
+        /// <param name="action">Action to invoke every second</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void RegisterOnSecond(Action action) => OnSecond += action;
+        
+        /// <summary>
+        /// Registers a callback to be invoked at the end of each tick.
+        /// </summary>
+        /// <param name="action">Action to invoke at tick end</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void RegisterOnEndTick(Action action) => OnEndTick += action;
 
+        /// <summary>
+        /// Creates a new entity with an automatically generated ID for the specified type.
+        /// </summary>
+        /// <param name="type">Type of entity to create</param>
+        /// <returns>Reference to the newly created entity</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref NTT CreateEntity(EntityType type) => ref CreateEntityWithNetId(type, IdGenerator.Get(type));
 
@@ -109,6 +140,10 @@ namespace MagnumOpus.ECS
                     system.EntityChanged(ntt);
             }
         }
+        /// <summary>
+        /// Main game loop update handling timing, system processing, and frame rate management.
+        /// Maintains consistent tick rate and processes all registered systems each frame.
+        /// </summary>
         public static void Update()
         {
             var tickTime = Stopwatch.GetElapsedTime(TickBeginTime);
@@ -145,6 +180,10 @@ namespace MagnumOpus.ECS
             Thread.Sleep(sleepTime);
         }
 
+        /// <summary>
+        /// Saves the current world state to disk including all entities and current tick count.
+        /// </summary>
+        /// <param name="path">Directory path to save world state files</param>
         public static void Save(string path)
         {
             var start = Stopwatch.GetTimestamp();

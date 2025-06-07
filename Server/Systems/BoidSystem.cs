@@ -6,12 +6,27 @@ using MagnumOpus.Helpers;
 
 namespace MagnumOpus.Systems
 {
+    /// <summary>
+    /// Implements flocking behavior for entities using boid algorithms (alignment, cohesion, separation).
+    /// Manages group movement patterns and target seeking for entities that exhibit swarm intelligence.
+    /// </summary>
     public sealed class BoidSystem : NttSystem<LifeGiverComponent, BoidBehaviorComponent, PositionComponent, ViewportComponent>
     {
         private readonly ConcurrentDictionary<int, Vector2> _flockTargets = new();
 
+        /// <summary>
+        /// Initializes the BoidSystem with full multi-threaded processing capabilities.
+        /// </summary>
         public BoidSystem() : base("Boid", threads: Environment.ProcessorCount) { }
 
+        /// <summary>
+        /// Processes boid flocking behavior including alignment, cohesion, separation, and target seeking.
+        /// </summary>
+        /// <param name="ntt">The entity exhibiting boid behavior</param>
+        /// <param name="lgc">Life giver component for spawner-based target generation</param>
+        /// <param name="boi">Boid behavior component containing flock ID and target data</param>
+        /// <param name="pos">Position component for movement calculations</param>
+        /// <param name="vwp">Viewport component for detecting nearby flock members</param>
         public override void Update(in NTT ntt, ref LifeGiverComponent lgc, ref BoidBehaviorComponent boi, ref PositionComponent pos, ref ViewportComponent vwp)
         {
             if ((Tick - boi.UpdateOffset) % NttWorld.TargetTps * 0.5 != 0)
@@ -35,31 +50,31 @@ namespace MagnumOpus.Systems
             var targetSeekingWeight = 5.0f;
 
             // Calculate average alignment, cohesion, and separation
-            foreach (var otherNtt in vwp.EntitiesVisible)
+            foreach (var otherEntity in vwp.EntitiesVisible)
             {
-                if (otherNtt == ntt)
+                if (otherEntity == ntt)
                     continue;
 
-                ref var otherBoi = ref otherNtt.Get<BoidBehaviorComponent>();
+                ref var otherBoid = ref otherEntity.Get<BoidBehaviorComponent>();
 
-                if (otherBoi.Flock != boi.Flock)
+                if (otherBoid.Flock != boi.Flock)
                     continue;
 
-                ref readonly var otherPos = ref otherNtt.Get<PositionComponent>();
-                var distance = Vector2.Distance(pos.Position, otherPos.Position);
+                ref readonly var otherPosition = ref otherEntity.Get<PositionComponent>();
+                var distance = Vector2.Distance(pos.Position, otherPosition.Position);
 
                 // Alignment
-                alignment += CoMath.DirectionToVector(otherPos.Direction);
+                alignment += CoMath.DirectionToVector(otherPosition.Direction);
                 alignmentCount++;
 
                 // Cohesion
-                cohesion += otherPos.Position;
+                cohesion += otherPosition.Position;
                 cohesionCount++;
 
                 // Separation
                 if (distance < separationDistance)
                 {
-                    separation += pos.Position - otherPos.Position;
+                    separation += pos.Position - otherPosition.Position;
                     separationCount++;
                 }
             }
@@ -77,11 +92,10 @@ namespace MagnumOpus.Systems
                 separation /= separationCount;
             if (!_flockTargets.ContainsKey(boi.Flock) || Tick % (NttWorld.TargetTps * 30) == 0)
             {
-                ref readonly var lgcPos = ref lgc.NTT.Get<PositionComponent>();
+                ref readonly var spawnerPosition = ref lgc.NTT.Get<PositionComponent>();
                 var angle = (float)(Random.Shared.NextDouble() * 2 * Math.PI);
                 var radius = (float)(Random.Shared.NextDouble() * 50);
-                _flockTargets[boi.Flock] = lgcPos.Position + new Vector2(radius * MathF.Cos(angle), radius * MathF.Sin(angle));
-                // Logger.Information($"New flock target for {boi.Flock}: {_flockTargets[boi.Flock]}");
+                _flockTargets[boi.Flock] = spawnerPosition.Position + new Vector2(radius * MathF.Cos(angle), radius * MathF.Sin(angle));
             }
             boi.Target = _flockTargets[boi.Flock];
 

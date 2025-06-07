@@ -6,6 +6,11 @@ using System.Text;
 
 namespace MagnumOpus.Networking.Cryptography
 {
+    /// <summary>
+    /// High-performance Blowfish cipher implementation for Conquer Online network encryption.
+    /// Provides symmetric key cryptography with cipher feedback mode (CFB) for secure client-server communication.
+    /// Supports key generation from shared secrets and initialization vectors for session-based encryption.
+    /// </summary>
     public sealed class BlowfishCipher
     {
         // Constants and static properties
@@ -68,11 +73,11 @@ namespace MagnumOpus.Networking.Cryptography
         }
 
         /// <summary>
-        /// The key schedule for Blowfish can be time consuming to generate. The server
-        /// should optimize around calls to generate keys. When providing an array of
-        /// seeds, only the first seed will be used to generate keys.
+        /// Generates Blowfish encryption keys from a shared secret seed using the standard key schedule algorithm.
+        /// The key generation process is computationally intensive and should be minimized in performance-critical scenarios.
+        /// Initializes both P-array and S-boxes with seed-derived values for secure encryption operations.
         /// </summary>
-        /// <param name="seeds">An array of seeds used to generate keys</param>
+        /// <param name="seedBuffer">Byte array containing the shared secret seed for key derivation</param>
         public void GenerateKeys(byte[] seedBuffer)
         {
             // Initialize key buffers
@@ -108,9 +113,13 @@ namespace MagnumOpus.Networking.Cryptography
             }
         }
 
-        /// <summary>Sets the IVs of the cipher.</summary>
-        /// <param name="decryptionIV">Decryption IV from client key exchange</param>
-        /// <param name="encryptionIV">Encryption IV from client key exchange</param>
+        /// <summary>
+        /// Sets the initialization vectors for cipher feedback mode encryption and decryption.
+        /// IVs are typically exchanged during the DiffieHellman key exchange process for session security.
+        /// Resets encryption and decryption counters to ensure proper cipher synchronization.
+        /// </summary>
+        /// <param name="decryptionIV">Initialization vector for decrypting incoming data</param>
+        /// <param name="encryptionIV">Initialization vector for encrypting outgoing data</param>
         public void SetIVs(in Memory<byte> decryptionIV, Memory<byte> encryptionIV)
         {
             decryptionIV.CopyTo(DecryptionIV);
@@ -120,11 +129,11 @@ namespace MagnumOpus.Networking.Cryptography
         }
 
         /// <summary>
-        /// Decrypts bytes using cipher feedback mode. The source and destination may be
-        /// the same slice, but otherwise should not overlap.
+        /// Decrypts data in-place using cipher feedback mode with automatic IV management.
+        /// Processes data byte-by-byte, updating the decryption IV after each block operation.
+        /// Maintains synchronization counters to ensure proper cipher stream alignment.
         /// </summary>
-        /// <param name="src">Source span that requires decrypting</param>
-        /// <param name="dst">Destination span to contain the decrypted result</param>
+        /// <param name="src">Source span containing encrypted data to decrypt in-place</param>
         public void Decrypt(Span<byte> src)
         {
             var block = new uint[2];
@@ -147,11 +156,11 @@ namespace MagnumOpus.Networking.Cryptography
         }
 
         /// <summary>
-        /// Encrypts bytes using cipher feedback mode. The source and destination may be
-        /// the same slice, but otherwise should not overlap.
+        /// Encrypts data in-place using cipher feedback mode with automatic IV management.
+        /// Processes data byte-by-byte, updating the encryption IV after each block operation.
+        /// Maintains synchronization counters to ensure proper cipher stream alignment.
         /// </summary>
-        /// <param name="src">Source span that requires encrypting</param>
-        /// <param name="dst">Destination span to contain the encrypted result</param>
+        /// <param name="src">Source span containing plaintext data to encrypt in-place</param>
         public void Encrypt(Span<byte> src)
         {
             var block = new uint[2];

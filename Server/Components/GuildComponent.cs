@@ -13,7 +13,7 @@ namespace MagnumOpus.Components
         public GuildRanks Rank;
         public int Donation;
         public int Funds;
-        public NTT[] Members = Array.Empty<NTT>();
+        public NTT[] Members = [];
 
         public GuildComponent()
         {
@@ -30,9 +30,9 @@ namespace MagnumOpus.Components
             LeaderId = leaderId;
             Donation = donation;
             Funds = funds;
-            Members = Array.Empty<NTT>();
+            Members = [];
         }
 
-        public override int GetHashCode() => EntityId;
+        public override readonly int GetHashCode() => EntityId;
     }
 }

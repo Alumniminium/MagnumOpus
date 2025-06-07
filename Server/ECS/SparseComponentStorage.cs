@@ -6,12 +6,27 @@ using Newtonsoft.Json;
 
 namespace MagnumOpus.ECS
 {
+    /// <summary>
+    /// Thread-safe sparse storage system for ECS components providing efficient memory usage and fast access.
+    /// Uses a generic dictionary-based approach with reader-writer locks for concurrent access safety.
+    /// Only stores components for entities that actually have them, avoiding memory waste for sparse data.
+    /// </summary>
+    /// <typeparam name="T">Component type to store (must be value type)</typeparam>
     public static class SparseComponentStorage<T> where T : struct
     {
+        /// <summary>Default component instance returned when component doesn't exist</summary>
         private static readonly T[] Default = new T[1];
+        /// <summary>Core storage mapping entity IDs to component instances</summary>
         private static readonly Dictionary<int, T> Components = [];
+        /// <summary>Reader-writer lock for thread-safe concurrent access</summary>
         private static readonly ReaderWriterLockSlim lockObj = new();
 
+        /// <summary>
+        /// Adds or updates a component for the specified entity with thread-safe write access.
+        /// Notifies the world of entity changes if this is a new component addition.
+        /// </summary>
+        /// <param name="ntt">Entity to add component to</param>
+        /// <param name="c">Component data to store</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void AddFor(in NTT ntt, ref T c)
         {
@@ -32,6 +47,11 @@ namespace MagnumOpus.ECS
                 lockObj.ExitWriteLock();
             }
         }
+        /// <summary>
+        /// Adds a default-initialized component for the specified entity.
+        /// Useful for marker components or when default values are sufficient.
+        /// </summary>
+        /// <param name="ntt">Entity to add default component to</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void AddFor(in NTT ntt)
         {
@@ -50,6 +70,11 @@ namespace MagnumOpus.ECS
                 lockObj.ExitWriteLock();
             }
         }
+        /// <summary>
+        /// Checks if the specified entity has this component type with thread-safe read access.
+        /// </summary>
+        /// <param name="ntt">Entity to check for component</param>
+        /// <returns>True if entity has the component</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool HasFor(in NTT ntt)
         {
@@ -63,6 +88,12 @@ namespace MagnumOpus.ECS
                 lockObj.ExitReadLock();
             }
         }
+        /// <summary>
+        /// Gets a mutable reference to the component for the specified entity.
+        /// Returns a reference to default component if entity doesn't have this component type.
+        /// </summary>
+        /// <param name="ntt">Entity to get component for</param>
+        /// <returns>Mutable reference to component data</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref T Get(NTT ntt)
         {
@@ -78,7 +109,12 @@ namespace MagnumOpus.ECS
             }
         }
 
-        // called via reflection @ ReflectionHelper.Remove<T>()
+        /// <summary>
+        /// Removes the component from the specified entity with optional change notification.
+        /// Called via reflection from ReflectionHelper.Remove&lt;T&gt;() for type-safe removal.
+        /// </summary>
+        /// <param name="ntt">Entity to remove component from</param>
+        /// <param name="notify">Whether to notify world of entity changes</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Remove(NTT ntt, bool notify)
         {
@@ -99,6 +135,12 @@ namespace MagnumOpus.ECS
             }
         }
 
+        /// <summary>
+        /// Transfers component ownership from one entity to another atomically.
+        /// Used for entity ownership changes while preserving component data.
+        /// </summary>
+        /// <param name="from">Source entity to transfer component from</param>
+        /// <param name="to">Target entity to transfer component to</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ChangeOwner(NTT from, NTT to)
         {
@@ -114,7 +156,11 @@ namespace MagnumOpus.ECS
             }
         }
 
-        // called via reflection @ ReflectionHelper.Save<T>()
+        /// <summary>
+        /// Saves all components of this type to disk for persistence between server restarts.
+        /// Called via reflection from ReflectionHelper.Save&lt;T&gt;() for type-safe serialization.
+        /// </summary>
+        /// <param name="path">Directory path to save component data</param>
         public static void Save(string path)
         {
             var start = Stopwatch.GetTimestamp();
@@ -127,6 +173,10 @@ namespace MagnumOpus.ECS
             FConsole.WriteLine($"Saved {typeof(T).Name} to {filename} in {time}ms");
         }
 
+        /// <summary>
+        /// Loads component data from disk, restoring component state from previous server session.
+        /// </summary>
+        /// <param name="path">Directory path to load component data from</param>
         public static void Load(string path)
         {
             var start = Stopwatch.GetTimestamp();

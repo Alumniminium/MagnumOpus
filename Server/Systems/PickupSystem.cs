@@ -6,49 +6,63 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Systems
 {
+    /// <summary>
+    /// Handles pickup requests for items and money from the ground, managing inventory space and cleanup.
+    /// Processes both money rewards and item transfers with appropriate client notifications.
+    /// </summary>
     public sealed class PickupSystem : NttSystem<PositionComponent, InventoryComponent, PickupRequestComponent>
     {
+        /// <summary>
+        /// Initializes the PickupSystem with limited threading for pickup processing.
+        /// </summary>
         public PickupSystem() : base("Pickup", threads: 2) { }
 
-        public override void Update(in NTT ntt, ref PositionComponent pos, ref InventoryComponent inv, ref PickupRequestComponent pic)
+        /// <summary>
+        /// Processes pickup requests, transferring money or items to inventory and cleaning up ground entities.
+        /// </summary>
+        /// <param name="ntt">The entity picking up the item</param>
+        /// <param name="position">Position component for location validation</param>
+        /// <param name="inventory">Inventory component to receive picked up items</param>
+        /// <param name="pickupRequest">Pickup request component specifying the item to pick up</param>
+        public override void Update(in NTT ntt, ref PositionComponent position, ref InventoryComponent inventory, ref PickupRequestComponent pickupRequest)
         {
-            if (pic.Item.Has<MoneyRewardComponent>())
+            if (pickupRequest.Item.Has<MoneyRewardComponent>())
             {
-                ref readonly var rew = ref pic.Item.Get<MoneyRewardComponent>();
-                inv.Money += (uint)rew.Amount;
+                ref readonly var moneyReward = ref pickupRequest.Item.Get<MoneyRewardComponent>();
+                inventory.Money += (uint)moneyReward.Amount;
 
-                var moneyTxtMsg = MsgText.Create(in ntt, $"You picked up {rew.Amount} gold", Enums.MsgTextType.TopLeft);
-                ntt.NetSync(ref moneyTxtMsg);
+                var moneyTextMessage = MsgText.Create(in ntt, $"You picked up {moneyReward.Amount} gold", Enums.MsgTextType.TopLeft);
+                ntt.NetSync(ref moneyTextMessage);
 
-                if (rew.Amount > 1000)
+                if (moneyReward.Amount > 1000)
                 {
-                    var moneyActionMsg = MsgAction.Create(ntt.Id, rew.Amount, 0, 0, 0, Enums.MsgActionType.GetMoney);
-                    ntt.NetSync(ref moneyActionMsg, true);
+                    var moneyActionMessage = MsgAction.Create(ntt.Id, moneyReward.Amount, 0, 0, 0, Enums.MsgActionType.GetMoney);
+                    ntt.NetSync(ref moneyActionMessage, true);
                 }
 
-                pic.Item.Set<DestroyEndOfFrameComponent>();
+                pickupRequest.Item.Set<DestroyEndOfFrameComponent>();
             }
             else
             {
-                if (!InventoryHelper.HasFreeSpace(ref inv))
+                if (!InventoryHelper.HasFreeSpace(ref inventory))
                 {
                     ntt.Remove<PickupRequestComponent>();
                     return;
                 }
 
-                pic.Item.Remove<PositionComponent>();
-                pic.Item.Remove<LifeTimeComponent>();
-                pic.Item.Remove<DestroyEndOfFrameComponent>();
+                pickupRequest.Item.Remove<PositionComponent>();
+                pickupRequest.Item.Remove<LifeTimeComponent>();
+                pickupRequest.Item.Remove<DestroyEndOfFrameComponent>();
 
-                InventoryHelper.AddItem(ntt, ref inv, in pic.Item);
-                InventoryHelper.SortById(ntt, ref inv, netSync: true);
+                InventoryHelper.AddItem(ntt, ref inventory, in pickupRequest.Item);
+                InventoryHelper.SortById(ntt, ref inventory, netSync: true);
             }
 
-            var delFloorMsg = MsgFloorItem.Create(in pic.Item, Enums.MsgFloorItemType.Delete);
-            ntt.NetSync(ref delFloorMsg, true);
+            var deleteFloorMessage = MsgFloorItem.Create(in pickupRequest.Item, Enums.MsgFloorItemType.Delete);
+            ntt.NetSync(ref deleteFloorMessage, true);
 
             if (IsLogging)
-                FConsole.WriteLine("{0} picked up {1}", ntt, pic.Item);
+                FConsole.WriteLine("{0} picked up {1}", ntt, pickupRequest.Item);
             ntt.Remove<PickupRequestComponent>();
         }
     }

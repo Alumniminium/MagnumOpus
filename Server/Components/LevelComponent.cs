@@ -1,49 +1,31 @@
 using MagnumOpus.ECS;
 using MagnumOpus.Enums;
-using MagnumOpus.Networking.Packets;
+using MagnumOpus.Helpers;
 
 namespace MagnumOpus.Components
 {
     [Component(saveEnabled: true)]
-    public struct LevelComponent
+    public struct LevelComponent(in NTT ntt, byte level = 1, uint experience = 0, uint experienceToNextLevel = 120)
     {
-        public NTT NTT;
+        public NTT NTT = ntt;
         public long ChangedTick = NttWorld.Tick;
-        
-        public byte Level;
-        public uint Experience;
-        public uint ExperienceToNextLevel;
+        private byte _level = level;
+        private uint _experience = experience;
 
-        public LevelComponent(in NTT ntt, byte level = 1, uint experience = 0, uint experienceToNextLevel = 120)
-        {
-            NTT = ntt;
-            Level = level;
-            Experience = experience;
-            ExperienceToNextLevel = experienceToNextLevel;
+        public uint ExperienceToNextLevel = experienceToNextLevel;
+
+        public byte Level 
+        { 
+            readonly get => _level;
+            set => NetworkSyncHelper.UpdateSyncedField(ref this, ref _level, value, MsgUserAttribType.Level, NTT);
         }
 
-        public void SetLevel(byte value)
-        {
-            if (Level != value)
-            {
-                Level = value;
-                ChangedTick = NttWorld.Tick;
-                var packet = MsgUserAttrib.Create(NTT.Id, value, MsgUserAttribType.Level);
-                NTT.NetSync(ref packet, true);
-            }
+        public uint Experience 
+        { 
+            readonly get => _experience;
+            set => NetworkSyncHelper.UpdateSyncedField(ref this, ref _experience, value, MsgUserAttribType.Experience, NTT);
         }
 
-        public void SetExperience(uint value)
-        {
-            if (Experience != value)
-            {
-                Experience = value;
-                ChangedTick = NttWorld.Tick;
-                var packet = MsgUserAttrib.Create(NTT.Id, value, MsgUserAttribType.Experience);
-                NTT.NetSync(ref packet, true);
-            }
-        }
-
-        public override int GetHashCode() => NTT;
+        public override readonly int GetHashCode() => NTT.Id;
     }
 }

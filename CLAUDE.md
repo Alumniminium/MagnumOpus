@@ -64,5 +64,3 @@ pos.Position = new Vector2(newX, newY);  // Set complete value, auto-tracks Chan
 ### Network-Synced Components
 
 For components with network sync (like HealthComponent), preserve custom property logic and manually manage ChangedTick within the setter to maintain network behavior.
-
-[... rest of the existing content remains unchanged ...]

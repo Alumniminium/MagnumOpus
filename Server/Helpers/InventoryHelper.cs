@@ -5,8 +5,18 @@ using MagnumOpus.Networking.Packets;
 
 namespace MagnumOpus.Helpers
 {
+    /// <summary>
+    /// Utility functions for inventory management including item operations, space validation, and network synchronization.
+    /// Provides comprehensive inventory manipulation with automatic client updates and entity lifecycle management.
+    /// </summary>
     public static class InventoryHelper
     {
+        /// <summary>
+        /// Retrieves an inventory item entity by its network ID.
+        /// </summary>
+        /// <param name="inv">Inventory component to search</param>
+        /// <param name="netId">Network ID of the item to find</param>
+        /// <returns>Item entity or default if not found</returns>
         public static NTT GetInventoryItemByNetIdFrom(ref InventoryComponent inv, int netId)
         {
             for (var i = 0; i < inv.Items.Length; i++)
@@ -15,6 +25,15 @@ namespace MagnumOpus.Helpers
             return default;
         }
 
+        /// <summary>
+        /// Removes an item from inventory by network ID with optional destruction and client synchronization.
+        /// </summary>
+        /// <param name="owner">Entity that owns the inventory</param>
+        /// <param name="inv">Inventory component to modify</param>
+        /// <param name="netId">Network ID of item to remove</param>
+        /// <param name="destroy">Whether to mark item for destruction</param>
+        /// <param name="netSync">Whether to send removal packet to client</param>
+        /// <returns>True if item was found and removed</returns>
         public static bool RemoveNetIdFromInventory(NTT owner, ref InventoryComponent inv, int netId, bool destroy = false, bool netSync = false)
         {
             var itemNtt = GetInventoryItemByNetIdFrom(ref inv, netId);
@@ -22,6 +41,15 @@ namespace MagnumOpus.Helpers
             return removed;
         }
 
+        /// <summary>
+        /// Removes a specific item entity from inventory with optional destruction and client synchronization.
+        /// </summary>
+        /// <param name="owner">Entity that owns the inventory</param>
+        /// <param name="inv">Inventory component to modify</param>
+        /// <param name="item">Item entity to remove</param>
+        /// <param name="destroy">Whether to mark item for destruction</param>
+        /// <param name="netSync">Whether to send removal packet to client</param>
+        /// <returns>True if item was found and removed</returns>
         public static bool RemoveNttFromInventory(NTT owner, ref InventoryComponent inv, NTT item, bool destroy = false, bool netSync = false)
         {
             var invIdx = -1;
@@ -51,7 +79,20 @@ namespace MagnumOpus.Helpers
             return found;
         }
 
+        /// <summary>
+        /// Checks if inventory has the specified number of free slots available.
+        /// </summary>
+        /// <param name="inv">Inventory component to check</param>
+        /// <param name="count">Number of free slots required</param>
+        /// <returns>True if enough free space is available</returns>
         public static bool HasFreeSpace(ref InventoryComponent inv, int count = 1) => CountItemId(ref inv, 0) >= count;
+        
+        /// <summary>
+        /// Checks if inventory contains an item with the specified network ID.
+        /// </summary>
+        /// <param name="inv">Inventory component to search</param>
+        /// <param name="netId">Network ID to search for</param>
+        /// <returns>True if item with network ID is found</returns>
         public static bool HasItemNetId(ref InventoryComponent inv, int netId)
         {
             for (var i = 0; i < inv.Items.Length; i++)
@@ -59,7 +100,20 @@ namespace MagnumOpus.Helpers
                     return true;
             return false;
         }
+        /// <summary>
+        /// Checks if inventory contains any item with the specified item ID.
+        /// </summary>
+        /// <param name="inv">Inventory component to search</param>
+        /// <param name="id">Item ID to search for</param>
+        /// <returns>True if any item with the ID is found</returns>
         public static bool HasItemId(ref InventoryComponent inv, int id) => CountItemId(ref inv, id) > 0;
+        
+        /// <summary>
+        /// Counts the number of items with the specified item ID in inventory.
+        /// </summary>
+        /// <param name="inv">Inventory component to search</param>
+        /// <param name="id">Item ID to count (0 counts empty slots)</param>
+        /// <returns>Number of items with the specified ID</returns>
         public static int CountItemId(ref InventoryComponent inv, int id)
         {
             var count = 0;
@@ -75,6 +129,13 @@ namespace MagnumOpus.Helpers
 
             return count;
         }
+        /// <summary>
+        /// Removes the first item with the specified item ID from inventory.
+        /// </summary>
+        /// <param name="inv">Inventory component to modify</param>
+        /// <param name="id">Item ID to remove</param>
+        /// <param name="destroy">Whether to mark item for destruction</param>
+        /// <returns>True if item was found and removed</returns>
         public static bool RemoveItemId(ref InventoryComponent inv, int id, bool destroy = false)
         {
             for (var i = 0; i < inv.Items.Length; i++)
@@ -94,6 +155,13 @@ namespace MagnumOpus.Helpers
             return false;
         }
 
+        /// <summary>
+        /// Refreshes inventory display on client by removing and re-adding all items.
+        /// Used for inventory sorting or complete refresh operations.
+        /// </summary>
+        /// <param name="owner">Entity that owns the inventory</param>
+        /// <param name="inv">Inventory component to refresh</param>
+        /// <param name="netSync">Whether to send refresh packets to client</param>
         public static void SortById(NTT owner, ref InventoryComponent inv, bool netSync = false)
         {
             if (!netSync)
@@ -111,6 +179,14 @@ namespace MagnumOpus.Helpers
             }
         }
 
+        /// <summary>
+        /// Adds an item entity to the first available inventory slot with optional client synchronization.
+        /// </summary>
+        /// <param name="owner">Entity that owns the inventory</param>
+        /// <param name="inv">Inventory component to modify</param>
+        /// <param name="item">Item entity to add</param>
+        /// <param name="netSync">Whether to send addition packet to client</param>
+        /// <returns>True if item was successfully added</returns>
         public static bool AddItem(NTT owner, ref InventoryComponent inv, in NTT item, bool netSync = false)
         {
             for (var i = 0; i < inv.Items.Length; i++)
@@ -130,6 +206,11 @@ namespace MagnumOpus.Helpers
             return false;
         }
 
+        /// <summary>
+        /// Counts the total number of non-empty items in inventory.
+        /// </summary>
+        /// <param name="inv">Inventory component to count</param>
+        /// <returns>Number of items currently in inventory</returns>
         internal static int CountItems(ref InventoryComponent inv)
         {
             var itemCount = 0;

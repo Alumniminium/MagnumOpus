@@ -1,5 +1,6 @@
 using System.Drawing;
 using MagnumOpus.ECS;
+using MagnumOpus.Helpers;
 using Newtonsoft.Json;
 
 namespace MagnumOpus.Components
@@ -11,7 +12,13 @@ namespace MagnumOpus.Components
         public readonly ReaderWriterLockSlim rwLock = new();
         public HashSet<NTT> EntitiesVisible;
         public HashSet<NTT> EntitiesVisibleLast;
-        public Rectangle Viewport;
+        private Rectangle _viewport;
+
+        public Rectangle Viewport 
+        { 
+            readonly get => _viewport;
+            set => NetworkSyncHelper.UpdateField(ref this, ref _viewport, value);
+        }
 
         [JsonConstructor]
         public ViewportComponent()
@@ -19,12 +26,14 @@ namespace MagnumOpus.Components
             ChangedTick = NttWorld.Tick;
             EntitiesVisible = new();
             EntitiesVisibleLast = new();
+            _viewport = default;
         }
+        
         public ViewportComponent(float viewDistance)
         {
             EntitiesVisible = new();
             EntitiesVisibleLast = new();
-            Viewport = new Rectangle(0, 0, (int)viewDistance, (int)viewDistance);
+            _viewport = new Rectangle(0, 0, (int)viewDistance, (int)viewDistance);
             ChangedTick = NttWorld.Tick;
         }
     }

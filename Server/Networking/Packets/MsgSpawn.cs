@@ -6,6 +6,11 @@ using MagnumOpus.Squiggly;
 
 namespace MagnumOpus.Networking.Packets
 {
+    /// <summary>
+    /// Network packet for spawning entities (players, monsters, NPCs) in the game world.
+    /// Contains complete entity appearance data including equipment, position, status effects, and visual transforms.
+    /// Supports different entity types with specialized creation methods for players and monsters.
+    /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public unsafe struct MsgSpawn
     {
@@ -40,6 +45,11 @@ namespace MagnumOpus.Networking.Packets
         public byte NameLen;
         public fixed byte Name[16];
 
+        /// <summary>
+        /// Creates a spawn packet for any entity type by routing to the appropriate specialized creation method.
+        /// </summary>
+        /// <param name="ntt">Entity to create spawn packet for</param>
+        /// <returns>Configured spawn packet for the entity</returns>
         public static MsgSpawn Create(in NTT ntt)
         {
             return ntt.Type switch
@@ -54,6 +64,12 @@ namespace MagnumOpus.Networking.Packets
             };
         }
 
+        /// <summary>
+        /// Creates a spawn packet specifically for player entities with complete equipment and appearance data.
+        /// Handles death transforms, equipment visualization, and guild information display.
+        /// </summary>
+        /// <param name="ntt">Player entity to create spawn packet for</param>
+        /// <returns>Player spawn packet with equipment, stats, and appearance data</returns>
         public static MsgSpawn CreatePlayer(in NTT ntt)
         {
             ref readonly var hed = ref ntt.Get<HeadComponent>();
@@ -118,6 +134,12 @@ namespace MagnumOpus.Networking.Packets
             return msg;
         }
 
+        /// <summary>
+        /// Creates a spawn packet specifically for monster entities with basic appearance and name data.
+        /// Looks up monster names from the database and configures basic visual properties.
+        /// </summary>
+        /// <param name="ntt">Monster entity to create spawn packet for</param>
+        /// <returns>Monster spawn packet with basic appearance and name data</returns>
         public static MsgSpawn CreateMonster(in NTT ntt)
         {
             ref readonly var bdy = ref ntt.Get<BodyComponent>();
@@ -153,7 +175,19 @@ namespace MagnumOpus.Networking.Packets
             return msg;
         }
 
+        /// <summary>
+        /// Adds a visual transformation effect to an entity's appearance (death, special effects, etc.).
+        /// </summary>
+        /// <param name="look">Base appearance value</param>
+        /// <param name="transformId">Transform effect identifier</param>
+        /// <returns>Modified appearance value with transform applied</returns>
         public static uint AddTransform(uint look, long transformId) => (uint)((transformId * 10000000L) + (look % 10000000L));
+        
+        /// <summary>
+        /// Removes visual transformation effects from an entity's appearance, returning to base look.
+        /// </summary>
+        /// <param name="look">Appearance value with potential transforms</param>
+        /// <returns>Base appearance value without transforms</returns>
         public static uint DelTransform(uint look) => look % 10000000;
     }
 }

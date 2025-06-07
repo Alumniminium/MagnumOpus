@@ -2,38 +2,70 @@ using Prometheus;
 
 namespace MagnumOpus.ECS
 {
+    /// <summary>
+    /// Prometheus metrics collection for game server monitoring including performance, economy, and gameplay statistics.
+    /// Provides comprehensive telemetry for server health, player actions, item drops, and economic transactions.
+    /// </summary>
     public static class PrometheusPush
     {
+        #region Core Performance Metrics
+        /// <summary>Current number of entities in the game world</summary>
         public static readonly Gauge NTTCount = Metrics.CreateGauge("MO_ENTITIES", "Counter for Entities");
+        /// <summary>Total number of game ticks processed</summary>
         public static readonly Counter TickCount = Metrics.CreateCounter("MO_TICKS", "Counter for Ticks");
+        /// <summary>Time distribution for game tick processing</summary>
         public static readonly Histogram TickTime = Metrics.CreateHistogram("MO_TICK", "Time taken for a tick");
+        /// <summary>Number of entity changes per tick</summary>
         public static readonly Counter EntityChangedCount = Metrics.CreateCounter("MO_ENTITY_CHANGED", "Counter for Entity Changed");
 
 
+        
+        /// <summary>Total entities created during server lifetime</summary>
         public static readonly Counter NTTCreations = Metrics.CreateCounter("MO_NTT_CREATION_COUNT", "Amount of times an NTT was created");
+        /// <summary>Total entities destroyed during server lifetime</summary>
         public static readonly Counter NTTDestroys = Metrics.CreateCounter("MO_NTT_DELETION_COUNT", "Amount of times an NTT was destroyed");
+        /// <summary>Total entity modifications during server lifetime</summary>
         public static readonly Counter NTTChanges = Metrics.CreateCounter("MO_NTT_CHANGE_COUNT", "Amount of times an NTT was changed");
+        /// <summary>Total player login attempts</summary>
         public static readonly Counter LoginCount = Metrics.CreateCounter("MO_LOGIN_COUNT", "Amount of times a player logged in");
+        /// <summary>Total player movement actions</summary>
         public static readonly Counter WalkCount = Metrics.CreateCounter("MO_WALK_COUNT", "Amount of times a player walked");
+        /// <summary>Total player jump actions</summary>
         public static readonly Counter JumpCount = Metrics.CreateCounter("MO_JUMP_COUNT", "Amount of times a player jumped");
+        /// <summary>Total distance covered by player jumps</summary>
         public static readonly Counter JumpDistance = Metrics.CreateCounter("MO_JUMP_DISTANCE", "Amount of distance a player jumped");
+        #endregion
 
 
+        
         #region Economy Metrics
+        /// <summary>Number of items purchased from shops</summary>
         public static readonly Counter ShopPurchases = Metrics.CreateCounter("MO_DROPS_SHOP_PURCHASE", "Amount of Shop Purchases");
+        /// <summary>Number of items sold to shops</summary>
         public static readonly Counter ShopSales = Metrics.CreateCounter("MO_DROPS_SHOP_SELL", "Amount of Shop Sales");
+        /// <summary>Total money earned by shops from player purchases</summary>
         public static readonly Counter ShopIncome = Metrics.CreateCounter("MO_SHOP_INCOME", "Amount of Money earned by the Shop");
+        /// <summary>Total money paid by shops for player sales</summary>
         public static readonly Counter ShopExpenses = Metrics.CreateCounter("MO_SHOP_EXPENSES", "Amount of Money spent by the Shop");
-
+        
+        /// <summary>Total money gained by server economy</summary>
         public static readonly Counter ServerIncome = Metrics.CreateCounter("MO_SERVER_INCOME", "Amount of Money earned by the Server");
+        /// <summary>Total money removed from server economy</summary>
         public static readonly Counter ServerExpenses = Metrics.CreateCounter("MO_SERVER_EXPENSES", "Amount of Money spent by the Server");
         #endregion
+        
         #region Drop Metrics
+        /// <summary>Number of meteor items dropped</summary>
         public static readonly Counter MeteorDropsCount = Metrics.CreateCounter("MO_DROPS_METEOR", "Amount of Meteors dropped");
+        /// <summary>Number of dragonball items dropped</summary>
         public static readonly Counter DragonballDropsCount = Metrics.CreateCounter("MO_DROPS_DRAGONBALL", "Amount of Dragonballs dropped");
+        /// <summary>Number of money drop instances</summary>
         public static readonly Counter MoneyDropCount = Metrics.CreateCounter("MO_DROPS_MONEY", "Amount of Money dropped");
+        /// <summary>Total amount of money dropped</summary>
         public static readonly Counter MoneyDropTotal = Metrics.CreateCounter("MO_DROPS_MONEY_TOTAL", "Total Amount of Money dropped");
+        /// <summary>Number of health potions dropped</summary>
         public static readonly Counter HealthPotionsCount = Metrics.CreateCounter("MO_DROPS_HEALTH_POTIONS", "Amount of Health Potions dropped");
+        /// <summary>Number of mana potions dropped</summary>
         public static readonly Counter ManaPotionsCount = Metrics.CreateCounter("MO_DROPS_MANA_POTIONS", "Amount of Mana Potions dropped");
 
         #region Quality Drops

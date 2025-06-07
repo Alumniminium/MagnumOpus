@@ -10,7 +10,6 @@ namespace MagnumOpus.Components
     {
         public Socket Socket;
         public bool UseGameCrypto;
-        public Memory<byte> RecvBuffer;
         public TQCipher AuthCrypto = new();
         public BlowfishCipher GameCrypto = new();
         public DiffieHellman DiffieHellman = new();
@@ -20,12 +19,10 @@ namespace MagnumOpus.Components
         public ConcurrentQueue<byte[]> SendQueue = new();
         public string Username;
 
-
         public NetworkComponent(Socket socket, byte[]? civ = null, byte[]? siv = null)
         {
             UseGameCrypto = false;
             Socket = socket;
-            RecvBuffer = new byte[4096];
             ClientIV = civ ?? new byte[8];
             ServerIV = siv ?? new byte[8];
             Username = string.Empty;

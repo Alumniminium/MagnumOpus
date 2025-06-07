@@ -7,26 +7,73 @@ using MagnumOpus.Components;
 
 namespace MagnumOpus.Helpers
 {
+    /// <summary>
+    /// Helper utilities for item analysis including type extraction, quality checking, and item classification.
+    /// Provides Conquer Online specific item ID parsing and property validation functions.
+    /// </summary>
     public static class ItemHelper
     {
+        /// <summary>
+        /// Determines if an item is broken (zero durability).
+        /// </summary>
+        /// <param name="item">Item component to check</param>
+        /// <returns>True if item durability is zero</returns>
         public static bool IsBroken(ref ItemComponent item) => item.CurrentDurability == 0;
+        
+        /// <summary>
+        /// Determines if an item should never drop when player dies (high plus items).
+        /// </summary>
+        /// <param name="item">Item component to check</param>
+        /// <returns>True if item is protected from death drops</returns>
         public static bool IsNeverDropWhenDead(ref ItemComponent item) => /*item.Monopoly == 3 || item..Monopoly == 3 || item..Monopoly == 9 || */ item.Plus > 5;
-        public static int GetLevel(ref ItemComponent item) => item.Id % 1000 / 10;
-        public static int GetLevel(int nType) => nType % 1000 / 10;
+        
+        /// <summary>
+        /// Extracts the level requirement from an item's ID.
+        /// </summary>
+        /// <param name="item">Item component to analyze</param>
+        /// <returns>Item level requirement</returns>
+        public static int GetLevel(ref ItemComponent item) => item.Id / 10 % 100;
+        
+        /// <summary>
+        /// Extracts the level requirement from an item type ID.
+        /// </summary>
+        /// <param name="nType">Item type ID to analyze</param>
+        /// <returns>Item level requirement</returns>
+        public static int GetLevel(int nType) => nType / 10 % 100;
+        /// <summary>
+        /// Sets the level requirement for an item by modifying its ID.
+        /// </summary>
+        /// <param name="item">Item component to modify</param>
+        /// <param name="level">New level requirement to set</param>
+        /// <returns>Reference to the modified item component</returns>
         public static ref ItemComponent SetLevel(ref ItemComponent item, int level)
         {
-            item.Id = (item.Id / 1000 * 1000) + (level * 10) + (item.Id % 10);
+            item.Id = item.Id / 1000 * 1000 + level * 10 + item.Id % 10;
             return ref item;
         }
+        
+        /// <summary>
+        /// Extracts the quality level from an item's ID.
+        /// </summary>
+        /// <param name="item">Item component to analyze</param>
+        /// <returns>Item quality level (0-9)</returns>
         public static int GetQuality(ref ItemComponent item) => item.Id % 10;
+        
+        /// <summary>
+        /// Extracts the quality level from an item type ID.
+        /// </summary>
+        /// <param name="nType">Item type ID to analyze</param>
+        /// <returns>Item quality level (0-9)</returns>
         public static int GetQuality(int nType) => nType % 10;
         public static ref ItemComponent SetQuality(ref ItemComponent item, int quality)
         {
             item.Id = (item.Id / 10 * 10) + quality;
             return ref item;
         }
-        public static int GetItemSubtype(ref ItemComponent item) => item.Id / 1000;
-        public static int GetItemSubtype(int nType) => nType / 1000;
+        public static int GetItemType(ref ItemComponent item) => item.Id / 1000;
+        public static int GetItemType(int nType) => nType / 1000;
+        public static int GetItemSubtype(ref ItemComponent item) => item.Id / 10 % 100;
+        public static int GetItemSubtype(int nType) => nType / 10 % 100;
         public static bool IsArrowSort(ref ItemComponent item) => item.Id / 1000 == 1050;
         public static bool IsArrowSort(int nType) => nType / 1000 == 1050;
         public static bool IsArrow(ref ItemComponent item) => IsArrowSort(ref item);
@@ -37,7 +84,7 @@ namespace MagnumOpus.Helpers
         public static bool IsBow(int nType) => nType / 1000 == 500;
         public static bool IsCountable(ref ItemComponent item) => IsArrowSort(ref item);
         public static bool IsCountable(int nType) => IsArrowSort(nType);
-        public static bool IsEquipment(ref ItemComponent item) => !IsArrowSort(ref item) && (int)GetSort(ref item) < 7 || IsShield(ref item) || GetItemSubtype(ref item) == 2100;
+        public static bool IsEquipment(ref ItemComponent item) => !IsArrowSort(ref item) && (int)GetSort(ref item) < 7 || IsShield(ref item) || GetItemType(ref item) == 2100;
         public static bool IsEquipment(int nType) => !IsArrowSort(nType) && (int)GetSort(nType) < 7 || IsShield(nType);
         public static bool IsArmor(ref ItemComponent item) => item.Id / 10000 == 13;
         public static bool IsArmor(int nType) => nType / 10000 == 13;
@@ -46,6 +93,11 @@ namespace MagnumOpus.Helpers
         public static ItemSort GetSort(ref ItemComponent item) => (ItemSort)(item.Id / 100000);
         public static ItemSort GetSort(int nType) => (ItemSort)(nType / 100000);
 
+        /// <summary>
+        /// Converts a money amount to the appropriate money item ID for visual representation.
+        /// </summary>
+        /// <param name="money">Amount of money to convert</param>
+        /// <returns>Item ID representing the money amount</returns>
         public static int GetItemIdFromMoney(int money)
         {
             var id = 1090000; //Silver
@@ -60,15 +112,31 @@ namespace MagnumOpus.Helpers
             return id;
         }
     }
+    /// <summary>
+    /// Item generation system for creating random equipment drops with quality, enchantments, and sockets.
+    /// Generates items based on monster drop tables and probability calculations for game loot systems.
+    /// </summary>
     public static class ItemGenerator
     {
-        public static readonly ushort[] NecklaceType = { 120, 121 };//120 necklace 121 bags
-        public static readonly ushort[] RingType = { 150, 151, 152 };//150 att 151 agi 152 bracelets
-        public static readonly ushort[] ArmetType = { 111, 112, 113, 114, 117, 118 };
-        public static readonly ushort[] ArmorType = { 130, 131, 132, 133, 134 };
-        public static readonly ushort[] OneHanderType = { 410, 420, 421, 430, 440, 450, 460, 480, 481, 490, 500 };//601 was here, but doesn't seem to be valid?
-        public static readonly ushort[] TwoHanderType = { 510, 530, 560, 561, 580, 900 };
+        /// <summary>Necklace item type IDs: 120=necklace, 121=bags</summary>
+        public static readonly ushort[] NecklaceType = [120, 121];
+        /// <summary>Ring item type IDs: 150=attack rings, 151=agility rings, 152=bracelets</summary>
+        public static readonly ushort[] RingType = [150, 151, 152];
+        /// <summary>Helmet item type IDs for various headgear types</summary>
+        public static readonly ushort[] ArmetType = [111, 112, 113, 114, 117, 118];
+        /// <summary>Armor item type IDs for body protection equipment</summary>
+        public static readonly ushort[] ArmorType = [130, 131, 132, 133, 134];
+        /// <summary>One-handed weapon type IDs for various melee weapons</summary>
+        public static readonly ushort[] OneHanderType = [410, 420, 421, 430, 440, 450, 460, 480, 481, 490, 500];
+        /// <summary>Two-handed weapon type IDs including shields</summary>
+        public static readonly ushort[] TwoHanderType = [510, 530, 560, 561, 580, 900];
 
+        /// <summary>
+        /// Generates a random item component based on drop configuration with random quality and enhancements.
+        /// </summary>
+        /// <param name="drop">Drop configuration specifying possible item types and levels</param>
+        /// <param name="mobLevel">Monster level for quality calculations (currently unused)</param>
+        /// <returns>Generated item component or default if generation failed</returns>
         public static ItemComponent Generate(Drops drop, int mobLevel = 0)
         {
             var item = new ItemComponent();
@@ -106,9 +174,9 @@ namespace MagnumOpus.Helpers
             item.CurrentDurability = (ushort)Random.Shared.Next(0, entry.AmountLimit);
             item.MaximumDurability = (ushort)Math.Min(entry.AmountLimit, item.CurrentDurability + Random.Shared.Next(0, entry.AmountLimit - item.CurrentDurability));
 
-            item = AddBless(ref item);
-            item = AddPlus(ref item);
-            item = AddSockets(ref item);
+            item = MaybeAddBless(ref item);
+            item = MaybeAddPlus(ref item);
+            item = MaybeAddSockets(ref item);
 
             unsafe
             {
@@ -118,7 +186,12 @@ namespace MagnumOpus.Helpers
         }
 
 
-        public static ref ItemComponent AddBless(ref ItemComponent entry)
+        /// <summary>
+        /// Randomly adds blessing levels to an item based on probability calculations.
+        /// </summary>
+        /// <param name="entry">Item component to potentially bless</param>
+        /// <returns>Reference to the modified item component</returns>
+        public static ref ItemComponent MaybeAddBless(ref ItemComponent entry)
         {
             var dice = Random.Shared.NextSingle();
             if (dice < 1)
@@ -130,7 +203,12 @@ namespace MagnumOpus.Helpers
             return ref entry;
         }
 
-        public static ref ItemComponent AddPlus(ref ItemComponent entry)
+        /// <summary>
+        /// Randomly adds plus enhancement to an item with low probability.
+        /// </summary>
+        /// <param name="entry">Item component to potentially enhance</param>
+        /// <returns>Reference to the modified item component</returns>
+        public static ref ItemComponent MaybeAddPlus(ref ItemComponent entry)
         {
             var dice = Random.Shared.NextSingle();
             if (dice < 0.01)
@@ -138,7 +216,12 @@ namespace MagnumOpus.Helpers
             return ref entry;
         }
 
-        public static ref ItemComponent AddSockets(ref ItemComponent entry)
+        /// <summary>
+        /// Randomly adds gem sockets to an item with very low probability.
+        /// </summary>
+        /// <param name="entry">Item component to potentially socket</param>
+        /// <returns>Reference to the modified item component</returns>
+        public static ref ItemComponent MaybeAddSockets(ref ItemComponent entry)
         {
             var dice = Random.Shared.NextSingle();
             if (dice < 0.01)
@@ -148,6 +231,11 @@ namespace MagnumOpus.Helpers
             return ref entry;
         }
 
+        /// <summary>
+        /// Generates the complete drop table for a monster including equipment, consumables, and level-appropriate items.
+        /// </summary>
+        /// <param name="mobId">Monster ID to generate drops for</param>
+        /// <returns>List of possible item drops for the monster</returns>
         public static List<ItemType.Entry> GetDropItemsFor(int mobId)
         {
             if (!Collections.Drops.TryGetValue(mobId, out var drops))

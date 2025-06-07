@@ -9,12 +9,38 @@ using MagnumOpus.Squiggly.Models;
 
 namespace MagnumOpus.Helpers
 {
+    /// <summary>
+    /// Provides lookup functions for Conquer Online database entities including NPCs, tasks, and actions.
+    /// Centralizes access to game database collections with null-safe retrieval methods.
+    /// </summary>
     public static class CqProcessor
     {
+        /// <summary>
+        /// Retrieves an NPC entity by ID from the database collection.
+        /// </summary>
+        /// <param name="npcId">NPC identifier to lookup</param>
+        /// <returns>NPC entity or null if not found</returns>
         public static cq_npc? GetNpc(int npcId) => Collections.CqNpc.TryGetValue(npcId, out var npc) ? npc : default;
+        
+        /// <summary>
+        /// Retrieves a task entity by ID from the database collection.
+        /// </summary>
+        /// <param name="taskId">Task identifier to lookup</param>
+        /// <returns>Task entity or null if not found</returns>
         public static cq_task? GetTask(long taskId) => Collections.CqTask.TryGetValue(taskId, out var task) ? task : default;
+        
+        /// <summary>
+        /// Retrieves an action entity by ID from the database collection.
+        /// </summary>
+        /// <param name="actionId">Action identifier to lookup</param>
+        /// <returns>Action entity or null if not found</returns>
         public static cq_action? GetAction(long actionId) => Collections.CqAction.TryGetValue(actionId, out var action) ? action : default;
     }
+    
+    /// <summary>
+    /// Processes Conquer Online action scripts including conditional logic, attribute manipulation, and game event handling.
+    /// Implements the original TQ action system with attribute operations, boolean checks, and script execution.
+    /// </summary>
     public static class CqActionProcessor
     {
         private static readonly bool Trace = false;
