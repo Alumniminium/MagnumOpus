@@ -1,6 +1,5 @@
 using System.Numerics;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
@@ -17,7 +16,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the DeathSystem with full multi-threaded processing capabilities.
         /// </summary>
-        public DeathSystem() : base("Death", threads: 1) { }
+        public DeathSystem() : base("Death", threads: 1, log: false) { }
 
         /// <summary>
         /// Processes death for different entity types, routing to appropriate death handlers.
@@ -107,14 +106,17 @@ namespace MagnumOpus.Systems
             }
             else if (dtc.Tick + (NttWorld.TargetTps * 10) <= NttWorld.Tick && ntt.IsMonster())
             {
-                ref readonly var lifeGiver = ref ntt.Get<LifeGiverComponent>();
-                ref var spawner = ref lifeGiver.NTT.Get<SpawnerComponent>();
-                ref readonly var position = ref ntt.Get<PositionComponent>();
+                if (ntt.Has<LifeGiverComponent>())
+                {
+                    ref readonly var lifeGiver = ref ntt.Get<LifeGiverComponent>();
+                    ref var spawner = ref lifeGiver.NTT.Get<SpawnerComponent>();
+                    spawner.Count--;
+                }
 
+                ref readonly var position = ref ntt.Get<PositionComponent>();
                 var spatialRemoval = new SpatialHashUpdateComponent(position.Position, Vector2.Zero, position.Map, position.Map, SpacialHashUpdatType.Remove);
                 ntt.Set(ref spatialRemoval);
 
-                spawner.Count--;
                 ntt.Set<DestroyEndOfFrameComponent>();
             }
         }

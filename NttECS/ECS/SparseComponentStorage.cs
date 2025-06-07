@@ -3,9 +3,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using MagnumOpus.IO;
-using NttECS.ECS;
 
-namespace MagnumOpus.ECS;
+namespace NttECS.ECS;
 
 /// <summary>
 /// Thread-safe sparse storage system for ECS components providing efficient memory usage and fast access.

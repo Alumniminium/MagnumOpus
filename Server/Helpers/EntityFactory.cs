@@ -1,7 +1,6 @@
 using System.Numerics;
 using MagnumOpus.Components;
 using MagnumOpus.AOGP.Actions;
-using MagnumOpus.ECS;
 using MagnumOpus.Squiggly;
 using MagnumOpus.Squiggly.Models;
 using NttECS.ECS;

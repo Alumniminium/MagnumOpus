@@ -1,6 +1,5 @@
 using System.Numerics;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
@@ -17,7 +16,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the AttackSystem with half the available CPU cores for processing.
         /// </summary>
-        public AttackSystem() : base("Attack", threads: 1) { }
+        public AttackSystem() : base("Attack", threads: 1, log: false) { }
 
         /// <summary>
         /// Processes an entity's attack against their target, handling damage and validation.
@@ -30,12 +29,6 @@ namespace MagnumOpus.Systems
             if (atk.SleepTicks > 0)
             {
                 atk.SleepTicks--;
-                return;
-            }
-
-            if (atk.Target.Has<DeathTagComponent>())
-            {
-                ntt.Remove<AttackComponent>();
                 return;
             }
 
@@ -55,7 +48,7 @@ namespace MagnumOpus.Systems
                         atk.SleepTicks = NttWorld.TargetTps;
                         // TODO: calculate damage
                         var damage = Random.Shared.Next(1, 10);
-                        if (ntt.Has<NetworkComponent>())
+                        if (ntt.IsPlayer())
                             damage *= 2;
                         if (ntt.Has<GuardPositionComponent>())
                             damage *= 10;

@@ -2,7 +2,6 @@ using MagnumOpus.IO;
 using MagnumOpus.AOGP;
 using MagnumOpus.AOGP.Goals;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using NttECS.ECS;
@@ -18,7 +17,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the BasicAISystem with full multi-threaded processing capabilities.
         /// </summary>
-        public BasicAISystem() : base("Basic AI", threads: 1) { }
+        public BasicAISystem() : base("Basic AI", threads: 1, log: false) { }
 
         /// <summary>
         /// Filters entities to only process living monsters that are not guards.

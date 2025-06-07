@@ -1,6 +1,5 @@
 using MagnumOpus.IO;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Squiggly;
 using MagnumOpus.Helpers;
@@ -17,7 +16,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the ExpRewardSystem with limited threading for experience processing.
         /// </summary>
-        public ExpRewardSystem() : base("Exp Reward", threads: 1) { }
+        public ExpRewardSystem() : base("Exp Reward", threads: 1, log: false) { }
 
         /// <summary>
         /// Processes experience rewards, handles level-ups with automatic attribute allocation and health restoration.

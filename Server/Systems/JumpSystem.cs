@@ -17,7 +17,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the JumpSystem with limited threading for jump processing.
         /// </summary>
-        public JumpSystem() : base("Jump", threads: 1) { }
+        public JumpSystem() : base("Jump", threads: 1, log: false) { }
 
         /// <summary>
         /// Filters out item entities from jump processing since they cannot jump.

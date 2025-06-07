@@ -1,7 +1,6 @@
 using System.Runtime.InteropServices;
 using MagnumOpus.IO;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Cryptography;
 using NttECS.ECS;
@@ -94,7 +93,12 @@ namespace MagnumOpus.Networking.Packets
 
                         var target = NttWorld.GetEntity(msg.TargetUniqueId);
 
-                        // TODO: check if target not invalid
+                        // Don't allow attacking dead targets
+                        if (target.Has<DeathTagComponent>())
+                        {
+                            FConsole.WriteLine($"[MsgInteract] {ntt.Id} tried to attack dead target {msg.TargetUniqueId}");
+                            return;
+                        }
 
                         var atk = new AttackComponent(in target, msg.Type);
                         ntt.Set(ref atk);

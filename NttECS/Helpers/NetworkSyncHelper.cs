@@ -1,6 +1,6 @@
-using MagnumOpus.ECS;
+using NttECS.ECS;
 
-namespace MagnumOpus.Helpers;
+namespace NttECS.Helpers;
 
 /// <summary>
 /// Simple network synchronization helper for property-based NetworkSync system.

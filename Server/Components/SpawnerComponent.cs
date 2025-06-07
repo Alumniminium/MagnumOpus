@@ -1,5 +1,5 @@
 using System.Drawing;
-using MagnumOpus.ECS;
+using NttECS.ECS;
 namespace MagnumOpus.Components
 {
     [Component(SaveEnabled: true)]

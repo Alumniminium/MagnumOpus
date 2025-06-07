@@ -1,13 +1,12 @@
-using MagnumOpus.ECS;
 using MagnumOpus.Enums;
+using NttECS.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components;
+
+[Component]
+public struct RequestChangeEquipComponent(int itemNetId, int slot, bool equip)
 {
-    [Component]
-    public struct RequestChangeEquipComponent(int itemNetId, int slot, bool equip)
-    {
-        public int ItemNetId = itemNetId;
-        public MsgItemPosition Slot = (MsgItemPosition)slot;
-        public bool Equip = equip;
-    }
+    public int ItemNetId = itemNetId;
+    public MsgItemPosition Slot = (MsgItemPosition)slot;
+    public bool Equip = equip;
 }

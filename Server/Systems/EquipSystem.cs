@@ -1,6 +1,5 @@
 using MagnumOpus.IO;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
@@ -17,7 +16,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the EquipSystem with limited threading for equipment processing.
         /// </summary>
-        public EquipSystem() : base("Equip", threads: 1) { }
+        public EquipSystem() : base("Equip", threads: 1, log: false) { }
 
         /// <summary>
         /// Processes equipment change requests, handling both equipping and unequipping operations.

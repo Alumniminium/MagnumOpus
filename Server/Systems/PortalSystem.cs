@@ -1,6 +1,5 @@
 using MagnumOpus.IO;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Squiggly;
 using NttECS.ECS;
 
@@ -15,7 +14,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the PortalSystem with limited threading for portal processing.
         /// </summary>
-        public PortalSystem() : base("Portal", threads: 1) { }
+        public PortalSystem() : base("Portal", threads: 1, log: false) { }
 
         /// <summary>
         /// Processes portal requests by finding destination coordinates through portal database lookups.

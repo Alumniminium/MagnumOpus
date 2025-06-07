@@ -1,7 +1,6 @@
 using System.Numerics;
 using MagnumOpus.IO;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Squiggly;
@@ -17,7 +16,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the GuardAISystem with full multi-threaded processing capabilities.
         /// </summary>
-        public GuardAISystem() : base("Guard AI", threads: 1) { }
+        public GuardAISystem() : base("Guard AI", threads: 1, log: false) { }
 
         /// <summary>
         /// Filters entities to only process guard monsters.

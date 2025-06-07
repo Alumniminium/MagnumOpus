@@ -4,11 +4,11 @@ using System.Numerics;
 using Co2Core.Security.Cryptography;
 using MagnumOpus.IO;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.SpacePartitioning;
 using MagnumOpus.Squiggly.Models;
+using NttECS.ECS;
 
 namespace MagnumOpus.Squiggly
 {

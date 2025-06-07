@@ -1,6 +1,5 @@
 using System.Numerics;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using NttECS.ECS;
 

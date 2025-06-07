@@ -1,6 +1,6 @@
 using MagnumOpus.IO;
 
-namespace MagnumOpus.ECS;
+namespace NttECS.ECS;
 
 /// <summary>
 /// High-performance thread pool for parallel execution of ECS system operations.
@@ -62,13 +62,13 @@ public static class ThreadedWorker
 
         _numThreadsUsed = threads;
         Action = action;
-        
+
         _allReady.Reset();
         Interlocked.Exchange(ref _readyThreads, 0);
-        
+
         for (var i = 0; i < threads; i++)
             _blocks[i].Set();
-            
+
         _allReady.WaitOne();
     }
 
@@ -87,7 +87,7 @@ public static class ThreadedWorker
         while (true)
         {
             _blocks[idx].WaitOne();
-            
+
             try
             {
                 Action.Invoke(idx, _numThreadsUsed);

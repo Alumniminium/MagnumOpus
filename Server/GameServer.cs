@@ -1,11 +1,8 @@
 using System.Net.Sockets;
-using System.Text;
 using MagnumOpus.IO;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
-using MagnumOpus.Networking.Packets;
 using NttECS.ECS;
 
 namespace MagnumOpus
@@ -66,7 +63,7 @@ namespace MagnumOpus
                     var count = net.Socket.Receive(sizeBytes.Span);
 
                     if (count == 0)
-                        throw new SocketException((int)SocketError.Disconnecting);
+                        break;
 
                     crypto.Decrypt(sizeBytes.Span, count);
                     var size = BitConverter.ToUInt16(sizeBytes.Span[..2]);

@@ -1,7 +1,6 @@
 using System.Numerics;
 using MagnumOpus.IO;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
@@ -18,7 +17,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the DropItemSystem with limited threading for item drop processing.
         /// </summary>
-        public DropItemSystem() : base("Drop Item", threads: 1) { IsLogging = false; }
+        public DropItemSystem() : base("Drop Item", threads: 1, log: false) { IsLogging = false; }
         
         /// <summary>
         /// Processes item drop requests, removing items from inventory and placing them on the ground.

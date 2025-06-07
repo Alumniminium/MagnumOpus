@@ -1,6 +1,5 @@
 using MagnumOpus.IO;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using NttECS.ECS;
 
 namespace MagnumOpus.Systems
@@ -14,7 +13,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the DamageSystem with half the available CPU cores for processing.
         /// </summary>
-        public DamageSystem() : base("Damage", threads: 1) { }
+        public DamageSystem() : base("Damage", threads: 1, log: false) { }
 
         /// <summary>
         /// Applies damage to an entity, handles death conditions, and awards experience to attackers.
@@ -24,6 +23,13 @@ namespace MagnumOpus.Systems
         /// <param name="dmg">Damage component containing damage amount and attacker information</param>
         public override void Update(in NTT ntt, ref HealthComponent hlt, ref DamageComponent dmg)
         {
+            // Don't process damage on already dead entities
+            if (ntt.Has<DeathTagComponent>())
+            {
+                ntt.Remove<DamageComponent>();
+                return;
+            }
+
             var actualDamage = Math.Clamp(dmg.Damage, 0, hlt.Health);
             hlt.Health -= (ushort)actualDamage;
 

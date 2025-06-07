@@ -1,10 +1,9 @@
-using MagnumOpus.ECS;
+using NttECS.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components;
+
+[Component(SaveEnabled: true)]
+public struct HealthRegenComponent(float healthRegFactor)
 {
-    [Component(SaveEnabled: true)]
-    public struct HealthRegenComponent(float healthRegFactor)
-    {
-        public float PassiveHealPerSec = healthRegFactor;
-    }
+    public float PassiveHealPerSec = healthRegFactor;
 }

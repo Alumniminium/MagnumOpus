@@ -1,9 +1,9 @@
-using MagnumOpus.ECS;
-namespace MagnumOpus.Components
+using NttECS.ECS;
+
+namespace MagnumOpus.Components;
+
+[Component(SaveEnabled: true)]
+public struct MoneyRewardComponent(int amount)
 {
-    [Component(SaveEnabled: true)]
-    public struct MoneyRewardComponent(int amount)
-    {
-        public int Amount = amount;
-    }
+    public int Amount = amount;
 }

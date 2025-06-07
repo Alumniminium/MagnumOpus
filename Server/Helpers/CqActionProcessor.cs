@@ -1,7 +1,6 @@
 using System.Globalization;
 using MagnumOpus.IO;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Squiggly;

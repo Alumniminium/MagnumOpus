@@ -1,6 +1,5 @@
 using MagnumOpus.IO;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Squiggly;
 using NttECS.ECS;
@@ -20,8 +19,8 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the ViewportSystem with multi-threaded processing capabilities.
         /// </summary>
-        public ViewportSystem() : base("Viewport", threads: 1) { }
-        
+        public ViewportSystem() : base("Viewport", threads: 1, log: false) { }
+
         /// <summary>
         /// Updates an entity's viewport, calculates visible entities, and handles AI activation.
         /// </summary>
@@ -35,7 +34,7 @@ namespace MagnumOpus.Systems
         /// </example>
         public override void Update(in NTT ntt, ref PositionComponent pos, ref ViewportComponent vwp, ref ViewportUpdateTagComponent _)
         {
-            // ntt.Remove<ViewportUpdateTagComponent>();
+            ntt.Remove<ViewportUpdateTagComponent>();
 
             var viewport = vwp.Viewport;
             viewport.X = (int)(pos.Position.X - (viewport.Width / 2));

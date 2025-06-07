@@ -1,5 +1,3 @@
-using MagnumOpus.Networking.Packets;
-
 namespace MagnumOpus.Networking
 {
     /// <summary>

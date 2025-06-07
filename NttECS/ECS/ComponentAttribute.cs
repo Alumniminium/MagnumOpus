@@ -1,4 +1,4 @@
-namespace MagnumOpus.ECS;
+namespace NttECS.ECS;
 
 /// <summary>
 /// Attribute to mark structs as ECS components with optional persistence configuration.

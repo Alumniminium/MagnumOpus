@@ -18,7 +18,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the ShopSystem with limited threading for transaction processing.
         /// </summary>
-        public ShopSystem() : base("Shop", threads: 1) { }
+        public ShopSystem() : base("Shop", threads: 1, log: false) { }
 
         /// <summary>
         /// Processes shop transactions, handling both item purchases and sales with appropriate validation and economy tracking.

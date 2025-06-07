@@ -1,12 +1,11 @@
-using MagnumOpus.ECS;
+using NttECS.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components;
+
+[Component]
+public struct RequestShopItemTransactionComponent(int shopId, int itemId, bool buy)
 {
-    [Component]
-    public struct RequestShopItemTransactionComponent(int shopId, int itemId, bool buy)
-    {
-        public int ShopId = shopId;
-        public int ItemId = itemId;
-        public bool Buy = buy;
-    }
+    public int ShopId = shopId;
+    public int ItemId = itemId;
+    public bool Buy = buy;
 }

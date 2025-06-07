@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
-using NttECS.ECS;
 
-namespace MagnumOpus.ECS
+namespace NttECS.ECS
 {
     /// <summary>
     /// High-performance entity query system providing type-safe component filtering with foreach enumeration support.

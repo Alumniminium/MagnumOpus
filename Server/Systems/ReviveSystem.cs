@@ -1,7 +1,6 @@
 using System.Numerics;
 using MagnumOpus.IO;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
@@ -19,7 +18,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the ReviveSystem with limited threading for revival processing.
         /// </summary>
-        public ReviveSystem() : base("Revive", threads: 1) { }
+        public ReviveSystem() : base("Revive", threads: 1, log: false) { }
 
         /// <summary>
         /// Processes player revival, restoring health and teleporting to appropriate respawn location.

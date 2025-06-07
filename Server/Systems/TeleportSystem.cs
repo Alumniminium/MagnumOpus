@@ -1,7 +1,6 @@
 using System.Numerics;
 using MagnumOpus.IO;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Helpers;
 using NttECS.ECS;
@@ -17,7 +16,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the TeleportSystem with limited threading and debug logging enabled.
         /// </summary>
-        public TeleportSystem() : base("Teleport", threads: 1 / 4, log: true) { }
+        public TeleportSystem() : base("Teleport", threads: 1 / 4, log: false) { }
 
         /// <summary>
         /// Processes an entity's teleportation request, updating position and notifying clients.

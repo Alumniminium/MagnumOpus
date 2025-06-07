@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using MagnumOpus.ECS;
 using MagnumOpus.Components;
 using NttECS.ECS;
 

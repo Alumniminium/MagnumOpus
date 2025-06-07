@@ -1,6 +1,3 @@
-using System.Text;
-using MagnumOpus.Networking.Packets;
-
 namespace MagnumOpus.Networking.Cryptography;
 
 public class Crypto

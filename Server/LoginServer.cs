@@ -1,7 +1,6 @@
 using System.Net.Sockets;
 using MagnumOpus.IO;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking;
 using NttECS.ECS;

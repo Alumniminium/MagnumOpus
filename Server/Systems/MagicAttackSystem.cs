@@ -1,6 +1,5 @@
 using MagnumOpus.IO;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Helpers;
 using NttECS.ECS;
@@ -16,7 +15,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the MagicAttackSystem with limited threading for spell execution.
         /// </summary>
-        public MagicAttackSystem() : base("Magic Attack", threads: 1) { }
+        public MagicAttackSystem() : base("Magic Attack", threads: 1, log: false) { }
 
         /// <summary>
         /// Executes magic attacks against all targets in the collection, applying damage and visual effects.
@@ -32,6 +31,10 @@ namespace MagnumOpus.Systems
             }
             foreach (var targetEntity in targetCollection.Targets)
             {
+                // Don't apply damage to already dead entities
+                if (targetEntity.Has<DeathTagComponent>())
+                    continue;
+
                 var damageComponent = new DamageComponent(in targetEntity, in ntt, (int)targetCollection.MagicType.Power);
                 targetEntity.Set(ref damageComponent);
 

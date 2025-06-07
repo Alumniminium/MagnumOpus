@@ -1,5 +1,4 @@
 using Co2Core.IO;
-using MagnumOpus.ECS;
 using NttECS.ECS;
 
 namespace MagnumOpus.Components

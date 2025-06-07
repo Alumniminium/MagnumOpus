@@ -1,9 +1,9 @@
-using MagnumOpus.ECS;
-namespace MagnumOpus.Components
+using NttECS.ECS;
+
+namespace MagnumOpus.Components;
+
+[Component]
+public struct RequestDropMoneyComponent(int amount)
 {
-    [Component]
-    public struct RequestDropMoneyComponent(int amount)
-    {
-        public int Amount = amount;
-    }
+    public int Amount = amount;
 }

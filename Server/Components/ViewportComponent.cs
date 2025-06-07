@@ -1,7 +1,6 @@
 using System.Drawing;
-using MagnumOpus.ECS;
-using MagnumOpus.Helpers;
 using NttECS.ECS;
+using NttECS.Helpers;
 
 namespace MagnumOpus.Components;
 

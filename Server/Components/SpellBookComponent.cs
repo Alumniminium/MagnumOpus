@@ -1,10 +1,10 @@
-using MagnumOpus.ECS;
-namespace MagnumOpus.Components
+using NttECS.ECS;
+
+namespace MagnumOpus.Components;
+
+[Component(SaveEnabled: true)]
+public struct SpellBookComponent
 {
-    [Component(SaveEnabled: true)]
-    public struct SpellBookComponent
-    {
-        public Dictionary<ushort, (ushort lvl, ushort exp, ushort cooldown)> Spells;
-        public SpellBookComponent() => Spells = [];
-    }
+    public Dictionary<ushort, (ushort lvl, ushort exp, ushort cooldown)> Spells;
+    public SpellBookComponent() => Spells = [];
 }

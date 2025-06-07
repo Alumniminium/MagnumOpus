@@ -1,11 +1,11 @@
-using MagnumOpus.ECS;
-namespace MagnumOpus.Components
+using NttECS.ECS;
+
+namespace MagnumOpus.Components;
+
+[Component(SaveEnabled: true)]
+public struct RecordPointComponent(ushort x, ushort y, ushort map)
 {
-    [Component(SaveEnabled: true)]
-    public struct RecordPointComponent(ushort x, ushort y, ushort map)
-    {
-        public ushort Map = map;
-        public ushort X = x;
-        public ushort Y = y;
-    }
+    public ushort Map = map;
+    public ushort X = x;
+    public ushort Y = y;
 }

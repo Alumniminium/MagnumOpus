@@ -1,10 +1,9 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using NttECS.ECS;
 using Prometheus;
 
-namespace MagnumOpus.ECS;
+namespace NttECS.ECS;
 
 /// <summary>
 /// Base class for all ECS systems providing entity filtering, multi-threading, and performance monitoring.
@@ -95,7 +94,7 @@ public abstract class NttSystem
 
         // First 'extraEntities' threads get one extra entity
         var chunkSize = baseChunkSize + (idx < extraEntities ? 1 : 0);
-        var start = (baseChunkSize * idx) + Math.Min(idx, extraEntities);
+        var start = baseChunkSize * idx + Math.Min(idx, extraEntities);
 
         Update(start, chunkSize);
     }
@@ -112,7 +111,7 @@ public abstract class NttSystem
     /// </summary>
     /// <param name="ntint">Entity to evaluate</param>
     /// <returns>True if entity matches system requirements</returns>
-    protected virtual bool MatchesFilter(in NTT ntint) => !ntint.Id.Equals(default(int));
+    protected virtual bool MatchesFilter(in NTT ntint) => !ntint.Id.Equals(default);
 
     /// <summary>
     /// Handles entity addition/removal when entity components change.

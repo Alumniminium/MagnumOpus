@@ -2,7 +2,6 @@ using System.Numerics;
 using Co2Core.IO;
 using MagnumOpus.IO;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using NttECS.ECS;
@@ -18,7 +17,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the TargetFinderSystem with limited threading for targeting calculations.
         /// </summary>
-        public TargetFinderSystem() : base("Radius Targets", threads: 1) { }
+        public TargetFinderSystem() : base("Radius Targets", threads: 1, log: false) { }
 
         /// <summary>
         /// Processes targeting requests to find entities within spell area-of-effect shapes.

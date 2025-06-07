@@ -1,7 +1,6 @@
 using System.Reflection;
-using NttECS.ECS;
 
-namespace MagnumOpus.ECS
+namespace NttECS.ECS
 {
     /// <summary>
     /// Reflection-based utility for performing type-safe operations on all component types.
@@ -28,7 +27,8 @@ namespace MagnumOpus.ECS
         /// </summary>
         private static void LoadMethods()
         {
-            var types = Assembly.GetExecutingAssembly().GetTypes();
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var types = assemblies.SelectMany(x => x.GetTypes());
 
             var componentTypes = types
                 .Where(t => t.GetCustomAttributes(typeof(ComponentAttribute), true).Length > 0)
@@ -36,7 +36,7 @@ namespace MagnumOpus.ECS
 
             foreach (var ct in componentTypes)
             {
-                var removeMethod = (Action<NTT, bool>)typeof(SparseComponentStorage<>).MakeGenericType(ct).GetMethod("Remove")!.CreateDelegate(typeof(Action<NTT, bool>));
+                var removeMethod = typeof(SparseComponentStorage<>).MakeGenericType(ct).GetMethod("Remove")!.CreateDelegate<Action<NTT, bool>>();
                 RemoveCache.Add(ct, removeMethod);
 
                 var changeOwnerMethod = (Action<NTT, NTT>)typeof(SparseComponentStorage<>).MakeGenericType(ct).GetMethod("ChangeOwner")!.CreateDelegate(typeof(Action<NTT, NTT>));
@@ -45,10 +45,10 @@ namespace MagnumOpus.ECS
                 var saveAttribute = ct.GetCustomAttribute<ComponentAttribute>();
                 if (saveAttribute?.SaveEnabled ?? false)
                 {
-                    var saveMethod = (Action<string>)typeof(SparseComponentStorage<>).MakeGenericType(ct).GetMethod("Save")!.CreateDelegate(typeof(Action<string>));
+                    var saveMethod = typeof(SparseComponentStorage<>).MakeGenericType(ct).GetMethod("Save")!.CreateDelegate<Action<string>>();
                     SaveCache.Add(ct, saveMethod);
 
-                    var loadMethod = (Action<string>)typeof(SparseComponentStorage<>).MakeGenericType(ct).GetMethod("Load")!.CreateDelegate(typeof(Action<string>));
+                    var loadMethod = typeof(SparseComponentStorage<>).MakeGenericType(ct).GetMethod("Load")!.CreateDelegate<Action<string>>();
                     LoadCache.Add(ct, loadMethod);
                 }
             }

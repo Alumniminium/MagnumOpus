@@ -1,11 +1,10 @@
-using MagnumOpus.ECS;
+using NttECS.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components;
+
+[Component]
+public struct PingComponent
 {
-    [Component]
-    public struct PingComponent
-    {
-        public int LastPing;
-        public int Ping;
-    }
+    public int LastPing;
+    public int Ping;
 }

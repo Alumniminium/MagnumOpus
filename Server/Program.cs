@@ -2,10 +2,10 @@
 using System.Runtime;
 using MagnumOpus.IO;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Squiggly;
 using MagnumOpus.Systems;
+using NttECS.ECS;
 
 namespace MagnumOpus
 {

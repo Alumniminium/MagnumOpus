@@ -1,7 +1,5 @@
-using System.Text;
 using MagnumOpus.IO;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using NttECS.ECS;
@@ -17,7 +15,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes PacketsOut system with limited threading for packet transmission.
         /// </summary>
-        public PacketsOut() : base("Packets Out", threads: 1) { }
+        public PacketsOut() : base("Packets Out", threads: 1, log: false) { }
 
         /// <summary>
         /// Processes outgoing packet queue, applying appropriate encryption and sending data to clients.

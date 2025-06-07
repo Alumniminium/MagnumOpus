@@ -4,9 +4,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using MagnumOpus.IO;
-using NttECS.ECS;
 
-namespace MagnumOpus.ECS;
+namespace NttECS.ECS;
 
 /// <summary>
 /// Central world manager for the Entity Component System, handling entity lifecycle, systems coordination, and game loop timing.
@@ -64,21 +63,21 @@ public static class NttWorld
     /// <param name="systems">Array of systems to register for entity processing</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void SetSystems(params NttSystem[] systems) => Systems = systems;
-    
+
     /// <summary>
     /// Sets the target ticks per second for consistent simulation timing.
     /// </summary>
     /// <param name="fps">Target frames/ticks per second</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void SetTPS(int fps) => TargetTps = fps;
-    
+
     /// <summary>
     /// Registers a callback to be invoked every second.
     /// </summary>
     /// <param name="action">Action to invoke every second</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void RegisterOnSecond(Action action) => OnSecond += action;
-    
+
     /// <summary>
     /// Registers a callback to be invoked at the end of each tick.
     /// </summary>
@@ -173,7 +172,7 @@ public static class NttWorld
         }
 
         var tickDuration = (float)Stopwatch.GetElapsedTime(TickBeginTime).TotalMilliseconds;
-        var sleepTime = (int)Math.Max(0, -1 + (UpdateTime * 1000) - tickDuration);
+        var sleepTime = (int)Math.Max(0, -1 + UpdateTime * 1000 - tickDuration);
         Thread.Sleep(sleepTime);
     }
 

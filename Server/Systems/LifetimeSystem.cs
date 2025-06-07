@@ -1,6 +1,5 @@
 using MagnumOpus.IO;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.Helpers;
@@ -19,7 +18,7 @@ namespace MagnumOpus.Systems
         /// <summary>
         /// Initializes the LifetimeSystem with limited threading for expiration processing.
         /// </summary>
-        public LifetimeSystem() : base("Lifetime", threads: 1) { IsLogging = false; }
+        public LifetimeSystem() : base("Lifetime", threads: 1, log: false) { IsLogging = false; }
 
         /// <summary>
         /// Processes entities with limited lifetimes, showing countdown effects and marking expired entities for death.

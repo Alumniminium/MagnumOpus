@@ -1,11 +1,10 @@
-using MagnumOpus.ECS;
+using NttECS.ECS;
 
-namespace MagnumOpus.Components
+namespace MagnumOpus.Components;
+
+[Component]
+public struct RequestItemUseComponent(int itemNetId, int param)
 {
-    [Component]
-    public struct RequestItemUseComponent(int itemNetId, int param)
-    {
-        public int ItemNetId = itemNetId;
-        public int Param = param;
-    }
+    public int ItemNetId = itemNetId;
+    public int Param = param;
 }
