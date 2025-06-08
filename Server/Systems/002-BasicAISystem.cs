@@ -36,10 +36,9 @@ namespace MagnumOpus.Systems
             if (brn.State == BrainState.WakingUp)
             {
                 ntt.Set<ViewportUpdateTagComponent>();
-                
+
                 if (IsLogging)
-                    FConsole.WriteLine("Waking up {ntt} with {visibleCount} visible entities", 
-                        ntt, vwp.EntitiesVisible.Count);
+                    FConsole.WriteLine("Waking up {ntt} with {visibleCount} visible entities", ntt, vwp.EntitiesVisible.Count);
             }
 
             // Validate current target is still visible
@@ -47,21 +46,11 @@ namespace MagnumOpus.Systems
                 brn.Target = default;
 
             // Find a new target if we don't have one
-            if (brn.Target == 0)
+            if (brn.Target == default)
             {
                 // Scan for visible players to target
-                foreach (var visibleEntity in vwp.EntitiesVisible)
-                {
-                    if (!visibleEntity.IsPlayer())
-                        continue;
+                brn.Target = vwp.Query<PlayerComponent>().Without<DeathTagComponent>().NearestTo(pos.Position);
 
-                    if (visibleEntity.Has<DeathTagComponent>())
-                        continue;
-
-                    brn.Target = visibleEntity;
-                    break;
-                }
-                
                 // No valid targets found - go idle
                 if (brn.Target == 0)
                 {
@@ -79,9 +68,14 @@ namespace MagnumOpus.Systems
             }
             else
             {
-                // Execute next action in the plan
-                brn.Plan[0].Execute(ntt);
-                brn.Plan.RemoveAt(0);
+                // Execute next action in the plan, if the target is still alive
+                if (!brn.Target.Has<DeathTagComponent>())
+                {
+                    brn.Plan[0].Execute(ntt);
+                    brn.Plan.RemoveAt(0);
+                }
+                else
+                    brn.Plan.Clear();
             }
 
             // Put monster to sleep for 1-2 seconds after action

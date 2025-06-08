@@ -7,12 +7,21 @@ namespace MagnumOpus.Helpers;
 
 public static class NttExtension
 {
+    public static bool IsDead(this NTT ntt) => ntt.Has<DeathTagComponent>();
+    public static bool IsAlive(this NTT ntt) => !ntt.IsDead();
+    public static bool NotPlayer(this NTT ntt) => !ntt.IsPlayer();
+    public static bool NotNpc(this NTT ntt) => !ntt.IsNpc();
+    public static bool NotMonster(this NTT ntt) => !ntt.IsMonster();
+    public static bool NotItem(this NTT ntt) => !ntt.IsItem();
+    public static bool NotTrap(this NTT ntt) => !ntt.IsTrap();
+
     public static bool IsPlayer(this NTT ntt) => ntt.Has<NetworkComponent>() || ntt.Has<PlayerComponent>();
     public static bool IsNpc(this NTT ntt) => ntt.Has<NpcComponent>();
     public static bool IsMonster(this NTT ntt) => ntt.Has<CqMonsterComponent>();
     public static bool IsItem(this NTT ntt) => ntt.Has<ItemComponent>();
     public static bool IsTrap(this NTT ntt) => ntt.Has<TrapComponent>();
     public static bool IsOther(this NTT ntt) => false; // No entities should match this for now
+    
     /// <summary>
     /// Synchronizes a network message to this entity or broadcasts it to nearby players.
     /// Handles both direct player messaging and area-of-effect broadcasting based on viewport.

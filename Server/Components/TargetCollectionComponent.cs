@@ -1,5 +1,6 @@
 using Co2Core.IO;
 using NttECS.ECS;
+using NttECS.Memory;
 
 namespace MagnumOpus.Components;
 
@@ -13,13 +14,13 @@ namespace MagnumOpus.Components;
 /// </summary>
 public struct TargetCollectionComponent
 {
-    public List<NTT> Targets;
+    public SwapList<NTT> Targets;
     public MagicType.Entry MagicType;
 
-    public TargetCollectionComponent() => Targets = [];
+    public TargetCollectionComponent() => Targets = new SwapList<NTT>(4);
     public TargetCollectionComponent(MagicType.Entry magicType)
     {
         MagicType = magicType;
-        Targets = [];
+        Targets = new SwapList<NTT>(4);
     }
 }

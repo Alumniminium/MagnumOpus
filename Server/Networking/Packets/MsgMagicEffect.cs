@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using MagnumOpus.Components;
 using NttECS.ECS;
+using NttECS.Memory;
 
 namespace MagnumOpus.Networking.Packets
 {
@@ -18,11 +19,10 @@ namespace MagnumOpus.Networking.Packets
         public int TargetCount;
         public fixed int Targets[180];
 
-        public static IEnumerable<byte[]> Create(in NTT attacker, IEnumerable<NTT> targetEnumerable, int damage, ushort skillId, byte skillLevel)
+        public static IEnumerable<byte[]> Create(in NTT attacker, SwapList<NTT> entities, int damage, ushort skillId, byte skillLevel)
         {
             ref readonly var bdy = ref attacker.Get<BodyComponent>();
             var maxTargets = 60;
-            var entities = targetEnumerable.ToList();
             var packetCount = (int)Math.Max(1, Math.Ceiling((float)entities.Count / maxTargets));
             var packets = new byte[packetCount][];
 

@@ -1,8 +1,7 @@
-﻿namespace MagnumOpus.Enums
+﻿namespace MagnumOpus.Enums;
+
+public enum MsgFriendStatusType : byte
 {
-    public enum MsgFriendStatusType : byte
-    {
-        Offline = 0,
-        Online = 1
-    }
+    Offline = 0,
+    Online = 1
 }

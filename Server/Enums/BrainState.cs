@@ -1,14 +1,11 @@
-// ReSharper disable All
+namespace MagnumOpus.Enums;
 
-namespace MagnumOpus.Enums
+public enum BrainState : byte
 {
-    public enum BrainState
-    {
-        Idle,
-        WakingUp,
-        Approaching,
-        Escaping,
-        Attacking,
-        Sleeping,
-    }
+    Idle,
+    WakingUp,
+    Approaching,
+    Escaping,
+    Attacking,
+    Sleeping,
 }

@@ -1,51 +1,44 @@
-﻿// -------- Yi --------
-// Project: Library File: GuildRequest.cs 
-// Created: 27/10/2015/2015 at 3:09 PM
-// Last Edit: 08/12/2015 at 12:31 PM
-// By: Buddha
+﻿namespace MagnumOpus.Enums;
 
-namespace MagnumOpus.Enums
+public enum GuildRequest
 {
-    public enum GuildRequest
-    {
-        None = 0,
-        ApplyJoin = 1, // ÉêÇë¼ÓÈëºÚÉç»á, id
-        InviteJoin = 2, // ÑûÇë¼ÓÈëºÚÉç»á, id
-        LeaveSyn = 3, // ÍÑÀëºÚÉç»á
-        KickOutMember = 4, // ¿ª³ýºÚÉç»á³ÉÔ±, name
-        QuerySynName = 6, // ²éÑ¯°ïÅÉÃû×Ö
-        SetAlly = 7, // ½áÃË				// to client, npc(npc_id is syn_id, same follow)
-        ClearAlly = 8, // ½â³ý½áÃË			// to client, npc
-        SetEnemy = 9, // Ê÷µÐ				// to client, npc
-        ClearAntagonize = 10, // ½â³ýÊ÷µÐ			// to client, npc
-        DonateMoney = 11, // °ïÖÚ¾èÇ®
-        QuerySynAttr = 12, // ²éÑ¯°ïÅÉÐÅÏ¢		// to server
-        SetSyn = 14, // Ìí¼Ó°ïÅÉID		// to client
-        UniteSubSyn = 15, // ºÏ²¢ÌÃ¿Ú // to client // dwData±»ºÏ²¢, targetÊÇÖ÷ÈË
-        UniteSyn = 16, // ºÏ²¢°ïÅÉ // to client // dwData±»ºÏ²¢, targetÊÇÖ÷ÈË
-        SetWhiteSyn = 17, // °×°ï°ïÅÉID // Î´±»Õ¼ÁìÇë·¢ID_NONE
-        SetBlackSyn = 18, // ºÚ°ï°ïÅÉID // Î´±»Õ¼ÁìÇë·¢ID_NONE
-        DestroySyn = 19, // ÊÀ½ç¹ã²¥£¬É¾³ý°ïÅÉ¡£
-        SetMantle = 20, // ÊÀ½ç¹ã²¥£¬Åû·ç // add huang 2004.1.1       
+    None = 0,
+    ApplyJoin = 1, // Apply to join guild/syndicate, id (申请加入黑社会, id)
+    InviteJoin = 2, // Invite to join guild/syndicate, id (邀请加入黑社会, id)
+    LeaveGuild = 3, // Leave guild/syndicate (脱离黑社会)
+    KickOutMember = 4, // Kick out guild member, name (开除黑社会成员, name)
+    QueryGuildName = 6, // Query guild name (查询帮派名字)
+    SetAlly = 7, // Form alliance (结盟)				// to client, npc(npc_id is syn_id, same follow)
+    ClearAlly = 8, // Dissolve alliance (解除结盟)			// to client, npc
+    SetEnemy = 9, // Set as enemy (树敌)				// to client, npc
+    RemoveEnemy = 10, // Clear enemy status (解除树敌)			// to client, npc
+    DonateMoney = 11, // Guild members donate money (帮众捐钱)
+    QueryGuildInfo = 12, // Query guild attributes/info (查询帮派信息)		// to server
+    SetGuildId = 14, // Add guild ID (添加帮派ID)		// to client
+    MergeSubGuild = 15, // Merge sub-guild (合并堂口) // to client // dwData is merged, target is master
+    MergeGuild = 16, // Merge guild (合并帮派) // to client // dwData is merged, target is master
+    SetWhiteGuild = 17, // White guild ID (白帮帮派ID) // Send ID_NONE if not occupied
+    SetBlackGuild = 18, // Black guild ID (黑帮帮派ID) // Send ID_NONE if not occupied
+    DestroyGuild = 19, // World broadcast, destroy guild (世界广播，删除帮派)
+    SetMantle = 20, // World broadcast, mantle/cape (世界广播，披风) // add huang 2004.1.1       
 
-        //_APPLY_ALLY = 21,			// ÉêÇë½áÃË			// to server&client, idTarget=SynLeaderID
-        //_CLEAR_ALLY = 22,			// Çå³ý½áÃË			// to server
+    //_APPLY_ALLY = 21,			// Apply for alliance (申请结盟)			// to server&client, idTarget=SynLeaderID
+    //_CLEAR_ALLY = 22,			// Clear alliance (清除结盟)			// to server
 
-        //_SET_ANTAGONIZE = 23,			//Ê÷µÐ client to server
-        //_CLEAR_ANTAGONIZE = 24,			//½â³ýÊ÷µÐ client to server
+    //_SET_ANTAGONIZE = 23,			// Set antagonize (树敌) client to server
+    //_CLEAR_ANTAGONIZE = 24,			// Clear antagonize (解除树敌) client to server
 
-        //NPCMSG_CREATE_SYN = 101,			// Í¨ÖªNPC·þÎñÆ÷Ìí¼Ó°ïÅÉ	// to npc
-        //NPCMSG_DESTROY_SYN = 102,			// Í¨ÖªNPC·þÎñÆ÷É¾³ý°ïÅÉ	// to npc
-        //KICKOUT_MEMBER_INFO_QUERY = 110,	//°ïÖ÷²éÑ¯ÉêÇë¿ª³ýµÄ³ÉÔ±
-        //KICKOUT_MEMBER_AGREE = 111,	//°ïÖ÷Í¬Òâ¿ª³ý»áÔ±
-        //KICKOUT_MEMBER_NOAGREE = 112,	//°ïÖ÷²»Í¬Òâ¿ª³ý»áÔ±
-        //SYNMEMBER_ASSIGN = 113,			//°ïÅÉ³ÉÔ±±àÖÆ	
-        //SYN_CHANGE_NAME = 114,			// °ïÅÉ¸ÄÃû
-        //SYN_CHANGE_SUBNAME = 114,		//·ÖÍÅ¸ÄÃû
-        //SYN_CHANGE_SUBSUBNAME = 115,		//·Ö¶Ó¸ÄÃû
-        //SYN_DEMISE = 116,		//ìøÈÃ
-        //SYN_SET_ASSISTANT = 117,		//ÉèÖÃ¸±°ïÖ÷
-        //SYN_SET_TEAMLEADER = 118,		//ÉèÖÃ°ïÅÉ¶Ó³¤
-        //SYN_SET_PUBLISHTIME = 119,		//ÉèÖÃ¹«¸æÊ±¼ä
-    }
+    //NPCMSG_CREATE_SYN = 101,			// Notify NPC server add guild (通知NPC服务器添加帮派)	// to npc
+    //NPCMSG_DESTROY_SYN = 102,			// Notify NPC server destroy guild (通知NPC服务器删除帮派)	// to npc
+    //KICKOUT_MEMBER_INFO_QUERY = 110,	// Guild leader queries kick request (帮主查询申请开除的成员)
+    //KICKOUT_MEMBER_AGREE = 111,	// Guild leader agrees to kick member (帮主同意开除会员)
+    //KICKOUT_MEMBER_NOAGREE = 112,	// Guild leader disagrees to kick member (帮主不同意开除会员)
+    //SYNMEMBER_ASSIGN = 113,			// Guild member assignment (帮派成员编制)	
+    //SYN_CHANGE_NAME = 114,			// Guild rename (帮派改名)
+    //SYN_CHANGE_SUBNAME = 114,		// Sub-group rename (分团改名)
+    //SYN_CHANGE_SUBSUBNAME = 115,		// Sub-team rename (分队改名)
+    //SYN_DEMISE = 116,		// Demise/transfer leadership (禅让)
+    //SYN_SET_ASSISTANT = 117,		// Set assistant leader (设置副帮主)
+    //SYN_SET_TEAMLEADER = 118,		// Set guild team leader (设置帮派队长)
+    //SYN_SET_PUBLISHTIME = 119,		// Set announcement time (设置公告时间)
 }

@@ -1,4 +1,5 @@
 using MagnumOpus.Components;
+using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
 using MagnumOpus.SpacePartitioning;

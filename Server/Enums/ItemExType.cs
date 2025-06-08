@@ -1,11 +1,10 @@
-namespace MagnumOpus.Enums
+namespace MagnumOpus.Enums;
+
+public enum ItemExType : byte
 {
-    public enum ItemExType : byte
-    {
-        None = 0,
-        Booth = 1,
-        Equipment = 2,
-        BoothCPs = 3,
-        OtherPlayer_Equipement = 4,
-    };
-}
+    None = 0,
+    Booth = 1,
+    Equipment = 2,
+    BoothCPs = 3,
+    OtherPlayer_Equipement = 4,
+};

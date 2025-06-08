@@ -1,10 +1,9 @@
-﻿namespace MagnumOpus.Enums
+﻿namespace MagnumOpus.Enums;
+
+public enum MsgRemoteMaintenanceType : byte
 {
-    public enum MsgRemoteMaintenanceType : byte
-    {
-        StartBackup = 0,
-        OptimizeMemory = 1,
-        Shutdown = 2,
-        DownloadDatabase = 3
-    }
+    StartBackup = 0,
+    OptimizeMemory = 1,
+    Shutdown = 2,
+    DownloadDatabase = 3
 }

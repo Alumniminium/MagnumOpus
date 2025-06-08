@@ -5,6 +5,7 @@ using MagnumOpus.ECS;
 using MagnumOpus.Helpers;
 using MagnumOpus.Networking.Packets;
 using NttECS.ECS;
+using MagnumOpus.Enums;
 
 namespace MagnumOpus.Systems
 {

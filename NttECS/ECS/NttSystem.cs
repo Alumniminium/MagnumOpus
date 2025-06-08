@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using NttECS.Memory;
 using Prometheus;
 
 namespace NttECS.ECS;
@@ -22,7 +23,7 @@ public abstract class NttSystem
     /// <summary>Thread-safe collection of entities matching this system's filter</summary>
     internal readonly ConcurrentDictionary<int, NTT> _entities = new();
     /// <summary>List view of entities for efficient iteration</summary>
-    internal readonly List<NTT> _entitiesList = [];
+    internal readonly SwapList<NTT> _entitiesList = new(64);
     /// <summary>Prometheus metric for tracking system execution time</summary>
     private readonly Gauge TimeMetricsExporter;
     /// <summary>Prometheus metric for tracking processed entity count</summary>
@@ -147,13 +148,122 @@ public abstract class NttSystem<T>(string name, int threads = 1, bool log = fals
 
     protected override void Update(int start, int amount)
     {
-        var span = CollectionsMarshal.AsSpan(_entitiesList).Slice(start, amount);
-        for (var i = 0; i < span.Length; i++)
+        // Use optimized packed component iteration when possible
+        if (UseBatchProcessing && PackedComponentStorage<T>.Count > 0)
         {
-            ref readonly var ntt = ref span[i];
-            ref var c1 = ref ntt.Get<T>();
-            Update(in ntt, ref c1);
+            UpdateBatch(start, amount);
         }
+        else
+        {
+            // Fallback to entity-based iteration
+            var span = _entitiesList.AsSpan(start, amount);
+            for (var i = 0; i < span.Length; i++)
+            {
+                ref readonly var ntt = ref span[i];
+                ref var c1 = ref ntt.Get<T>();
+                Update(in ntt, ref c1);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Enables batch processing optimization for better cache locality.
+    /// Default is true for optimal performance with zero-branching sequential iteration.
+    /// Override to return false only if system needs entity-based iteration for specific reasons.
+    /// </summary>
+    protected virtual bool UseBatchProcessing => true;
+
+    /// <summary>
+    /// Optimized batch processing method using packed component arrays.
+    /// Provides excellent cache locality by processing components sequentially with zero branching.
+    /// </summary>
+    /// <param name="start">Starting index in entity list</param>
+    /// <param name="amount">Number of entities to process</param>
+    protected virtual void UpdateBatch(int start, int amount)
+    {
+        // Build filtered component arrays for this system's entities
+        var filteredComponents = GetFilteredComponents();
+        var filteredEntities = GetFilteredEntities();
+
+        // Process entities in the specified range with zero branching
+        var endIndex = Math.Min(start + amount, Math.Min(filteredComponents.Length, filteredEntities.Length));
+        for (var i = start; i < endIndex; i++)
+        {
+            var ntt = new NTT(filteredEntities[i]);
+            // No branching - direct sequential processing
+            Update(in ntt, ref filteredComponents[i]);
+        }
+    }
+
+    /// <summary>
+    /// Gets a filtered array of components containing only entities that match this system's filter.
+    /// This enables zero-branching iteration with perfect cache locality.
+    /// </summary>
+    /// <returns>Array of components for entities matching this system</returns>
+    private T[] GetFilteredComponents()
+    {
+        if (_filteredComponents == null || _componentsCacheTick != NttWorld.Tick)
+        {
+            RebuildFilteredArrays();
+        }
+        return _filteredComponents!;
+    }
+
+    /// <summary>
+    /// Gets a filtered array of entity IDs containing only entities that match this system's filter.
+    /// Parallel to GetFilteredComponents() for zero-branching iteration.
+    /// </summary>
+    /// <returns>Array of entity IDs for entities matching this system</returns>
+    private int[] GetFilteredEntities()
+    {
+        if (_filteredEntities == null || _componentsCacheTick != NttWorld.Tick)
+        {
+            RebuildFilteredArrays();
+        }
+        return _filteredEntities!;
+    }
+
+    /// <summary>Cached filtered component array for this system's entities</summary>
+    private T[]? _filteredComponents;
+    /// <summary>Cached filtered entity ID array for this system's entities</summary>
+    private int[]? _filteredEntities;
+    /// <summary>Tick when the filtered arrays were last built</summary>
+    private long _componentsCacheTick = -1;
+
+    /// <summary>
+    /// Rebuilds the filtered component and entity arrays by intersecting the packed storage
+    /// with this system's entity filter. Called when cache is invalidated.
+    /// </summary>
+    private void RebuildFilteredArrays()
+    {
+        var allComponents = PackedComponentStorage<T>.GetComponentSpan();
+        var allEntities = PackedComponentStorage<T>.GetEntitySpan();
+
+        // Count matching entities first to allocate exact arrays
+        var matchCount = 0;
+        for (var i = 0; i < allEntities.Length; i++)
+        {
+            if (_entities.ContainsKey(allEntities[i]))
+                matchCount++;
+        }
+
+        // Allocate exact-size arrays (no wasted memory)
+        _filteredComponents = new T[matchCount];
+        _filteredEntities = new int[matchCount];
+
+        // Build filtered arrays with only matching entities
+        var writeIndex = 0;
+        for (var i = 0; i < allEntities.Length; i++)
+        {
+            if (_entities.ContainsKey(allEntities[i]))
+            {
+                _filteredComponents[writeIndex] = allComponents[i];
+                _filteredEntities[writeIndex] = allEntities[i];
+                writeIndex++;
+            }
+        }
+
+        _componentsCacheTick = NttWorld.Tick;
     }
     /// <summary>
     /// Processes a single entity with its component. Must be implemented by derived systems.
@@ -164,6 +274,8 @@ public abstract class NttSystem<T>(string name, int threads = 1, bool log = fals
 }
 /// <summary>
 /// Generic system base class for processing entities with exactly two component types.
+/// Uses entity-based iteration but benefits from packed storage through faster Get<T>() calls.
+/// TODO Phase 2: Implement multi-component packed iteration for maximum performance.
 /// </summary>
 /// <typeparam name="T">First required component type</typeparam>
 /// <typeparam name="T2">Second required component type</typeparam>
@@ -173,7 +285,7 @@ public abstract class NttSystem<T, T2>(string name, int threads = 1, bool log = 
 
     protected override void Update(int start, int amount)
     {
-        var span = CollectionsMarshal.AsSpan(_entitiesList).Slice(start, amount);
+        var span = _entitiesList.AsSpan(start, amount);
         for (var i = 0; i < span.Length; i++)
         {
             ref readonly var ntt = ref span[i];
@@ -196,7 +308,7 @@ public abstract class NttSystem<T, T2, T3>(string name, int threads = 1, bool lo
 
     protected override void Update(int start, int amount)
     {
-        var span = CollectionsMarshal.AsSpan(_entitiesList).Slice(start, amount);
+        var span = _entitiesList.AsSpan(start, amount);
         for (var i = 0; i < span.Length; i++)
         {
             ref readonly var ntt = ref span[i];
@@ -214,7 +326,7 @@ public abstract class NttSystem<T, T2, T3, T4>(string name, int threads = 1, boo
 
     protected override void Update(int start, int amount)
     {
-        var span = CollectionsMarshal.AsSpan(_entitiesList).Slice(start, amount);
+        var span = _entitiesList.AsSpan(start, amount);
         for (var i = 0; i < span.Length; i++)
         {
             ref readonly var ntt = ref span[i];
@@ -233,7 +345,7 @@ public abstract class NttSystem<T, T2, T3, T4, T5>(string name, int threads = 1,
 
     protected override void Update(int start, int amount)
     {
-        var span = CollectionsMarshal.AsSpan(_entitiesList).Slice(start, amount);
+        var span = _entitiesList.AsSpan(start, amount);
         for (var i = 0; i < span.Length; i++)
         {
             ref readonly var ntt = ref span[i];
@@ -253,7 +365,7 @@ public abstract class NttSystem<T, T2, T3, T4, T5, T6>(string name, int threads 
 
     protected override void Update(int start, int amount)
     {
-        var span = CollectionsMarshal.AsSpan(_entitiesList).Slice(start, amount);
+        var span = _entitiesList.AsSpan(start, amount);
         for (var i = 0; i < span.Length; i++)
         {
             ref readonly var ntt = ref span[i];

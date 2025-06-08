@@ -1,9 +1,8 @@
-namespace MagnumOpus.Components
+namespace MagnumOpus.Enums;
+
+public enum SpacialHashUpdatType
 {
-    public enum SpacialHashUpdatType
-    {
-        Add,
-        Remove,
-        Move
-    }
+    Add,
+    Remove,
+    Move
 }

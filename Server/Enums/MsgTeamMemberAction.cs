@@ -1,8 +1,7 @@
-﻿namespace MagnumOpus.Enums
+﻿namespace MagnumOpus.Enums;
+
+public enum MsgTeamMemberAction : byte
 {
-    public enum MsgTeamMemberAction : byte
-    {
-        AddMember = 0,
-        DelMember = 1
-    }
+    AddMember = 0,
+    DelMember = 1
 }

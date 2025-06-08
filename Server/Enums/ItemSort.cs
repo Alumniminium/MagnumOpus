@@ -1,13 +1,12 @@
-namespace MagnumOpus.Enums
+namespace MagnumOpus.Enums;
+
+public enum ItemSort
 {
-    public enum ItemSort
-    {
-        ITEMSORT_WEAPON_SINGLE_HAND = 4,
-        ITEMSORT_WEAPON_DOUBLE_HAND = 5,
-        ITEMSORT_WEAPON_SINGLE_HAND2 = 6,
-        ITEMSORT_USABLE = 7,
-        ITEMSORT_WEAPON_SHIELD = 9,
-        ITEMSORT_USABLE2 = 10,
-        ITEMSORT_USABLE3 = 12,
-    }
+    WEAPON_ONE_HANDED = 4,
+    WEAPON_TWO_HANDED = 5,
+    WEAPON_OFF_HAND_ONLY = 6,
+    USABLE = 7,
+    SHIELD = 9,
+    USABLE2 = 10,
+    USABLE3 = 12,
 }

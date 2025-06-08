@@ -28,8 +28,8 @@ public readonly struct NTT(int id)
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly void Set<T, T2>(ref T t1, ref T2 t2) where T : struct where T2 : struct
     {
-        SparseComponentStorage<T>.AddFor(this, ref t1);
-        SparseComponentStorage<T2>.AddFor(this, ref t2);
+        PackedComponentStorage<T>.AddFor(this, ref t1);
+        PackedComponentStorage<T2>.AddFor(this, ref t2);
     }
     /// <summary>
     /// Sets three components on this entity simultaneously for efficient batch operations.
@@ -42,9 +42,9 @@ public readonly struct NTT(int id)
     /// <param name="t3">Third component data</param>
     public readonly void Set<T, T2, T3>(ref T t1, ref T2 t2, ref T3 t3) where T : struct where T2 : struct where T3 : struct
     {
-        SparseComponentStorage<T>.AddFor(in this, ref t1);
-        SparseComponentStorage<T2>.AddFor(in this, ref t2);
-        SparseComponentStorage<T3>.AddFor(in this, ref t3);
+        PackedComponentStorage<T>.AddFor(in this, ref t1);
+        PackedComponentStorage<T2>.AddFor(in this, ref t2);
+        PackedComponentStorage<T3>.AddFor(in this, ref t3);
     }
 
     /// <summary>
@@ -52,7 +52,7 @@ public readonly struct NTT(int id)
     /// </summary>
     /// <typeparam name="T">Component type to set</typeparam>
     /// <param name="t">Component data to set</param>
-    public readonly void Set<T>(ref T t) where T : struct => SparseComponentStorage<T>.AddFor(in this, ref t);
+    public readonly void Set<T>(ref T t) where T : struct => PackedComponentStorage<T>.AddFor(in this, ref t);
 
     /// <summary>
     /// Sets a component on this entity by value.
@@ -60,27 +60,27 @@ public readonly struct NTT(int id)
     /// <typeparam name="T">Component type to set</typeparam>
     /// <param name="component">Component data to set</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly void Set<T>(T component) where T : struct => SparseComponentStorage<T>.AddFor(in this, ref component);
+    public readonly void Set<T>(T component) where T : struct => PackedComponentStorage<T>.AddFor(in this, ref component);
 
     /// <summary>
     /// Sets a default-initialized component on this entity (marker component).
     /// </summary>
     /// <typeparam name="T">Component type to set with default values</typeparam>
-    public readonly void Set<T>() where T : struct => SparseComponentStorage<T>.AddFor(in this);
+    public readonly void Set<T>() where T : struct => PackedComponentStorage<T>.AddFor(in this);
     /// <summary>
     /// Gets a mutable reference to a component on this entity for direct modification.
     /// </summary>
     /// <typeparam name="T">Component type to retrieve</typeparam>
     /// <returns>Mutable reference to the component data</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly ref T Get<T>() where T : struct => ref SparseComponentStorage<T>.Get(this);
+    public readonly ref T Get<T>() where T : struct => ref PackedComponentStorage<T>.Get(this);
     /// <summary>
     /// Checks if this entity has a specific component type.
     /// </summary>
     /// <typeparam name="T">Component type to check for</typeparam>
     /// <returns>True if entity has the component</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly bool Has<T>() where T : struct => SparseComponentStorage<T>.HasFor(in this);
+    public readonly bool Has<T>() where T : struct => PackedComponentStorage<T>.HasFor(in this);
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly bool Has<T, T2>() where T : struct where T2 : struct => Has<T>() && Has<T2>();
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

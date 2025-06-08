@@ -4,12 +4,13 @@ using MagnumOpus.Components;
 using MagnumOpus.Helpers;
 using System.Collections.Concurrent;
 using NttECS.ECS;
+using NttECS.Memory;
 
 namespace MagnumOpus.SpacePartitioning
 {
     internal class BucketList
     {
-        public readonly List<NTT> Entities = [];
+        public readonly SwapList<NTT> Entities = new(64);
         public readonly ReaderWriterLockSlim Lock = new(LockRecursionPolicy.NoRecursion);
     }
 
@@ -85,15 +86,12 @@ namespace MagnumOpus.SpacePartitioning
                     bucket.Lock.EnterReadLock();
                     try
                     {
-                        foreach (var ntt in bucket.Entities)
+                        for (var i = 0; i < bucket.Entities.Count; i++)
                         {
-                            if (vwp.EntitiesVisible.Contains(ntt))
-                                continue;
-
-                            ref readonly var pos = ref ntt.Get<PositionComponent>();
+                            ref readonly var pos = ref bucket.Entities[i].Get<PositionComponent>();
 
                             if (CoMath.InScreen(pos.Position.X, pos.Position.Y, cx, cy))
-                                vwp.EntitiesVisible.Add(ntt);
+                                vwp.EntitiesVisible.Add(bucket.Entities[i]);
                         }
                     }
                     finally

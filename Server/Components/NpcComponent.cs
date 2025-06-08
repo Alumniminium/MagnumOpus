@@ -1,3 +1,4 @@
+using MagnumOpus.Networking.Packets;
 using NttECS.ECS;
 
 namespace MagnumOpus.Components;
@@ -13,6 +14,6 @@ namespace MagnumOpus.Components;
 public struct NpcComponent(ushort baseId, ushort typeId, ushort sort)
 {
     public ushort Base = baseId;
-    public ushort Type = typeId;
-    public ushort Sort = sort;
+    public NpcType Type = (NpcType)typeId;
+    public NpcSort Sort = (NpcSort)sort;
 }

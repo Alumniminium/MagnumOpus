@@ -23,8 +23,9 @@ namespace MagnumOpus.Systems
                 ntt.NetSync(packet, broadcast: true);
 
             // === APPLY DAMAGE TO TARGETS ===
-            foreach (var targetEntity in tcc.Targets)
+            for (var i = 0; i < tcc.Targets.Count; i++)
             {
+                var targetEntity = tcc.Targets[i];
                 // Skip already dead entities
                 if (targetEntity.Has<DeathTagComponent>())
                     continue;

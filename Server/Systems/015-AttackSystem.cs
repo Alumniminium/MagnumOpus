@@ -31,12 +31,18 @@ namespace MagnumOpus.Systems
             {
                 case MsgInteractType.Physical:
                     {
-                        // Physical attacks require close proximity (2.5 units)
-                        if (distance > 2.5f)
+                        if (ntt.IsDead())
                         {
                             ntt.Remove<AttackComponent>();
                             break;
                         }
+                        
+                        // Physical attacks require close proximity (2.5 units)
+                            if (distance > 2.5f)
+                            {
+                                ntt.Remove<AttackComponent>();
+                                break;
+                            }
 
                         // === CALCULATE AND APPLY PHYSICAL DAMAGE ===
                         atk.CooldownTicks = NttWorld.TargetTps; // 1 second attack cooldown
@@ -58,6 +64,11 @@ namespace MagnumOpus.Systems
 
                 case MsgInteractType.Ranged:
                     {
+                        if (ntt.IsDead())
+                        {
+                            ntt.Remove<AttackComponent>();
+                            break;
+                        }
                         // Ranged attacks have longer range (10 units)
                         if (distance > 10)
                         {

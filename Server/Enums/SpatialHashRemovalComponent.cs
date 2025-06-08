@@ -1,4 +1,5 @@
 using System.Numerics;
+using MagnumOpus.Enums;
 using NttECS.ECS;
 namespace MagnumOpus.Components;
 

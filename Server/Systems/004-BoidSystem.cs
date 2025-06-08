@@ -35,19 +35,21 @@ namespace MagnumOpus.Systems
             var separation = Vector2.Zero;
             var neighborCount = 0;
 
-            // === CALCULATE BOID FORCES FROM FLOCK MEMBERS ===
-            foreach (var otherEntity in vwp.EntitiesVisible)
+            // arrays
+            var (otherEntities, otherBoidComponents, otherPositions) = vwp.Query<BoidBehaviorComponent, PositionComponent>();
+
+            for (var i = 0; i < otherEntities.Length; i++)
             {
-                // Skip self
+                var otherEntity = otherEntities[i];
+                var otherBoidComponent = otherBoidComponents[i];
+                var otherPosition = otherPositions[i];
+
                 if (otherEntity == ntt)
                     continue;
 
-                // Only interact with same flock members
-                ref var otherBoid = ref otherEntity.Get<BoidBehaviorComponent>();
-                if (otherBoid.Flock != boi.Flock)
+                if (otherBoidComponent.Flock != boi.Flock)
                     continue;
 
-                ref readonly var otherPosition = ref otherEntity.Get<PositionComponent>();
                 var distance = Vector2.Distance(pos.Position, otherPosition.Position);
 
                 // Alignment: match flock direction
