@@ -40,12 +40,15 @@ namespace MagnumOpus.Systems
                 FConsole.WriteLine("{ntt} has {count} visible entities", ntt, vwp.EntitiesVisible.Count);
 
             // Only process AI activation and synchronization for players
-            if (!ntt.IsPlayer())
+            if (ntt.NotPlayer())
                 return;
 
             // === PROCESS NEWLY VISIBLE ENTITIES ===
             foreach (var visibleEntity in vwp.EntitiesVisible)
             {
+                if (visibleEntity == ntt)
+                    continue;
+
                 // Skip dead entities
                 if (visibleEntity.Has<DeathTagComponent>())
                     continue;
@@ -69,10 +72,7 @@ namespace MagnumOpus.Systems
                 // === SYNCHRONIZE NEW VISIBILITY ===
                 // Trigger viewport update for newly visible entity
                 visibleEntity.Set<ViewportUpdateTagComponent>();
-
-                // Perform full bidirectional sync for network updates
                 NetworkHelper.FullSync(in ntt, in visibleEntity);
-                NetworkHelper.FullSync(in visibleEntity, in ntt);
             }
         }
     }

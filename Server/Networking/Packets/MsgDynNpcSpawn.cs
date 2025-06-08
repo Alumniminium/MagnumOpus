@@ -15,7 +15,7 @@ namespace MagnumOpus.Networking.Packets
         public short X;
         public short Y;
         public ushort Look;
-        public ushort Type;
+        public NpcType Type;
         public ushort Base;
 
         public static MsgDynNpcSpawn Create(in NTT ntt)

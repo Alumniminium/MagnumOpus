@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using MagnumOpus.Components;
 using NttECS.ECS;
+using Org.BouncyCastle.Math.EC.Rfc7748;
 
 namespace MagnumOpus.Helpers;
 
@@ -24,7 +25,7 @@ public static class ViewportQueryExtensions
     /// Query for entities with two component types, returning parallel arrays.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static (NTT[] Entities, T1[] Components1, T2[] Components2) Query<T1, T2>(this ref ViewportComponent viewport) 
+    public static (NTT[] Entities, T1[] Components1, T2[] Components2) Query<T1, T2>(this ref ViewportComponent viewport)
         where T1 : struct where T2 : struct
     {
         var entities = new List<NTT>();
@@ -34,53 +35,13 @@ public static class ViewportQueryExtensions
         foreach (var entity in viewport.EntitiesVisible)
         {
             if (!entity.Has<T1>() || !entity.Has<T2>()) continue;
-            
+
             entities.Add(entity);
             components1.Add(entity.Get<T1>());
             components2.Add(entity.Get<T2>());
         }
 
         return (entities.ToArray(), components1.ToArray(), components2.ToArray());
-    }
-
-    /// <summary>
-    /// Convenient shortcut for living players.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static (NTT[] Entities, PlayerComponent[] Components) Players(this ref ViewportComponent viewport)
-    {
-        var entities = new List<NTT>();
-        var components = new List<PlayerComponent>();
-
-        foreach (var entity in viewport.EntitiesVisible)
-        {
-            if (!entity.Has<PlayerComponent>() || entity.Has<DeathTagComponent>()) continue;
-            
-            entities.Add(entity);
-            components.Add(entity.Get<PlayerComponent>());
-        }
-
-        return (entities.ToArray(), components.ToArray());
-    }
-
-    /// <summary>
-    /// Convenient shortcut for living monsters.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static (NTT[] Entities, CqMonsterComponent[] Components) Monsters(this ref ViewportComponent viewport)
-    {
-        var entities = new List<NTT>();
-        var components = new List<CqMonsterComponent>();
-
-        foreach (var entity in viewport.EntitiesVisible)
-        {
-            if (!entity.Has<CqMonsterComponent>() || entity.Has<DeathTagComponent>()) continue;
-            
-            entities.Add(entity);
-            components.Add(entity.Get<CqMonsterComponent>());
-        }
-
-        return (entities.ToArray(), components.ToArray());
     }
 
     /// <summary>
@@ -103,26 +64,13 @@ public static class ViewportQueryExtensions
 public readonly struct ViewportArrayQuery<T> where T : struct
 {
     private readonly HashSet<NTT> _entities;
-    private readonly bool _withoutDeath;
-
-    internal ViewportArrayQuery(HashSet<NTT> entities, bool withoutDeath = false)
-    {
-        _entities = entities;
-        _withoutDeath = withoutDeath;
-    }
+    internal ViewportArrayQuery(HashSet<NTT> entities) => _entities = entities;
 
     /// <summary>
-    /// Filter out entities with DeathTagComponent.
+    /// Filter out entities that have the specified component type.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ViewportArrayQuery<T> Without<TWithout>() where TWithout : struct
-    {
-        if (typeof(TWithout) == typeof(DeathTagComponent))
-        {
-            return new ViewportArrayQuery<T>(_entities, withoutDeath: true);
-        }
-        return this; // Only support death filter for now
-    }
+    public ViewportArrayQuery<T> Without<TWithout>() where TWithout : struct => new([.. _entities.Where(x => !x.Has<TWithout>())]);
 
     /// <summary>
     /// Find the nearest entity to the specified position without allocating arrays.
@@ -131,20 +79,19 @@ public readonly struct ViewportArrayQuery<T> where T : struct
     public NTT NearestTo(Vector2 position)
     {
         var nearestEntity = default(NTT);
-        var nearestDistanceSq = float.MaxValue;
+        var minDistance = float.MaxValue;
 
         foreach (var entity in _entities)
         {
             if (!entity.Has<T>()) continue;
-            if (_withoutDeath && entity.Has<DeathTagComponent>()) continue;
             if (!entity.Has<PositionComponent>()) continue;
 
             ref readonly var entityPos = ref entity.Get<PositionComponent>();
-            var distanceSq = Vector2.DistanceSquared(position, entityPos.Position);
+            var distance = CoMath.Distance(position, entityPos.Position);
 
-            if (distanceSq < nearestDistanceSq)
+            if (distance < minDistance)
             {
-                nearestDistanceSq = distanceSq;
+                minDistance = distance;
                 nearestEntity = entity;
             }
         }
@@ -161,8 +108,6 @@ public readonly struct ViewportArrayQuery<T> where T : struct
         foreach (var entity in _entities)
         {
             if (!entity.Has<T>()) continue;
-            if (_withoutDeath && entity.Has<DeathTagComponent>()) continue;
-            
             return entity;
         }
         return default;
@@ -178,8 +123,6 @@ public readonly struct ViewportArrayQuery<T> where T : struct
         foreach (var entity in _entities)
         {
             if (!entity.Has<T>()) continue;
-            if (_withoutDeath && entity.Has<DeathTagComponent>()) continue;
-            
             count++;
         }
         return count;
@@ -197,8 +140,7 @@ public readonly struct ViewportArrayQuery<T> where T : struct
         foreach (var entity in _entities)
         {
             if (!entity.Has<T>()) continue;
-            if (_withoutDeath && entity.Has<DeathTagComponent>()) continue;
-            
+
             entityList.Add(entity);
             componentList.Add(entity.Get<T>());
         }

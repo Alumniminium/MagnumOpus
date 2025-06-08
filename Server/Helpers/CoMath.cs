@@ -31,11 +31,18 @@ public static class CoMath
     /// <returns>True if points are within range</returns>
     public static bool InRange(Vector2 start, Vector2 end, double range)
     {
+        var distance = Distance(start, end);
+        return distance <= range * range;
+    }
+
+    public static int Distance(Vector2 start, Vector2 end)
+    {
         var deltaX = end.X - start.X;
         var deltaY = end.Y - start.Y;
         var distance = (deltaX * deltaX) + (deltaY * deltaY);
-        return distance <= range * range;
+        return (int)distance;
     }
+
     /// <summary>
     /// Gets the 8-directional movement direction from start to end position.
     /// </summary>

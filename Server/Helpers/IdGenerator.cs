@@ -33,7 +33,7 @@ public static class IdGenerator
             {
                 NpcIds = data.NpcIds ?? new(Enumerable.Range(0, 399_999));
                 MonsterIds = data.MonsterIds ?? new(Enumerable.Range(400_000, 399_999));
-                PlayerIds = data.PlayerIds ?? new(Enumerable.Range(1_000_000, 100_000));
+                PlayerIds = data.PlayerIds ?? new(Enumerable.Range(1_000_000, 1_000_000));
                 ItemIds = data.ItemIds ?? new(Enumerable.Range(2_000_000, 1_000_000));
                 TrapIds = data.TrapIds ?? new(Enumerable.Range(800_000, 100_000));
                 OtherIds = data.OtherIds ?? new(Enumerable.Range(3_000_000, 1_000_000));

@@ -31,8 +31,15 @@ namespace MagnumOpus.Systems
                 brn.SleepTicks--;
                 if (brn.SleepTicks > 0)
                     return;
-                
+
                 brn.State = BrainState.WakingUp;
+            }
+
+            if (brn.Target.Has<DeathTagComponent>())
+            {
+                brn.Target = default;
+                brn.State = BrainState.Sleeping;
+                return;
             }
 
             // === THREAT DETECTION AND TARGET ACQUISITION ===
@@ -45,26 +52,25 @@ namespace MagnumOpus.Systems
                 var closestDistance = int.MaxValue;
                 var closestThreat = default(NTT);
 
-                // Scan for threats within guard range (18 units from guard position)
-                foreach (var visibleEntity in vwp.EntitiesVisible)
+                var (entities, positionComponents) = vwp.Query<PositionComponent>().Without<DeathTagComponent>().Without<DeathTagComponent>().Without<GuardPositionComponent>();
+                for (var i = 0; i < entities.Length; i++)
                 {
-                    // Skip other guards and dead entities
-                    if (visibleEntity.Has<GuardPositionComponent>() || visibleEntity.Has<DeathTagComponent>())
-                        continue;
+                    ref readonly var visibleEntity = ref entities[i];
+                    ref readonly var entityPosition = ref positionComponents[i];
 
-                    ref readonly var entityPosition = ref visibleEntity.Get<PositionComponent>();
-                    var distanceFromGuardPost = (int)Vector2.Distance(grd.Position, entityPosition.Position);
-                    
-                    // Only consider threats within guard range and closer than current target
-                    if (distanceFromGuardPost > 18 || distanceFromGuardPost > closestDistance)
-                        continue;
+                    if (visibleEntity.IsMonster(includeGuards: false))
+                    {
+                        var distanceFromGuardPost = CoMath.Distance(grd.Position, entityPosition.Position);
+                        // Only consider threats within guard range and closer than current target
+                        if (distanceFromGuardPost >= 18 || distanceFromGuardPost > closestDistance)
+                            continue;
 
-                    closestDistance = distanceFromGuardPost;
-                    closestThreat = visibleEntity;
-                    
-                    if (IsLogging)
-                        FConsole.WriteLine("{ntt} detected threat {threat} at distance {dist} from guard post", 
-                            ntt, visibleEntity, distanceFromGuardPost);
+                        closestDistance = distanceFromGuardPost;
+                        closestThreat = visibleEntity;
+
+                        if (IsLogging)
+                            FConsole.WriteLine("{ntt} detected threat {threat} at distance {dist} from guard post", ntt, visibleEntity, distanceFromGuardPost);
+                    }
                 }
 
                 // Set target if threat found
@@ -87,21 +93,12 @@ namespace MagnumOpus.Systems
                     brn.State = BrainState.Approaching;
                 }
                 else
-                {
                     brn.State = BrainState.Idle;
-                }
             }
             else
             {
                 // Validate current target still exists and is alive
                 if (!NttWorld.EntityExists(brn.Target))
-                {
-                    brn.Target = default;
-                    return;
-                }
-
-                ref readonly var target = ref NttWorld.GetEntity(brn.Target);
-                if (target.Has<DeathTagComponent>())
                 {
                     brn.Target = default;
                     return;
@@ -127,9 +124,24 @@ namespace MagnumOpus.Systems
             {
                 // Attack the target
                 ref readonly var targetEntity = ref NttWorld.GetEntity(brn.Target);
+
+                ref readonly var targetPos = ref targetEntity.Get<PositionComponent>();
+
+                if (!CoMath.InRange(pos.Position, targetPos.Position, 2))
+                {
+                    brn.State = BrainState.Approaching;
+                    return;
+                }
+
+                if (targetEntity.Has<GuardPositionComponent>())
+                    return;
+
+                var name = targetEntity.Get<NameTagComponent>().Name;
+                FConsole.WriteLine("{ntt} attacking target {target}", ntt, name);
+
                 var attackComponent = new AttackComponent(in targetEntity, MsgInteractType.Physical);
                 ntt.Set(ref attackComponent);
-                
+
                 if (IsLogging)
                     FConsole.WriteLine("{ntt} attacking target {target}", ntt, targetEntity);
             }

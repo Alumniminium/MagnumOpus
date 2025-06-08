@@ -40,13 +40,6 @@ namespace MagnumOpus.Networking
         /// <returns>Deserialized packet structure, or default value if buffer is too small</returns>
         public static T Deserialize<T>(Span<byte> buffer) where T : unmanaged
         {
-            // Validate buffer size before unsafe memory access
-            if (buffer.Length < sizeof(T))
-            {
-                // Return default value for safety - caller should handle gracefully
-                return default(T);
-            }
-
             fixed (byte* ptr = buffer)
                 return *(T*)ptr;
         }

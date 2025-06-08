@@ -57,14 +57,6 @@ namespace MagnumOpus.Networking.Packets
                 return CreatePlayer(ntt);
             else if (ntt.IsMonster())
                 return CreateMonster(ntt);
-            else if (ntt.IsNpc())
-                throw new NotImplementedException("NPC spawn not implemented");
-            else if (ntt.IsItem())
-                throw new NotImplementedException("Item spawn not implemented");
-            else if (ntt.IsTrap())
-                throw new NotImplementedException("Trap spawn not implemented");
-            else if (ntt.IsOther())
-                throw new NotImplementedException("Other spawn not implemented");
             else
                 throw new NotImplementedException("Unknown entity type");
         }

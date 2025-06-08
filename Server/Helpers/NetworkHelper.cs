@@ -25,7 +25,7 @@ namespace MagnumOpus.Helpers
         /// // Sync a monster to a player when it enters their view
         /// NetworkHelper.FullSync(player, monster);
         /// </example>
-        public static void FullSync(in NTT to, in NTT ntt)
+        public static void FullSync(in NTT to, in NTT ntt, bool showEffect = false)
         {
             if (!to.IsPlayer())
                 return;
@@ -38,25 +38,24 @@ namespace MagnumOpus.Helpers
             {
                 var spawnPacket = MsgSpawn.Create(ntt);
                 to.NetSync(ref spawnPacket);
-
-                // Skip spawn effect for entities created in previous ticks
-                // TODO: Find alternative way to check if entity was just created
-
-                var spawnEffectMsg = MsgName.Create(ntt.Id, "MBStandard", MsgNameType.RoleEffect);
-                to.NetSync(ref spawnEffectMsg);
             }
             else if (ntt.IsItem())
             {
                 var spawnPacket = MsgFloorItem.Create(in ntt, MsgFloorItemType.Create);
                 to.NetSync(ref spawnPacket);
             }
-            else if (ntt.IsOther())
+            else
             {
                 if (ntt.Has<BodyComponent>())
                 {
                     var spawnPacket = MsgSpawn.CreatePlayer(ntt);
                     to.NetSync(ref spawnPacket);
                 }
+            }
+            if (showEffect)
+            {
+                var spawnEffectMsg = MsgName.Create(ntt.Id, "MBStandard", MsgNameType.RoleEffect);
+                to.NetSync(ref spawnEffectMsg);
             }
         }
 

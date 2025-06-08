@@ -9,6 +9,7 @@ using MagnumOpus.Helpers;
 using MagnumOpus.SpacePartitioning;
 using MagnumOpus.Squiggly.Models;
 using NttECS.ECS;
+using NttECS.IO;
 
 namespace MagnumOpus.Squiggly
 {
