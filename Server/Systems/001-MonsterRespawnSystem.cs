@@ -44,14 +44,12 @@ namespace MagnumOpus.Systems
             if (!Collections.Maps.TryGetValue(pos.Map, out var mapData))
             {
                 spawner.Set<DestroyEndOfFrameComponent>();
-                FConsole.WriteLine("CQ_GENERATOR ID {id} invalid map {map}", 
-                    spawnerComponent.GeneratorId, pos.Map);
+                FConsole.WriteLine("CQ_GENERATOR ID {id} invalid map {map}", spawnerComponent.GeneratorId, pos.Map);
                 return;
             }
 
             if (IsLogging)
-                FConsole.WriteLine("{ntt} spawning {count} {monster} on map {map}", 
-                    spawner, spawnerComponent.GenPerTimer, monsterTypeData.name, mapData);
+                FConsole.WriteLine("{ntt} spawning {count} {monster} on map {map}", spawner, spawnerComponent.GenPerTimer, monsterTypeData.name, mapData);
 
             // === SPAWN MONSTERS ===
             // Create monsters up to the per-timer limit
@@ -82,8 +80,7 @@ namespace MagnumOpus.Systems
                 if (IsLogging)
                 {
                     FConsole.WriteLine("{monster} spawned at {pos}", newMonster, pos.Position);
-                    var spawnMessage = MsgText.Create(in spawner, 
-                        $"Respawning {monsterTypeData.name} at {pos.Position.X}, {pos.Position.Y}");
+                    var spawnMessage = MsgText.Create(in spawner, $"Respawning {monsterTypeData.name} at {pos.Position.X}, {pos.Position.Y}");
                     spawner.NetSync(ref spawnMessage, true);
                 }
 

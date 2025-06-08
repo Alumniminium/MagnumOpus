@@ -1,30 +1,22 @@
 # MagnumOpus TODO List
 
-## Planned Features
+## Completed
 
-### ChangedTick Auto-Tracking System
-**Status**: Not Implemented (Planned)
+### ECS Performance Improvements (DONE)
+- [x] **Viewport Query Optimization**: Replaced iterator pattern with parallel array returns for better performance
+- [x] **Multi-Component Queries**: Added Query<T1, T2>() methods returning tuple of component arrays
+- [x] **Query Filtering**: Implemented Without() and InRange() filtering for array-based queries
+- [x] **BoidSystem Migration**: Updated to use new high-performance array-based API
+- [x] **SwapList Implementation**: Fixed Vector<T> issues and added AsSpan(), GetEnumerator() support
 
-A source generator to automatically manage ChangedTick updates for component properties, eliminating manual `ChangedTick = NttWorld.Tick` assignments.
+### Documentation (DONE)
+- [x] **Enum Translations**: Fixed corrupted Chinese characters in GuildRequest, NpcSort enums
+- [x] **AssociateMode Research**: Validated friend/enemy packet operations
+- [x] **MapFlags Research**: Documented packet 1110 bitwise flags from ElitePVPers
 
-#### Implementation Plan
-1. Create `/ChangedTickGenerator/` source generator project
-2. Add `[AutoChangedTick]` attribute support
-3. Implement `[Track]` backing field generation
-4. Convert components to use auto-generated properties
-5. Remove manual ChangedTick assignments
-
-#### Target Components
-- **PositionComponent**: Auto-track `Position`, `Direction`
-- **ManaComponent**: Auto-track `Mana`, `MaxMana`
-- **WalkComponent**: Auto-track `Direction`, `IsRunning`
-- **HealthComponent**: Preserve custom logic for network sync
-
-#### Benefits
-- Immutable update patterns
-- Atomic operations
-- Impossible to forget ChangedTick updates
-- Better performance through single updates
+### Build System (DONE)
+- [x] **SwapList Integration**: Fixed CollectionsMarshal.AsSpan issues and foreach compatibility
+- [x] **System Compilation**: Resolved all ECS component access patterns
 
 ## Testing Tasks
 
@@ -41,19 +33,15 @@ A source generator to automatically manage ChangedTick updates for component pro
 ### Immediate
 - [ ] Add more system cleanup following established pattern
 - [ ] Implement additional equipment validation rules
-- [ ] Add unit tests for equipment system
 - [ ] Fix GOAP garbage collection issues
+- [ ] **Performance Validation**: Benchmark SwapList vs List in production workloads
 
 ### Architecture Improvements
-- [ ] **Source Generators**: Complete ChangedTick automation
 - [ ] **Event System**: Decouple systems with event-driven architecture
 - [ ] **Hot-Reload**: Runtime configuration changes
 - [ ] **Metrics**: Enhanced observability and performance monitoring
 
 ### Architecture Evolution
-- [ ] **Distributed Design**: Multi-server scalability
-- [ ] **Plugin Architecture**: Modular game logic
-- [ ] **Database Migrations**: Schema versioning
 - [ ] **Admin Tools**: In-game administrative interface
 
 ### Legacy Migration
@@ -66,7 +54,6 @@ A source generator to automatically manage ChangedTick updates for component pro
 - [ ] Profile equipment system performance under load
 - [ ] Optimize inventory helper methods
 - [ ] Review spatial hash update frequency
-- [ ] Implement object pooling for high-frequency allocations
 
 ## ECS Architecture Refactoring
 
@@ -119,6 +106,18 @@ A source generator to automatically manage ChangedTick updates for component pro
 - Are generators controlled by cq_actions?
 - Why do Titan/Ganoderma spawns not work correctly?
 - Should Guard spawns really have max_npc = 1?
+
+Answer: https://cooldown.dev/topic/524-generating-mobs/
+if (generator.Grid >= 1)
+{
+  maxNpc = (int)((generator.BoundCx / generator.Grid) * (generator.BoundCy / generator.Grid));
+  if (maxNpc < 0)
+  {
+    maxNpc = 1;
+  }
+}
+Grid is the `maxnpc` field.
+
 
 ### CQ_MONSTERTYPE
 - What do AI Type and STC Type fields control?
