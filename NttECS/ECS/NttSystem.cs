@@ -59,13 +59,9 @@ public abstract class NttSystem
         }
 
         if (ThreadCount > 1 && _entitiesList.Count > ThreadCount * 2)
-        {
             ThreadedWorker.Run(EndUpdate, ThreadCount);
-        }
         else
-        {
             Update(0, _entitiesList.Count);
-        }
 
         NTTCountMetricsExporter.Set(_entities.Count);
         TimeMetricsExporter.Set((float)Stopwatch.GetElapsedTime(ts).TotalMilliseconds);
@@ -203,9 +199,7 @@ public abstract class NttSystem<T>(string name, int threads = 1, bool log = fals
     private T[] GetFilteredComponents()
     {
         if (_filteredComponents is null || _componentsCacheTick != NttWorld.Tick)
-        {
             RebuildFilteredArrays();
-        }
         return _filteredComponents!;
     }
 
@@ -217,9 +211,7 @@ public abstract class NttSystem<T>(string name, int threads = 1, bool log = fals
     private int[] GetFilteredEntities()
     {
         if (_filteredEntities is null || _componentsCacheTick != NttWorld.Tick)
-        {
             RebuildFilteredArrays();
-        }
         return _filteredEntities!;
     }
 

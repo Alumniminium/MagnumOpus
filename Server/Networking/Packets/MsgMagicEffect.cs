@@ -36,7 +36,8 @@ namespace MagnumOpus.Networking.Packets
                     packet.Type = skillId;
                     packet.Level = skillLevel;
                     packet.TargetCount = Math.Min(Math.Min(entities.Count - i * maxTargets, maxTargets), entities.Count);
-                };
+                }
+                ;
                 var offset = 0;
                 for (var j = 0; j < Math.Min(entities.Count - i * maxTargets, maxTargets); j++)
                 {
