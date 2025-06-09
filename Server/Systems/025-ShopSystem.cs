@@ -104,7 +104,7 @@ public sealed class ShopSystem : NttSystem<InventoryComponent, RequestShopItemTr
                 soldItemEntity.Set(ref destroyComponent);
                 inventory.Items.Span[slotIndex] = default;
 
-                var removeInventoryMessage = MsgItem.Create(soldItemEntity.Id, soldItemEntity.Id, soldItemEntity.Id, MsgItemType.RemoveInventory);
+                var removeInventoryMessage = MsgItem.Create(soldItemEntity.Id, soldItemEntity.Id, MsgItemType.RemoveInventory);
                 ntt.NetSync(ref removeInventoryMessage);
 
                 if (IsLogging)

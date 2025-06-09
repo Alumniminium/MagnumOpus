@@ -9,7 +9,7 @@ namespace MagnumOpus.Systems;
 
 public sealed class LifetimeSystem : NttSystem<LifeTimeComponent>
 {
-    private static readonly uint[] countdown = new uint[] { 5, 4, 3, 2, 1 }.Select(sec => (uint)NttWorld.TargetTps * sec).ToArray();
+    private static readonly uint[] countdown = [.. new uint[] { 5, 4, 3, 2, 1 }.Select(sec => (uint)NttWorld.TargetTps * sec)];
 
     public LifetimeSystem() : base("Lifetime", threads: 1, log: false) { IsLogging = false; }
 

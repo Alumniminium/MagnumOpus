@@ -24,8 +24,8 @@ public sealed class SpatialHashSystem : NttSystem<SpatialHashUpdateComponent>
                 {
                     // === REMOVE ENTITY FROM SPATIAL HASH ===
                     // Broadcast death message and remove from spatial system
-                    var deathMessage = MsgInteract.Create(ntt, ntt, Enums.MsgInteractType.Death, 0);
-                    ntt.NetSync(ref deathMessage, broadcast: true);
+                    var deathMsg = MsgInteract.Create(ntt, ntt, Enums.MsgInteractType.Death, 0);
+                    ntt.NetSync(ref deathMsg, broadcast: true);
                     Collections.SpatialHashes[spatialUpdate.Map].Remove(ntt, spatialUpdate.Position);
                     break;
                 }

@@ -35,7 +35,7 @@ public sealed class TeleportSystem : NttSystem<TeleportComponent, PositionCompon
         ntt.NetSync(ref despawnPacket, broadcast: true, ignoreSelf: false);
 
         // Send new location to client
-        var teleportPacket = MsgAction.Create(ntt.Id, tpc.Map, tpc.X, tpc.Y, Enums.Direction.South, Enums.MsgActionType.SendLocation);
+        var teleportPacket = MsgAction.Create(ntt.Id, tpc.Map, tpc.X, tpc.Y, Enums.Direction.South, Enums.MsgActionType.QueryLocation);
         ntt.NetSync(ref teleportPacket);
 
         // Update client map status

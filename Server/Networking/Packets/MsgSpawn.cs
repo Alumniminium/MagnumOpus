@@ -93,9 +93,9 @@ namespace MagnumOpus.Networking.Packets
                 head = headItem.Get<ItemComponent>().Id;
                 eqc.Items.TryGetValue(MsgItemPosition.Armor, out var armorItem);
                 armor = armorItem.Get<ItemComponent>().Id;
-                eqc.Items.TryGetValue(MsgItemPosition.RightWeapon, out var mainHandItem);
+                eqc.Items.TryGetValue(MsgItemPosition.PrimaryWeapon, out var mainHandItem);
                 mainHand = mainHandItem.Get<ItemComponent>().Id;
-                eqc.Items.TryGetValue(MsgItemPosition.LeftWeapon, out var offHandItem);
+                eqc.Items.TryGetValue(MsgItemPosition.SecondaryWeapon, out var offHandItem);
                 offHand = offHandItem.Get<ItemComponent>().Id;
             }
 

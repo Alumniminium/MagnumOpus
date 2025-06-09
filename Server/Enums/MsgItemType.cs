@@ -23,7 +23,14 @@ public enum MsgItemType
     BuyVendingItem = 24,
     UpdateArrowCount = 25,
     ParticleEffect = 26,
+
+    /// <summary>
+    /// Apparently this is used to measure ping, with the ItemPacket... 
+    /// Echoing back the packet with the same data is enough to make this work.
+    /// </summary>
     Ping = 27,
+
     Enchant = 28,
+
     BoothAddCp = 29
 }

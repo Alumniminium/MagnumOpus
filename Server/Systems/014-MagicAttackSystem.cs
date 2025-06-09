@@ -19,8 +19,8 @@ public sealed class MagicAttackSystem : NttSystem<TargetCollectionComponent>
         // === BROADCAST MAGIC EFFECT ANIMATIONS ===
         // Send visual effects to nearby players for spell animations
         var effectPackets = MsgMagicEffect.Create(in ntt, tcc.Targets, (int)tcc.MagicType.Power, (ushort)tcc.MagicType.MagicType, (byte)tcc.MagicType.Level);
-        foreach (var packet in effectPackets)
-            ntt.NetSync(packet, broadcast: true);
+        for (var i = 0; i < effectPackets.Length; i++)
+            ntt.NetSync(effectPackets[i], broadcast: true, ignoreSelf: false);
 
         // === APPLY DAMAGE TO TARGETS ===
         for (var i = 0; i < tcc.Targets.Count; i++)

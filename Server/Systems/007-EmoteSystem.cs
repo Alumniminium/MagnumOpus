@@ -37,7 +37,7 @@ public sealed class EmoteSystem(bool log = false) : NttSystem<EmoteComponent, Po
         if (IsLogging)
             FConsole.WriteLine("{ntt} changed emote to {emote}", ntt, emo.Emote);
 
-        var actionMessage = MsgAction.Create(ntt.Id, (int)emo.Emote, 0, 0, pos.Direction, MsgActionType.ChangeAction);
-        ntt.NetSync(ref actionMessage, broadcast: true);
+        var msgAction = MsgAction.Create(ntt.Id, (int)emo.Emote, 0, 0, pos.Direction, MsgActionType.UpdateEmote);
+        ntt.NetSync(ref msgAction, broadcast: true);
     }
 }

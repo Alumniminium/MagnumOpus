@@ -22,8 +22,8 @@ public struct EquipmentComponent
     [JsonIgnore] public readonly ref NTT Bottle => ref CollectionsMarshal.GetValueRefOrAddDefault(Items, MsgItemPosition.Bottle, out _);
     [JsonIgnore] public readonly ref NTT Armor => ref CollectionsMarshal.GetValueRefOrAddDefault(Items, MsgItemPosition.Armor, out _);
     [JsonIgnore] public readonly ref NTT Ring => ref CollectionsMarshal.GetValueRefOrAddDefault(Items, MsgItemPosition.Ring, out _);
-    [JsonIgnore] public readonly ref NTT LeftWeapon => ref CollectionsMarshal.GetValueRefOrAddDefault(Items, MsgItemPosition.LeftWeapon, out _);
-    [JsonIgnore] public readonly ref NTT RightWeapon => ref CollectionsMarshal.GetValueRefOrAddDefault(Items, MsgItemPosition.RightWeapon, out _);
+    [JsonIgnore] public readonly ref NTT LeftWeapon => ref CollectionsMarshal.GetValueRefOrAddDefault(Items, MsgItemPosition.SecondaryWeapon, out _);
+    [JsonIgnore] public readonly ref NTT RightWeapon => ref CollectionsMarshal.GetValueRefOrAddDefault(Items, MsgItemPosition.PrimaryWeapon, out _);
     [JsonIgnore] public readonly ref NTT Boots => ref CollectionsMarshal.GetValueRefOrAddDefault(Items, MsgItemPosition.Boots, out _);
 
     [JsonConstructor]
@@ -35,8 +35,8 @@ public struct EquipmentComponent
             { MsgItemPosition.Bottle, default },
             { MsgItemPosition.Armor, default },
             { MsgItemPosition.Ring, default },
-            { MsgItemPosition.RightWeapon, default },
-            { MsgItemPosition.LeftWeapon, default },
+            { MsgItemPosition.PrimaryWeapon, default },
+            { MsgItemPosition.SecondaryWeapon, default },
             { MsgItemPosition.Boots, default }
     };
     public EquipmentComponent(Dictionary<MsgItemPosition, NTT> items) => Items = items;

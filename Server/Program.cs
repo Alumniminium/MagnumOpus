@@ -68,7 +68,7 @@ public static class Game
         };
 
         FConsole.WriteLine("[DATABASE] Loading...");
-        NttWorld.SetSystems(systems.ToArray());
+        NttWorld.SetSystems([.. systems]);
         NttWorld.SetTPS(60);
         ReflectionHelper.LoadComponents("_STATE_FILES");
         ref var ntt = ref NttWorld.GetEntity(0);

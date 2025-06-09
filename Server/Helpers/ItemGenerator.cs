@@ -80,7 +80,7 @@ namespace MagnumOpus.Helpers
         public static bool IsArrow(int nType) => IsArrowSort(nType);
         public static bool IsExpend(ref ItemComponent item) => IsArrowSort(ref item) || item.Id < 50000;
         public static bool IsExpend(int nType) => IsArrowSort(nType) || nType < 50000;
-        public static bool IsBow(ref ItemComponent item) => item.Id / 1000 == 500;
+        public static bool IsBow(in ItemComponent item) => item.Id / 1000 == 500;
         public static bool IsBow(int nType) => nType / 1000 == 500;
         public static bool IsCountable(ref ItemComponent item) => IsArrowSort(ref item);
         public static bool IsCountable(int nType) => IsArrowSort(nType);

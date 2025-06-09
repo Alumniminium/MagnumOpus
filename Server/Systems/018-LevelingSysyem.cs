@@ -64,7 +64,7 @@ public sealed class LevelingSystem : NttSystem<LevelComponent, ExpRewardComponen
         }
 
         // Broadcast level up animation to nearby players
-        var levelUpMessage = MsgAction.Create(ntt.Id, 0, 0, 0, 0, Enums.MsgActionType.LevelUp);
+        var levelUpMessage = MsgAction.Create(ntt.Id, 0, 0, 0, 0, Enums.MsgActionType.UpdateLevelUp);
         ntt.NetSync(ref levelUpMessage, true);
 
         // Log the level up event

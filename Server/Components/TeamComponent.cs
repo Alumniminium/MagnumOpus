@@ -15,6 +15,13 @@ public struct TeamComponent
     public int MemberCount;
     public NTT[] Members = new NTT[5];
     public readonly NTT Leader => Members[0];
+
+    /// <summary>
+    /// Last tick when the leader's position was updated.
+    /// Used to prevent sending position updates of the leader every tick.
+    /// </summary>
+    public long LastLeaderPosTick;
+
     public bool ShareItems;
     public bool ShareGold;
 

@@ -1,7 +1,7 @@
 using System.Numerics;
-using MagnumOpus.Enums;
 using NttECS.ECS;
-namespace MagnumOpus.Components;
+
+namespace MagnumOpus.Enums;
 
 [Component(SaveEnabled: false)]
 public struct SpatialHashUpdateComponent(Vector2 pos, Vector2 lastPos, int map, int lastMap, SpacialHashUpdatType type)

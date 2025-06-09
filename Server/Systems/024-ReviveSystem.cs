@@ -68,7 +68,7 @@ public sealed class ReviveSystem : NttSystem<ReviveComponent, HealthComponent, P
         bodyComponent.Look = MsgSpawn.DelTransform(bodyComponent.Look);
 
         // === NETWORK SYNCHRONIZATION ===
-        var locationMessage = MsgAction.Create(ntt.Id, position.Map, (ushort)position.Position.X, (ushort)position.Position.Y, Direction.North, MsgActionType.SendLocation);
+        var locationMessage = MsgAction.Create(ntt.Id, position.Map, (ushort)position.Position.X, (ushort)position.Position.Y, Direction.North, MsgActionType.QueryLocation);
         NetworkHelper.Despawn(ntt);
         ntt.NetSync(ref locationMessage);
 

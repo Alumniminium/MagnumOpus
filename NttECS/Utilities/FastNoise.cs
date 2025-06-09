@@ -3,9 +3,9 @@ using System.Runtime.CompilerServices;
 
 // Switch between using floats or doubles for input position
 using FNLfloat = System.Single;
-namespace NttECS.Utilities;
-
 //using FNLfloat = System.Double;
+
+namespace NttECS.Utilities;
 
 public class FastNoiseLite
 {

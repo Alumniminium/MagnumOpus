@@ -73,7 +73,7 @@ public static class InventoryHelper
         if (!netSync)
             return found;
 
-        var remInv = MsgItem.Create(item.Id, item.Id, item.Id, MsgItemType.RemoveInventory);
+        var remInv = MsgItem.Create(item.Id, item.Id, MsgItemType.RemoveInventory);
         owner.NetSync(ref remInv);
 
         return found;
@@ -169,7 +169,7 @@ public static class InventoryHelper
 
         for (var i = 0; i < inv.Items.Length; i++)
         {
-            var packet = MsgItem.Create(inv.Items.Span[i].Id, inv.Items.Span[i].Id, inv.Items.Span[i].Id, MsgItemType.RemoveInventory);
+            var packet = MsgItem.Create(inv.Items.Span[i].Id, inv.Items.Span[i].Id, MsgItemType.RemoveInventory);
             owner.NetSync(ref packet);
         }
         for (var i = 0; i < inv.Items.Length; i++)

@@ -160,6 +160,27 @@ You can do checks when reviving or logging in that the current map has Record Di
 - Consider UDP for position updates
 - Implement delta compression
 
+## Game Server Optimization (IN PROGRESS)
+
+### Completed
+- [x] **ConnectionManager**: Created with ArrayPool buffer pooling and connection limits
+- [x] **SocketAsyncEventArgs Planning**: Researched IOCP-based approach for better scalability
+
+### Current Task
+- [ ] **SocketAsyncEventArgs Implementation**: Replace async/await with callback-based IOCP networking
+  - Update ConnectionManager to pool SocketAsyncEventArgs objects
+  - Rewrite GameServer to use event callbacks instead of async methods
+  - Eliminate ref local issues across await boundaries
+  - Maintain compatibility with existing ECS packet processing
+  - Target: Handle 10,000+ concurrent connections efficiently
+
+### Benefits of SocketAsyncEventArgs Approach
+- **Performance**: Uses I/O Completion Ports for maximum efficiency
+- **Scalability**: No thread-per-connection or async state machine overhead
+- **Compatibility**: Works perfectly with ref locals and ECS components
+- **Memory**: Object pooling reduces GC pressure
+- **Simplicity**: Callback-based approach simpler than async/await for this use case
+
 ## Documentation Tasks
 
 - [ ] Document all packet structures

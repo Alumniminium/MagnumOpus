@@ -3,10 +3,26 @@ namespace MagnumOpus.Enums;
 [Flags]
 public enum MagicTypeEnum
 {
+    /// <summary>
+    /// Damage a single target
+    /// Thunder, Fire, Tornado, Meteor, ...
+    /// </summary>
     DamageSingle = 1,
+    /// <summary>
+    /// Heal a single target
+    /// Cure, Advanced Cure, Nectar, ...
     HealSingle = 2,
+    /// <summary>
+    /// Unknown
+    /// </summary>
     AttackCrossHp = 3,
+    /// <summary>
+    /// Unknown
+    /// </summary>
     AttackSectorHp = 4,
+    /// <summary>
+    /// Unknown
+    /// </summary>
     AttackRoundHp = 5,
     AttackSingleStatus = 6,
     RecoverSingleStatus = 7,

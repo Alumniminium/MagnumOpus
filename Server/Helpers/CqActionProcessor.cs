@@ -481,7 +481,7 @@ public static class CqActionProcessor
 
                         if (chkRange.Contains(item.Id))
                         {
-                            var msg = MsgItem.Create(ntt.Id, inv.Items.Span[i].Id, inv.Items.Span[i].Id, MsgItemType.RemoveInventory);
+                            var msg = MsgItem.Create(ntt.Id, inv.Items.Span[i].Id,  MsgItemType.RemoveInventory);
                             ntt.NetSync(ref msg);
                             count++;
 

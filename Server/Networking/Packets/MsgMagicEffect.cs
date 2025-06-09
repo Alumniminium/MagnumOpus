@@ -19,7 +19,7 @@ namespace MagnumOpus.Networking.Packets
         public int TargetCount;
         public fixed int Targets[180];
 
-        public static IEnumerable<byte[]> Create(in NTT attacker, SwapList<NTT> entities, int damage, ushort skillId, byte skillLevel)
+        public static byte[][] Create(in NTT attacker, SwapList<NTT> entities, int damage, ushort skillId, byte skillLevel)
         {
             ref readonly var bdy = ref attacker.Get<BodyComponent>();
             var maxTargets = 60;
@@ -51,7 +51,7 @@ namespace MagnumOpus.Networking.Packets
                     *(MsgMagicEffect*)p = packet;
                 packets[i] = buffer;
             }
-            return packets;
+            return packets.ToArray();
         }
 
         public static MsgMagicEffect Create(in NTT attacker, in NTT target, int damage, ushort skillId, byte skillLevel)

@@ -2,7 +2,6 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using MagnumOpus.Components;
 using NttECS.ECS;
-using Org.BouncyCastle.Math.EC.Rfc7748;
 
 namespace MagnumOpus.Helpers;
 
@@ -141,7 +140,7 @@ public readonly struct ViewportArrayQuery<T> where T : struct
             componentList.Add(entity.Get<T>());
         }
 
-        entities = entityList.ToArray();
-        components = componentList.ToArray();
+        entities = [.. entityList];
+        components = [.. componentList];
     }
 }

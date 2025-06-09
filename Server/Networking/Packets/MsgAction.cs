@@ -93,13 +93,13 @@ public unsafe struct MsgAction
                     ntt.Set(ref rev);
                     break;
                 }
-            case MsgActionType.SendLocation:
+            case MsgActionType.QueryLocation:
                 {
                     if (_trace)
                         FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id} -> {msg.X}, {msg.Y}");
 
                     ref var pos = ref ntt.Get<PositionComponent>();
-                    var reply = Create(ntt.Id, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.SendLocation);
+                    var reply = Create(ntt.Id, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.QueryLocation);
                     ntt.NetSync(ref reply);
                     if (_trace)
                         FConsole.WriteLine($"[GAME] Outgoing {msg.Type}: {ntt.Id} -> {reply.X}, {reply.Y}");
@@ -114,9 +114,9 @@ public unsafe struct MsgAction
                     break;
                 }
             case MsgActionType.LeaveBooth:
-            case MsgActionType.ConfirmGuild:
-            case MsgActionType.SendAssociates:
-            case MsgActionType.SendProficiencies:
+            case MsgActionType.QueryGuild:
+            case MsgActionType.QueryFriends:
+            case MsgActionType.QuerySkills:
                 {
                     if (_trace)
                         FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id}");
@@ -124,7 +124,7 @@ public unsafe struct MsgAction
                     ntt.NetSync(ref msg);
                     break;
                 }
-            case MsgActionType.SendItems:
+            case MsgActionType.QueryItems:
                 {
                     if (_trace)
                         FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id}");
@@ -137,7 +137,7 @@ public unsafe struct MsgAction
                     ntt.NetSync(ref msg);
                     break;
                 }
-            case MsgActionType.SendSpells:
+            case MsgActionType.QuerySpells:
                 {
                     if (_trace)
                         FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id}");
@@ -161,7 +161,7 @@ public unsafe struct MsgAction
                     ntt.NetSync(ref msg, true);
                     break;
                 }
-            case MsgActionType.ChangeFacing:
+            case MsgActionType.UpdateFacing:
                 {
                     if (_trace)
                         FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id} -> {msg.Direction}");
@@ -171,7 +171,7 @@ public unsafe struct MsgAction
                     ntt.NetSync(ref msg, true);
                     break;
                 }
-            case MsgActionType.ChangeAction:
+            case MsgActionType.UpdateEmote:
                 {
                     if (_trace)
                         FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id} -> {msg.Param}");

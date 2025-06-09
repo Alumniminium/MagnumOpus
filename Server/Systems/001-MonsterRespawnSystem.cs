@@ -80,8 +80,8 @@ public sealed class MonsterRespawnSystem : NttSystem<SpawnerComponent, PositionC
             if (IsLogging)
             {
                 FConsole.WriteLine("{monster} spawned at {pos}", newMonster, pos.Position);
-                var spawnMessage = MsgText.Create(in spawner, $"Respawning {monsterTypeData.name} at {pos.Position.X}, {pos.Position.Y}");
-                spawner.NetSync(ref spawnMessage, true);
+                var spawnMsg = MsgText.Create(in spawner, $"Respawning {monsterTypeData.name} at {pos.Position.X}, {pos.Position.Y}");
+                spawner.NetSync(ref spawnMsg, true);
             }
 
             // Stop spawning if we've reached maximum capacity

@@ -4,18 +4,26 @@ using MagnumOpus.Components;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using NttECS.ECS;
+using System.Security.Cryptography.X509Certificates;
 
 namespace MagnumOpus.Networking.Packets
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [StructLayout(LayoutKind.Explicit, Pack = 1)]
     public unsafe struct MsgItem
     {
+        [FieldOffset(0)]
         public ushort Size;
+        [FieldOffset(2)]
         public ushort Id;
+        [FieldOffset(4)]
         public int UnqiueId;
+        [FieldOffset(8)]
         public int Param;
+        [FieldOffset(12)]
         public MsgItemType Type;
+        [FieldOffset(16)]
         public uint Timestamp;
+        [FieldOffset(20)]
         public int Value;
 
         public readonly int Money => UnqiueId;
@@ -24,7 +32,7 @@ namespace MagnumOpus.Networking.Packets
         public readonly int ShopId => UnqiueId;
         public readonly int ShopItemId => Param;
 
-        public static MsgItem Create(int uid, int value, int param, MsgItemType type)
+        public static MsgItem Create(int uid, int param, MsgItemType type)
         {
             var msg = new MsgItem
             {
@@ -33,8 +41,21 @@ namespace MagnumOpus.Networking.Packets
                 UnqiueId = uid,
                 Param = param,
                 Type = type,
-                Value = value,
+                Value = param,
                 Timestamp = (uint)NttWorld.Tick,
+            };
+            return msg;
+        }
+
+        public static MsgItem EquipItem(NTT itemNtt, MsgItemPosition position)
+        {
+            var msg = new MsgItem
+            {
+                Size = (ushort)sizeof(MsgItem),
+                Id = 1009,
+                UnqiueId = itemNtt.Id,
+                Param = (int)position,
+                Type = MsgItemType.SetEquipPosition,
             };
             return msg;
         }
