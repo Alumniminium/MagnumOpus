@@ -1,6 +1,6 @@
 using Prometheus;
 
-namespace MagnumOpus.ECS;
+namespace MagnumOpus.Helpers;
 
 /// <summary>
 /// Prometheus metrics collection for game server monitoring including performance, economy, and gameplay statistics.

@@ -4,7 +4,6 @@ using MagnumOpus.AOGP.Actions;
 using MagnumOpus.Squiggly;
 using MagnumOpus.Squiggly.Models;
 using NttECS.ECS;
-using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 
 namespace MagnumOpus.Helpers;

@@ -2,7 +2,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using MagnumOpus.IO;
 using MagnumOpus.Components;
-using MagnumOpus.ECS;
 using MagnumOpus.Enums;
 using MagnumOpus.Helpers;
 using NttECS.ECS;
