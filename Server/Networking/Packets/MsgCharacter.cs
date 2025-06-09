@@ -69,7 +69,7 @@ namespace MagnumOpus.Networking.Packets
             ref var atr = ref ntt.Get<AttributeComponent>();
             ref var rbn = ref ntt.Get<RebornComponent>();
 
-            var spouseName = "None";
+            var spouseName = " ";
             // ref readonly var partner = ref PixelWorld.GetEntity(mar.SpouseId);
             // ref var sNtc = ref partner.Get<NameTagComponent>();
             // sNtc.Name ??= "None";

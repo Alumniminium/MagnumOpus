@@ -30,8 +30,8 @@ public class PacketsOut : NttSystem<NetworkComponent>
                 var packetId = BitConverter.ToInt16(packetData[2..4]);
                 if (IsLogging)
                 {
+                    FConsole.WriteLine("Sending {id} (Size: {Length}) to {ntt}...", ((PacketId)packetId).ToString(), packetData.Length, ntt);
                     FConsole.WriteLine(packetData.Dump());
-                    FConsole.WriteLine("Sending {id}/{id} (Size: {Length}) to {ntt}...", ((PacketId)packetId).ToString(), packetId, packetData.Length, ntt);
                 }
 
                 // === ENCRYPT AND SEND PACKET ===

@@ -13,6 +13,7 @@ namespace MagnumOpus.Components;
 /// </summary>
 public struct AttributeComponent(in NTT ntt)
 {
+    public long ChangedTick;
     public NTT NTT = ntt;
     private ushort _strength = 0;
     private ushort _agility = 0;

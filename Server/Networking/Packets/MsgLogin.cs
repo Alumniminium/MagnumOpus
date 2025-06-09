@@ -116,15 +116,13 @@ namespace MagnumOpus.Networking.Packets
             var vwp = new ViewportComponent(21);
             ntt.Set(ref vwp);
             ntt.Set<PlayerComponent>();
-            ntt.Set<ViewportUpdateTagComponent>(); // Trigger initial viewport calculation
+            //ntt.Set<ViewportUpdateTagComponent>(); // Trigger initial viewport calculation
 
             var ok = MsgText.Create("SYSTEM", "ALLUSERS", "ANSWER_OK", MsgTextType.LoginInformation);
             var info = MsgCharacter.Create(ntt);
-            var msgMap = MsgMapStatus.Create(1002, (uint)(MapFlags.Mine | MapFlags.NewbieProtect));
-
+            
             ntt.NetSync(ref ok);
             ntt.NetSync(ref info);
-            ntt.NetSync(ref msgMap);
         }
     }
 }
