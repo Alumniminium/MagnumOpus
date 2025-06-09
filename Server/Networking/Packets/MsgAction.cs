@@ -9,15 +9,6 @@ using NttECS.ECS;
 namespace MagnumOpus.Networking.Packets;
 
 [StructLayout(LayoutKind.Explicit, Pack = 1)]
-public unsafe struct MsgHeader
-{
-    [FieldOffset(0)]
-    public ushort Size;
-    [FieldOffset(2)]
-    public PacketId Id;
-}
-
-[StructLayout(LayoutKind.Explicit, Pack = 1)]
 public unsafe struct MsgAction
 {
     [FieldOffset(0)]

@@ -16,10 +16,7 @@ public static class ViewportQueryExtensions
     /// Query for entities with a single component type, returning parallel arrays.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ViewportArrayQuery<T> Query<T>(this ref ViewportComponent viewport) where T : struct
-    {
-        return new ViewportArrayQuery<T>(viewport.EntitiesVisible);
-    }
+    public static ViewportArrayQuery<T> Query<T>(this ref ViewportComponent viewport) where T : struct => new ViewportArrayQuery<T>(viewport.EntitiesVisible);
 
     /// <summary>
     /// Query for entities with two component types, returning parallel arrays.
@@ -51,9 +48,8 @@ public static class ViewportQueryExtensions
     public static bool Any<T>(this ref ViewportComponent viewport) where T : struct
     {
         foreach (var entity in viewport.EntitiesVisible)
-        {
-            if (entity.Has<T>()) return true;
-        }
+            if (entity.Has<T>())
+                return true;
         return false;
     }
 }

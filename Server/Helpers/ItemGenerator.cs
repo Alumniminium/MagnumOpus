@@ -245,7 +245,7 @@ namespace MagnumOpus.Helpers
 
             using var ctx = new SquigglyContext();
             var mob = ctx.cq_monstertype.FirstOrDefault(x => x.id == mobId);
-            if (mob == null)
+            if (mob is null)
                 return drops;
 
             var possibleTypes = new List<(int, ushort[])>();

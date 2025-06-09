@@ -34,7 +34,7 @@ namespace MagnumOpus.Networking
                 }
 
                 var packetTypeRaw = BitConverter.ToUInt16(packet.Span[2..]);
-                
+
                 // Check if this is a valid PacketId enum value
                 if (!Enum.IsDefined(typeof(PacketId), packetTypeRaw))
                 {

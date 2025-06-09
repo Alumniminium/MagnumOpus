@@ -202,7 +202,7 @@ public abstract class NttSystem<T>(string name, int threads = 1, bool log = fals
     /// <returns>Array of components for entities matching this system</returns>
     private T[] GetFilteredComponents()
     {
-        if (_filteredComponents == null || _componentsCacheTick != NttWorld.Tick)
+        if (_filteredComponents is null || _componentsCacheTick != NttWorld.Tick)
         {
             RebuildFilteredArrays();
         }
@@ -216,7 +216,7 @@ public abstract class NttSystem<T>(string name, int threads = 1, bool log = fals
     /// <returns>Array of entity IDs for entities matching this system</returns>
     private int[] GetFilteredEntities()
     {
-        if (_filteredEntities == null || _componentsCacheTick != NttWorld.Tick)
+        if (_filteredEntities is null || _componentsCacheTick != NttWorld.Tick)
         {
             RebuildFilteredArrays();
         }

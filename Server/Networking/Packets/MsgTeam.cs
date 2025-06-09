@@ -41,7 +41,7 @@ namespace MagnumOpus.Networking.Packets
                 case MsgTeamAction.Create:
                     if (ntt.Has<TeamComponent>())
                         return;
-                    var tc = new TeamComponent(in ntt);
+                    var tc = new TeamComponent(ntt);
                     ntt.Set(ref tc);
                     break;
                 case MsgTeamAction.Dismiss:

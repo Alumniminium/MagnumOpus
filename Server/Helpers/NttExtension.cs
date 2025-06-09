@@ -13,7 +13,7 @@ public static class NttExtension
     public static bool NotSpawner(this NTT ntt) => !ntt.IsSpawner();
     public static bool NotPlayer(this NTT ntt) => !ntt.IsPlayer();
     public static bool NotNpc(this NTT ntt) => !ntt.IsNpc();
-    public static bool NotMonster(this NTT ntt) => !ntt.IsMonster();
+    public static bool NotMonster(this NTT ntt, bool guardsAreMonsters) => !ntt.IsMonster(guardsAreMonsters);
     public static bool NotItem(this NTT ntt) => !ntt.IsItem();
     public static bool NotTrap(this NTT ntt) => !ntt.IsTrap();
     public static bool NotGuard(this NTT ntt) => !ntt.IsGuard();
@@ -22,7 +22,7 @@ public static class NttExtension
     public static bool IsSpawner(this NTT ntt) => ntt.Has<SpawnerComponent>();
     public static bool IsPlayer(this NTT ntt) => ntt.Has<NetworkComponent>() || ntt.Has<PlayerComponent>();
     public static bool IsNpc(this NTT ntt) => ntt.Has<NpcComponent>();
-    public static bool IsMonster(this NTT ntt, bool includeGuards = false) => ntt.Has<CqMonsterComponent>() || (includeGuards && ntt.Has<GuardPositionComponent>());
+    public static bool IsMonster(this NTT ntt, bool guardsAreMonsters) => ntt.Has<CqMonsterComponent>() || (guardsAreMonsters && ntt.Has<GuardPositionComponent>());
     public static bool IsItem(this NTT ntt) => ntt.Has<ItemComponent>();
     public static bool IsTrap(this NTT ntt) => ntt.Has<TrapComponent>();
 

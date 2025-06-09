@@ -43,7 +43,7 @@ namespace MagnumOpus.Networking.Packets
             PrometheusPush.LoginCount.Inc();
 
             ref var net = ref ntt.Get<NetworkComponent>();
-            net.Crypto.GenerateAltKey((int)msg.Token, (int)msg.Token);
+            net.Crypto.GenerateAltKey(msg.Token, msg.Token);
 
             FConsole.WriteLine($"[GAME] GameCrypto initialized - UniqueId: {msg.UniqueId}, Token: {(uint)msg.Token}");
 

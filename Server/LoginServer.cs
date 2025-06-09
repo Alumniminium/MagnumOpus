@@ -33,7 +33,7 @@ public static class LoginServer
             player.Set(ref net);
 
             var ipendpoint = client.Client.RemoteEndPoint?.ToString();
-            if (ipendpoint == null)
+            if (ipendpoint is null)
                 break;
 
             IpRegistry.Register(player, ipendpoint.Split(':')[0]);
@@ -54,7 +54,7 @@ public static class LoginServer
         try
         {
             while (net.Socket.Connected)
-            {   
+            {
                 var buffer = new byte[1024];
                 var count = net.Socket.Receive(buffer);
                 if (count == 0) break;

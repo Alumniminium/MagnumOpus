@@ -29,7 +29,7 @@ public sealed class Pool<T>
 
     public T Get()
     {
-        if (!_queue.TryDequeue(out T found))
+        if (!_queue.TryDequeue(out var found))
             found = _onCreate();
 
         Interlocked.Increment(ref _rentals); // Only increment after successful operation
@@ -38,7 +38,7 @@ public sealed class Pool<T>
 
     public void Return(T obj)
     {
-        if (obj == null) return; // Guard against null returns
+        if (obj is null) return; // Guard against null returns
 
         _onReturn?.Invoke(obj);
 

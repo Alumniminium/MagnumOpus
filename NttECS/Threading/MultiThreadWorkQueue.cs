@@ -13,7 +13,7 @@ public class MultiThreadWorkQueue<T>
     /// Gets the current number of items in the queue waiting to be processed.
     /// </summary>
     public int QueueSize => Queue.Count;
-    
+
     private readonly BlockingCollection<T> Queue = [];
     private readonly Thread[] workerThreads;
     private readonly Action<T> OnExec;

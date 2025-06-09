@@ -62,7 +62,7 @@ public static partial class FConsole
             // Handle both numbered placeholders {0}, {1} and named placeholders {caster}, {target}
             var numberedMatches = ArgMatcher().Matches(line);
             var namedMatches = NamedArgMatcher().Matches(line);
-            
+
             if (numberedMatches.Count == 0 && namedMatches.Count == 0)
             {
                 Lines.Add($"{line}{Environment.NewLine}");
@@ -86,7 +86,7 @@ public static partial class FConsole
                 if (objects.Length >= namedMatches.Count)
                 {
                     var formattedLine = line;
-                    for (int i = 0; i < namedMatches.Count && i < objects.Length; i++)
+                    for (var i = 0; i < namedMatches.Count && i < objects.Length; i++)
                     {
                         var placeholder = namedMatches[i].Value;
                         formattedLine = formattedLine.Replace(placeholder, objects[i]?.ToString() ?? "null");
@@ -119,7 +119,7 @@ public static partial class FConsole
 
     [GeneratedRegex(@"\{(\d+)\}")]
     private static partial Regex ArgMatcher();
-    
+
     [GeneratedRegex(@"\{([a-zA-Z_][a-zA-Z0-9_]*)\}")]
     private static partial Regex NamedArgMatcher();
 }

@@ -176,7 +176,7 @@ public static class CqActionProcessor
 
     public static long Process(in NTT ntt, in NTT trigger, cq_action? action)
     {
-        if (action == null)
+        if (action is null)
             return 0;
 
         var taskType = (TaskActionType)action.type;

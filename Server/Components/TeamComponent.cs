@@ -18,15 +18,12 @@ public struct TeamComponent
     public bool ShareItems;
     public bool ShareGold;
 
-    public TeamComponent()
-    {
-        Members = new NTT[5];
-        CreatedTick = NttWorld.Tick;
-    }
-    public TeamComponent(in NTT ntt)
+    public TeamComponent(NTT ntt)
     {
         CreatedTick = NttWorld.Tick;
         Members[0] = ntt;
         MemberCount = 1;
+        ShareItems = true;
+        ShareGold = true;
     }
 }

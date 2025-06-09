@@ -23,14 +23,14 @@ public static class GOAPPlanner
     public static List<GOAPAction> Plan(in NTT ntt, List<GOAPAction> availableActions, GOAPGoal goal)
     {
         if (goal.IsGoalAchieved(ntt))
-            return new List<GOAPAction>();
+            return [];
 
         var startState = new WorldState(ntt);
         var openSet = new PriorityQueue<PlanNode, float>();
         var closedSet = new HashSet<WorldState>();
         var nodeCount = 0;
 
-        var startNode = new PlanNode(startState, new List<GOAPAction>(), 0, goal.CalculateHeuristic(ntt));
+        var startNode = new PlanNode(startState, [], 0, goal.CalculateHeuristic(ntt));
         openSet.Enqueue(startNode, startNode.TotalCost);
 
         while (openSet.Count > 0 && nodeCount < MaxNodesExpanded)
@@ -63,7 +63,7 @@ public static class GOAPPlanner
                 var heuristic = goal.CalculateHeuristic(newState, ntt);
 
                 var newNode = new PlanNode(newState, newActionSequence, newCost, heuristic);
-                
+
                 if (!closedSet.Contains(newState))
                     openSet.Enqueue(newNode, newNode.TotalCost);
             }
@@ -96,7 +96,7 @@ public static class GOAPPlanner
             }
         }
 
-        if (bestAction != null)
+        if (bestAction is not null)
             plan.Add(bestAction);
 
         return plan;
@@ -106,21 +106,13 @@ public static class GOAPPlanner
 /// <summary>
 /// Represents a node in the A* search tree for action planning.
 /// </summary>
-public class PlanNode
+public class PlanNode(WorldState state, List<GOAPAction> actionSequence, float costSoFar, float heuristic)
 {
-    public WorldState State { get; }
-    public List<GOAPAction> ActionSequence { get; }
-    public float CostSoFar { get; }
-    public float Heuristic { get; }
+    public WorldState State { get; } = state;
+    public List<GOAPAction> ActionSequence { get; } = actionSequence;
+    public float CostSoFar { get; } = costSoFar;
+    public float Heuristic { get; } = heuristic;
     public float TotalCost => CostSoFar + Heuristic;
-
-    public PlanNode(WorldState state, List<GOAPAction> actionSequence, float costSoFar, float heuristic)
-    {
-        State = state;
-        ActionSequence = actionSequence;
-        CostSoFar = costSoFar;
-        Heuristic = heuristic;
-    }
 }
 
 /// <summary>
@@ -145,7 +137,7 @@ public class WorldState : IEquatable<WorldState>
         {
             var brain = ntt.Get<BrainComponent>();
             Target = brain.Target;
-            
+
             if (Target != 0 && Target.Has<PositionComponent>())
             {
                 var targetPos = Target.Get<PositionComponent>().Position;
@@ -170,8 +162,8 @@ public class WorldState : IEquatable<WorldState>
 
     public bool Equals(WorldState? other)
     {
-        if (other == null) return false;
-        
+        if (other is null) return false;
+
         return Vector2.Distance(Position, other.Position) < 0.1f &&
                Target == other.Target &&
                Math.Abs(DistanceToTarget - other.DistanceToTarget) < 0.1f &&

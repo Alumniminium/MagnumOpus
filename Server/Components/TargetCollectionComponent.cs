@@ -12,15 +12,8 @@ namespace MagnumOpus.Components;
 /// before applying spell effects. Part of the magic system's target resolution and spell
 /// application workflow for multi-target spells and area effects.
 /// </summary>
-public struct TargetCollectionComponent
+public struct TargetCollectionComponent(MagicType.Entry magicType)
 {
-    public SwapList<NTT> Targets;
-    public MagicType.Entry MagicType;
-
-    public TargetCollectionComponent() => Targets = new SwapList<NTT>(4);
-    public TargetCollectionComponent(MagicType.Entry magicType)
-    {
-        MagicType = magicType;
-        Targets = new SwapList<NTT>(4);
-    }
+    public SwapList<NTT> Targets = new SwapList<NTT>(4);
+    public MagicType.Entry MagicType = magicType;
 }

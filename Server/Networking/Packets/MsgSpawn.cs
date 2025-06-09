@@ -55,7 +55,7 @@ namespace MagnumOpus.Networking.Packets
         {
             if (ntt.IsPlayer())
                 return CreatePlayer(ntt);
-            else if (ntt.IsMonster())
+            else if (ntt.IsMonster(guardsAreMonsters: true))
                 return CreateMonster(ntt);
             else
                 throw new NotImplementedException("Unknown entity type");
@@ -87,7 +87,7 @@ namespace MagnumOpus.Networking.Packets
             var mainHand = 0;
             var offHand = 0;
 
-            if (eqc.Items != null)
+            if (eqc.Items is not null)
             {
                 eqc.Items.TryGetValue(MsgItemPosition.Head, out var headItem);
                 head = headItem.Get<ItemComponent>().Id;

@@ -9,7 +9,7 @@ namespace MagnumOpus;
 
 public static class GameServer
 {
-    private static readonly TcpListener listener = new(System.Net.IPAddress.Any, Constants.GamePort); 
+    private static readonly TcpListener listener = new(System.Net.IPAddress.Any, Constants.GamePort);
     private static readonly Thread thread = new(GameServerLoop) { IsBackground = true, Priority = ThreadPriority.Highest };
 
     public static void Start()
@@ -27,7 +27,7 @@ public static class GameServer
             FConsole.WriteLine($"[GAME] Client connected: {client.Client.RemoteEndPoint}");
             var ipendpoint = client.Client.RemoteEndPoint?.ToString();
 
-            if (ipendpoint == null) break;
+            if (ipendpoint is null) break;
             var (found, ntt) = IpRegistry.GetEntity(ipendpoint.Split(':')[0]);
             if (!found) continue;
 

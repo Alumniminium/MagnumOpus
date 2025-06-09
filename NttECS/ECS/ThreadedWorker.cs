@@ -80,7 +80,7 @@ public static class ThreadedWorker
     /// <param name="id">Thread identifier (index in thread pool)</param>
     public static void ThreadLoop(object? id)
     {
-        if (id == null)
+        if (id is null)
             throw new ArgumentNullException(nameof(id));
 
         var idx = (int)id;

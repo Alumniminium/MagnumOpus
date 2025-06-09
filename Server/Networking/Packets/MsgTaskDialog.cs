@@ -51,13 +51,13 @@ namespace MagnumOpus.Networking.Packets
             var cq_npc = CqProcessor.GetNpc(npc.Id);
             ref readonly var task = ref npc.Get<CqActionComponent>();
 
-            if (cq_npc == null)
+            if (cq_npc is null)
                 return;
 
             FConsole.WriteLine($"Task 0: {cq_npc.task0}");
 
             var cq_task = CqProcessor.GetTask(cq_npc.task0);
-            if (cq_task == null)
+            if (cq_task is null)
                 return;
 
             FConsole.WriteLine($"Task: {cq_task.id}, Next: {cq_task.id_next}, Fail: {cq_task.id_nextfail}");
@@ -70,7 +70,7 @@ namespace MagnumOpus.Networking.Packets
             {
                 action = CqProcessor.GetAction(nextId);
 
-                if (action == null)
+                if (action is null)
                     break;
 
                 nextId = CqActionProcessor.Process(in ntt, in npc, action);
@@ -106,7 +106,7 @@ namespace MagnumOpus.Networking.Packets
             }
             var task = CqProcessor.GetTask(option);
 
-            if (task == null)
+            if (task is null)
             {
                 ntt.Remove<CqTaskComponent>();
                 return;
@@ -117,7 +117,7 @@ namespace MagnumOpus.Networking.Packets
             for (var i = 0; i < 32; i++)
             {
                 var action = CqProcessor.GetAction(nextId);
-                if (action == null || action.id == 0)
+                if (action is null || action.id == 0)
                     break;
 
                 // FConsole.WriteLine($"Type: {task.type}, Data: {task.param.Trim()}, Next: {task.id_next}, Fail: {task.id_nextfail}");

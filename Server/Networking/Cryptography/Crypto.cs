@@ -5,11 +5,11 @@ public class Crypto
     /// <summary>
     /// Integer constant used to generate the initialization vector.
     /// </summary>
-    public static UInt32 P = 0x13FA0F9D;
+    static readonly uint P = 0x13FA0F9D;
     /// <summary>
     /// Integer constant used to generate the initialization vector.
     /// </summary>
-    public static UInt32 G = 0x6D5C7962;
+    static readonly uint G = 0x6D5C7962;
 
     /// <summary>
     /// The key size in bytes.
@@ -19,24 +19,24 @@ public class Crypto
     /// <summary>
     /// The initial key.
     /// </summary>
-    private readonly Byte[] mIV = new Byte[KEY_SIZE];
+    readonly byte[] mIV = new byte[KEY_SIZE];
     /// <summary>
     /// The alternate key (to be used for decryption).
     /// </summary>
-    private readonly Byte[] mAltKey = new Byte[KEY_SIZE];
+    readonly byte[] mAltKey = new byte[KEY_SIZE];
     /// <summary>
     /// Whether or not the alternate key is used for decryption.
     /// </summary>
-    private bool mUsingAltKey = false;
+    bool mUsingAltKey = false;
 
     /// <summary>
     /// The encryption counter.
     /// </summary>
-    private UInt16 mEnCounter = 0;
+    ushort mEnCounter = 0;
     /// <summary>
     /// The decryption counter.
     /// </summary>
-    private UInt16 mDeCounter = 0;
+    ushort mDeCounter = 0;
 
     /// <summary>
     /// Create a new cipher instance. The key will be generated
@@ -46,17 +46,17 @@ public class Crypto
     {
         const int K = KEY_SIZE / 2;
 
-        fixed (UInt32* _p = &P, _g = &G)
+        fixed (uint* _p = &P, _g = &G)
         {
-            Byte* p = (Byte*)_p;
-            Byte* g = (Byte*)_g;
+            var p = (byte*)_p;
+            var g = (byte*)_g;
 
-            for (int i = 0; i < K; ++i)
+            for (var i = 0; i < K; ++i)
             {
                 mIV[i + 0] = p[0];
                 mIV[i + K] = g[0];
-                p[0] = (Byte)((p[1] + (Byte)(p[0] * p[2])) * p[0] + p[3]);
-                g[0] = (Byte)((g[1] - (Byte)(g[0] * g[2])) * g[0] + g[3]);
+                p[0] = (byte)((p[1] + (byte)(p[0] * p[2])) * p[0] + p[3]);
+                g[0] = (byte)((g[1] - (byte)(g[0] * g[2])) * g[0] + g[3]);
             }
         }
     }
@@ -67,19 +67,19 @@ public class Crypto
     ///
     /// In Conquer Online: A = Token, B = AccountUID
     /// </summary>
-    public unsafe void GenerateAltKey(Int32 A, Int32 B)
+    public unsafe void GenerateAltKey(int A, int B)
     {
         const int K = KEY_SIZE / 2;
 
-        UInt32 tmp1 = (UInt32)(((A + B) ^ 0x4321) ^ A);
-        UInt32 tmp2 = tmp1 * tmp1;
+        var tmp1 = (uint)((A + B) ^ 0x4321 ^ A);
+        var tmp2 = tmp1 * tmp1;
 
-        Byte* tmpKey1 = (Byte*)&tmp1;
-        Byte* tmpKey2 = (Byte*)&tmp2;
-        for (int i = 0; i < K; ++i)
+        var tmpKey1 = (byte*)&tmp1;
+        var tmpKey2 = (byte*)&tmp2;
+        for (var i = 0; i < K; ++i)
         {
-            mAltKey[i + 0] = (Byte)(mIV[i + 0] ^ tmpKey1[(i % 4)]);
-            mAltKey[i + K] = (Byte)(mIV[i + K] ^ tmpKey2[(i % 4)]);
+            mAltKey[i + 0] = (byte)(mIV[i + 0] ^ tmpKey1[i % 4]);
+            mAltKey[i + K] = (byte)(mIV[i + K] ^ tmpKey2[i % 4]);
         }
         mUsingAltKey = true;
         mEnCounter = 0;
@@ -88,16 +88,16 @@ public class Crypto
     /// <summary>
     /// Encrypts data with the algorithm.
     /// </summary>
-    public void Encrypt(Span<Byte> aBuf, int aLength)
+    public void Encrypt(Span<byte> aBuf, int aLength)
     {
         const int K = KEY_SIZE / 2;
 
-        for (int i = 0; i < aLength; ++i)
+        for (var i = 0; i < aLength; ++i)
         {
-            aBuf[i] ^= (Byte)0xAB;
-            aBuf[i] = (Byte)(aBuf[i] >> 4 | aBuf[i] << 4);
-            aBuf[i] ^= (Byte)(mIV[(Byte)(mEnCounter & 0xFF) + 0]);
-            aBuf[i] ^= (Byte)(mIV[(Byte)(mEnCounter >> 8) + K]);
+            aBuf[i] ^= 0xAB;
+            aBuf[i] = (byte)(aBuf[i] >> 4 | aBuf[i] << 4);
+            aBuf[i] ^= mIV[(byte)(mEnCounter & 0xFF) + 0];
+            aBuf[i] ^= mIV[(byte)(mEnCounter >> 8) + K];
             ++mEnCounter;
         }
     }
@@ -105,17 +105,17 @@ public class Crypto
     /// <summary>
     /// Decrypts data with the algorithm.
     /// </summary>
-    public void Decrypt(Span<Byte> aBuf, int aLength)
+    public void Decrypt(Span<byte> aBuf, int aLength)
     {
         const int K = KEY_SIZE / 2;
 
-        Byte[] key = mUsingAltKey ? mAltKey : mIV;
-        for (int i = 0; i < aLength; ++i)
+        var key = mUsingAltKey ? mAltKey : mIV;
+        for (var i = 0; i < aLength; ++i)
         {
-            aBuf[i] ^= (Byte)0xAB;
-            aBuf[i] = (Byte)(aBuf[i] >> 4 | aBuf[i] << 4);
-            aBuf[i] ^= (Byte)(key[(Byte)(mDeCounter & 0xFF) + 0]);
-            aBuf[i] ^= (Byte)(key[(Byte)(mDeCounter >> 8) + K]);
+            aBuf[i] ^= 0xAB;
+            aBuf[i] = (byte)(aBuf[i] >> 4 | aBuf[i] << 4);
+            aBuf[i] ^= key[(byte)(mDeCounter & 0xFF) + 0];
+            aBuf[i] ^= key[(byte)(mDeCounter >> 8) + K];
             ++mDeCounter;
         }
     }

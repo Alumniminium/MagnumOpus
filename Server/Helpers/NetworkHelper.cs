@@ -34,7 +34,7 @@ namespace MagnumOpus.Helpers
                 var spawnPacket = MsgNpcSpawn.Create(ntt);
                 to.NetSync(ref spawnPacket);
             }
-            else if (ntt.IsPlayer() || ntt.IsMonster())
+            else if (ntt.IsPlayer() || ntt.IsMonster(guardsAreMonsters: true))
             {
                 var spawnPacket = MsgSpawn.Create(ntt);
                 to.NetSync(ref spawnPacket);

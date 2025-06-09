@@ -39,7 +39,7 @@ public static class ComponentChangeTracker
     {
         var componentType = typeof(TComponent);
         var changedTickField = componentType.GetField("ChangedTick");
-        if (changedTickField != null)
+        if (changedTickField is not null)
         {
             var boxedComponent = (object)component;
             changedTickField.SetValue(boxedComponent, NttWorld.Tick);

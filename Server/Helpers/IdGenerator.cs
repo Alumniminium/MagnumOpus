@@ -29,7 +29,7 @@ public static class IdGenerator
         {
             var json = File.ReadAllText(filename);
             var data = JsonSerializer.Deserialize<IdGeneratorState>(json);
-            if (data != null)
+            if (data is not null)
             {
                 NpcIds = data.NpcIds ?? new(Enumerable.Range(0, 399_999));
                 MonsterIds = data.MonsterIds ?? new(Enumerable.Range(400_000, 399_999));

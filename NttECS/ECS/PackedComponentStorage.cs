@@ -16,22 +16,22 @@ public static class PackedComponentStorage<T> where T : struct
 {
     /// <summary>Dense array storing components contiguously for optimal cache performance</summary>
     private static T[] _components = new T[1024];
-    
+
     /// <summary>Maps entity IDs to component array indices for O(1) lookups</summary>
-    private static int[] _entityToIndex = new int[4_000_000];
-    
+    private static readonly int[] _entityToIndex = new int[4_000_000];
+
     /// <summary>Maps component array indices back to entity IDs for iteration</summary>
     private static int[] _indexToEntity = new int[1024];
-    
+
     /// <summary>Current number of components stored</summary>
     private static int _count = 0;
-    
+
     /// <summary>Indicates which entity slots are occupied (entity ID -> bool)</summary>
-    private static bool[] _hasComponent = new bool[4_000_000];
-    
+    private static readonly bool[] _hasComponent = new bool[4_000_000];
+
     /// <summary>Reader-writer lock for thread-safe concurrent access</summary>
     private static readonly ReaderWriterLockSlim _lock = new();
-    
+
     /// <summary>Default component instance returned when component doesn't exist</summary>
     private static readonly T[] _default = new T[1];
 
@@ -60,14 +60,14 @@ public static class PackedComponentStorage<T> where T : struct
             {
                 // Add new component
                 EnsureCapacity(_count + 1);
-                
+
                 var index = _count;
                 _components[index] = component;
                 _entityToIndex[ntt.Id] = index;
                 _indexToEntity[index] = ntt.Id;
                 _hasComponent[ntt.Id] = true;
                 _count++;
-                
+
                 NttWorld.InformChangesFor(ntt);
             }
         }
@@ -98,7 +98,7 @@ public static class PackedComponentStorage<T> where T : struct
     {
         if (ntt.Id == 0 || ntt.Id >= _hasComponent.Length)
             return false;
-            
+
         _lock.EnterReadLock();
         try
         {
@@ -121,13 +121,13 @@ public static class PackedComponentStorage<T> where T : struct
     {
         if (ntt.Id == 0 || ntt.Id >= _hasComponent.Length)
             return ref _default[0];
-            
+
         _lock.EnterReadLock();
         try
         {
             if (!_hasComponent[ntt.Id])
                 return ref _default[0];
-                
+
             var index = _entityToIndex[ntt.Id];
             return ref _components[index];
         }
@@ -157,7 +157,7 @@ public static class PackedComponentStorage<T> where T : struct
 
             var indexToRemove = _entityToIndex[ntt.Id];
             var lastIndex = _count - 1;
-            
+
             if (indexToRemove != lastIndex)
             {
                 // Move last component to fill the gap (maintain density)
@@ -166,13 +166,13 @@ public static class PackedComponentStorage<T> where T : struct
                 _entityToIndex[lastEntityId] = indexToRemove;
                 _indexToEntity[indexToRemove] = lastEntityId;
             }
-            
+
             // Clear the last slot
             _components[lastIndex] = default;
             _indexToEntity[lastIndex] = 0;
             _hasComponent[ntt.Id] = false;
             _count--;
-            
+
             if (notify)
                 NttWorld.InformChangesFor(ntt);
         }
@@ -192,19 +192,19 @@ public static class PackedComponentStorage<T> where T : struct
     {
         if (from.Id == 0 || to.Id == 0 || from.Id >= _hasComponent.Length || to.Id >= _hasComponent.Length)
             return;
-            
+
         _lock.EnterWriteLock();
         try
         {
             if (!_hasComponent[from.Id])
                 return;
-                
+
             var index = _entityToIndex[from.Id];
             var component = _components[index];
-            
+
             // Remove from source
             _hasComponent[from.Id] = false;
-            
+
             // Add to target
             _entityToIndex[to.Id] = index;
             _indexToEntity[index] = to.Id;
@@ -283,7 +283,7 @@ public static class PackedComponentStorage<T> where T : struct
     {
         if (requiredCapacity <= _components.Length)
             return;
-            
+
         var newCapacity = Math.Max(requiredCapacity, _components.Length * 2);
         Array.Resize(ref _components, newCapacity);
         Array.Resize(ref _indexToEntity, newCapacity);
@@ -303,11 +303,11 @@ public static class PackedComponentStorage<T> where T : struct
         {
             // Create a dictionary for JSON serialization compatibility
             var componentDict = new Dictionary<int, T>();
-            for (int i = 0; i < _count; i++)
+            for (var i = 0; i < _count; i++)
             {
                 componentDict[_indexToEntity[i]] = _components[i];
             }
-            
+
             var json = JsonSerializer.Serialize(componentDict);
             File.WriteAllText(filename, json);
         }
@@ -337,22 +337,22 @@ public static class PackedComponentStorage<T> where T : struct
         {
             var json = File.ReadAllText(filename);
             var componentDict = JsonSerializer.Deserialize<Dictionary<int, T>>(json) ?? [];
-            
+
             // Clear existing data
             _count = 0;
             Array.Clear(_hasComponent);
-            
+
             // Load components into packed arrays
             foreach (var kvp in componentDict)
             {
                 var entityId = kvp.Key;
                 var component = kvp.Value;
-                
+
                 if (entityId >= _hasComponent.Length)
                     continue;
-                    
+
                 EnsureCapacity(_count + 1);
-                
+
                 _components[_count] = component;
                 _entityToIndex[entityId] = _count;
                 _indexToEntity[_count] = entityId;
