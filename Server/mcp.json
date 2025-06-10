@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "magnumopus": {
+      "command": "dotnet",
+      "args": ["run", "--project", "Server/MagnumOpus.csproj"],
+      "env": {
+        "PROMETHEUS_PORT": "1234",
+        "LOGIN_PORT": "9958",
+        "GAME_PORT": "5816",
+        "PUBLIC_IP": "192.168.69.1"
+      },
+      "metadata": {
+        "name": "MagnumOpus Game Server",
+        "description": "High-performance MMORPG server with MCP diagnostics and monitoring",
+        "version": "1.0.0",
+        "capabilities": {
+          "transport": ["http"],
+          "port": 5000
+        }
+      }
+    }
+  }
+}

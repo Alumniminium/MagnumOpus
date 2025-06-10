@@ -46,7 +46,7 @@ public sealed class DropMoneySystem : NttSystem<PositionComponent, InventoryComp
             moneyEntity.Set(ref spatialUpdate);
 
             // Broadcast money drop to nearby players
-            var dropPacket = MsgFloorItem.Create(moneyEntity, Enums.MsgFloorItemType.Create);
+            var dropPacket = MsgFloorItem.Create(moneyEntity, MsgFloorItemType.Create);
             ntt.NetSync(ref dropPacket, true);
 
             if (IsLogging)

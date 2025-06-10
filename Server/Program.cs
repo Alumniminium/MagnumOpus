@@ -31,6 +31,10 @@ public static class Game
         using var server = new Prometheus.MetricServer(port: Constants.PrometheusPort);
         server.Start();
 
+        // Start MCP server for diagnostics and monitoring
+        Task.Run(() => MCP.McpServer.Start());
+        FConsole.WriteLine("[MCP] MCP server started on port 5000");
+
         var systems = new List<NttSystem>
         {
             new PacketsIn(),
@@ -101,7 +105,6 @@ public static class Game
 
         LoginServer.Start();
         GameServer.Start();
-
         GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
 
         while (true)

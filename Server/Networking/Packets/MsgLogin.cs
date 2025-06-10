@@ -119,7 +119,7 @@ namespace MagnumOpus.Networking.Packets
 
             var ok = MsgText.Create("SYSTEM", "ALLUSERS", "ANSWER_OK", MsgTextType.LoginInformation);
             var info = MsgCharacter.Create(ntt);
-            
+
             ntt.NetSync(ref ok);
             ntt.NetSync(ref info);
         }

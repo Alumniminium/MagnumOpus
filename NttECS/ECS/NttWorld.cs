@@ -27,7 +27,7 @@ public static class NttWorld
     private static readonly ConcurrentQueue<NTT> ToBeRemoved = new();
     public static readonly ConcurrentQueue<NTT> ChangedThisTick = new();
 
-    private static NttSystem[] Systems = Array.Empty<NttSystem>();
+    public static NttSystem[] Systems = Array.Empty<NttSystem>();
     public static long Tick { get; private set; }
     private static long TickBeginTime;
     private static float TimeAcc;

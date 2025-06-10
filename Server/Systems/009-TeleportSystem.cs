@@ -31,15 +31,15 @@ public sealed class TeleportSystem : NttSystem<TeleportComponent, PositionCompon
 
         // === CLIENT SYNCHRONIZATION ===
         // Send despawn packet to remove entity from old location
-        var despawnPacket = MsgAction.Create(ntt.Id, ntt.Id, 0, 0, 0, Enums.MsgActionType.RemoveEntity);
+        var despawnPacket = MsgAction.Create(ntt.Id, ntt.Id, 0, 0, 0, MsgActionType.RemoveEntity);
         ntt.NetSync(ref despawnPacket, broadcast: true, ignoreSelf: false);
 
         // Send new location to client
-        var teleportPacket = MsgAction.Create(ntt.Id, tpc.Map, tpc.X, tpc.Y, Enums.Direction.South, Enums.MsgActionType.QueryLocation);
+        var teleportPacket = MsgAction.Create(ntt.Id, tpc.Map, tpc.X, tpc.Y, Direction.South, MsgActionType.QueryLocation);
         ntt.NetSync(ref teleportPacket);
 
         // Update client map status
-        var mapStatusPacket = MsgMapStatus.Create(tpc.Map, (uint)Enums.MapFlags.None);
+        var mapStatusPacket = MsgMapStatus.Create(tpc.Map, (uint)MapFlags.None);
         ntt.NetSync(ref mapStatusPacket);
 
         // === FINALIZE TELEPORT ===
