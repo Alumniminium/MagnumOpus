@@ -541,7 +541,7 @@ public static class EntityQueryTools
                 {
                     ref readonly var pos = ref visibleEntity.Get<PositionComponent>();
                     entityInfo["position"] = new { x = pos.Position.X, y = pos.Position.Y };
-                    
+
                     if (entity.Has<PositionComponent>())
                     {
                         ref readonly var myPos = ref entity.Get<PositionComponent>();
