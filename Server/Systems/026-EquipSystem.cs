@@ -62,6 +62,9 @@ public sealed class EquipSystem : NttSystem<InventoryComponent, EquipmentCompone
             var msg = MsgItem.EquipItem(newItemNtt, change.Slot);
             ntt.NetSync(ref msg);
 
+            var itemInfoMsg = MsgItemInformation.Create(newItemNtt, MsgItemInfoAction.AddItem, change.Slot);
+            ntt.NetSync(ref itemInfoMsg);
+
             if (IsLogging)
                 FConsole.WriteLine("{ntt} equipped {item} to slot {slot}", ntt, newItemNtt, change.Slot);
         }
