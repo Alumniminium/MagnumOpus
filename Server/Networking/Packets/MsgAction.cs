@@ -104,13 +104,8 @@ public unsafe struct MsgAction
                     if (_trace)
                         FConsole.WriteLine($"[GAME] Outgoing {msg.Type}: {ntt.Id} -> {reply.X}, {reply.Y}");
 
-                    // Add to players list for the first time
-                    if (!NttWorld.Players.Contains(ntt))
-                    {
-                        NttWorld.Players.Add(ntt);
-                        // Only trigger viewport update on first login, not teleport
-                        ntt.Set<ViewportUpdateTagComponent>();
-                    }
+                    NttWorld.Players.Add(ntt);
+                    ntt.Set<ViewportUpdateTagComponent>();
                     break;
                 }
             case MsgActionType.LeaveBooth:
