@@ -188,7 +188,8 @@ public enum MsgActionType : short
     GetMoney = 121,
     QueryEnemy = 123,
     OpenDialog = 126,
-    GuardJump = 130,
+    // GuardJump = 130, // Replaced by LoginCompleted as per COPS v6 (Patch 5017)
+    LoginCompleted = 130,
     /// <summary>
     /// Sending this makes entities jump somewhere.
     /// This works on: Players, Monsters, NPCs (all types, but they don't have animations)
