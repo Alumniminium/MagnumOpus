@@ -106,12 +106,45 @@ public unsafe struct MsgAction
 
                     NttWorld.Players.Add(ntt);
                     ntt.Set<ViewportUpdateTagComponent>();
+
+                    // START Temporary SkillBookComponent seeding for testing QuerySkills
+                    if (!ntt.Has<SkillBookComponent>())
+                    {
+                        var skillBook = new SkillBookComponent(); // Relies on constructor initializing .Skills
+                        skillBook.Skills.Add((ushort)MagnumOpus.Enums.SkillId.Thunder, new SkillBookComponent.SkillData { Level = 10, Experience = 1234 });
+                        skillBook.Skills.Add((ushort)MagnumOpus.Enums.SkillId.FastBlade, new SkillBookComponent.SkillData { Level = 5, Experience = 500 });
+                        ntt.Set(ref skillBook);
+                        if (_trace)
+                            FConsole.WriteLine($"[GAME] Added sample SkillBookComponent to {ntt.Id}");
+                    }
+                    // END Temporary SkillBookComponent seeding
+
+                    // START Temporary FriendListComponent seeding for testing QueryFriends
+                    if (!ntt.Has<FriendListComponent>())
+                    {
+                        var friendList = new FriendListComponent(); // Relies on constructor initializing .FriendIds
+                        // Add self if NameTagComponent exists, to ensure at least one valid friend to send
+                        if (ntt.Has<NameTagComponent>())
+                        {
+                            friendList.FriendIds.Add(ntt.Id);
+                        }
+                        friendList.FriendIds.Add(999999); // A likely offline/non-existent friend ID
+                        ntt.Set(ref friendList);
+                        if (_trace)
+                            FConsole.WriteLine($"[GAME] Added sample FriendListComponent to {ntt.Id}");
+                    }
+                    // END Temporary FriendListComponent seeding
                     break;
                 }
             case MsgActionType.LeaveBooth:
+                {
+                    if (_trace)
+                        FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id}");
+
+                    ntt.NetSync(ref msg);
+                    break;
+                }
             case MsgActionType.QueryGuild:
-            case MsgActionType.QueryFriends:
-            case MsgActionType.QuerySkills:
                 {
                     if (_trace)
                         FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id}");
@@ -193,6 +226,83 @@ public unsafe struct MsgAction
 
                     var tpc = new PortalComponent(msg.X, msg.Y);
                     ntt.Set(ref tpc);
+                    break;
+                }
+            case MsgActionType.QuerySkills:
+                {
+                    if (_trace)
+                        FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id}");
+
+                    if (ntt.Has<SkillBookComponent>())
+                    {
+                        ref readonly var sbc = ref ntt.Get<SkillBookComponent>();
+                        foreach (var skillEntry in sbc.Skills)
+                        {
+                            var skillMsg = new MsgProf
+                            {
+                                Size = (ushort)System.Runtime.InteropServices.Marshal.SizeOf<MsgProf>(),
+                                Id = 1025, // Packet ID for MsgProf
+                                ProfId = skillEntry.Key,
+                                Level = skillEntry.Value.Level,
+                                Experience = skillEntry.Value.Experience
+                            };
+                            ntt.NetSync(ref skillMsg);
+                        }
+                    }
+                    else
+                    {
+                        if (_trace)
+                            FConsole.WriteLine($"[GAME] {ntt.Id} has no SkillBookComponent for QuerySkills.");
+                    }
+                    // Echo back the original MsgAction packet
+                    ntt.NetSync(ref msg);
+                    break;
+                }
+            case MsgActionType.QueryFriends:
+                {
+                    if (_trace)
+                        FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id}");
+
+                    if (ntt.Has<FriendListComponent>())
+                    {
+                        ref readonly var flc = ref ntt.Get<FriendListComponent>();
+                        foreach (var friendId in flc.FriendIds)
+                        {
+                            ref readonly var friendEntity = ref NttWorld.GetEntity(friendId);
+                            if (friendEntity.Id != 0) // Check if entity exists
+                            {
+                                bool isOnline = NttWorld.Players.Contains(friendEntity);
+                                var status = isOnline ? MsgFriendStatusType.Online : MsgFriendStatusType.Offline;
+                                var action = isOnline ? MsgFriendActionType.FriendOnline : MsgFriendActionType.FriendOffline;
+
+                                if (friendEntity.Has<NameTagComponent>())
+                                {
+                                    var friendMsg = MsgFriend.Create(friendEntity, action, status);
+                                    ntt.NetSync(ref friendMsg);
+                                }
+                                else
+                                {
+                                    if (_trace)
+                                        FConsole.WriteLine($"[GAME] Friend entity {friendId} has no NameTagComponent for QueryFriends.");
+                                }
+                            }
+                            else
+                            {
+                                if (_trace)
+                                    FConsole.WriteLine($"[GAME] Friend entity ID {friendId} not found for QueryFriends.");
+                                // Optionally, send a specific message for offline/unknown friend if MsgFriend.Create can handle it
+                                // or if a different packet type is used for this case.
+                                // For now, only sending if entity and NameTagComponent exist.
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (_trace)
+                            FConsole.WriteLine($"[GAME] {ntt.Id} has no FriendListComponent for QueryFriends.");
+                    }
+                    // Echo back the original MsgAction packet
+                    ntt.NetSync(ref msg);
                     break;
                 }
             case MsgActionType.QueryEntity:
