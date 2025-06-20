@@ -116,8 +116,8 @@ public unsafe struct MsgAction
                     if (!ntt.Has<SkillBookComponent>())
                     {
                         var skillBook = new SkillBookComponent(); // Relies on constructor initializing .Skills
-                        skillBook.Skills.Add((ushort)SkillId.Thunder, new SkillBookComponent.SkillData { Level = 10, Experience = 1234 });
-                        skillBook.Skills.Add((ushort)SkillId.FastBlade, new SkillBookComponent.SkillData { Level = 5, Experience = 500 });
+                        skillBook.Skills.Add((ushort)MagnumOpus.Enums.SkillId.Thunder, new SkillBookComponent.SkillData { Level = 10, Experience = 1234 });
+                        skillBook.Skills.Add((ushort)MagnumOpus.Enums.SkillId.FastBlade, new SkillBookComponent.SkillData { Level = 5, Experience = 500 });
                         ntt.Set(ref skillBook);
                         if (_trace)
                             FConsole.WriteLine($"[GAME] Added sample SkillBookComponent to {ntt.Id}");
@@ -144,9 +144,10 @@ public unsafe struct MsgAction
             case MsgActionType.LeaveBooth:
                 {
                     if (_trace)
-                        FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id}");
+                        FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id} - Processing LeaveBooth without echo, setting ViewportUpdateTag.");
 
-                    ntt.NetSync(ref msg);
+                    // ntt.NetSync(ref msg); // Line removed
+                    ntt.Set<ViewportUpdateTagComponent>();
                     break;
                 }
             case MsgActionType.QueryGuild:
@@ -358,6 +359,13 @@ public unsafe struct MsgAction
                         FConsole.WriteLine($"[GAME] Incomming {msg.Type} : {ntt.Id} -> {msg.JumpX}, {msg.JumpY}");
 
                     ntt.NetSync(ref msg);
+                    break;
+                }
+            case MsgActionType.LoginCompleted:
+                {
+                    if (_trace)
+                        FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id} - Acknowledging LoginCompleted.");
+                    ntt.NetSync(ref msg); // Echo back
                     break;
                 }
             default:
