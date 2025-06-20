@@ -99,8 +99,13 @@ public unsafe struct MsgAction
                         FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id} -> {msg.X}, {msg.Y}");
 
                     ref var pos = ref ntt.Get<PositionComponent>();
-                    var reply = Create(ntt.Id, pos.Map, (ushort)pos.Position.X, (ushort)pos.Position.Y, Direction.North, MsgActionType.QueryLocation);
-                    ntt.NetSync(ref reply);
+                    msg.UniqueId = ntt.Id;
+                    msg.X = (ushort)pos.Position.X;
+                    msg.Y = (ushort)pos.Position.Y;
+                    msg.Direction = Direction.North;
+                    msg.Param = pos.Map;
+                    ntt.NetSync(ref msg);
+
                     if (_trace)
                         FConsole.WriteLine($"[GAME] Outgoing {msg.Type}: {ntt.Id} -> {reply.X}, {reply.Y}");
 
@@ -111,8 +116,8 @@ public unsafe struct MsgAction
                     if (!ntt.Has<SkillBookComponent>())
                     {
                         var skillBook = new SkillBookComponent(); // Relies on constructor initializing .Skills
-                        skillBook.Skills.Add((ushort)MagnumOpus.Enums.SkillId.Thunder, new SkillBookComponent.SkillData { Level = 10, Experience = 1234 });
-                        skillBook.Skills.Add((ushort)MagnumOpus.Enums.SkillId.FastBlade, new SkillBookComponent.SkillData { Level = 5, Experience = 500 });
+                        skillBook.Skills.Add((ushort)SkillId.Thunder, new SkillBookComponent.SkillData { Level = 10, Experience = 1234 });
+                        skillBook.Skills.Add((ushort)SkillId.FastBlade, new SkillBookComponent.SkillData { Level = 5, Experience = 500 });
                         ntt.Set(ref skillBook);
                         if (_trace)
                             FConsole.WriteLine($"[GAME] Added sample SkillBookComponent to {ntt.Id}");
@@ -240,7 +245,7 @@ public unsafe struct MsgAction
                         {
                             var skillMsg = new MsgProf
                             {
-                                Size = (ushort)System.Runtime.InteropServices.Marshal.SizeOf<MsgProf>(),
+                                Size = (ushort)Marshal.SizeOf<MsgProf>(),
                                 Id = 1025, // Packet ID for MsgProf
                                 ProfId = skillEntry.Key,
                                 Level = skillEntry.Value.Level,
@@ -357,9 +362,6 @@ public unsafe struct MsgAction
                 }
             default:
                 {
-                    if (!_trace)
-                        break;
-
                     FConsole.WriteLine($"[GAME] Unhandled MsgActionType: {(int)msg.Type}/{msg.Type}");
                     FConsole.WriteLine(memory.Dump());
                     break;

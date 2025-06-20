@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using ECS; // Assuming ECS namespace for [Component]
+using NttECS.ECS; // Assuming ECS namespace for [Component]
 
 namespace MagnumOpus.Components
 {
