@@ -139,9 +139,10 @@ public unsafe struct MsgAction
             case MsgActionType.LeaveBooth:
                 {
                     if (_trace)
-                        FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id}");
+                        FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id} - Processing LeaveBooth without echo, setting ViewportUpdateTag.");
 
-                    ntt.NetSync(ref msg);
+                    // ntt.NetSync(ref msg); // Line removed
+                    ntt.Set<ViewportUpdateTagComponent>();
                     break;
                 }
             case MsgActionType.QueryGuild:
@@ -353,6 +354,13 @@ public unsafe struct MsgAction
                         FConsole.WriteLine($"[GAME] Incomming {msg.Type} : {ntt.Id} -> {msg.JumpX}, {msg.JumpY}");
 
                     ntt.NetSync(ref msg);
+                    break;
+                }
+            case MsgActionType.LoginCompleted:
+                {
+                    if (_trace)
+                        FConsole.WriteLine($"[GAME] Incomming {msg.Type}: {ntt.Id} - Acknowledging LoginCompleted.");
+                    ntt.NetSync(ref msg); // Echo back
                     break;
                 }
             default:
